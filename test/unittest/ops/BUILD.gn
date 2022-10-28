@@ -1,0 +1,119 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+
+module_output_path = "neural_network_runtime/"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "//third_party/googletest/googlemock/include",
+    "//foundation/ai/neural_network_runtime",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//third_party/mindspore/mindspore/lite/mindir/include"
+  ]
+}
+
+ohos_unittest("OpsUnittest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/ops/add_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/argmax_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/avgpool_pad_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/avgpool_padmod_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/batch_to_space_nd_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/batchnorm_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/biasadd_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/cast_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/concat_three_inputs_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/concat_two_inputs_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/conv2d_pad_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/conv2d_padmode_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/conv2d_tranpose_padmode_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/conv2d_transpose_pad_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/depthwise_conv2d_native_pad_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/depthwise_conv2d_native_padmode_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/div_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/eltwise_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/expandims_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/fullconnection_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/fullconnection_with_axis_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/fill_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/gather_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/gelu_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/hswish_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/layernorm_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/lessequal_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/maximum_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/maxpool_pad_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/maxpool_padmode_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/matmul_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/mul_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/onehot_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/pad_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/pow_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/prelu_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/quant_dtype_cast_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/reduce_all_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/reduce_mean_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/reduce_prod_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/relu_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/relu6_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/reshape_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/resize_bilinear_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/rsqrt_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/scale_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/shape_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/sigmoid_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/slice_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/softmax_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/spacetobatchnd_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/split_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/sqrt_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/squared_difference_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/squeeze_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/stack_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/strided_slice_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/sub_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/tanh_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/tile_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/topk_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/transpose_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/unsqueeze_builder_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/ops_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/base_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "hitrace_native:hitrace_meter",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+group("ops_unittest") {
+  testonly = true
+  deps = [
+    ":OpsUnittest",
+  ]
+}

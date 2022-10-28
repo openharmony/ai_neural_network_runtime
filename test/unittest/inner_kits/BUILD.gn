@@ -1,0 +1,64 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+
+module_output_path = "neural_network_runtime/"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "//third_party/googletest/googlemock/include",
+    "//foundation/ai/neural_network_runtime",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//third_party/mindspore/mindspore/lite/mindir/include"
+  ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "--coverage",
+  ]
+
+  ldflags = [
+    "--coverage",
+  ]
+}
+
+ohos_unittest("NeuralNetworkRuntimeInnerTest") {
+  module_out_path = module_output_path
+  sources = ["//foundation/ai/neural_network_runtime/test/unittest/inner_kits/neural_network_runtime_inner_test.cpp"]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "mindspore:mindir"
+  ]
+}
+
+group("inner_kits_unittest") {
+  testonly = true
+  deps = [ ":NeuralNetworkRuntimeInnerTest" ]
+}
