@@ -1,0 +1,133 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+config("nnrt_config") {
+  cflags_cc = [ "-fexceptions" ]
+}
+
+nnrt_sources = [
+  "native/device_manager.cpp",
+  "native/device_registrar.cpp",
+  "native/hdi_device.cpp",
+  "native/hdi_prepared_model.cpp",
+  "native/memory_manager.cpp",
+  "native/transform.cpp",
+  "native/nn_tensor.cpp",
+  "native/validation.cpp",
+  "native/inner_model.cpp",
+  "native/compilation.cpp",
+  "native/execution_plan.cpp",
+  "native/executor.cpp",
+  "native/neural_network_runtime.cpp",
+  "native/ops_builder.cpp",
+  "native/ops_registry.cpp",
+]
+
+ops_sources = [
+  "native/ops/add_builder.cpp",
+  "native/ops/argmax_builder.cpp",
+  "native/ops/avgpool_builder.cpp",
+  "native/ops/pooling_builder.cpp",
+  "native/ops/batch_to_space_nd_builder.cpp",
+  "native/ops/bias_add_builder.cpp",
+  "native/ops/cast_builder.cpp",
+  "native/ops/concat_builder.cpp",
+  "native/ops/conv2d_builder.cpp",
+  "native/ops/conv2d_transpose_builder.cpp",
+  "native/ops/depthwise_conv2d_native_builder.cpp",
+  "native/ops/div_builder.cpp",
+  "native/ops/eltwise_builder.cpp",
+  "native/ops/expandims_builder.cpp",
+  "native/ops/fullconnection_builder.cpp",
+  "native/ops/maxpool_builder.cpp",
+  "native/ops/slice_builder.cpp",
+  "native/ops/softmax_builder.cpp",
+  "native/ops/space_to_batch_nd_builder.cpp",
+  "native/ops/split_builder.cpp",
+  "native/ops/sqrt_builder.cpp",
+  "native/ops/squared_difference_builder.cpp",
+  "native/ops/squeeze_builder.cpp",
+  "native/ops/stack_builder.cpp",
+  "native/ops/strided_slice_builder.cpp",
+  "native/ops/sub_builder.cpp",
+  "native/ops/tanh_builder.cpp",
+  "native/ops/tile_builder.cpp",
+  "native/ops/top_k_builder.cpp",
+  "native/ops/transpose_builder.cpp",
+  "native/ops/unsqueeze_builder.cpp",
+  "native/ops/batchnorm_builder.cpp",
+  "native/ops/fill_builder.cpp",
+  "native/ops/matmul_builder.cpp",
+  "native/ops/gather_builder.cpp",
+  "native/ops/gelu_builder.cpp",
+  "native/ops/hswish_builder.cpp",
+  "native/ops/layernorm_builder.cpp",
+  "native/ops/maximum_builder.cpp",
+  "native/ops/lessequal_builder.cpp",
+  "native/ops/mul_builder.cpp",
+  "native/ops/onehot_builder.cpp",
+  "native/ops/pad_builder.cpp",
+  "native/ops/pow_builder.cpp",
+  "native/ops/prelu_builder.cpp",
+  "native/ops/quant_dtype_cast_builder.cpp",
+  "native/ops/reduceall_builder.cpp",
+  "native/ops/reducemean_builder.cpp",
+  "native/ops/reduceprod_builder.cpp",
+  "native/ops/relu_builder.cpp",
+  "native/ops/relu6_builder.cpp",
+  "native/ops/reshape_builder.cpp",
+  "native/ops/resize_bilinear_builder.cpp",
+  "native/ops/rsqrt_builder.cpp",
+  "native/ops/scale_builder.cpp",
+  "native/ops/shape_builder.cpp",
+  "native/ops/sigmoid_builder.cpp",
+]
+
+ohos_shared_library("libneural_network_runtime") {
+  sources = nnrt_sources
+  sources += ops_sources
+  include_dirs = [
+    "//commonlibrary/c_utils/base/include",
+    "//drivers/hdf_core/adapter/uhdf/posix/include",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/ipc/include",
+    "//drivers/hdf_core/framework/include/core",
+    "//drivers/hdf_core/framework/include/utils",
+    "//drivers/hdf_core/framework/core/common/include/host",
+    "//foundation/ai/neural_network_runtime",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//third_party/googletest/googletest/include/gtest",
+    "//third_party/mindspore/mindspore/lite/mindir/include"
+  ]
+
+  install_images = [
+    "system",
+    "updater"
+  ]
+
+  public_configs = [ ":nnrt_config" ]
+
+  external_deps = [
+    "hilog_native:libhilog",
+    "hitrace_native:libhitracechain",
+    "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+
+  subsystem_name = "ai"
+  part_name = "neural_network_runtime"
+}

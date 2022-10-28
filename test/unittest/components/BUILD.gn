@@ -1,0 +1,336 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+
+module_output_path = "neural_network_runtime/"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "//third_party/googletest/googlemock/include",
+    "//foundation/ai/neural_network_runtime",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//third_party/mindspore/mindspore/lite/mindir/include"
+  ]
+}
+
+ohos_unittest("CompilationTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/compilation/compilation_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/compilation_mock_idevice.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("ExecutorTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/executor/executor_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/executor_mock_device.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("DeviceManagerTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/device_manager/device_manager_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/mock_idevice.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("DeviceRegistrarTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/device_registrar/device_registrar_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/mock_idevice.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("HDIDeviceTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/hdi_device/hdi_device_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/mock_idevice.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/file_utils.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("HDIPreparedModelTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/hdi_prepared_model/hdi_prepared_model_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/mock_idevice.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/file_utils.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("MemoryManagerTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/memory_manager/memory_manager_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/file_utils.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("TransformTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/transform/transform_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("InnerModelTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/inner_model/inner_model_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/inner_model_mock_device.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("NnTensorTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/inner_model/nn_tensor_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("NnValidationTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/inner_model/nn_validation_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("OpsRegistryTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/inner_model/ops_regitstry_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+ohos_unittest("NeuralNetworkRuntimeTest") {
+  module_out_path = module_output_path
+
+  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/components/neural_network_runtime_test/neural_network_runtime_test.cpp" ]
+  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/executor_mock_device.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "//third_party/googletest:gtest_main",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "mindspore:mindir"
+  ]
+}
+
+group("components_unittest") {
+  testonly = true
+  deps = [
+    ":CompilationTest",
+    ":ExecutorTest",
+    ":DeviceManagerTest",
+    ":DeviceRegistrarTest",
+    ":HDIDeviceTest",
+    ":HDIPreparedModelTest",
+    ":MemoryManagerTest",
+    ":TransformTest",
+    ":InnerModelTest",
+    ":NnTensorTest",
+    ":NnValidationTest",
+    ":OpsRegistryTest",
+    ":NeuralNetworkRuntimeTest",
+  ]
+}

@@ -1,0 +1,20 @@
+# ignore .a .o
+*.[ao]
+*.so
+*.ms
+
+# ignore build
+build/
+libs/
+obj/
+_ignore/
+
+# ignore schema
+jni/include/schema/
+
+# ignore vscode
+.vscode
+
+# ignore runtime file
+deploy.bat
+log.txt

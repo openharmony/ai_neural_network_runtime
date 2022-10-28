@@ -1,0 +1,50 @@
+{
+    "name": "@ohos/neural_network_runtime",
+    "description": "The Neural Network Runtime that bridges the inference framework and the device accelerator.",
+    "version": "3.2",
+    "license": "MIT",
+    "publishAs": "code-segment",
+    "segment": {
+        "destPath": "foundation/ai/neural_network_runtime"
+    },
+    "dirs": {},
+    "scripts": {},
+    "licensePath": "COPYING",
+    "readmePath": {
+        "en": "README.rst"
+    },
+    "component": {
+        "name": "neural_network_runtime",
+        "subsystem": "ai",
+        "syscap": [],
+        "features": [],
+        "adapted_system_type": ["standard"],
+        "rom": "1024KB",
+        "ram": "2048KB",
+        "deps": {
+            "components": [
+                "hilog"
+            ],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [
+                 "//foundation/ai/neural_network_runtime:nnrt_target"
+             ],
+            "inner_kits": [
+                {"type": "so",
+                 "name": "//foundation/ai/neural_network_runtime:nnrt_target",
+                 "header": {
+                     "header_files": [
+                         "neural_network_runtime_inner.h"
+                     ],
+                     "header_base":"//foundation/ai/neural_network_runtime/interfaces/innerkits/c"
+                }
+                }
+            ],
+            "test": [
+                "//foundation/ai/neural_network_runtime:nnrt_test_target"
+            ]
+        }
+    }
+}
