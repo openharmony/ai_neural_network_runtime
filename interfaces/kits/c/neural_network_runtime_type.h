@@ -171,31 +171,31 @@ typedef enum {
  * @version 1.0
  */
 typedef enum {
-    /** 操作数数据类型未知 */
+    /** 张量数据类型未知 */
     OH_NN_UNKNOWN = 0,
-    /** 操作数数据类型为bool */
+    /** 张量数据类型为bool */
     OH_NN_BOOL = 1,
-    /** 操作数数据类型为int8 */
+    /** 张量数据类型为int8 */
     OH_NN_INT8 = 2,
-    /** 操作数数据类型为int16 */
+    /** 张量数据类型为int16 */
     OH_NN_INT16 = 3,
-    /** 操作数数据类型为int32 */
+    /** 张量数据类型为int32 */
     OH_NN_INT32 = 4,
-    /** 操作数数据类型为int64 */
+    /** 张量数据类型为int64 */
     OH_NN_INT64 = 5,
-    /** 操作数数据类型为uint8 */
+    /** 张量数据类型为uint8 */
     OH_NN_UINT8 = 6,
-    /** 操作数数据类型为uint16 */
+    /** 张量数据类型为uint16 */
     OH_NN_UINT16 = 7,
-    /** 操作数数据类型为uint32 */
+    /** 张量数据类型为uint32 */
     OH_NN_UINT32 = 8,
-    /** 操作数数据类型为uint64 */
+    /** 张量数据类型为uint64 */
     OH_NN_UINT64 = 9,
-    /** 操作数数据类型为float16 */
+    /** 张量数据类型为float16 */
     OH_NN_FLOAT16 = 10,
-    /** 操作数数据类型为float32 */
+    /** 张量数据类型为float32 */
     OH_NN_FLOAT32 = 11,
-    /** 操作数数据类型为float64 */
+    /** 张量数据类型为float64 */
     OH_NN_FLOAT64 = 12
 } OH_NN_DataType;
 
@@ -1351,9 +1351,9 @@ typedef enum {
 } OH_NN_OperationType;
 
 /**
- * @brief 操作数的类型
+ * @brief 张量的类型
  *
- * 操作数通常用于设置模型的输入、输出和算子参数。作为模型（或算子）的输入和输出时，需要将操作数类型设置为{@link OH_NN_TENSOR}；操作数
+ * 张量通常用于设置模型的输入、输出和算子参数。作为模型（或算子）的输入和输出时，需要将张量类型设置为{@link OH_NN_TENSOR}；张量
  * 用于设置算子参数时，需要指定参数类型。假设正在设置{@link OH_NN_OPS_CONV2D}算子的pad参数，则需要将
  * {@link OH_NN_Tensor}实例的type属性设置为{@link OH_NN_CONV2D_PAD}。其他算子参数的设置以此类推，枚举值
  * 的命名遵守 OH_NN_{算子名称}_{属性名} 的格式。
@@ -1591,25 +1591,25 @@ typedef struct OH_NN_QuantParam {
 } OH_NN_QuantParam;
 
 /**
- * @brief 操作数结构体
+ * @brief 张量结构体
  *
- * {@link OH_NN_Tensor}类型通常用于构造模型图中的数据节点和算子参数，在构造操作数时需要明确数据类型、维数、维度信息和量化信息。
- * type成员指定操作数的用途，当操作数用作模型图中的输入、输出，则要求type置为{@link OH_NN_TENSOR}；当操作数用作算子参数，
+ * {@link OH_NN_Tensor}类型通常用于构造模型图中的数据节点和算子参数，在构造张量时需要明确数据类型、维数、维度信息和量化信息。
+ * type成员指定张量的用途，当张量用作模型图中的输入、输出，则要求type置为{@link OH_NN_TENSOR}；当张量用作算子参数，
  * 则需要指定为具体的枚举值，具体参考{@link OH_NN_TensorType}。
  *
  * @since 9
  * @version 1.0
  */
 typedef struct OH_NN_Tensor {
-    /** 指定操作数的数据类型，要求从{@link OH_NN_DataType}枚举类型中取值。 */
+    /** 指定张量的数据类型，要求从{@link OH_NN_DataType}枚举类型中取值。 */
     OH_NN_DataType dataType;
-    /** 指定操作数的维数 */
+    /** 指定张量的维数 */
     uint32_t dimensionCount;
-    /** 指定操作数的维度信息 */
+    /** 指定张量的维度信息 */
     const int32_t *dimensions;
-    /** 指定操作数的量化信息，数据类型要求为{@link OH_NN_QuantParam}。 */
+    /** 指定张量的量化信息，数据类型要求为{@link OH_NN_QuantParam}。 */
     const OH_NN_QuantParam *quantParam;
-    /** 指定操作数的类型, 要求从{@link OH_NN_TensorType}枚举类型中取值。 */
+    /** 指定张量的类型, 要求从{@link OH_NN_TensorType}枚举类型中取值。 */
     OH_NN_TensorType type;
 } OH_NN_Tensor;
 

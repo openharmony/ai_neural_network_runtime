@@ -35,7 +35,7 @@ extern "C" {
  * @addtogroup NNModel
  * @{
  *
- * @brief Neural Network Runtime 构图模块，提供了一系列构图接口实现操作数的添加、算子的添加和输入输出的设置，帮助开发者完成
+ * @brief Neural Network Runtime 构图模块，提供了一系列构图接口实现张量的添加、算子的添加和输入输出的设置，帮助开发者完成
  *        AI模型的构建。
  *
  * @since 9
@@ -60,19 +60,19 @@ extern "C" {
 OH_NNModel *OH_NNModel_Construct(void);
 
 /**
- * @brief 向模型实例中添加操作数
+ * @brief 向模型实例中添加张量
  *
- * Neural Network Runtime模型中的数据节点和算子参数均由模型的操作数构成。本方法根据tensor，向model实
- * 例中添加操作数。操作数添加的顺序是模型中记录操作数的索引值，{@link OH_NNModel_SetTensorData}、
+ * Neural Network Runtime模型中的数据节点和算子参数均由模型的张量构成。本方法根据tensor，向model实
+ * 例中添加张量。张量添加的顺序是模型中记录张量的索引值，{@link OH_NNModel_SetTensorData}、
  * {@link OH_NNModel_AddOperation}和{@link OH_NNModel_SpecifyInputsAndOutputs}
- * 方法根据该索引值，指定不同的操作数。\n 
+ * 方法根据该索引值，指定不同的张量。\n 
  *
  * Neural Network Runtime支持动态形状输入和输出。在添加动态形状的数据节点时，需要将tensor.dimensions中支持动态
  * 变化的维度设置为-1。例如：一个4维tensor，将tensor.dimensions设置为[1, -1, 2, 2]，表示其第二个维度支持
  * 动态变化。\n 
  *
  * @param model 指向{@link OH_NNModel}实例的指针。
- * @param tensor {@link OH_NN_Tensor}操作数的指针，tensor指定了添加到模型实例中操作数的属性。
+ * @param tensor {@link OH_NN_Tensor}张量的指针，tensor指定了添加到模型实例中张量的属性。
  * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
  * @since 9
  * @version 1.0
@@ -80,13 +80,13 @@ OH_NNModel *OH_NNModel_Construct(void);
 OH_NN_ReturnCode OH_NNModel_AddTensor(OH_NNModel *model, const OH_NN_Tensor *tensor);
 
 /**
- * @brief 设置操作数的数值
+ * @brief 设置张量的数值
  *
- * 对于具有常量值的操作数（如模型的权重），需要在构图阶段使用本方法设置数值。操作数的索引值根据操作数添加进模型的顺序决定，操作数的添加参考
+ * 对于具有常量值的张量（如模型的权重），需要在构图阶段使用本方法设置数值。张量的索引值根据张量添加进模型的顺序决定，张量的添加参考
  * {@link OH_NNModel_AddTensor}。\n 
  *
  * @param model 指向{@link OH_NNModel}实例的指针。
- * @param index 操作数的索引值。
+ * @param index 张量的索引值。
  * @param dataBuffer 指向真实数据的指针。
  * @param length 数据缓冲区的长度。
  * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
@@ -100,11 +100,11 @@ OH_NN_ReturnCode OH_NNModel_SetTensorData(OH_NNModel *model, uint32_t index, con
  *
  * 本方法向模型实例中添加算子，算子类型由op指定，算子的参数、输入和输出由paramIndices、inputIndices和
  * outputIndices指定。本方法将对算子参数的属性和输入输出的数量进行校验，这些属性需要在调用
- * {@link OH_NNModel_AddTensor}添加操作数的时候正确设置。每个算子期望的参数、输入和输出属性请参考
+ * {@link OH_NNModel_AddTensor}添加张量的时候正确设置。每个算子期望的参数、输入和输出属性请参考
  * {@link OH_NN_OperationType}。\n 
  *
- * paramIndices、inputIndices和outputIndices中存储的是操作数的索引值，每个索引值根据操作数添加进模型的顺序决定，正确
- * 设置并添加算子要求准确设置每个操作数的索引值。操作数的添加参考{@link OH_NNModel_AddTensor}。\n 
+ * paramIndices、inputIndices和outputIndices中存储的是张量的索引值，每个索引值根据张量添加进模型的顺序决定，正确
+ * 设置并添加算子要求准确设置每个张量的索引值。张量的添加参考{@link OH_NNModel_AddTensor}。\n 
  *
  * 如果添加算子时，添加了额外的参数（非算子需要的参数），本方法返回{@link OH_NN_INVALID_PARAMETER}；如果没有设置算子参数，
  * 则算子按默认值设置缺省的参数，默认值请参考{@link OH_NN_OperationType}。\n 
@@ -127,10 +127,10 @@ OH_NN_ReturnCode OH_NNModel_AddOperation(OH_NNModel *model,
 /**
  * @brief 指定模型的输入输出
  *
- * 模型实例需要指定操作数作为端到端的输入和输出，设置为输入和输出的操作数不能使用{@link OH_NNModel_SetTensorData}设置
+ * 模型实例需要指定张量作为端到端的输入和输出，设置为输入和输出的张量不能使用{@link OH_NNModel_SetTensorData}设置
  * 数值，需要在执行阶段调用OH_NNExecutor的方法设置输入、输出数据。\n 
  *
- * 操作数的索引值根据操作数添加进模型的顺序决定，操作数的添加参考
+ * 张量的索引值根据张量添加进模型的顺序决定，张量的添加参考
  * {@link OH_NNModel_AddTensor}。\n 
  *
  * 暂时不支持异步设置模型输入输出。\n 
@@ -397,7 +397,7 @@ OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation);
  *
  * 由于Neural Network Runtime支持动态输入形状的模型，在固定形状输入和动态形状输入的场景下，本方法采取不同的处理策略：
  *
- * - 固定形状输入的场景：tensor各属性必须和构图阶段调用{@link OH_NNModel_AddTensor}添加的操作数保持一致；
+ * - 固定形状输入的场景：tensor各属性必须和构图阶段调用{@link OH_NNModel_AddTensor}添加的张量保持一致；
  * - 动态形状输入的场景：在构图阶段，由于动态输入的形状不确定，调用本方法时，要求tensor.dimensions中的每个值必须大于0，
  * 以确定执行计算阶段输入的形状。设置形状时，只允许调整数值为-1的维度。假设在构图阶段，输入A的维度为
  * [-1, 224, 224, 3]，调用本方法时，只能调整第一个维度的尺寸，如：[3, 224, 224, 3]。调整其他维度将返回
@@ -409,7 +409,7 @@ OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation);
  *
  * @param executor 指向{@link OH_NNExecutor}实例的指针。
  * @param inputIndex 输入的索引值。
- * @param tensor 设置输入数据对应的操作数。
+ * @param tensor 设置输入数据对应的张量。
  * @param dataBuffer 指向输入数据的指针。
  * @param length 数据缓冲区的字节长度。
  * @return  函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
@@ -575,7 +575,7 @@ void OH_NNExecutor_DestroyOutputMemory(OH_NNExecutor *executor, uint32_t outputI
  *
  * @param executor 指向{@link OH_NNExecutor}实例的指针。
  * @param inputIndex 输入的索引值。
- * @param tensor 指向{@link OH_NN_Tensor}的指针，设置单个输入所对应的操作数。
+ * @param tensor 指向{@link OH_NN_Tensor}的指针，设置单个输入所对应的张量。
  * @param memory 指向{@link OH_NN_Memory}的指针。
  * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
  * @since 9

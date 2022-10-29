@@ -4,6 +4,13 @@
 
 Neural Network Runtime作为AI推理引擎和加速芯片的桥梁，为AI推理引擎提供精简的Native接口，满足推理引擎通过加速芯片执行端到端推理的需求；同时为加速芯片提供了统一的HDI接口，使能加速芯片接入OpenHarmony社区生态。
 
+## 基本概念
+
+在开发前，需要先了解以下概念，以便更好地理解全文内容：
+
+- Native API：Openharmony 面向应用开发者的C语言接口。
+- HDI：Hardware Device Interface，硬件设备接口，是OpenHarmony中系统组件与芯片组件通信的接口。关于更多HDI的细节，请浏览[驱动子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E9%A9%B1%E5%8A%A8%E5%AD%90%E7%B3%BB%E7%BB%9F.md)。
+
 ## 环境准备
 
 ### 环境要求
