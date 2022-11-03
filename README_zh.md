@@ -2,11 +2,11 @@
 
 ## 简介
 
-Neural Network Runtime（NNRt, 神经网络运行时）是一套面向AI领域的加速推理框架，支持在各种端侧AI加速芯片上的推理计算；NNRt作为上层AI推理框架和底层加速芯片中间的桥梁，为端侧AI推理框架提供统一的Native接口，并使能AI推理框架的硬件加速推理；NNRt开放了南向HDI接口，便于端侧AI加速芯片直接接入OpenHarmony硬件生态。
+Neural Network Runtime（NNRt, 神经网络运行时）是面向AI领域的跨芯片推理计算运行时，作为中间桥梁连通上层AI推理框架和底层加速芯片，实现AI模型的跨芯片推理计算。
 
-如图1所示，NNRt北向对接了[MindSpore Lite](https://gitee.com/openharmony/third_party_mindspore)推理框架，同时开放Native接口对接其他端侧推理框架（Tensorflow Lite等）;NNRt南向开放了HDI接口，支持各种AI加速芯片（NPU、DSP等）对接。AI应用层通过AI推理框架和NNRt能直接使用底层AI加速芯片加速推理计算。
+如图1所示，NNRt开放北向Native接口供AI推理框架接入，当前NNRt对接了系统内置的[MindSpore Lite](https://gitee.com/openharmony/third_party_mindspore)推理框架。同时NNRt开放南向HDI接口，供端侧AI加速芯片（如NPU、DSP等）接入OpenHarmony硬件生态。AI应用通过AI推理框架和NNRt能直接使用底层芯片加速推理计算。
 
-Neural Network Runtime与MindSpore Lite使用[MindIR](https://gitee.com/openharmony/third_party_mindspore)来统一两个框架间的模型中间表达，减少中间过程不必要的模型转换，使得模型传递更加高效。
+Neural Network Runtime与MindSpore Lite使用统一的模型中间表达，减少中间过程不必要的模型转换，使得模型传递更加高效。
 
 通常，AI应用、AI推理引擎、Neural Network Runtime处在同一个进程下，芯片驱动运行在另一个进程下，两者之间需要借助进程间通信（IPC）传递模型和计算数据。Neural Network Runtime根据HDI接口实现了HDI客户端，相应的，芯片厂商需要根据HDI接口实现并开放HDI服务。
 
@@ -48,16 +48,14 @@ Neural Network Runtime与MindSpore Lite使用[MindIR](https://gitee.com/openharm
 
 ### 接口说明
 
-Native接口文档请参考：
-- 待补充，正在评审翻译。
+Native接口文档请参考：[Native接口](https://gitee.com/openharmony-sig/interface_native_header/pulls/182)。
 
-HDI接口文档请参考：
-- 待补充，正在评审翻译。
+HDI接口文档请参考：[HDI接口](https://gitee.com/openharmony-sig/interface_native_header/pulls/179)。
 
 ### 使用说明
 
-- AI推理引擎/应用开发请参考：[Neural Network Runtime开发指导](./neural-network-runtime-guidelines.md)
-- AI加速芯片驱动/设备开发请参考：[Neural Network Runtime设备开发指导](./example/drivers/README_zh.md)
+- AI推理引擎/应用开发请参考：[Neural Network Runtime应用开发指导](./neural-network-runtime-guidelines.md)。
+- AI加速芯片驱动/设备开发请参考：[Neural Network Runtime设备开发指导](./example/drivers/README_zh.md)。
 
 ## 相关仓
 
