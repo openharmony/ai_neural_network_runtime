@@ -2,7 +2,12 @@
 
 ## 场景介绍
 
-Neural Network Runtime作为AI推理引擎和加速芯片的桥梁，为AI推理引擎提供精简的Native接口，满足推理引擎通过加速芯片执行端到端推理的需求；同时为加速芯片提供了统一的HDI接口，使能加速芯片接入OpenHarmony社区生态。
+Neural Network Runtime作为AI推理引擎和加速芯片的桥梁，为AI推理引擎提供精简的Native接口，满足推理引擎通过加速芯片执行端到端推理的需求。
+
+本文以图1展示的`Add`单算子模型为例，介绍Neural Network Runtime的开发流程。`Add`算子包含两个输入、一个参数和一个输出，其中的`activation`参数用于指定`Add`算子的激活类型。
+
+**图1** Add单算子网络示意图
+!["Add单算子网络示意图"](neural_network_runtime_add_op_model.png)
 
 ## 基本概念
 
@@ -17,7 +22,7 @@ Neural Network Runtime作为AI推理引擎和加速芯片的桥梁，为AI推理
 
 Neural Network Runtime部件的环境要求如下：
 
-- 系统版本：OpenHarmony 3.2及以上。
+- 系统版本：OpenHarmony 3.2 Beta5及以上版本。
 - 开发环境：Ubuntu 18.04及以上。
 - 接入设备：OpenHarmony定义的标准设备，并且系统中内置的硬件加速器驱动，已通过HDI接口对接Neural Network Runtime。
 
@@ -45,15 +50,13 @@ native/
 ├── oh-uni-package.json
 └── sysroot // Native API头文件和库
 ```
-## Neural Network Runtime接口
+## 接口文档
 
 详细的Neural Network Runtime接口文档请参考:
 - [neural_network_runtime.h](./interfaces/kits/c/neural_network_runtime.h)
 - [neural_network_runtime_type.h](./interfaces/kits/c/neural_network_runtime_type.h)
 
-## Neural Network Runtime开发指导
-
-### 开发步骤
+## 开发步骤
 
 Neural Network Runtime的开发流程主要包含**模型构造**、**模型编译**和**推理执行**三个阶段。以下开发步骤以`Add`单算子模型为例，介绍调用Neural Network Runtime接口，开发应用的过程。
 
@@ -82,9 +85,7 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
 
 3. 构造模型。
 
-    以下图所示的`Add`单算子模型为例，使用Neural Network Runtime构图模块，构造样例模型。`Add`算子有两个输入、一个参数和一个输出，其中的参数用于指定`Add`的激活类型。
-
-    !["Add单算子网络示意图"](neural_network_runtime_add_op_model.png)
+    使用Neural Network Runtime构图模块，构造`Add`单算子样例模型。
 
     ```cpp
     OH_NN_ReturnCode BuildModel(OH_NNModel** pModel)
@@ -332,7 +333,7 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
             return -1;
         }
 
-        // 获取
+        // 获取可执行的设备
         GetAvailableDevices(availableDevices);
         if (availableDevices.empty()) {
             std::cout << "No available device." << std::endl;
@@ -432,20 +433,18 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
     Output index: 11, value is: 33.000000.
     ```
 
-4. 检查Cache（可选）
+4. 检查Cache（可选）。
 
     如果在调测环境下，Neural Network Runtime对接的HDI服务支持Cache功能，执行完 `nnrt_example`, 可以在 `/data/local/tmp` 目录下
     找到生成的缓存文件。
 
-    > **Cache功能说明：** 模型的IR需要传递到硬件驱动层，由HDI服务将统一的IR图，编译成硬件专用的计算图，编译的过程非常耗时。Neural Network Runtime支持
-    计算图缓存的特性，可以将HDI服务编译生成的计算图，缓存到设备存储中。当下一次在同一个加速芯片上编译同一个模型时，通过指定缓存的路径，
-    Neural Network Runtime可以直接加载缓存文件中的计算图，减少编译消耗的时间。
+    > **Cache功能说明：** 模型的IR需要传递到硬件驱动层，由HDI服务将统一的IR图，编译成硬件专用的计算图，编译的过程非常耗时。Neural Network Runtime支持计算图缓存的特性，可以将HDI服务编译生成的计算图，缓存到设备存储中。当下一次在同一个加速芯片上编译同一个模型时，通过指定缓存的路径，Neural Network Runtime可以直接加载缓存文件中的计算图，减少编译消耗的时间。
 
     ```shell
     ls /data/local/tmp
     ```
 
-    以下为打印结果
+    以下为打印结果：
     ```text
     # 0.nncache  cache_info.nncache
     ```
@@ -457,11 +456,11 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
 
 ### 相关实例
 
-针对Neural Network Runtime应用开发，可以参考一下实例：
+第三方AI推理框架对接Neural Network Runtime的对接工作，可以参考以下实例：
 - [Tensorflow Lite对接Neural Network Runtime](./example/deep_learning_framework/README_zh.md)
 
 
 ## 相关仓
 
-- [HDF Framework](https://gitee.com/openharmony/drivers_hdf_core)
+- [**Neural Network Runtime**](https://gitee.com/openharmony-sig/neural_network_runtime)
 - [Mindspore](https://gitee.com/openharmony/third_party_mindspore)
