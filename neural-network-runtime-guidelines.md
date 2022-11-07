@@ -4,17 +4,10 @@
 
 Neural Network Runtime作为AI推理引擎和加速芯片的桥梁，为AI推理引擎提供精简的Native接口，满足推理引擎通过加速芯片执行端到端推理的需求。
 
-本文以图1展示的`Add`单算子模型为例，介绍Neural Network Runtime的开发流程。`Add`算子包含两个输入、一个参数和一个输出，其中的`activation`参数用于指定`Add`算子的激活类型。
+本文以图1展示的`Add`单算子模型为例，介绍Neural Network Runtime的开发流程。`Add`算子包含两个输入、一个参数和一个输出，其中的`activation`参数用于指定`Add`算子中激活函数的类型。
 
 **图1** Add单算子网络示意图
 !["Add单算子网络示意图"](neural_network_runtime_add_op_model.png)
-
-## 基本概念
-
-在开发前，需要先了解以下概念，以便更好地理解全文内容：
-
-- Native API：Openharmony 面向应用开发者的C语言接口。
-- HDI：Hardware Device Interface，硬件设备接口，是OpenHarmony中系统组件与芯片组件通信的接口。关于更多HDI的细节，请浏览[驱动子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E9%A9%B1%E5%8A%A8%E5%AD%90%E7%B3%BB%E7%BB%9F.md)。
 
 ## 环境准备
 
@@ -50,11 +43,48 @@ native/
 ├── oh-uni-package.json
 └── sysroot // Native API头文件和库
 ```
-## 接口文档
+## 接口说明
 
-详细的Neural Network Runtime接口文档请参考:
-- [neural_network_runtime.h](./interfaces/kits/c/neural_network_runtime.h)
-- [neural_network_runtime_type.h](./interfaces/kits/c/neural_network_runtime_type.h)
+这里给出Neural Network Runtime开发流程中通用的接口，具体请见下列表格。
+
+### 模型构造相关接口
+
+| 接口名称 | 描述 |
+| ------- | --- |
+| OH_NNModel_Construct() | 创建OH_NNModel类型的模型实例。 |
+| OH_NN_ReturnCode OH_NNModel_AddTensor(OH_NNModel *model, const OH_NN_Tensor *tensor) | 向模型实例中添加张量。 |
+| OH_NN_ReturnCode OH_NNModel_SetTensorData(OH_NNModel *model, uint32_t index, const void *dataBuffer, size_t length) | 设置张量的数值。 |
+| OH_NN_ReturnCode OH_NNModel_AddOperation(OH_NNModel *model, OH_NN_OperationType op, const OH_NN_UInt32Array *paramIndices, const OH_NN_UInt32Array *inputIndices, const OH_NN_UInt32Array *outputIndices) | 向模型实例中添加算子。 |
+| OH_NN_ReturnCode OH_NNModel_SpecifyInputsAndOutputs(OH_NNModel *model, const OH_NN_UInt32Array *inputIndices, const OH_NN_UInt32Array *outputIndices) | 指定模型的输入输出。 |
+| OH_NN_ReturnCode OH_NNModel_Finish(OH_NNModel *model) | 完成模型构图。|
+| void OH_NNModel_Destroy(OH_NNModel **model) | 释放模型实例。 |
+
+### 模型编译相关接口
+
+| 接口名称 | 描述 |
+| ------- | --- |
+| OH_NNCompilation *OH_NNCompilation_Construct(const OH_NNModel *model) | 创建OH_NNCompilation类型的编译实例。 |
+| OH_NN_ReturnCode OH_NNCompilation_SetDevice(OH_NNCompilation *compilation, size_t deviceID) | 指定模型编译和计算的硬件。 |
+| OH_NN_ReturnCode OH_NNCompilation_SetCache(OH_NNCompilation *compilation, const char *cachePath, uint32_t version) | 设置编译后的模型缓存路径和缓存版本。 |
+| OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation) | 进行模型编译。 |
+| void OH_NNCompilation_Destroy(OH_NNCompilation **compilation) | 释放Compilation对象。 |
+
+### 执行推理相关接口
+
+| 接口名称 | 描述 |
+| ------- | --- |
+| OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation) | 创建OH_NNExecutor类型的执行器实例。 |
+| OH_NN_ReturnCode OH_NNExecutor_SetInput(OH_NNExecutor *executor, uint32_t inputIndex, const OH_NN_Tensor *tensor, const void *dataBuffer, size_t length) | 设置模型单个输入的数据。 |
+| OH_NN_ReturnCode OH_NNExecutor_SetOutput(OH_NNExecutor *executor, uint32_t outputIndex, void *dataBuffer, size_t length) | 设置模型单个输出的缓冲区。 |
+| OH_NN_ReturnCode OH_NNExecutor_Run(OH_NNExecutor *executor) | 执行推理。 |
+| void OH_NNExecutor_Destroy(OH_NNExecutor **executor) | 销毁OH_NNExecutor实例，释放实例占用的内存。 |
+
+### 设备管理相关接口
+
+| 接口名称 | 描述 |
+| ------- | --- |
+| OH_NN_ReturnCode OH_NNDevice_GetAllDevicesID(const size_t **allDevicesID, uint32_t *deviceCount) | 获取对接到 Neural Network Runtime 的硬件ID。 |
+
 
 ## 开发步骤
 
@@ -71,7 +101,7 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
 
 2. 导入Neural Network Runtime。
 
-    在 nnrt_example.cpp` 文件的开头添加以下代码，引入Neural Network Runtime接口。
+    在 `nnrt_example.cpp` 文件的开头添加以下代码，引入Neural Network Runtime接口。
 
     ```cpp
     #include <cstdint>
@@ -80,17 +110,18 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
 
     #include "neural_network_runtime/neural_network_runtime.h"
 
-    const size_t DATA_LENGTH = 4 * 12; // 输出、输出的字节长度
+    // 常量，用于指定输入、输出数据的字节长度
+    const size_t DATA_LENGTH = 4 * 12;
     ```
 
 3. 构造模型。
 
-    使用Neural Network Runtime构图模块，构造`Add`单算子样例模型。
+    使用Neural Network Runtime接口，构造`Add`单算子样例模型。
 
     ```cpp
     OH_NN_ReturnCode BuildModel(OH_NNModel** pModel)
     {
-        // 创建模型实例，调用构图模块的接口，进行模型构图
+        // 创建模型实例，进行模型构造
         OH_NNModel* model = OH_NNModel_Construct();
         if (model == nullptr) {
             std::cout << "Create model failed." << std::endl;
@@ -114,7 +145,7 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
             return ret;
         }
 
-        // 添加Add算子唯一一个参数Tensor，激活函数类型，其数据类型为int8，是一个标量。
+        // 添加Add算子的参数Tensor，该参数Tensor用于指定激活函数的类型，Tensor的数据类型为int8。
         int32_t activationDims = 1;
         int8_t activationValue = OH_NN_FUSED_NONE;
         OH_NN_Tensor activation = {OH_NN_INT8, 1, &activationDims, nullptr, OH_NN_ADD_ACTIVATIONTYPE};
@@ -124,7 +155,7 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
             return ret;
         }
 
-        // 将激活函数类型设置为“无激活函数”。
+        // 将激活函数类型设置为OH_NN_FUSED_NONE，表示该算子不添加激活函数。
         ret = OH_NNModel_SetTensorData(model, 2, &activationValue, sizeof(int8_t));
         if (ret != OH_NN_SUCCESS) {
             std::cout << "BuildModel failed, set value of activation failed." << std::endl;
@@ -211,7 +242,8 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
 
         // 设置编译的硬件、缓存路径、性能模式、计算优先级、是否开启float16低精度计算等选项
 
-        OH_NN_ReturnCode ret = OH_NNCompilation_SetDevice(compilation, availableDevice[0]); // 选择在第一个设备上编译模型
+        // 选择在第一个设备上编译模型
+        OH_NN_ReturnCode ret = OH_NNCompilation_SetDevice(compilation, availableDevice[0]);
         if (ret != OH_NN_SUCCESS) {
             std::cout << "CreateCompilation failed, error happened when setting device." << std::endl;
             return ret;
@@ -221,18 +253,6 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
         ret = OH_NNCompilation_SetCache(compilation, "/data/local/tmp", 1);
         if (ret != OH_NN_SUCCESS) {
             std::cout << "CreateCompilation failed, error happened when setting cache path." << std::endl;
-            return ret;
-        }
-
-        ret = OH_NNCompilation_SetPerformanceMode(compilation, OH_NN_PERFORMANCE_MEDIUM); // 选择中等的性能模式
-        if (ret != OH_NN_SUCCESS) {
-            std::cout << "CreateCompilation failed, error happened when setting performance mode." << std::endl;
-            return ret;
-        }
-
-        ret = OH_NNCompilation_EnableFloat16(compilation, true); // 如果设备支持Float16低精度推理，则开启Float16精度推理
-        if (ret != OH_NN_SUCCESS) {
-            std::cout << "CreateCompilation failed, error happened when enable float16 computation." << std::endl;
             return ret;
         }
 
@@ -314,9 +334,9 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
     }
     ```
 
-8. 构建端到端构图-编译-执行流程。
+8. 构建端到端模型构造-编译-执行流程。
 
-    步骤3-步骤7实现了模型的构图、编译和执行流程，并封装成4个函数，便于模块化开发。以下示例代码将4个函数串联成完整的Neural Network Runtime开发流程。
+    步骤3-步骤7实现了模型的模型构造、编译和执行流程，并封装成4个函数，便于模块化开发。以下示例代码将4个函数串联成完整的Neural Network Runtime开发流程。
     ```cpp
     int main()
     {
@@ -325,7 +345,7 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
         OH_NNExecutor* executor = nullptr;
         std::vector<size_t> availableDevices;
 
-        // 模型构图阶段
+        // 模型构造阶段
         OH_NN_ReturnCode ret = BuildModel(&model);
         if (ret != OH_NN_SUCCESS) {
             std::cout << "BuildModel failed." << std::endl;
@@ -417,7 +437,7 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
     hdc_std shell "/data/local/tmp/nnrt_example"
     ```
 
-    > **说明：** 如果样例执行正常，应该得到以下输出。
+    如果样例执行正常，应该得到以下输出。
     ```text
     Output index: 0, value is: 11.000000.
     Output index: 1, value is: 13.000000.
@@ -433,13 +453,15 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
     Output index: 11, value is: 33.000000.
     ```
 
-4. 检查Cache（可选）。
+4. 检查模型缓存（可选）。
 
-    如果在调测环境下，Neural Network Runtime对接的HDI服务支持Cache功能，执行完 `nnrt_example`, 可以在 `/data/local/tmp` 目录下
-    找到生成的缓存文件。
+    如果在调测环境下，Neural Network Runtime对接的HDI服务支持模型缓存功能，执行完 `nnrt_example`, 可以在 `/data/local/tmp` 目录下找到生成的缓存文件。
 
-    > **Cache功能说明：** 模型的IR需要传递到硬件驱动层，由HDI服务将统一的IR图，编译成硬件专用的计算图，编译的过程非常耗时。Neural Network Runtime支持计算图缓存的特性，可以将HDI服务编译生成的计算图，缓存到设备存储中。当下一次在同一个加速芯片上编译同一个模型时，通过指定缓存的路径，Neural Network Runtime可以直接加载缓存文件中的计算图，减少编译消耗的时间。
+    > **说明：** 
+    >
+    > 模型的IR需要传递到硬件驱动层，由HDI服务将统一的IR图，编译成硬件专用的计算图，编译的过程非常耗时。Neural Network Runtime支持计算图缓存的特性，可以将HDI服务编译生成的计算图，缓存到设备存储中。当下一次在同一个加速芯片上编译同一个模型时，通过指定缓存的路径，Neural Network Runtime可以直接加载缓存文件中的计算图，减少编译消耗的时间。
 
+    检查缓存目录下的缓存文件：
     ```shell
     ls /data/local/tmp
     ```
@@ -449,18 +471,12 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
     # 0.nncache  cache_info.nncache
     ```
 
-    如果缓存不再使用，需要手动删除缓存，可以参考以下命令。
+    如果缓存不再使用，需要手动删除缓存，可以参考以下命令，删除缓存文件。
     ```shell
     rm /data/local/tmp/*nncache
     ```
 
-### 相关实例
+## 相关实例
 
-第三方AI推理框架对接Neural Network Runtime的对接工作，可以参考以下实例：
-- [Tensorflow Lite对接Neural Network Runtime](./example/deep_learning_framework/README_zh.md)
-
-
-## 相关仓
-
-- [**Neural Network Runtime**](https://gitee.com/openharmony-sig/neural_network_runtime)
-- [Mindspore](https://gitee.com/openharmony/third_party_mindspore)
+第三方AI推理框架对接Neural Network Runtime的流程，可以参考以下相关实例：
+- [Tensorflow Lite接入NNRt Delegate开发指南](https://gitee.com/openharmony-sig/neural_network_runtime/tree/master/example/deep_learning_framework)
