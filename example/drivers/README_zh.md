@@ -90,7 +90,7 @@ NNRt通过HDI接口实现与设备芯片的对接，由HDI接口实现跨进程�
             └── prepared_model_stub.h
         ```
 
-2. 实现HDI服务
+2. 实现HDI服务。
     - 在drivers/peripheral目录下新建开发目录，用于HDI服务开发，开发目录结构如下所示。
         ```text
         drivers/peripheral/nnrt
@@ -225,7 +225,7 @@ NNRt通过HDI接口实现与设备芯片的对接，由HDI接口实现跨进程�
       }
       ```
 
-3. 声明HDI服务
+3. 声明HDI服务。
     
     在对应产品的uhdf hcs配置文件中声明用户态驱动与服务，本例中rk3568对应在```vendor/hihope/rk3568/hdf_config/uhdf/device_info.hcs```文件中新增如下配置:
     ```text
@@ -247,7 +247,7 @@ NNRt通过HDI接口实现与设备芯片的对接，由HDI接口实现跨进程�
     ```
     > 注意：修改hcs文件后请删除out目录重新编译，才能生效。
 
-4. 配置host进程用户和组
+4. 配置host进程用户和组。
     
     对于新增host进程的场景，需要新增配置对应进程的用户ID和组ID。 进程的用户ID在文件```base/startup/init/services/etc/passwd```中配置，进程的组ID在文件```base/startup/init/services/etc/group```中配置。 
     ```text
@@ -259,7 +259,7 @@ NNRt通过HDI接口实现与设备芯片的对接，由HDI接口实现跨进程�
     ```
     完成上述所有配置后，全量编译版本后应该可以观察到新增host进程启动，也可以通过hilog输出检索新增的服务名称nnrt_interface_service观察到服务发布成功。
 
-5. SELinux配置
+5. SELinux配置。
 
     OHOS已经开启SELinux特性，需要对新增的进程和服务配置相应的SELinux规则，用于运行host进程启动访问某些资源、发布HDI服务。对于调用者来说，也需要配置SELinux规则运行获取和调用某个HDI服务。
 
