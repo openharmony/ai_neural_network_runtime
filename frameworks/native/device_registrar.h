@@ -20,7 +20,7 @@
 #include <memory>
 #include <functional>
 
-#include "interfaces/oem/cpp_api/device.h"
+#include "device.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

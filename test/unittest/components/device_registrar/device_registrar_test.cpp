@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 
 #include "common/log.h"
-#include "interfaces/oem/cpp_api/device_registrar.h"
+#include "frameworks/native/device_registrar.h"
 #include "frameworks/native/hdi_device.h"
 #include "frameworks/native/device_manager.h"
 #include "test/unittest/common/mock_idevice.h"

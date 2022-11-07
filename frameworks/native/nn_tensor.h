@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "interfaces/oem/cpp_api/cpp_type.h"
+#include "cpp_type.h"
 #include "interfaces/kits/c/neural_network_runtime.h"
 
 namespace OHOS {

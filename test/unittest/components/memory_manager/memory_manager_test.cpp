@@ -22,7 +22,7 @@
 
 #include <gtest/gtest.h>
 
-#include "interfaces/oem/cpp_api/cpp_type.h"
+#include "frameworks/native/cpp_type.h"
 #include "frameworks/native/memory_manager.h"
 #include "test/unittest/common/file_utils.h"
 

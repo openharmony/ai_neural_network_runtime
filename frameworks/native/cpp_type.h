@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef NEURAL_NETWORK_RUNTIME_OEM_CPP_API_TYPE_H
-#define NEURAL_NETWORK_RUNTIME_OEM_CPP_API_TYPE_H
+#ifndef NEURAL_NETWORK_RUNTIME_CPP_API_TYPE_H
+#define NEURAL_NETWORK_RUNTIME_CPP_API_TYPE_H
 
 #include <vector>
 #include <string>
@@ -61,4 +61,4 @@ struct IOTensor {
 } // NeuralNetworkRuntime
 } // OHOS
 
-#endif // NEURAL_NETWORK_RUNTIME_OEM_CPP_API_TYPE_H
+#endif // NEURAL_NETWORK_RUNTIME_CPP_API_TYPE_H

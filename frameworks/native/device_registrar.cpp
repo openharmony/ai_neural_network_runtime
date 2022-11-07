@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "interfaces/oem/cpp_api/device_registrar.h"
+#include "device_registrar.h"
 
 #include "device_manager.h"
 #include "common/log.h"

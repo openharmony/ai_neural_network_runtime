@@ -21,8 +21,8 @@
 
 #include "refbase.h"
 #include "hdi_interfaces.h"
-#include "interfaces/oem/cpp_api/prepared_model.h"
-#include "interfaces/oem/cpp_api/cpp_type.h"
+#include "prepared_model.h"
+#include "cpp_type.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

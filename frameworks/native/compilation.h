@@ -18,8 +18,8 @@
 #include "inner_model.h"
 #include "execution_plan.h"
 
-#include "interfaces/oem/cpp_api/device.h"
-#include "interfaces/oem/cpp_api/cpp_type.h"
+#include "device.h"
+#include "cpp_type.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

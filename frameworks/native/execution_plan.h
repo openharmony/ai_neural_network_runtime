@@ -18,8 +18,8 @@
 
 #include "frameworks/native/nn_tensor.h"
 #include "interfaces/kits/c/neural_network_runtime_type.h"
-#include "interfaces/oem/cpp_api/prepared_model.h"
-#include "interfaces/oem/cpp_api/device.h"
+#include "prepared_model.h"
+#include "device.h"
 
 
 namespace OHOS {
