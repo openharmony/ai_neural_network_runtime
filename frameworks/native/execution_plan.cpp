@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "common/log.h"
-#include "interfaces/oem/cpp_api/cpp_type.h"
+#include "cpp_type.h"
 
 
 namespace OHOS {

@@ -18,7 +18,7 @@
 
 #include "hdi_interfaces.h"
 #include "interfaces/kits/c/neural_network_runtime_type.h"
-#include "interfaces/oem/cpp_api/cpp_type.h"
+#include "cpp_type.h"
 #include "mindir.h"
 #include "mindir_types.h"
 #include "ops_builder.h"

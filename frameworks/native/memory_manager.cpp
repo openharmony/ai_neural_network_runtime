@@ -19,7 +19,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "interfaces/oem/cpp_api/cpp_type.h"
+#include "cpp_type.h"
 #include "common/log.h"
 
 namespace OHOS {

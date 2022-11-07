@@ -23,7 +23,7 @@ Neural Network Runtime与MindSpore Lite使用MindIR统一模型的中间表达�
 │   └── drivers                    # 设备驱动开发样例存放目录
 ├── frameworks
 │   └── native                     # 框架代码存放目录
-│       └── op                     # 算子头文件和实现存放目录
+│       └── ops                    # 算子头文件和实现存放目录
 ├── interfaces                     # 接口存放目录
 │   ├── innerkits                  # 系统内部接口文件存放目录
 │   └── kits                       # 对外开放接口文件存放目录 

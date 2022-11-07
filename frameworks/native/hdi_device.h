@@ -19,7 +19,7 @@
 #include "refbase.h"
 #include "hdi_interfaces.h"
 
-#include "interfaces/oem/cpp_api/device.h"
+#include "device.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

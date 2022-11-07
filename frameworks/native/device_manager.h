@@ -23,7 +23,7 @@
 #include <functional>
 #include <mutex>
 
-#include "interfaces/oem/cpp_api/device.h"
+#include "device.h"
 #include "interfaces/kits/c/neural_network_runtime_type.h"
 
 namespace OHOS {
