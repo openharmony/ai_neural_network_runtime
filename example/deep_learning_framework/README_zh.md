@@ -28,7 +28,7 @@
 
 **图1** 运作机制
 
-![运作机制图](./Principle.png)
+![运作机制图](../../figures/Principle.png)
 
 以TensorFlow lite的MobileNetv2模型进行标签分类任务为例，实现调用NNRt API在指定芯片上加速推理，主要有以下三个部分：
 1. 通过TFLite delegate机制，创建NNRt Delegate，并接入TFLite的Hardware Accelerator中。
@@ -39,7 +39,7 @@
 
 **图2** 开发流程
 
-![开发流程图](./Flowchart.png)
+![开发流程图](../../figures/Flowchart.png)
 
 主要开发步骤包括命令行参数解析、创建NNRt Delegate、TFLite nodes的替换、tensors的内存分配、执行推理、结果查看等，具体如下：
 1. 解析运行demoe的命令，初始化模型推理所需参数和创建NNRt Delegate的options。
