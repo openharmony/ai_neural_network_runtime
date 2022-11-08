@@ -41,13 +41,13 @@ namespace delegate {
 namespace nnrt {
 constexpr int32_t SCALAR_RANK = 1;
 
-#define RETURN_TFLITE_ERROR_IF_NN_ERROR_FOR_COMPILE(code, callDesc)                                                  \
+#define RETURN_TFLITE_ERROR_IF_NN_ERROR_FOR_COMPILE(code, callDesc)                                                   \
     do {                                                                                                              \
         if ( (code) != OH_NN_SUCCESS) {                                                                               \
-            const auto errorDesc = NnrtErrorDescription((code));                                                    \
-            TFLITE_LOG_PROD(TFLITE_LOG_ERROR, "NN API returned error %s at line %d while %s.\n", errorDesc.c_str(),  \
+            const auto errorDesc = NnrtErrorDescription((code));                                                      \
+            TFLITE_LOG_PROD(TFLITE_LOG_ERROR, "NN API returned error %s at line %d while %s.\n", errorDesc.c_str(),   \
                 __LINE__, (callDesc));                                                                                \
-            m_nnrt->OH_NNCompilation_Destroy(&m_pNnCompilation);                                                   \
+            m_nnrt->OH_NNCompilation_Destroy(&m_pNnCompilation);                                                      \
             return kTfLiteError;                                                                                      \
         }                                                                                                             \
     } while (0)
