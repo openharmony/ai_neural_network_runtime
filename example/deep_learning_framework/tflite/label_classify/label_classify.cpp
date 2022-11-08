@@ -250,9 +250,9 @@ void InferenceModel(Settings& settings, DelegateProviders& delegateProviders)
 
 void DisplayUsage()
 {
-    LOG(INFO) << "label_classify\n"
+    LOG(INFO) << "label_classify -m xxx.tflite -i xxx.bmp -l xxx.txt -c 1 -a 1\n"
               << "\t--help,         -h: show the usage of the demo\n"
-              << "\t--use_nnrt,   -a: [0|1], use NNRT or not\n"
+              << "\t--use_nnrt,     -a: [0|1], 1 refers to use NNRT\n"
               << "\t--input_mean,   -b: input mean\n"
               << "\t--count,        -c: loop interpreter->Invoke() for certain times\n"
               << "\t--image,        -i: image_name.bmp\n"
@@ -266,7 +266,7 @@ void DisplayUsage()
               << "\t--input_shape,  -p: Indicates the specified dynamic input node and the corresponding shape.\n";
 }
 
-void InitSettings(int32_t argc, char** argv, Settings& settings)
+int32_t InitSettings(int32_t argc, char** argv, Settings& settings)
 {
     // getopt_long stores the option index here.
     int32_t optionIndex = 0;
@@ -312,11 +312,13 @@ void InitSettings(int32_t argc, char** argv, Settings& settings)
             case '?':
                 // getopt_long already printed an error message.
                 DisplayUsage();
-                return;
+                return -1;
             default:
-                return;
+                return -1;
         }
     }
+
+    return 0;
 }
 
 int32_t Main(int32_t argc, char** argv)
@@ -327,8 +329,16 @@ int32_t Main(int32_t argc, char** argv)
         return EXIT_FAILURE;
     }
 
+    if (argc <= 1) {
+        DisplayUsage();
+        return EXIT_FAILURE;
+    }
+
     Settings settings;
-    InitSettings(argc, argv, settings);
+    if (InitSettings(argc, argv, settings) == -1) {
+        return EXIT_FAILURE;
+    };
+
     InferenceModel(settings, delegateProviders);
     return 0;
 }
