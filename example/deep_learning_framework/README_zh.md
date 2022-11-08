@@ -13,7 +13,7 @@
 - OHOS：OpenHarmony Operating System，OpenHarmony操作系统。
 
 ## 约束与限制
-1. 系统版本：OpenHarmonyOS 3.2 Beta5及以上版本。
+1. 系统版本：OpenHarmony master分支。
 2. 开发环境：Ubuntu 18.04及以上。
 3. 接入设备：OpenHarmony定义的标准设备。
 4. 其他开发依赖：

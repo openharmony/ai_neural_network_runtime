@@ -15,7 +15,7 @@ Neural Network Runtime作为AI推理引擎和加速芯片的桥梁，为AI推理
 
 Neural Network Runtime部件的环境要求如下：
 
-- 系统版本：OpenHarmony 3.2 Beta5及以上版本。
+- 系统版本：OpenHarmony master分支。
 - 开发环境：Ubuntu 18.04及以上。
 - 接入设备：OpenHarmony定义的标准设备，并且系统中内置的硬件加速器驱动，已通过HDI接口对接Neural Network Runtime。
 
