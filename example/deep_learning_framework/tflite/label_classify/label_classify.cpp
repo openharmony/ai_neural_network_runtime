@@ -323,14 +323,14 @@ int32_t InitSettings(int32_t argc, char** argv, Settings& settings)
 
 int32_t Main(int32_t argc, char** argv)
 {
-    DelegateProviders delegateProviders;
-    bool parseResult = delegateProviders.InitFromCmdlineArgs(&argc, const_cast<const char**>(argv));
-    if (!parseResult) {
+    if (argc <= 1) {
+        DisplayUsage();
         return EXIT_FAILURE;
     }
 
-    if (argc <= 1) {
-        DisplayUsage();
+    DelegateProviders delegateProviders;
+    bool parseResult = delegateProviders.InitFromCmdlineArgs(&argc, const_cast<const char**>(argv));
+    if (!parseResult) {
         return EXIT_FAILURE;
     }
 
