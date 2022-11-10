@@ -13,8 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef NEURAL_NETWORK_RUNTIME_H
-#define NEURAL_NETWORK_RUNTIME_H
+/**
+ * @addtogroup NeuralNeworkRuntime
+ * @{
+ *
+ * @brief 提供Neural Network Runtime加速模型推理的相关接口。
+ *
+ * @Syscap SystemCapability.Ai.NeuralNetworkRuntime
+ * @since 9
+ * @version 1.0
+ */
+
 /**
  * @file neural_network_runtime.h
  *
@@ -25,22 +34,15 @@
  * @since 9
  * @version 1.0
  */
+
+#ifndef NEURAL_NETWORK_RUNTIME_H
+#define NEURAL_NETWORK_RUNTIME_H
+
 #include "neural_network_runtime_type.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @addtogroup NNModel
- * @{
- *
- * @brief Neural Network Runtime 构图模块，提供了一系列构图接口实现张量的添加、算子的添加和输入输出的设置，帮助开发者完成
- *        AI模型的构建。
- *
- * @since 9
- * @version 1.0
- */
 
 /**
  * @brief 创建{@link OH_NNModel}类型的模型实例，搭配OH_NNModel模块提供的其他接口，完成模型实例的构造。
@@ -200,17 +202,7 @@ OH_NN_ReturnCode OH_NNModel_GetAvailableOperations(OH_NNModel *model,
                                                    size_t deviceID,
                                                    const bool **isSupported,
                                                    uint32_t *opCount);
-/** @} */
 
-/**
- * @addtogroup NNCompilation
- * @{
- *
- * @brief Neural Network Runtime 编译模块
- *
- * @since 9
- * @version 1.0
- */
 
 /**
  * @brief 创建{@link OH_NNCompilation}类型的编译实例
@@ -361,24 +353,14 @@ OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation);
  * @version 1.0
  */
 void OH_NNCompilation_Destroy(OH_NNCompilation **compilation);
-/** @} */
 
-/**
- * @addtogroup NNExecutor
- * @{
- *
- * @brief Neural Network Runtime 执行模块
- *
- * @since 9
- * @version 1.0
- */
 
 /**
  * @brief 创建{@link OH_NNExecutor}类型的执行器实例
  *
  * 本方法接受一个编译器，构造一个与硬件关联的模型推理执行器。通过{@link OH_NNExecutor_SetInput}设置模型输入数据，
  * 设置输入数据后，调用{@link OH_NNExecutor_Run}方法执行推理，最后通过
- * {@link OH_NNExecutor_GetOutput}获取计算结果。\n 
+ * {@link OH_NNExecutor_SetOutput}获取计算结果。\n 
  *
  * 调用本方法创建{@link OH_NNExecutor}实例后，如果不需要创建其他执行器，可以安全释放{@link OH_NNCompilation}实例。\n 
  *
@@ -463,7 +445,7 @@ OH_NN_ReturnCode OH_NNExecutor_SetOutput(OH_NNExecutor *executor,
  * @param executor 指向{@link OH_NNExecutor}实例的指针。
  * @param outputIndex 输出的索引值。
  * @param shape 指向int32_t数组的指针，数组中的每个元素值，是输出tensor在每个维度上的长度。
- * @param length uint32_t类型的指针，返回输出的维数。
+ * @param shapeLength uint32_t类型的指针，返回输出的维数。
  * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
  * @since 9
  * @version 1.0
@@ -619,17 +601,7 @@ OH_NN_ReturnCode OH_NNExecutor_SetOutputWithMemory(OH_NNExecutor *executor,
  * @version 1.0
  */
 void OH_NNExecutor_Destroy(OH_NNExecutor **executor);
-/** @} */
 
-/**
- * @addtogroup NNDevice
- * @{
- *
- * @brief Neural Network Runtime 设备管理模块
- *
- * @since 9
- * @version 1.0
- */
 
 /**
  * @brief 获取对接到 Neural Network Runtime 的硬件ID。
@@ -678,9 +650,10 @@ OH_NN_ReturnCode OH_NNDevice_GetName(size_t deviceID, const char **name);
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNDevice_GetType(size_t deviceID, OH_NN_DeviceType *deviceType);
-/** @} */
 
 #ifdef __cplusplus
 }
 #endif // __cplusplus
+
 #endif // NEURAL_NETWORK_RUNTIME_H
+/** @} */

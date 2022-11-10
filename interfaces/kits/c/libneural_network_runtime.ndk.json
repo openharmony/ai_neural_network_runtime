@@ -1,0 +1,95 @@
+[
+    {
+        "name": "OH_NNModel_Construct"
+    },
+    {
+        "name": "OH_NNModel_AddTensor"
+    },
+    {
+        "name": "OH_NNModel_SetTensorData"
+    },
+    {
+        "name": "OH_NNModel_AddOperation"
+    },
+    {
+        "name": "OH_NNModel_SpecifyInputsAndOutputs"
+    },
+    {
+        "name": "OH_NNModel_Finish"
+    },
+    {
+        "name": "OH_NNModel_Destroy"
+    },
+    {
+        "name": "OH_NNModel_GetAvailableOperations"
+    },
+    {
+        "name": "OH_NNCompilation_Construct"
+    },
+    {
+        "name": "OH_NNCompilation_SetDevice"
+    },
+    {
+        "name": "OH_NNCompilation_SetCache"
+    },
+    {
+        "name": "OH_NNCompilation_SetPerformanceMode"
+    },
+    {
+        "name": "OH_NNCompilation_SetPriority"
+    },
+    {
+        "name": "OH_NNCompilation_EnableFloat16"
+    },
+    {
+        "name": "OH_NNCompilation_Build"
+    },
+    {
+        "name": "OH_NNCompilation_Destroy"
+    },
+    {
+        "name": "OH_NNExecutor_Construct"
+    },
+    {
+        "name": "OH_NNExecutor_SetInput"
+    },
+    {
+        "name": "OH_NNExecutor_SetOutput"
+    },
+    {
+        "name": "OH_NNExecutor_GetOutputShape"
+    },
+    {
+        "name": "OH_NNExecutor_Run"
+    },
+    {
+        "name": "OH_NNExecutor_AllocateInputMemory"
+    },
+    {
+        "name": "OH_NNExecutor_AllocateOutputMemory"
+    },
+    {
+        "name": "OH_NNExecutor_DestroyInputMemory"
+    },
+    {
+        "name": "OH_NNExecutor_DestroyOutputMemory"
+    },
+    {
+        "name": "OH_NNExecutor_SetInputWithMemory"
+    },
+    {
+        "name": "OH_NNExecutor_SetOutputWithMemory"
+    },
+    {
+        "name": "OH_NNExecutor_Destroy"
+    },
+    {
+        "name": "OH_NNDevice_GetAllDevicesID"
+    },
+    {
+        "name": "OH_NNDevice_GetName"
+    },
+    {
+        "name": "OH_NNDevice_GetType"
+    }
+]
