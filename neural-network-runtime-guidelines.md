@@ -1,4 +1,4 @@
-# Neural Network Runtime开发指导
+# Neural Network Runtime对接AI推理框架开发指导
 
 ## 场景介绍
 
@@ -7,7 +7,7 @@ Neural Network Runtime作为AI推理引擎和加速芯片的桥梁，为AI推理
 本文以图1展示的`Add`单算子模型为例，介绍Neural Network Runtime的开发流程。`Add`算子包含两个输入、一个参数和一个输出，其中的`activation`参数用于指定`Add`算子中激活函数的类型。
 
 **图1** Add单算子网络示意图
-!["Add单算子网络示意图"](./figures/neural_network_runtime_add_op_model.png)
+!["Add单算子网络示意图"](figures/neural_network_runtime_add_op_model.png)
 
 ## 环境准备
 
@@ -47,6 +47,14 @@ native/
 
 这里给出Neural Network Runtime开发流程中通用的接口，具体请见下列表格。
 
+### 结构体
+
+| 结构体名称 | 描述 |
+| --------- | ---- |
+| typedef struct OH_NNModel OH_NNModel | Neural Network Runtime的模型句柄，用于构造模型。 |
+| typedef struct OH_NNCompilation OH_NNCompilation | Neural Network Runtime的编译器句柄，用于编译AI模型。 |
+| typedef struct OH_NNExecutor OH_NNExecutor | Neural Network Runtime的执行器句柄，用于在指定设备上执行推理计算。 |
+
 ### 模型构造相关接口
 
 | 接口名称 | 描述 |
@@ -67,7 +75,7 @@ native/
 | OH_NN_ReturnCode OH_NNCompilation_SetDevice(OH_NNCompilation *compilation, size_t deviceID) | 指定模型编译和计算的硬件。 |
 | OH_NN_ReturnCode OH_NNCompilation_SetCache(OH_NNCompilation *compilation, const char *cachePath, uint32_t version) | 设置编译后的模型缓存路径和缓存版本。 |
 | OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation) | 进行模型编译。 |
-| void OH_NNCompilation_Destroy(OH_NNCompilation **compilation) | 释放Compilation对象。 |
+| void OH_NNCompilation_Destroy(OH_NNCompilation **compilation) | 释放OH_NNCompilation对象。 |
 
 ### 执行推理相关接口
 
@@ -101,7 +109,7 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
 
 2. 导入Neural Network Runtime。
 
-    在 `nnrt_example.cpp` 文件的开头添加以下代码，引入Neural Network Runtime接口。
+    在 `nnrt_example.cpp` 文件的开头添加以下代码，引入Neural Network Runtime模块。
 
     ```cpp
     #include <cstdint>
@@ -133,7 +141,7 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
         OH_NN_Tensor input1 = {OH_NN_FLOAT32, 4, inputDims, nullptr, OH_NN_TENSOR};
         OH_NN_ReturnCode ret = OH_NNModel_AddTensor(model, &input1);
         if (ret != OH_NN_SUCCESS) {
-            std::cout << "BuildModel failed, add Tensor of first input failed." << std::endl
+            std::cout << "BuildModel failed, add Tensor of first input failed." << std::endl;
             return ret;
         }
 
@@ -206,7 +214,7 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
 
 4. 查询Neural Network Runtime已经对接的加速芯片。
 
-    通过HDI接口，Neural Network Runtime支持对接多种加速芯片。在执行模型编译前，需要查询当前设备下，Neural Network Runtime已经对接的加速芯片。每个加速芯片对应唯一的ID值，在编译阶段需要通过设备ID，指定模型编译的芯片。
+    Neural Network Runtime支持通过HDI接口，对接多种加速芯片。在执行模型编译前，需要查询当前设备下，Neural Network Runtime已经对接的加速芯片。每个加速芯片对应唯一的ID值，在编译阶段需要通过设备ID，指定模型编译的芯片。
     ```cpp
     void GetAvailableDevices(std::vector<size_t>& availableDevice)
     {
@@ -422,7 +430,7 @@ Neural Network Runtime的开发流程主要包含**模型构造**、**模型编�
     ```shell
     mkdir build && cd build
     cmake -DCMAKE_TOOLCHAIN_FILE={交叉编译工具链的路径}/build/cmake/ohos.toolchain.cmake -DOHOS_ARCH=arm64-v8a -DOHOS_PLATFORM=OHOS -DOHOS_STL=c++_static ..
-    make .
+    make
     ```
 
 3. 执行以下代码，将样例推送到设备上执行。

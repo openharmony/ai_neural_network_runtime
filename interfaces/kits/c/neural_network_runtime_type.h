@@ -13,8 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef NEURAL_NETWORK_RUNTIME_TYPE_H
-#define NEURAL_NETWORK_RUNTIME_TYPE_H
+/**
+ * @addtogroup NeuralNeworkRuntime
+ * @{
+ *
+ * @brief 提供Neural Network Runtime加速模型推理的相关接口。
+ *
+ * @Syscap SystemCapability.Ai.NeuralNetworkRuntime
+ * @since 9
+ * @version 1.0
+ */
+
 /**
  * @file neural_network_runtime_type.h
  *
@@ -23,6 +32,10 @@
  * @since 9
  * @version 1.0
  */
+
+#ifndef NEURAL_NETWORK_RUNTIME_TYPE_H
+#define NEURAL_NETWORK_RUNTIME_TYPE_H
+
 #include <cstddef>
 #include <cstdint>
 
@@ -1629,4 +1642,6 @@ typedef struct OH_NN_Memory {
 #ifdef __cplusplus
 }
 #endif // __cplusplus
+
 #endif // NEURAL_NETWORK_RUNTIME_TYPE_H
+/** @} */
