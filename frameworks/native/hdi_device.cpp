@@ -111,7 +111,7 @@ OH_NN_ReturnCode HDIDevice::GetSupportedOperation(std::shared_ptr<const mindspor
         return OH_NN_FAILED;
     }
     if (hdiRet != HDF_SUCCESS) {
-        LOGE("Get supported operation failed. ErrorCode=%d", ret);
+        LOGE("Get supported operation failed. ErrorCode=%d", hdiRet);
         return OH_NN_UNAVALIDABLE_DEVICE;
     }
     return OH_NN_SUCCESS;
