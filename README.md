@@ -10,7 +10,7 @@ NNRt and MindSpore Lite use MindIR unified intermediate representation to reduce
 
 Generally, the AI application, AI inference engine, and NNRt are in the same process, and the chip driver runs in another process. The transmission of models and computing data between the two processes should be implemented by IPC. NNRt architecture implements the HDI client based on the HDI APIs. Accordingly, chip vendors need to implement and open the HDI services through HDI APIs.
 
-** Figure 1** NNRt architecture
+**Figure 1** NNRt architecture
 !["NNRt architecture"](./figures/neural_network_runtime.png)
 
 ## Directory Structure
