@@ -17,7 +17,7 @@
  * @addtogroup NeuralNeworkRuntime
  * @{
  *
- * @brief 提供Neural Network Runtime加速模型推理的相关接口。
+ * @brief Provides APIs for accelerating the Neural Network Runtime model inference.
  *
  * @Syscap SystemCapability.Ai.NeuralNetworkRuntime
  * @since 9
@@ -27,7 +27,7 @@
 /**
  * @file neural_network_runtime_type.h
  *
- * @brief Neural Network Runtime定义的结构体和枚举值。
+ * @brief Defines the structure and enumeration for Neural Network Runtime.
  *
  * @since 9
  * @version 1.0
@@ -44,7 +44,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Neural Network Runtime的模型句柄
+ * @brief Defines the handles of models for Neural Network Runtime.
  *
  * @since 9
  * @version 1.0
@@ -52,7 +52,7 @@ extern "C" {
 typedef struct OH_NNModel OH_NNModel;
 
 /**
- * @brief Neural Network Runtime的编译器句柄
+ * @brief Defines the compiler handle for Neural Network Runtime.
  *
  * @since 9
  * @version 1.0
@@ -60,7 +60,7 @@ typedef struct OH_NNModel OH_NNModel;
 typedef struct OH_NNCompilation OH_NNCompilation;
 
 /**
- * @brief Neural Network Runtime的执行器句柄
+ * @brief Defines the executor handle for Neural Network Runtime.
  *
  * @since 9
  * @version 1.0
@@ -68,1574 +68,1710 @@ typedef struct OH_NNCompilation OH_NNCompilation;
 typedef struct OH_NNExecutor OH_NNExecutor;
 
 /**
- * @brief 硬件的执行性能模式
+ * @brief Defines the hardware performance mode.
  *
  * @since 9
  * @version 1.0
  */
 typedef enum {
-    /** 无性能模式偏好 */
+    /** No performance mode preference */
     OH_NN_PERFORMANCE_NONE = 0,
-    /** 低能耗模式 */
+    /** Low power consumption mode*/
     OH_NN_PERFORMANCE_LOW = 1,
-    /** 中性能模式 */
+    /** Medium performance mode */
     OH_NN_PERFORMANCE_MEDIUM = 2,
-    /** 高性能模式 */
+    /** High performance mode */
     OH_NN_PERFORMANCE_HIGH = 3,
-    /** 极致性能模式 */
+    /** Ultimate performance mode */
     OH_NN_PERFORMANCE_EXTREME = 4
 } OH_NN_PerformanceMode;
 
 /**
- * @brief 模型推理任务优先级
+ * @brief Defines the model inference task priority.
  *
  * @since 9
  * @version 1.0
  */
 typedef enum {
-    /** 无优先级偏好 */
+    /** No priority preference */
     OH_NN_PRIORITY_NONE = 0,
-    /** 低优先级 */
+    /** Low priority */
     OH_NN_PRIORITY_LOW = 1,
-    /** 中优先级 */
+    /** Medium priority */
     OH_NN_PRIORITY_MEDIUM = 2,
-    /** 高优先级 */
+    /** High priority */
     OH_NN_PRIORITY_HIGH = 3
 } OH_NN_Priority;
 
 /**
- * @brief Neural Network Runtime 定义的错误码类型
+ * @brief Defines error codes for Neural Network Runtime.
  *
  * @since 9
  * @version 1.0
  */
 typedef enum {
-    /** 操作成功 */
+    /** The operation is successful. */
     OH_NN_SUCCESS = 0,
-    /** 操作失败 */
+    /** The operation failed. */
     OH_NN_FAILED = 1,
-    /** 非法参数 */
+    /** Invalid parameter. */
     OH_NN_INVALID_PARAMETER = 2,
-    /** 内存相关的错误，包括：内存不足、内存数据拷贝失败、内存申请失败等。 */
+    /** Memory-related error, for example, insufficient memory, memory data copy failure, or memory application failure. */
     OH_NN_MEMORY_ERROR = 3,
-    /** 非法操作 */
+    /** Invalid operation. */
     OH_NN_OPERATION_FORBIDDEN = 4,
-    /** 空指针异常 */
+    /** Null pointer exception */
     OH_NN_NULL_PTR = 5,
-    /** 无效文件 */
+    /** Invalid file. */
     OH_NN_INVALID_FILE = 6,
-    /** 硬件发生错误，错误可能包含：HDL服务崩溃 */
+    /** A hardware error occurs, for example, HDL service crash. */
     OH_NN_UNAVALIDABLE_DEVICE = 7,
-    /** 非法路径 */
+    /** Invalid path. */
     OH_NN_INVALID_PATH = 8
 } OH_NN_ReturnCode;
 
 /**
- * @brief Neural Network Runtime 融合算子中激活函数的类型
+ * @brief Defines activation function types in the fusion operator for Neural Network Runtime.
  *
  * @since 9
  * @version 1.0
  */
 typedef enum : int8_t {
-    /** 未指定融合激活函数 */
+    /** The fusion activation function is not specified. */
     OH_NN_FUSED_NONE = 0,
-    /** 融合relu激活函数 */
+    /** Fusion relu activation function */
     OH_NN_FUSED_RELU = 1,
-    /** 融合relu6激活函数 */
+    /** Fusion relu6 activation function */
     OH_NN_FUSED_RELU6 = 2
 } OH_NN_FuseType;
 
 /**
- * @brief tensor数据的排布类型
+ * @brief Defines the layout type of tensor data.
  *
  * @since 9
  * @version 1.0
  */
 typedef enum {
-    /** 当tensor没有特定的排布类型时（如标量或矢量），使用{@link OH_NN_FORMAT_NONE} */
+    /** The tensor does not have a specific layout type (such as scalar or vector). */
     OH_NN_FORMAT_NONE = 0,
-    /** 读取（使用）维度信息时按照NCHW读取（使用）*/
+    /** The tensor arranges data in NCHW format.*/
     OH_NN_FORMAT_NCHW = 1,
-    /** 读取（使用）维度信息时按照NHWC读取（使用） */
+    /** The tensor arranges data in NHWC format.*/
     OH_NN_FORMAT_NHWC = 2
 } OH_NN_Format;
 
 /**
- * @brief Neural Network Runtime 支持的设备类型
+ * @brief Defines device types supported by Neural Network Runtime.
  *
  * @since 9
  * @version 1.0
  */
 typedef enum {
-    /** 不属于CPU、GPU、专用加速器的设备 */
+    /** Devices that are not CPU, GPU, or dedicated accelerator*/
     OH_NN_OTHERS = 0,
-    /** CPU设备 */
+    /** CPU device */
     OH_NN_CPU = 1,
-    /** GPU设备 */
+    /** GPU device */
     OH_NN_GPU = 2,
-    /** 专用硬件加速器 */
+    /** Dedicated hardware accelerator */
     OH_NN_ACCELERATOR = 3,
 } OH_NN_DeviceType;
 
 /**
- * @brief Neural Network Runtime 支持的数据类型
+ * @brief Defines tensor data types supported by Neural Network Runtime.
  *
  * @since 9
  * @version 1.0
  */
 typedef enum {
-    /** 张量数据类型未知 */
+    /** Unknown type */
     OH_NN_UNKNOWN = 0,
-    /** 张量数据类型为bool */
+    /** bool */
     OH_NN_BOOL = 1,
-    /** 张量数据类型为int8 */
+    /** int8 */
     OH_NN_INT8 = 2,
-    /** 张量数据类型为int16 */
+    /** int16 */
     OH_NN_INT16 = 3,
-    /** 张量数据类型为int32 */
+    /** int32 */
     OH_NN_INT32 = 4,
-    /** 张量数据类型为int64 */
+    /** int64 */
     OH_NN_INT64 = 5,
-    /** 张量数据类型为uint8 */
+    /** uint8 */
     OH_NN_UINT8 = 6,
-    /** 张量数据类型为uint16 */
+    /** uint16 */
     OH_NN_UINT16 = 7,
-    /** 张量数据类型为uint32 */
+    /** uint32 */
     OH_NN_UINT32 = 8,
-    /** 张量数据类型为uint64 */
+    /** uint64 */
     OH_NN_UINT64 = 9,
-    /** 张量数据类型为float16 */
+    /** float16 */
     OH_NN_FLOAT16 = 10,
-    /** 张量数据类型为float32 */
+    /** float32 */
     OH_NN_FLOAT32 = 11,
-    /** 张量数据类型为float64 */
+    /** float64 */
     OH_NN_FLOAT64 = 12
 } OH_NN_DataType;
 
 
 /**
- * @brief Neural Network Runtime 支持算子的类型
+ * @brief Defines operator types supported by Neural Network Runtime.
  *
  * @since 9
  * @version 1.0
  */
 typedef enum {
     /**
-     * 返回两个输入张量对应元素相加的和的张量。
+     * Returns the tensor of the sum of the elements corresponding to two input tensors.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，第一个输入的张量，数据类型要求为布尔值或者数字。
-     * * y，第二个输入的张量，数据类型和形状需要和第一个输入保持一致。
+     * * <b>input1</b>: first input tensor, of the Boolean or number type.
+     * * <b>input2</b>: second input tensor, whose data type must be the same as that of the first tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 输出：
+     * Outputs:
      *
-     * * 0 输出x和y的和，数据形状与输入broadcast之后一样，数据类型与较高精度的输入精度一致
+     * * <b>output</b>: sum of <b>input1</b> and <b>input2</b>. 
+     *       The data shape is the same as that of the input after broadcasting, 
+     *       and the data type is the same as that of the input with a higher precision.
      */
     OH_NN_OPS_ADD = 1,
 
     /**
-     * 在输入tensor上应用 2D 平均池化，仅支持NHWC格式的tensor。支持int8量化输入。
+     * Apply 2D average pooling to the input tensor, which now must be in NHWC format. The int8 quantization input is supported.
      *
-     * 如果输入中含有padMode参数：
+     * If the input contains the <b>padMode</b> parameter:
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，一个张量。
+     * * <b>input</b>: tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * kernelSize，用来取平均值的kernel大小，是一个长度为2的int数组[kernel_height，kernel_weight]，
-     *      第一个数表示kernel高度，第二个数表示kernel宽度。
-     * * strides，kernel移动的距离，是一个长度为2的int数组[stride_height，stride_weight]，
-     *      第一个数表示高度上的移动步幅，第二个数表示宽度上的移动步幅。
-     * * padMode，填充模式，int类型的可选值，0表示same，1表示valid，并且以最近邻的值填充。
-     *      same，输出的高度和宽度与x相同，填充总数将在水平和垂直方向计算，并在可能的情况下均匀分布到顶部
-     *      和底部、左侧和右侧。否则，最后一个额外的填充将从底部和右侧完成。
-     *      valid，输出的可能最大高度和宽度将在不填充的情况下返回。额外的像素将被丢弃。
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>kernelSize</b> indicates the kernel size used to obtain the average value. It is an int array [kernel_height, kernel_width].
+     *       The first number indicates the kernel height, and the second number indicates the kernel width.
+     * * <b>strides</b> indicates the distance of kernel moving. The value is an int array [stride_height, stride_width].
+     *       The first number indicates the moving step in height, and the second number indicates the moving step in width.
+     * * <b>padMode</b>: padding mode, which is optional. The value is of the int type and can be <b>0</b> (same) or <b>1</b> (valid). 
+     *       The nearest neighbor value is used for padding.
+     *       <b>0</b> (same): The height and width of the output are the same as those of the input. 
+     *       The total padding quantity is calculated horizontally and vertically and evenly distributed to the top, bottom, left, and right if possible.
+     *       Otherwise, the last additional padding will be completed from the bottom and right.
+     *       <b>1</b> (valid): The possible maximum height and width of the output will be returned in case of no padding. Excessive pixels will be discarded.
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 如果输入中含有padList参数：
+     * If the input contains the <b>padList</b> parameter:
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，一个张量。
+     * * <b>input</b>: tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * kernelSize，用来取平均值的kernel大小，是一个长度为2的int数组[kernel_height，kernel_weight]，
-     *      第一个数表示kernel高度，第二个数表示kernel宽度。
-     * * strides，kernel移动的距离，是一个长度为2的int数组[stride_height，stride_weight]，
-     *      第一个数表示高度上的移动步幅，第二个数表示宽度上的移动步幅。
-     * * padList，输入x周围的填充，是一个长度为4的int数组[top，bottom，left，right]，并且以最近邻的值填充。
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>kernelSize</b> indicates the kernel size used to obtain the average value. It is an int array [kernel_height, kernel_width].
+     *       The first number indicates the kernel height, and the second number indicates the kernel width.
+     * * <b>strides</b> indicates the distance of kernel moving. The value is an int array [stride_height, stride_width].
+     *       The first number indicates the moving step in height, and the second number indicates the moving step in width.
+     * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right], and the nearest neighbor values are used for padding.
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 输出：
+     * Outputs:
      *
-     * * 输出x平均池化后的张量。
+     * * <b>output</b>: average pooling result of the input.
      */
     OH_NN_OPS_AVG_POOL = 2,
 
     /**
-     * 对一个tensor进行batch normalization，对tensor元素进行缩放和位移，缓解一批数据中潜在的covariate shift。
+     * Batch normalization is performed on a tensor to scale and shift tensor elements, relieving potential covariate shift in a batch of data.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，一个n维的tensor，要求形状为[N，...，C]，即第n维是通道数（channel）。
-     * * scale，缩放因子的1D张量，用于缩放归一化的第一个张量。
-     * * offset，用于偏移的1D张量，以移动到归一化的第一个张量。
-     * * mean，总体均值的一维张量，仅用于推理；对于训练，必须为空。
-     * * variance，用于总体方差的一维张量。仅用于推理；对于训练，必须为空。
+     * * <b>input</b>: <i>n</i>-dimensional tensor of shape [N, ..., C]. The <i>n</i>th dimension is the number of channels.
+     * * <b>scale</b>: 1D tensor of the scaling factor used to scale the first normalized tensor.
+     * * <b>offset</b>: 1D tensor used to move to the first normalized tensor.
+     * * <b>mean</b>: 1D tensor of the overall mean value. It is used only for inference. In case of training, this parameter must be left empty.
+     * * <b>variance</b>: 1D tensor used for the overall variance. It is used only for inference. In case of training, this parameter must be left empty.
      *
-     * 参数：
+     * Parameters:
      *
-     * * epsilon，数值稳定性的小附加值。
+     * * <b>epsilon</b>: fixed small additional value.
      *
-     * 输出：
+     * Outputs:
      *
-     * * 输出张量，形状和数据类型与输入x一致。
+     * * <b>output</b>: <i>n</i>-dimensional output tensor whose shape and data type are the same as those of the input.
      */
     OH_NN_OPS_BATCH_NORM = 3,
 
     /**
-     * 将一个4维tensor的batch维度按block_shape切分成小块，并将这些小块拼接到空间维度。
+     * Divides the batch dimension of a 4D tensor into small blocks by <b>block_shape</b>, and interleaves these blocks back into the spatial dimension.
      *
-     * 参数：
+     * Parameters:
      *
-     * * x，输入张量，维将被切分，拼接回空间维度。
+     * * <b>input</b>: input tensor. The dimension will be divided into small blocks, and these blocks will be interleaved into the spatial dimension.
      *
-     * 输出：
+     * Outputs:
      *
-     * * blockSize，一个长度为2的数组[height_block，weight_block]，指定切分到空间维度上的block大小。
-     * * crops，一个shape为(2，2)的2维数组[[crop0_start，crop0_end]，[crop1_start，crop1_end]]，
-     *      表示在output的空间维度上截掉部分元素。
+     * * <b>blockSize</b>: size of each block to be interleaved into the spatial dimension. The value is an array [height_block, width_block].
+     * * <b>crops</b>: elements truncated from the spatial dimension of the output. The value is a 2D array [[crop0_start, crop0_end], 
+     *       [crop1_start, crop1_end]] with the shape of (2, 2).
+     *      
      *
-     * 输出：
+     * Outputs:
      *
-     * * 输出张量，假设x的形状为(n，h，w，c)，output的形状为（n'，h'，w'，c'）：
-     *      n' = n / (block_shape[0] * block_shape[1])
-     *      h' = h * block_shape[0] - crops[0][0] - crops[0][1]
-     *      w' = w * block_shape[1] - crops[1][0] - crops[1][1]
-     *      c'= c
+     * * <b>output</b>. Assume that the shape of <b>input</b> is (n,h,w,c) and the shape of <b>output</b> is (n',h',w',c'):
+     *       n' = n / (block_shape[0] * block_shape[1])
+     *       h' = h * block_shape[0] - crops[0][0] - crops[0][1]
+     *       w' = w * block_shape[1] - crops[1][0] - crops[1][1]
+     *       c'= c
      */
     OH_NN_OPS_BATCH_TO_SPACE_ND = 4,
 
     /**
-     * 对给出的输入张量上的各个维度方向上的数据进行偏置。
+     * Offsets the data in each dimension of the input tensor.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，输入张量，可为2-5维度。
-     * * bias，参数对应输入维度数量的偏移值。
+     * * <b>input</b>: input tensor, which can have two to five dimensions.
+     * * <b>bias</b>: offset of the number of input dimensions.
      *
-     * 输出：
+     * Outputs:
      *
-     * * 输出张量，根据输入中每个维度方向偏移后的结果。
+     * * <b>output</b>: sum of the input tensor and the bias in each dimension.
      */
     OH_NN_OPS_BIAS_ADD = 5,
 
     /**
-     * 对输入张量中的数据类型进行转换。
+     * Converts the data type in the input tensor.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，输入张量。
-     * * type，输入转换目的的数据类型。
+     * * <b>input</b>: input tensor.
+     * * <b>type</b>: converted data type.
      *
-     * 输出：
+     * Outputs:
      *
-     * * 输出张量，输出转换为目的数据类型后的张量。
+     * * <b>output</b>: converted tensor.
      */
     OH_NN_OPS_CAST = 6,
 
     /**
-     * 在指定轴上连接张量，将输入张量按给定的轴连接起来。
+     * Connects tensors in a specified dimension.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x：N个输入张量。
+     * * <b>input</b>: <i>N</i> input tensors.
      *
-     * 参数：
+     * Parameters:
      *
-     * * axis，指定轴的位置。
+     * * <b>axis</b>: dimension for connecting tensors.
      *
-     * 输出：
+     * Outputs:
      *
-     * * 输出n个张量按axis轴连接的结果。
+     * * <b>output</b>: result of connecting <i>N</i> tensors along the axis.
      */
     OH_NN_OPS_CONCAT = 7,
 
     /**
-     * 二维卷积层。
+     * 2D convolutional layer.
      *
-     * 如果输入中含有padMode参数：
+     * If the input contains the <b>padMode</b> parameter:
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，输入张量。
-     * * weight，卷积的权重，要求weight排布为[outChannel，kernelHeight，kernelWidth，inChannel/group]，
-     *      inChannel必须要能整除group。
-     * * bias，卷积的偏置，是长度为[outChannel]的数组。在量化场景下，bias 参数不需要量化参数，其量化
-     *      版本要求输入 OH_NN_INT32 类型数据，实际量化参数由 x 和 weight 共同决定。
+     * * <b>input</b>: input tensor.
+     * * <b>weight</b>: convolution weight in [outChannel, kernelHeight, kernelWidth, inChannel/group] format. 
+     *       The value of <b>inChannel</b> must be exactly divided by the value of <b>group</b>.
+     *      
+     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>. 
+     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters. 
+     *       The quantization version requires data input of the <b>OH_NN_INT32</b> type. 
+     *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.
      *
-     * 参数：
+     * Parameters:
      *
-     * * stride，卷积核在height和weight上的步幅，是一个长度为2的int数组[strideHeight，strideWidth]。
-     * * dilation，表示扩张卷积在height和weight上的扩张率，是一个长度为2的int数组[dilationHeight，dilationWidth]，
-     *      值必须大于或等于1，并且不能超过x的height和width。
-     * * padMode，x的填充模式，支持same和valid，int类型，0表示same，1表示valid。
-     *      same，输出的高度和宽度与x相同，填充总数将在水平和垂直方向计算，并在可能的情况下均匀分布到顶部和底部、左侧
-     *      和右侧。否则，最后一个额外的填充将从底部和右侧完成。
-     *      Valid，输出的可能最大高度和宽度将在不填充的情况下返回。额外的像素将被丢弃。
-     * * group，将输入x按in_channel分组，int类型。group等于1，这是常规卷积；group大于1且小于或等于in_channel，这是分组卷积。
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>stride</b>: movement stride of the convolution kernel in height and width. It is an int array [strideHeight, strideWidth].
+     * * <b>dilation</b>: dilation size of the convolution kernel in height and width. It is an int array [dilationHeight, dilationWidth]. 
+     *       The value must be greater than or equal to <b>1</b> and cannot exceed the height and width of <b>input</b>.
+     *      
+     * * <b>padMode</b>: padding mode of <b>input</b>. The value is of the int type and can be <b>0</b> (same) or <b>1</b> (valid).
+     *       <b>0</b> (same): The height and width of the output are the same as those of the input. 
+     *       The total padding quantity is calculated horizontally and vertically and evenly distributed to the top, bottom, left, and right if possible. 
+     *       Otherwise, the last additional padding will be completed from the bottom and right.
+     *      
+     *       <b>1</b> (valid): The possible maximum height and width of the output will be returned in case of no padding. The excessive pixels will be discarded.
+     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>. The value is of the int type.
+     *       If <b>group</b> is <b>1</b>, it is a conventional convolution. If <b>group</b> is greater than <b>1</b> and 
+     *       less than or equal to <b>in_channel</b>, it is a group convolution.
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>. The specified activation function is called before output.
      *
+     * If the input contains the <b>padList</b> parameter:
      *
-     * 如果输入中含有padList参数：
+     * Inputs:
      *
-     * 输入：
+     * * <b>input</b>: input tensor.
+     * * <b>weight</b>: convolution weight in [outChannel, kernelHeight, kernelWidth, inChannel/group] format. 
+     *       The value of <b>inChannel</b> must be exactly divided by the value of <b>group</b>.
+     *      
+     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>. 
+     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters. 
+     *       The quantization version requires data input of the <b>OH_NN_INT32</b> type. 
+     *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.
      *
-     * * x，输入张量。
-     * * weight，卷积的权重，要求weight排布为[outChannel，kernelHeight，kernelWidth，inChannel/group]，
-     *      inChannel必须要能整除group。
-     * * bias，卷积的偏置，是长度为[outChannel]的数组。在量化场景下，bias 参数不需要量化参数，其量化
-     *      版本要求输入 OH_NN_INT32 类型数据，实际量化参数由 x 和 weight 共同决定。
+     * Parameters:
      *
-     * 参数：
+     * * <b>stride</b>: movement stride of the convolution kernel in height and width. It is an int array [strideHeight, strideWidth].
+     * * <b>dilation</b>: dilation size of the convolution kernel in height and width. It is an int array [dilationHeight, dilationWidth].
+     *       The value must be greater than or equal to <b>1</b> and cannot exceed the height and width of <b>input</b>.
+     * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right].
+     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>. The value is of the int type.
+     *       If <b>group</b> is <b>1</b>, it is a conventional convolution.
+     *       If <b>group</b> is <b>in_channel</b>, it is depthwiseConv2d. In this case, group==in_channel==out_channel.
+     *       If <b>group</b> is greater than <b>1</b> and less than <b>in_channel</b>, it is a group convolution. In this case, out_channel==group.
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * * stride，卷积核在height和weight上的步幅，是一个长度为2的int数组[strideHeight，strideWidth]。
-     * * dilation，表示扩张卷积在height和weight上的扩张率，是一个长度为2的int数组[dilationHeight，dilationWidth]。
-     *      值必须大于或等于1，并且不能超过x的height和width。
-     * * padList，输入x周围的填充，是一个长度为4的int数组[top，bottom，left，right]。
-     * * group，将输入x按in_channel分组，int类型。
-     *      group等于1，这是常规卷积。
-     *      group等于in_channel，这是depthwiseConv2d，此时group==in_channel==out_channel。
-     *      group大于1且小于in_channel，这是分组卷积，out_channel==group。
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * Outputs:
      *
-     * 输出：
-     *
-     * * 输出张量，卷积的输出。
+     * * <b>output</b>: convolution computing result.
      */
     OH_NN_OPS_CONV2D = 8,
 
     /**
-     * 二维卷积转置。
+     * 2D convolution transposition.
      *
-     * 如果输入中含有padMode参数：
+     * If the input contains the <b>padMode</b> parameter:
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，输入张量。
-     * * weight，卷积的权重，要求weight排布为[outChannel，kernelHeight，kernelWidth，inChannel/group]，
-     *      inChannel必须要能整除group。
-     * * bias，卷积的偏置，是长度为[outChannel]的数组。在量化场景下，bias 参数不需要量化参数，其量化
-     *      版本要求输入 OH_NN_INT32 类型数据，实际量化参数由 x 和 weight 共同决定。
-     * * stride，卷积核在height和weight上的步幅，是一个长度为2的int数组[strideHeight，strideWidth]。
+     * * <b>input</b>: input tensor.
+     * * <b>weight</b>: convolution weight in [outChannel, kernelHeight, kernelWidth, inChannel/group] format. 
+     *       The value of <b>inChannel</b> must be exactly divided by the value of <b>group</b>.
+     *      
+     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>. 
+     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters. 
+     *       The quantization version requires data input of the <b>OH_NN_INT32</b> type. 
+     *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.
+     *      
+     * * <b>stride</b>: movement stride of the convolution kernel in height and width. It is an int array [strideHeight, strideWidth].
      *
-     * 参数：
+     * Parameters:
      *
-     * * dilation，表示扩张卷积在height和weight上的扩张率，是一个长度为2的int数组[dilationHeight，dilationWidth]。
-     *      值必须大于或等于1，并且不能超过x的height和width。
-     * * padMode，x的填充模式，支持same和valid，int类型，0表示same，1表示valid。
-     *      same，输出的高度和宽度与x相同，填充总数将在水平和垂直方向计算，并在可能的情况下均匀分布到顶部和底部、左侧
-     *      和右侧。否则，最后一个额外的填充将从底部和右侧完成。
-     *      Valid，输出的可能最大高度和宽度将在不填充的情况下返回。额外的像素将被丢弃。
-     * * group，将输入x按in_channel分组，int类型。group等于1，这是常规卷积；group大于1且小于或等于in_channel，这是分组卷积。
-     * * outputPads，一个整数或元组/2 个整数的列表，指定沿输出张量的高度和宽度的填充量。可以是单个整数，用于为所
-     *      有空间维度指定相同的值。沿给定维度的输出填充量必须小于沿同一维度的步幅。
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>dilation</b>: dilation size of the convolution kernel in height and width. It is an int array [dilationHeight, dilationWidth].
+     *       The value must be greater than or equal to <b>1</b> and cannot exceed the height and width of <b>input</b>.
+     * * <b>padMode</b>: padding mode of <b>input</b>. The value is of the int type and can be <b>0</b> (same) or <b>1</b> (valid).
+     *       <b>0</b> (same): The height and width of the output are the same as those of the input.
+     *       The total padding quantity is calculated horizontally and vertically and evenly distributed to the top, bottom, left, and right if possible. 
+     *       Otherwise, the last additional padding will be completed from the bottom and right.
+     *       <b>1</b> (valid): The possible maximum height and width of the output will be returned in case of no padding. The excessive pixels will be discarded.
+     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>. The value is of the int type. 
+     *       If <b>group</b> is <b>1</b>, it is a conventional convolution. If <b>group</b> is greater than <b>1</b> and 
+     *       less than or equal to <b>in_channel</b>, it is a group convolution.
+     * * <b>outputPads</b>: padding along the height and width of the output tensor. The value is an int or a tuple. 
+     *       It can be a single integer to specify the same value for all spatial dimensions. The amount of output 
+     *       padding along a dimension must be less than the stride along this dimension.
+     *      
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 如果输入中含有padList参数：
+     * If the input contains the <b>padList</b> parameter:
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，输入张量。
-     * * weight，卷积的权重，要求weight排布为[outChannel，kernelHeight，kernelWidth，inChannel/group]，
-     *      inChannel必须要能整除group。
-     * * bias，卷积的偏置，是长度为[outChannel]的数组。在量化场景下，bias 参数不需要量化参数，其量化
-     *      版本要求输入 OH_NN_INT32 类型数据，实际量化参数由 x 和 weight 共同决定。
+     * * <b>input</b>: input tensor.
+     * * <b>weight</b>: convolution weight in [outChannel, kernelHeight, kernelWidth, inChannel/group] format. 
+     *       The value of <b>inChannel</b> must be exactly divided by the value of <b>group</b>.      
+     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>. 
+     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters. 
+     *       The quantization version requires data input of the <b>OH_NN_INT32</b> type. 
+     *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.
+     * 
+     * Parameters:
      *
-     * 参数：
+     * * <b>stride</b>: movement stride of the convolution kernel in height and width. It is an int array [strideHeight, strideWidth].
+     * * <b>dilation</b>: dilation size of the convolution kernel in height and width. It is an int array [dilationHeight, dilationWidth].
+     *       The value must be greater than or equal to <b>1</b> and cannot exceed the height and width of <b>input</b>.
+     * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right].
+     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>. The value is of the int type. 
+     *       If <b>group</b> is <b>1</b>, it is a conventional convolution. If <b>group</b> is greater than <b>1</b> 
+     *       and less than or equal to <b>in_channel</b>, it is a group convolution.
+     * * <b>outputPads</b>: padding along the height and width of the output tensor. The value is an int or a tuple. 
+     *       It can be a single integer to specify the same value for all spatial dimensions. The amount of output padding 
+     *       along a dimension must be less than the stride along this dimension.
+     *      
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * * stride，卷积核在height和weight上的步幅，是一个长度为2的int数组[strideHeight，strideWidth]。
-     * * dilation，表示扩张卷积在height和weight上的扩张率，是一个长度为2的int数组[dilationHeight，dilationWidth]。
-     *      值必须大于或等于1，并且不能超过x的height和width。
-     * * padList，输入x周围的填充，是一个长度为4的int数组[top，bottom，left，right]。
-     * * group，将输入x按in_channel分组，int类型。group等于1，这是常规卷积；group大于1且小于或等于in_channel，这是分组卷积。
-     * * outputPads，一个整数或元组/2 个整数的列表，指定沿输出张量的高度和宽度的填充量。可以是单个整数，用于为所
-     *      有空间维度指定相同的值。沿给定维度的输出填充量必须小于沿同一维度的步幅。
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * Outputs:
      *
-     * 输出：
-     *
-     * * 输出张量，卷积转置后的输出。
+     * * <b>output</b>: computing result after convolution and transposition.
      */
     OH_NN_OPS_CONV2D_TRANSPOSE = 9,
 
     /**
-     * 2维深度可分离卷积
+     * 2D depthwise separable convolution.
      *
-     * 如果输入中含有padMode参数：
+     * If the input contains the <b>padMode</b> parameter:
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，输入张量。
-     * * weight，卷积的权重，要求weight排布为[outChannel，kernelHeight，kernelWidth，1]，outChannel = channelMultiplier x inChannel。
-     * * bias，卷积的偏置，是长度为[outChannel]的数组。在量化场景下，bias 参数不需要量化参数，其量化
-     *      版本要求输入 OH_NN_INT32 类型数据，实际量化参数由 x 和 weight 共同决定。
+     * * <b>input</b>: input tensor.
+     * * <b>weight</b>: convolution weight in [outChannel, kernelHeight, kernelWidth, 1] format. 
+     *       <b>outChannel</b> is equal to <b>channelMultiplier</b> multiplied by <b>inChannel</b>.
+     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>. 
+     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters. 
+     *       The quantization version requires data input of the <b>OH_NN_INT32</b> type. 
+     *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.
      *
-     * 参数：
+     * Parameters:
      *
-     * * stride，卷积核在height和weight上的步幅，是一个长度为2的int数组[strideHeight，strideWidth]。
-     * * dilation，表示扩张卷积在height和weight上的扩张率，是一个长度为2的int数组[dilationHeight，dilationWidth]。
-     *      值必须大于或等于1，并且不能超过x的height和width。
-     * * padMode，x的填充模式，支持same和valid，int类型，0表示same，1表示valid
-     *      same，输出的高度和宽度与x相同，填充总数将在水平和垂直方向计算，并在可能的情况下均匀分布到顶部和底部、左侧
-     *      和右侧。否则，最后一个额外的填充将从底部和右侧完成
-     *      Valid，输出的可能最大高度和宽度将在不填充的情况下返回。额外的像素将被丢弃
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>stride</b>: movement stride of the convolution kernel in height and width. It is an int array [strideHeight, strideWidth].
+     * * <b>dilation</b>: dilation size of the convolution kernel in height and width. It is an int array [dilationHeight, dilationWidth].
+     *       The value must be greater than or equal to <b>1</b> and cannot exceed the height and width of <b>input</b>.
+     * * <b>padMode</b>: padding mode of <b>input</b>. The value is of the int type and can be <b>0</b> (same) or <b>1</b> (valid).
+     *       <b>0</b> (same): The height and width of the output are the same as those of the input. 
+     *       The total padding quantity is calculated horizontally and vertically and evenly distributed to the top, bottom, left, and right if possible.
+     *       Otherwise, the last additional padding will be completed from the bottom and right.
+     *      
+     *       <b>1</b> (valid): The possible maximum height and width of the output will be returned in case of no padding. The excessive pixels will be discarded.
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 如果输入中含有padList 参数：
+     * If the input contains the <b>padList</b> parameter:
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，输入张量。
-     * * weight，卷积的权重，要求weight排布为[outChannel，kernelHeight，kernelWidth，1]，outChannel = channelMultiplier x inChannel。
-     * * bias，卷积的偏置，是长度为[outChannel]的数组。在量化场景下，bias 参数不需要量化参数，其量化
-     *      版本要求输入 OH_NN_INT32 类型数据，实际量化参数由 x 和 weight 共同决定。
+     * * <b>input</b>: input tensor.
+     * * <b>weight</b>: convolution weight in [outChannel, kernelHeight, kernelWidth, 1] format. 
+     *       <b>outChannel</b> is equal to <b>channelMultiplier</b> multiplied by <b>inChannel</b>.
+     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>. 
+     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters. 
+     *       The quantization version requires data input of the <b>OH_NN_INT32</b> type. 
+     *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.
      *
-     * 参数：
+     * Parameters:
      *
-     * * stride，卷积核在height和weight上的步幅，是一个长度为2的int数组[strideHeight，strideWidth]。
-     * * dilation，表示扩张卷积在height和weight上的扩张率，是一个长度为2的int数组[dilationHeight，dilationWidth]。
-     *      值必须大于或等于1，并且不能超过x的height和width。
-     * * padList，输入x周围的填充，是一个长度为4的int数组[top，bottom，left，right]。
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>stride</b>: movement stride of the convolution kernel in height and width. It is an int array [strideHeight, strideWidth].
+     * * <b>dilation</b>: dilation size of the convolution kernel in height and width. It is an int array [dilationHeight, dilationWidth].
+     *       The value must be greater than or equal to <b>1</b> and cannot exceed the height and width of <b>input</b>.
+     * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right].
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 输出：
+     * Outputs:
      *
-     * * 输出张量，卷积后的输出。
+     * * <b>output</b>: convolution computing result.
      */
     OH_NN_OPS_DEPTHWISE_CONV2D_NATIVE = 10,
 
     /**
-     * 对输入的两个标量或张量做商。
+     * Divides two input scalars or tensors.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x1，第一个输入是标量或布尔值或数据类型为数字或布尔值的张量。
-     * * x2，数据类型根据x1的类型，要求有所不同：
-     *      当第一个输入是张量时，第二个输入可以是实数或布尔值或数据类型为实数/布尔值的张量。
-     *      当第一个输入是实数或布尔值时，第二个输入必须是数据类型为实数/布尔值的张量。
+     * * <b>input1</b>: first input, which is a number, a bool, or a tensor whose data type is number or Boolean.
+     * * <b>input2</b>: second input, which must meet the following requirements: 
+     *       If the first input is a tensor, the second input can be a real number, a Boolean value, or a tensor whose data type is real number or Boolean value.
+     *       If the first input is a real number or Boolean value, the second input must be a tensor whose data type is real number or Boolean value.
      *
-     * 参数：
+     * Parameters:
      *
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 输出：
+     * Outputs:
      *
-     * * 输出张量，输出两输入相除后的结果。
+     * * <b>output</b>: result of dividing <b>input1</b> by <b>input2</b>.
      */
     OH_NN_OPS_DIV = 11,
 
     /**
-     * 设置参数对输入进行product(点乘)、sum(相加减)或max(取大值)。
+     * Sets parameters to perform product (dot product), sum (addition and subtraction), or max (larger value) on the input.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x1，第一个输入张量。
-     * * x2，第二个输入张量。
+     * * <b>input1</b>: first input tensor.
+     * * <b>input2</b>: second input tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * mode，枚举，选择操作方式。
+     * * <b>mode</b>: operation mode. The value is an enumerated value.
      *
-     * 输出：
+     * Outputs:
      *
-     * * 输出tensor，与x1有相同的数据类型和形状。
-     *
+     * * <b>output</b>: computing result, which has the same data type and shape of <b>output</b> and <b>input1</b>.
      */
     OH_NN_OPS_ELTWISE = 12,
 
     /**
-     * 在给定轴上为tensor添加一个额外的维度。
+     * Adds an additional dimension to a tensor in the given dimension.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，输入张量。
-     * * axis，需要添加的维度的index，int32_t类型，值必须在[-dim-1，dim]，且只允许常量值。
+     * * <b>input</b>: input tensor.
+     * * <b>axis</b>: index of the dimension to be added. The value is of the int32_t type and must be a constant in the range [-dim-1, dim].
      *
-     * 输出：
+     * Outputs:
      *
-     * * 输出tensor，与x有相同的数据类型和形状。
+     * * <b>output</b>: tensor after dimension expansion.
      */
     OH_NN_OPS_EXPAND_DIMS = 13,
 
     /**
-     * 根据指定的维度，创建由一个标量填充的张量。
+     * Creates a tensor of the specified dimensions and fills it with a scalar.
      *
-     * 输入：
+     * Inputs:
      *
-     * * value，填充的标量。
-     * * shape，指定创建张量的维度。
+     * * <b>value</b>: scalar used to fill the tensor.
+     * * <b>shape</b>: dimensions of the tensor to be created.
      *
-     * 输出：
+     * Outputs:
      *
-     * * 输出张量，与value有相同的数据类型，shape由输入指定。
+     * * <b>output</b>: generated tensor, which has the same data type as <b>value</b>. The tensor shape is specified by the <b>shape</b> parameter.
      */
     OH_NN_OPS_FILL = 14,
 
     /**
-     * 全连接，整个输入作为feature map，进行特征提取。
+     * Full connection. The entire input is used as the feature map for feature extraction.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，全连接的输入张量。
-     * * weight，全连接的权重张量。
-     * * bias，全连接的偏置，在量化场景下，bias 参数不需要量化参数，其量化
-     *      版本要求输入 OH_NN_INT32 类型数据，实际量化参数由 x 和 weight 共同决定。
+     * * <b>input</b>: full-connection input tensor.
+     * * <b>weight</b>: weight tensor for a full connection.
+     * * <b>bias</b>: full-connection bias. In quantization scenarios, no quantized parameter is required for this parameter.
+     *       If quantization is required, the data must be of the OH_NN_INT32 type. 
+     *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.
      *
-     * 参数：
+     * Parameters:
      *
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，输出运算后的张量。
-
-     * 如果输入中含有axis参数：
+     * * <b>output</b>: computed tensor.
      *
-     * 输入：
+     * If the input contains the <b>axis</b> parameter:
      *
-     * * x，全连接的输入张量。
-     * * weight，全连接的权重张量。
-     * * bias，全连接的偏置，在量化场景下，bias 参数不需要量化参数，其量化
-     *      版本要求输入 OH_NN_INT32 类型数据，实际量化参数由 x 和 weight 共同决定。
+     * Inputs:
      *
-     * 参数：
+     * * <b>input</b>: full-connection input tensor.
+     * * <b>weight</b>: weight tensor for a full connection.
+     * * <b>bias</b>: full-connection bias. In quantization scenarios, no quantized parameter is required for this parameter.
+     *       If quantization is required, the data must be of the OH_NN_INT32 type. The actual quantization parameters
+     *       are determined by <b>input</b> and <b>weight</b>.      
      *
-     * * axis，x做全连接的轴，从指定轴axis开始，将axis和axis后面的轴展开成1维去做全连接。
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * Parameters:
      *
-     * 输出：
+     * * <b>axis</b>: axis in which the full connection is applied. The specified axis and its following axes are
+     *       converted into a 1D tensor for applying the full connection.
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * * output，输出运算后的张量。
+     * Outputs:
+     *
+     * * <b>output</b>: computed tensor.
      */
     OH_NN_OPS_FULL_CONNECTION = 15,
 
     /**
-     * 根据指定的索引和轴返回输入tensor的切片。
+     * Returns the slice of the input tensor based on the specified index and axis.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，输入待切片的tensor。
-     * * inputIndices，指定输入x在axis上的索引，是一个int类型的数组，值必须在[0,x.shape[axis])范围内
-     * * axis，输入x被切片的轴，int32_t类型的数组，数组长度为1。
+     * * <b>input</b>: tensor to be sliced.
+     * * <b>inputIndices</b>: indices of the specified input on the axis. The value is an array of the int type
+     *       and must be in the range [0,input.shape[axis]).
+     * * <b>axis</b>: axis on which <b>input</b> is sliced. The value is an array with one element of the int32_t type.
      *
-     * 输出：
+     * Outputs:
      *
-     * * Output，输出切片后的tensor。
+     * * <b>output</b>: sliced tensor.
      */
     OH_NN_OPS_GATHER = 16,
 
     /**
-     * 计算输入的Hswish激活值。
+     * Calculate the <b>Hswish</b> activation value of the input.
      *
-     * 输入：
+     * Inputs:
      *
-     * * 一个n维输入tensor。
+     * * An <i>n</i>-dimensional input tensor.
      *
-     * 输出：
+     * Outputs:
      *
-     * * n维Hswish激活值，数据类型和shape和input一致。
+     * * <b>output</b>: <i>n</i>-dimensional <b>Hswish</b> activation value. The data type is the same as that of <b>shape</b> and <b>input</b>.
      */
     OH_NN_OPS_HSWISH = 17,
 
     /**
-     * 对输入x1和x2，计算每对元素的x<=y的结果。
+     * For <b>input1</b> and <b>input2</b>, calculate the result of input1[i]<=input2[i] for each pair of elements,
+     * where i is the index of each element in the input tensor.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  x1，可以是实数、布尔值或数据类型是实数/NN_BOOL的tensor。
-     * *  x2，如果input_x是tensor，input_y可以是实数、布尔值，否则只能是tensor，其数据类型是实数或NN_BOOL。
+     * * <b>input1</b>, which can be a real number, Boolean value, or tensor whose data type is real number or NN_BOOL.
+     * * <b>input2</b>, which can be a real number or a Boolean value if <b>input1</b> is a tensor and must be a tensor
+     *       with the data type of real number or NN_BOOL if <b>input1</b> is not a tensor.
      *
-     * 输出：
+     * Outputs:
      *
-     * * Tensor，数据类型为NN_BOOL的tensor，使用量化模型时，output的量化参数不可省略，但量化参数的数值不会对输入结果产生影响。
+     * * A tensor of the data type NN_BOOL. When a quantization model is used, the quantization parameters of the output
+     *   cannot be omitted. However, values of the quantization parameters do not affect the result.
      */
     OH_NN_OPS_LESS_EQUAL = 18,
 
     /**
-     * 计算x1和x2的内积
+     * Calculate the inner product of <b>input1</b> and <b>input2</b>.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x1，n维输入tensor。
-     * * x2，n维输入tensor。
+     * * <b>input1</b>: <i>n</i>-dimensional input tensor.
+     * * <b>input2</b>: <i>n</i>-dimensional input tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * TransposeX，布尔值，是否对x1进行转置。
-     * * TransposeY，布尔值，是否对x2进行转置。
+     * * <b>TransposeX</b>: Boolean value indicating whether to transpose <b>input1</b>.
+     * * <b>TransposeY</b>: Boolean value indicating whether to transpose <b>input2</b>.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，计算得到内积，当type!=NN_UNKNOWN时，output数据类型由type决定；当type==NN_UNKNOWN时，
-     *      output的数据类型取决于inputX和inputY进行计算时转化的数据类型。
+     * * <b>output</b>: inner product obtained after calculation. In case of type!=NN_UNKNOWN, the output data type is
+     *       determined by <b>type</b>. In case of type==NN_UNKNOWN, the output data type depends on the data type
+     *       converted during computing of <b>inputX</b> and <b>inputY</b>.
+     *      
      */
     OH_NN_OPS_MATMUL = 19,
 
     /**
-     * 计算input1和input2对应元素最大值，input1和input2的输入遵守隐式类型转换规则，使数据类型一致。输入必须
-     * 是两个张量或一个张量和一个标量。当输入是两个张量时，它们的数据类型不能同时为NN_BOOL。它们的形状支持
-     * broadcast成相同的大小。当输入是一个张量和一个标量时，标量只能是一个常数。
+     * Calculates the maximum of <b>input1</b> and <b>input2</b> element-wise. The inputs of <b>input1</b> and <b>input2</b>
+     * comply with the implicit type conversion rules to make the data types consistent. * The inputs must be two tensors or one tensor and one scalar.
+     * When the inputs are two tensors, their data types cannot be both NN_BOOL. Their shapes can be broadcast to the same size.
+     * When the inputs are one tensor and one scalar, the scalar must be a constant.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  x1，n维输入tensor，实数或NN_BOOL类型。
-     * *  x2，n维输入tensor，实数或NN_BOOL类型。
+     * * <b>input1</b>: <i>n</i>-dimensional input tensor of the real number or NN_BOOL type.
+     * * <b>input2</b>: <i>n</i>-dimensional input tensor of the real number or NN_BOOL type.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，n维输出tensor，output的shape和数据类型和两个input中精度或者位数高的相同。
+     * * <b>output</b>: <i>n</i>-dimensional output tensor. The <b>shape</b> and data type of
+     *       <b>output</b> are the same as those of the two inputs with a higher precision.
      */
     OH_NN_OPS_MAXIMUM = 20,
 
     /**
-     * 在输入tensor上应用 2D 最大值池化。
+     * Applies 2D maximum pooling to the input tensor.
      *
-     * 如果输入中含有padMode参数：
+     * If the input contains the <b>padMode</b> parameter:
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，一个张量。
+     * * <b>input</b>: tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * kernelSize，用来取最大值的kernel大小，是一个长度为2的int数组[kernel_height，kernel_weight]，
-     *       第一个数表示kernel高度，第二个数表示kernel宽度。
-     * * strides，kernel移动的距离，是一个长度为2的int数组[stride_height，stride_weight]，
-     *      第一个数表示高度上的移动步幅，第二个数表示宽度上的移动步幅。
-     * * padMode，填充模式，int类型的可选值，0表示same，1表示valid，并且以最近邻的值填充。
-     *      same，输出的高度和宽度与x相同，填充总数将在水平和垂直方向计算，并在可能的情况下均匀分布到顶部
-     *      和底部、左侧和右侧。否则，最后一个额外的填充将从底部和右侧完成。
-     *      valid，输出的可能最大高度和宽度将在不填充的情况下返回。额外的像素将被丢弃。
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>kernelSize</b>: kernel size used to obtain the maximum. It is an int array [kernel_height, kernel_width].
+     *       The first number indicates the kernel height, and the second number indicates the kernel width.
+     * * <b>strides</b> indicates the distance of kernel moving. The value is an int array [stride_height, stride_width].
+     *       The first number indicates the moving step in height, and the second number indicates the moving step in width.
+     * * <b>padMode</b>: padding mode, which is optional. The value is of the int type and can be <b>0</b> (same)
+     *       or <b>1</b> (valid). The nearest neighbor value is used for padding.
+     *       <b>0</b> (same): The height and width of the output are the same as those of the input. 
+     *       The total padding quantity is calculated horizontally and vertically and evenly distributed to the top, bottom, left, and right if possible.
+     *       Otherwise, the last additional padding will be completed from the bottom and right.  
+     *       <b>1</b> (valid): The possible maximum height and width of the output will be returned in case of no padding. The excessive pixels will be discarded.
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 如果输入中含有padList参数：
+     * If the input contains the <b>padList</b> parameter:
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，一个张量。
+     * * <b>input</b>: tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * kernelSize，用来取最大值的kernel大小，是一个长度为2的int数组[kernel_height，kernel_weight]，
-     *       第一个数表示kernel高度，第二个数表示kernel宽度。
-     * * strides，kernel移动的距离，是一个长度为2的int数组[stride_height，stride_weight]，
-     *      第一个数表示高度上的移动步幅，第二个数表示宽度上的移动步幅。
-     * * padList，输入x周围的填充，是一个长度为4的int数组[top，bottom，left，right]，并且以最近邻的值填充。
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>kernelSize</b>: kernel size used to obtain the maximum. It is an int array [kernel_height, kernel_width].
+     *       The first number indicates the kernel height, and the second number indicates the kernel width.
+     * * <b>strides</b> indicates the distance of kernel moving. The value is an int array [stride_height, stride_width].
+     *       The first number indicates the moving step in height, and the second number indicates the moving step in width.
+     * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right], 
+     *       and the nearest neighbor values are used for padding.
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，输出x最大值池化后的张量。
+     * * <b>output</b>: tensor obtained after maximum pooling is applied to the input.
      */
     OH_NN_OPS_MAX_POOL = 21,
 
     /**
-     * 将inputX和inputY相同的位置的元素相乘得到output。如果inputX和inputY类型shape不同，要求inputX和inputY可以
-     * 通过broadcast扩充成相同的shape进行相乘。
+     * Multiplies elements in the same positions of <b>inputX</b> and <b>inputY</b> to obtain the output.
+     * If <b>inputX</b> and <b>inputY</b> have different shapes, expand them to the same shape
+     * through broadcast and then perform multiplication.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x1，一个n维tensor。
-     * * x2，一个n维tensor。
+     * * <b>input1</b>: <i>n</i>-dimensional tensor.
+     * * <b>input2</b>: <i>n</i>-dimensional tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，x1和x2每个元素的乘积。
+     * * Product of each element of <b>input1</b> and <b>input2</b>.
      */
     OH_NN_OPS_MUL = 22,
 
     /**
-     * 根据indices指定的位置，生成一个由one-hot向量构成的tensor。每个onehot向量中的有效值由on_value决定，其他位置由off_value决定。
+     * Generates a one-hot tensor based on the positions specified by <b>indices</b>. The positions specified by <b>indices</b>
+     * are determined by <b>on_value</b>, and other positions are determined by <b>off_value</b>.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  indices，n维tensor。indices中每个元素决定每个one-hot向量，on_value的位置
-     * *  depth，一个整型标量，决定one-hot向量的深度。要求depth>0。
-     * *  on_value，一个标量，指定one-hot向量中的有效值。
-     * *  off_value，(一个标量，指定one-hot向量中除有效位以外，其他位置的值。
+     * * <b>indices</b>: <i>n</i>-dimensional tensor. Each element in <b>indices</b> determines the position of
+     *       <b>on_value</b> in each one-hot vector.
+     * * <b>depth</b>: integer scalar that determines the depth of the one-hot vector. The value of <b>depth</b>
+     *       must be greater than <b>0</b>.
+     * * <b>on_value</b>: scalar that specifies a valid value in the one-hot vector.
+     * * <b>off_value</b>: scalar that specifies the values of other posistions in the one-hot vector except the valid value.
      *
-     * 参数：
+     * Parameters:
      *
-     * *  axis，一个整型标量，指定插入one-hot的维度。
-     *       indices的形状是[N，C]，depth的值是D，当axis=0时，output形状为[D，N，C]，
-     *       indices的形状是[N，C]，depth的值是D，当axis=-1时，output形状为[N，C，D]，
-     *       indices的形状是[N，C]，depth的值是D，当axis=1时，output形状为[N，D，C]。
+     * * <b>axis</b>: integer scalar that specifies the dimension for inserting the one-hot. Assume that the shape
+     *       of <b>indices</b> is [N, C], and the value of <b>depth</b> is D. 
+     *       When <b>axis</b> is <b>0</b>, the shape of the output is [D, N, C].
+     *       When <b>axis</b> is <b>-1</b>, the shape of the output is [N, C, D].
+     *       When <b>axis</b> is <b>1</b>, the shape of the output is [N, D, C].
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，如果indices时n维tensor，则output是(n+1)维tensor。output的形状由indices和axis共同决定。
+     * * <b>output</b>: (<i>n</i>+1)-dimensional tensor if <b>indices</b> is an <i>n</i>-dimensional tensor.
+     *       The output shape is determined by <b>indices</b> and <b>axis</b>.
      */
     OH_NN_OPS_ONE_HOT = 23,
 
     /**
-     * 在inputX指定维度的数据前后，添加指定数值进行增广。
+     * Pads <b>inputX</b> in the specified dimensions.
      *
-     * 输入：
+     * Inputs:
      *
-     * * inputX，一个n维tensor，要求inputX的排布为[BatchSize，…]。
-     * * paddings，一个2维tensor，指定每一维度增补的长度，shape为[n，2]。paddings[i][0]表示第i维上，需要在inputX前增补的数量；
-     *      paddings[i][1]表示第i维上，需要在inputX后增补的数量。
+     * * <b>inputX</b>: <i>n</i>-dimensional tensor in [BatchSize, ...] format.
+     * * <b>paddings</b>: 2D tensor that specifies the length to pad in each dimension. The shape is [n, 2]. 
+     *       For example, <b>paddings[i][0]</b> indicates the number of paddings to be added preceding <b>inputX</b> in the <i>i</i>th dimension.
+     *       <b>paddings[i][1]</b> indicates the number of paddings to be added following <b>inputX</b> in the <i>i</i>th dimension.
      *
-     * 参数：
+     * Parameters:
      *
-     * * padValues，一个常数，数据类型和inputX一致，指定Pad操作补全的数值。
+     * * <b>padValues</b>: value to be added to the pad operation. The value is a constant with the same data type as <b>inputX</b>.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，一个n维tensor，维数和数据类型和inputX保持一致。shape由inputX和paddings共同决定
-     *      output.shape[i] = input.shape[i] + paddings[i][0]+paddings[i][1]。
+     * * <b>output</b>: <i>n</i>-dimensional tensor after padding, with the same dimensions and data type as <b>inputX</b>.
+     *       The shape is determined by <b>inputX</b> and <b>paddings</b>.
+     *       output.shape[i] = input.shape[i] + paddings[i][0]+paddings[i][1]
      */
     OH_NN_OPS_PAD = 24,
 
     /**
-     * 求x的y次幂，输入必须是两个tensor或一个tensor和一个标量。当输入是两个tensor时，它们的数据类型不能同时为NN_BOOL，
-     * 且要求两个tensor的shape相同。当输入是一个tensor和一个标量时，标量只能是一个常数。
+     * Calculates the <b>y</b> power of each element in <b>input</b>. The inputs must be two tensors or one tensor and one scalar.
+     * When the inputs are two tensors, their data types cannot be both NN_BOOL, and their shapes must be the same.
+     * When the inputs are one tensor and one scalar, the scalar must be a constant.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，实数、bool值或tensor，tensor的数据类型为实数/NN_BOOL。
-     * * y，实数、bool值或tensor，tensor的数据类型为实数/NN_BOOL。
+     * * <b>input</b>: real number, Boolean value, or tensor whose data type is real number or NN_BOOL.
+     * * <b>y</b>: real number, Boolean value, or tensor whose data type is real number or NN_BOOL.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，形状由x和y broadcast后的形状决定。
+     * * <b>output</b>: tensor, whose shape is determined by the shape of <b>input</b> and <b>y</b> after broadcasting.
      */
     OH_NN_OPS_POW = 25,
 
     /**
-     * 给定一个tensor，计算其缩放后的值。
+     * Scales a tensor.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，一个n维tensor。
-     * * scale，缩放tensor。
-     * * bias，偏置tensor。
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     * * <b>scale</b>: scaling tensor.
+     * * <b>bias</b>: bias tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * axis，指定缩放的维度。
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>axis</b>: dimensions to be scaled.
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，scale的计算结果，一个n维tensor，类型和input一致，shape由axis决定。
+     * * <b>output</b>: scaled <i>n</i>-dimensional tensor, whose data type is the same as that of <b>input</b> and
+     *       shape is determined by <b>axis</b>.
      */
     OH_NN_OPS_SCALE = 26,
 
     /**
-     * 输入一个tensor，计算其shape。
+     * Calculates the shape of the input tensor.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，一个n维tensor。
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，输出tensor的维度，一个整型数组。
+     * * <b>output</b>: integer array representing the dimensions of the input tensor.
      */
     OH_NN_OPS_SHAPE = 27,
 
     /**
-     * 给定一个tensor，计算其sigmoid结果。
+     * Applies the <b>sigmoid</b> operation to the input tensor.
      *
-     * 输入：
+     * Inputs:
      *
-     * * input，一个n维tensor。
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，sigmoid的计算结果，一个n维tensor，类型和shape和input一致。
+     * * <b>output</b>: result of the <b>sigmoid</b> operation. It is an <i>n</i>-dimensional tensor
+     *       with the same data type and shape as <b>input</b>.
      */
     OH_NN_OPS_SIGMOID = 28,
 
     /**
-     * 在input tensor各维度，以begin为起点，截取size长度的切片。
+     * Slices a tensor of the specified size from the input in each dimension.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，n维输入tensor。
-     * * begin，一组不小于0的整数，指定每个维度上的起始切分点。
-     * * size，一组不小于1的整数，指定每个维度上切片的长度。假设某一维度i，1<=size[i]<=input.shape[i]-begin[i]。
+     * * <b>input</b>: <i>n</i>-dimensional input tensor.
+     * * <b>begin</b>: start of the slice, which is an array of integers greater than or equal to 0.
+     * * <b>size</b>: slice length, which is an array of integers greater than or equal to 0. 
+     *       Assume that a dimension is <b>i</b> and 1<=size[i]<=input.shape[i]-begin[i].
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，切片得到的n维tensor，其TensorType和input一致，shape和size相同。
+     * * <b>output</b>: <i>n</i>-dimensional tensor obtained by slicing. 
+     *       The <b>TensorType</b>, shape, and size of the output are the same as those of the input.
      */
     OH_NN_OPS_SLICE = 29,
 
     /**
-     * 给定一个tensor，计算其softmax结果。
+     * Applies the <b>softmax</b> operation to the input tensor.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，n维输入tensor。
+     * * <b>input</b>: <i>n</i>-dimensional input tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * axis，int64类型，指定计算softmax的维度。整数取值范围为[-n，n)。
+     * * <b>axis</b>: dimension in which the <b>softmax</b> operation is performed.
+     *       The value is of the int64 type. It is an integer in the range [-n, n).
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，softmax的计算结果，一个n维tensor，类型和shape和x一致。
+     * * <b>output</b>: result of the <b>softmax</b> operation. It is an <i>n</i>-dimensional tensor with
+     *       the same data type and shape as <b>input</b>.
      */
     OH_NN_OPS_SOFTMAX = 30,
 
     /**
-     * 将4维tensor在空间维度上进行切分成blockShape[0] * blockShape[1]个小块，然后在batch维度上拼接这些小块。
+     * Divides a 4D tensor into small blocks and combines these blocks in the original batch.
+     * The number of blocks is <b>blockShape[0]</b> multiplied by <b>blockShape[1]</b>.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，一个4维tensor
+     * * <b>input</b>: 4D tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * blockShape，一对整数，每个整数不小于1。
-     * * paddings，一对数组，每个数组由两个整数组成。组成paddings的4个整数都不小于0。paddings[0][0]和paddings[0][1]指
-     *      定了第三个维度上padding的数量，paddings[1][0]和paddings[1][1]指定了第四个维度上padding的数量。
+     * * <b>blockShape</b>: a pair of integers. Each of them is greater than or equal to <b>1</b>.
+     * * <b>paddings</b>: a pair of arrays. Each of them consists of two integers. The four integers that form <b>paddings</b> 
+     *       must be greater than or equal to <b>0</b>. <b>paddings[0][0]</b> and <b>paddings[0][1]</b>
+     *       specify the number of paddings in the third dimension, and <b>paddings[1][0]</b> and <b>paddings[1][1]</b>
+     *       specify the number of paddings in the fourth dimension.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，一个4维tensor，数据类型和input一致。shape由input，blockShape和paddings共同决定，假设input shape为[n，c，h，w]，则有
-     *      output.shape[0] = n * blockShape[0] * blockShape[1]
-     *      output.shape[1] = c
-     *      output.shape[2] = (h + paddings[0][0] + paddings[0][1]) / blockShape[0]
-     *      output.shape[3] = (w + paddings[1][0] + paddings[1][1]) / blockShape[1]
-     *      要求(h + paddings[0][0] + paddings[0][1])和(w + paddings[1][0] + paddings[1][1])能被
-     *      blockShape[0]和blockShape[1]整除。
+     * * <b>output</b>: 4D tensor with the same data type as <b>input</b>. The shape is determined by <b>input</b>,
+     *       <b>blockShape</b>, and <b>paddings</b>. Assume that the input shape is [n,c,h,w], then:
+     *       output.shape[0] = n * blockShape[0] * blockShape[1]
+     *       output.shape[1] = c
+     *       output.shape[2] = (h + paddings[0][0] + paddings[0][1]) / blockShape[0]
+     *       output.shape[3] = (w + paddings[1][0] + paddings[1][1]) / blockShape[1]
+     *       (h + paddings[0][0] + paddings[0][1]) and (w + paddings[1][0] + paddings[1][1]) is exactly divisible by 
+     *       (h + paddings[0][0] + paddings[0][1]) and (w + paddings[1][0] + paddings[1][1]).
+     *      
      */
     OH_NN_OPS_SPACE_TO_BATCH_ND = 31,
 
     /**
-     * Split 算子沿 axis 维度将 input 拆分成多个 tensor，tensor 数量由 outputNum 指定。
+     * Splits the input into multiple tensors along the axis dimension. The number of tensors is specified by <b>outputNum</b>.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，n维tensor。
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * outputNum，long，输出tensor的数量，output_num类型为int。
-     * * size_splits，1维tensor，指定 tensor 沿 axis 轴拆分后，每个 tensor 的大小，size_splits 类型为 int。
-     *      如果 size_splits 的数据为空，则 tensor 被拆分成大小均等的 tensor，此时要求 input.shape[axis] 可以被 outputNum 整除；
-     *      如果 size_splits 不为空，则要求 size_splits 所有元素之和等于 input.shape[axis]。
-     * * axis，指定拆分的维度，axis类型为int。
+     * * <b>outputNum</b>: number of output tensors. The data type is long.
+     * * <b>size_splits</b>: size of each tensor split from the input. The value is a 1D tensor of the int type.
+     *       If <b>size_splits</b> is empty, the input will be evenly split into tensors of the same size. In this case,
+     *       <b>input.shape[axis]</b> can be exactly divisible by <b>outputNum</b>.
+     *       If <b>size_splits</b> is not empty, the sum of all its elements must be equal to <b>input.shape[axis]</b>.
+     * * <b>axis</b>: splitting dimension of the int type.
      *
-     * 输出：
+     * Outputs:
      *
-     * * outputs，一组n维tensor，每一个tensor类型和shape相同，每个tensor的类型和input一致。
+     * * <b>outputs</b>: array of <i>n</i>-dimensional tensors, with the same data type and dimensions. 
+     *       The data type of each tensor is the same as that of <b>input</b>.
      */
     OH_NN_OPS_SPLIT = 32,
 
     /**
-     * 给定一个tensor，计算其平方根。
+     * Calculates the square root of a tensor.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，一个n维tensor。
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，输入的平方根，一个n维tensor，类型和shape和input一致。
+     * * <b>output</b>: square root of the input. It is an <i>n</i>-dimensional tensor with the same data type and shape as <b>input</b>.
      */
     OH_NN_OPS_SQRT = 33,
 
     /**
-     * 计算两个输入的差值并返回差值的平方。SquaredDifference算子支持tensor和tensor相减。
-     * 如果两个tensor的TensorType不相同，Sub算子会将低精度的tensor转成更高精度的类型。
-     * 如果两个tensor的shape不同，要求两个tensor可以通过broadcast拓展成相同shape的tensor。
+     * Calculates the square of the difference between two tensors. The <b>SquaredDifference</b> operator supports tensor and tensor subtraction.
+     * If two tensors have different <b>TensorTypes</b>, the Sub operator converts the low-precision tensor to a high-precision one.
+     * If two tensors have different shapes, the two tensors can be extended to tensors with the same shape through broadcast.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，被减数，inputX是一个tensor，tensor的类型可以是NN_FLOAT16、NN_FLOAT32、NN_INT32或NN_BOOL。
-     * * y，减数，inputY是一个tensor，tensor的类型可以是NN_FLOAT16、NN_FLOAT32、NN_INT32或NN_BOOL。
+     * * <b>input1</b>: minuend, which is a tensor of the NN_FLOAT16, NN_FLOAT32, NN_INT32, or NN_BOOL type.
+     * * <b>input2</b>: subtrahend, which is a tensor of the NN_FLOAT16, NN_FLOAT32, NN_INT32, or NN_BOOL type.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，两个input差值的平方。output的shape由inputX和inputY共同决定，inputX和inputY的shape相同时，
-     *      output的shape和inputX、inputY相同；shape不同时，需要将inputX或inputY做broadcast操作后，相减得到output。
-     *      output的TensorType由两个输入中更高精度的TensorType决定。
+     * * <b>output</b>: square of the difference between two inputs. The output shape is determined
+     *       by<b>input1</b> and <b>input2</b>. If they have the same shape, the output tensor has the same shape as them.
+     *       If they have different shapes, perform the broadcast operation on <b>input1</b> and <b>input2</b> and perform subtraction.
+     *       <b>TensorType</b> of the output is the same as that of the input tensor with higher precision.
      */
     OH_NN_OPS_SQUARED_DIFFERENCE = 34,
 
     /**
-     * 去除axis中，长度为1的维度。支持int8量化输入假设input的shape为[2，1，1，2，2]，axis为[0,1]，
-     * 则output的shape为[2，1，2，2]。第0维到第1维之间，长度为0的维度被去除。
+     * Removes the dimension with a length of 1 from the specified axis. The int8 quantization input is supported.
+     * Assume that the input shape is [2, 1, 1, 2, 2] and axis is [0,1], the output shape is [2, 1, 2, 2],
+     * which means the dimension whose length is 0 between dimensions 0 and dimension 1 is removed.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，n维tensor。
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * axis，指定删除的维度。axis可以是一个int64_t的整数或数组，整数的取值范围为[-n，n)。
+     * * <b>axis</b>: dimension to be removed. The value is of int64_t type and can be an integer in the range [-n, n) or an array.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，输出tensor。
+     * * <b>output</b>: output tensor.
      */
     OH_NN_OPS_SQUEEZE = 35,
 
     /**
-     * 将一组tensor沿axis维度进行堆叠，堆叠前每个tensor的维数为n，则堆叠后output维数为n+1。
+     * Stacks multiple tensors along the specified axis. If each tensor has <i>n</i> dimensions before stacking,
+     * the output tensor will have <i>n</i>+1 dimensions.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，Stack支持传入多个输入n维tensor，每个tensor要求shape相同且类型相同。
+     * * <b>input</b>: input for stacking, which can contain multiple <i>n</i>-dimensional tensors.
+     *       Each of them must have the same shape and type.
      *
-     * 参数：
+     * Parameters:
      *
-     * * axis，一个整数，指定tensor堆叠的维度。axis可以是负数，axis取值范围为[-(n+1)，(n+1))。
+     * * <b>axis</b>: dimension for tensor stacking, which is an integer. The value range is [-(n+1),(n+1)),
+     *       which means a negative number is allowed.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，将input沿axis维度堆叠的输出，n+1维tensor，TensorType和input相同。
+     * * <b>output</b>: stacking result of the input along the axis dimension. The value is an <i>n</i>+1-dimensional tensor
+     *       and has the same <b>TensorType</b> as the input.
      */
     OH_NN_OPS_STACK = 36,
 
     /**
-     * 跨步截取Tensor
+     * Slices a tensor with the specified stride.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，n维输入tensor。
-     * * begin，1维tensor，begin的长度等于n，begin[i]指定第i维上截取的起点。
-     * * end，1维tensor，end的长度等于n，end[i]指定第i维上截取的终点。
-     * * strides，1维tensor，strides的长度等于n，strides[i]指定第i维上截取的步长。
+     * * <b>input</b>: <i>n</i>-dimensional input tensor.
+     * * <b>begin</b>: start of slicing, which is a 1D tensor. The length of <b>begin</b> is <i>n</i>. 
+     *       <b>begin[i]</b> specifies the start of slicing in the <i>i</i>th dimension.
+     * * <b>end</b>: end of slicing, which is a 1D tensor. The length of <b>end</b> is <i>n</i>. 
+     *       <b>end[i]</b> specifies the end of slicing in the <i>i</i>th dimension.
+     * * <b>strides</b>: slicing stride, which is a 1D tensor. The length of <b>strides</b> is <i>n</i>. 
+     *       strides[i] specifies the stride at which the tensor is sliced in the <i>i</i>th dimension.
      *
-     * 参数：
+     * Parameters:
      *
-     * * beginMask，一个整数，用于解除begin的限制。将beginMask转成二进制表示，如果binary(beginMask)[i]==1，
-     *      则对于第i维，从第一个元素开始，以strides[i]为步长截取元素直到第end[i]-1个元素。
-     * * endMask，个整数，用于解除end的限制。将endMask转成二进制表示，如果binary(endMask)[i]==1，则对于第i维，
-     *      从第begin[i]个元素起，以strides[i]为步长截取元素直到tensor边界。
-     * * ellipsisMask，一个整数，用于解除begin和end的限制。将ellipsisMask转成二进制表示，如果binary(ellipsisMask)[i]==1，
-     *      则对于第i维，从第一个元素开始，以strides[i]为补偿，截取元素直到tensor边界。binary(ellipsisMask)仅允许有一位不为0。
-     * * newAxisMask，一个整数，用于新增维度。将newAxisMask转成二进制表示，如果binary(newAxisMask)[i]==1，则在第i维插入长度为1的新维度。
-     * * shrinkAxisMask，一个整数，用于压缩指定维度。将shrinkAxisMask转成二进制表示，如果binary(shrinkAxisMask)[i]==1，
-     *      则舍去第i维所有元素，第i维长度压缩至1。
+     * * <b>beginMask</b>: an integer used to mask <b>begin</b>. <b>beginMask</b> is represented in binary code. 
+     *       In case of binary(beginMask)[i]==1, for the <i>i</i>th dimension, elements are sliced from the first element 
+     *       at <b>strides[i]</b> until the end[i]-1 element.
+     *      
+     * * <b>endMask</b>: an integer used to mask <b>end</b>. <b>endMask</b> is represented in binary code. 
+     *       In case of binary(endMask)[i]==1, elements are sliced from the element at the <b>begin[i]</b> position 
+     *       in the <i>i</i>th dimension until the tensor boundary at <b>strides[i]</b>.
+     *      
+     * * <b>ellipsisMask</b>: integer used to mask <b>begin</b> and <b>end</b>. <b>ellipsisMask</b> is represented in binary code. 
+     *       In case of binary(ellipsisMask)[i]==1, elements are sliced from the first element at <b>strides[i]</b> in the <i>i</i>th dimension
+     *       until the tensor boundary. Only one bit of <b>binary(ellipsisMask)</b> can be a non-zero value.
+     *      
+     * * <b>newAxisMask</b>: new dimension, which is an integer. <b>newAxisMask</b> is represented in binary code. 
+     *       In case of binary(newAxisMask)[i]==1, a new dimension whose length is 1 is inserted into the <i>i</i>th dimension.
+     * * <b>shrinkAxisMask</b>: shrinking dimension, which is an integer. * <b>shrinkAxisMask</b> is represented in binary code.
+     *       In the case of binary(shrinkAxisMask)[i]==1, all elements in the <i>i</i>th dimension will be discarded, 
+     *       and the length of the <i>i</i>th dimension is shrunk to <b>1</b>.
      *
-     * 输出：
+     * Outputs:
      *
-     * * 堆叠运算后的Tensor，数据类型与x相同。输出维度rank(x[0])+1 维。
+     * * A tensor, with the same data type as <b>input</b>. The number of dimensions of the output tensor is rank(input[0])+1.
      */
     OH_NN_OPS_STRIDED_SLICE = 37,
 
     /**
-     * 计算两个输入的差值。
+     * Calculates the difference between two tensors.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，被减数，x是一个tensor。
-     * * y，减数，y是一个tensor。
+     * * <b>input1</b>: minuend, which is a tensor.
+     * * <b>input2</b>: subtrahend, which is a tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * activationType，是一个整型常量，且必须是FuseType中含有的值。
-     *      在输出之前调用指定的激活。
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，两个input相减的差。output的shape由inputX和inputY共同决定，inputX和inputY的shape相同时，output的shape和inputX、inputY相同；
-     *      shape不同时，需要将inputX或inputY做broadcast操作后，相减得到output。output的TensorType由两个输入中更高精度的TensorType决定。
+     * * <b>output</b>: difference between the two tensors. The output shape is determined by<b>input1</b> and <b>input2</b>.
+     *       If they have the same shape, the output tensor has the same shape as them.
+     *       If they have different shapes, perform the broadcast operation on <b>input1</b> and <b>input2</b> and perform subtraction.
+     *       <b>TensorType</b> of the output is the same as that of the input tensor with higher precision.
      */
     OH_NN_OPS_SUB = 38,
 
     /**
-     * 计算输入tensor的双曲正切值。
+     * Computes hyperbolic tangent of the input tensor.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，n维tensor。
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，input的双曲正切，TensorType和tensor shape和input相同。
+     * * <b>output</b>: hyperbolic tangent of the input. The <b>TensorType</b> and tensor shape are the same as those of the input.
      */
     OH_NN_OPS_TANH = 39,
 
     /**
-     * 以multiples指定的次数拷贝input。
+     * Copies a tensor the specified times.
      *
-     * 输入：
-     * * x，n维tensor。
-     * * multiples，1维tensor，指定各个维度拷贝的次数。其长度m不小于input的维数n。
+     * Inputs:
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     * * <b>multiples</b>: number of times that the input tensor is copied in each dimension. The value is a 1D tensor.
+     *       The length <i>m</i> is not less than the number of dimensions, that is, <i>n</i>.
      *
-     * 输出：
-     * * Tensor，m维tensor，TensorType与input相同。如果input和multiples长度相同，
-     *      则output和input维数一致，都是n维tensor；如果multiples长度大于n，则用1填充input的维度，
-     *      再在各个维度上拷贝相应的次数，得到m维tensor。
+     * Outputs:
+     * * An <i>m</i>-dimensional tensor whose <b>TensorType</b> is the same as that of the input. If <b>input</b> and
+     *       <b>multiples</b> have the same length, <b>input</b> and <b>output</b> have the same number of dimensions.
+     *       If the length of <b>multiples</b> is greater than <i>n</i>, 1 is used to fill the input dimension, 
+     *       and then the input is copied in each dimension the specified times to obtain the <i>m</i>-dimensional tensor.
      */
     OH_NN_OPS_TILE = 40,
 
     /**
-     * 根据permutation对input 0进行数据重排。
+     * Transposes data of <b>input 0</b> based on <b>permutation</b>.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，n维tensor，待重排的tensor。
-     * * perm，1维tensor，其长度和input 0的维数一致。
+     * * <b>input</b>: <i>n</i>-dimensional tensor to be transposed.
+     * * <b>permutation</b>: The value is a 1D tensor whose length is the same as the number of dimensions of <b>input 0</b>.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，n维tensor，output 0的TensorType与input 0相同，shape由input 0的shape和permutation共同决定。
+     * * <b>output</b>: <i>n</i>-dimensional tensor. <b>TensorType</b> of <b>output 0</b> is the same as that of <b>input 0</b>,
+     *       and the output shape is determined by the shape and <b>permutation</b> of <b>input 0</b>.
      */
     OH_NN_OPS_TRANSPOSE = 41,
 
     /**
-     * keepDims为false时，计算指定维度上的平均值，减少input的维数；当keepDims为true时，计算指定维度上的平均值，保留相应的维度。
+     * Calculates the average value in the specified dimension. If <b>keepDims</b> is set to <b>false</b>, the number of dimensions
+     * is reduced for the input; if <b>keepDims</b> is set to <b>true</b>, the number of dimensions is retained.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  input，n维输入tensor，n<8。
-     * *  axis，1维tensor，指定计算均值的维度，axis中每个元素的取值范围为[-n，n)。
+     * * <b>input</b>: <i>n</i>-dimensional input tensor, where <i>n</i> is less than 8.
+     * * <b>axis</b>: dimension used to calculate the average value. The value is a 1D tensor. The value range of each element in <b>axis</b> is [–n, n).
      *
-     * 参数：
+     * Parameters:
      *
-     * *  keepDims，布尔值，是否保留维度的标志位。
+     * * <b>keepDims</b>: indicates whether to retain the dimension. The value is a Boolean value.
      *
-     * 输出：
+     * Outputs:
      *
-     * *  output，m维输出tensor，数据类型和input相同。当keepDims为false时，m==n；当keepDims为true时，m<n。
+     * * <b>output</b>: <i>m</i>-dimensional output tensor whose data type is the same as that of the input. If <b>keepDims</b> is
+     *       <b>false</b>, m==n. If <b>keepDims</b> is <b>true</b>, m<n.
      */
     OH_NN_OPS_REDUCE_MEAN = 42,
 
     /**
-     * 采用Bilinear方法，按给定的参数对input进行变形。
+     * The Bilinear method is used to deform the input based on the given parameters.
      *
-     * 输入：
+     * Inputs:
      *
-     * * x，4维输入tensor，input中的每个元素不能小于0。input排布必须是[batchSize，height，width，channels]。
+     * * <b>input</b>: 4D input tensor. Each element in the input cannot be less than 0. The input layout must be [batchSize, height, width, channels].
      *
-     * 参数：
+     * Parameters:
      *
-     * * newHeight，resize之后4维tensor的height值。
-     * * newWidth，resize之后4维tensor的width值。
-     * * preserveAspectRatio，一个布尔值，指示resize操作是否保持input tensor的height/width比例。
-     * * coordinateTransformMode，一个int32整数，指示Resize操作所使用的坐标变换方法，目前支持以下方法：
-     * * excludeOutside，一个int64浮点数。当excludeOutside=1时，超出input边界的采样权重被置为0,其余权重重新归一化处理。
+     * * <b>newHeight</b>: resized height of the 4D tensor.
+     * * <b>newWidth</b>: resized width of the 4D tensor.
+     * * <b>preserveAspectRatio</b>: indicates whether to maintain the height/width ratio of <b>input</b> after resizing.
+     * * <b>coordinateTransformMode</b>: coordinate transformation method used by the resize operation. The value is an int32 integer.
+     *       Currently, the following methods are supported:
+     * * <b>excludeOutside</b>: an int64 floating point number. When its value is <b>1</b>, the sampling weight of the part that
+     *       exceeds the boundary of <b>input</b> is set to <b>0</b>, and other weights are normalized.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，n维输出tensor，output的shape和数据类型和input相同。
+     * * <b>output</b>: <i>n</i>-dimensional tensor, with the same shape and data type as <b>input</b>. 
      */
     OH_NN_OPS_RESIZE_BILINEAR = 43,
 
-     /**
-     * 求input平方根的倒数。
+    /**
+     * Calculates the reciprocal of the square root of a tensor.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  x，n维输入tensor，input中的每个元素不能小于0，n<8。
+     * * <b>input</b>: <i>n</i>-dimensional tensor, where <i>n</i> is less than 8. Each element of the tensor cannot be less than 0.
      *
-     * 输出：
+     * Outputs:
      *
-     * *  output，n维输出tensor，output的shape和数据类型和input相同。
-
+     * * <b>output</b>: <i>n</i>-dimensional tensor, with the same shape and data type as <b>input</b>.
      */
     OH_NN_OPS_RSQRT = 44,
 
-     /**
-     * 根据inputShape调整input的形状。
+    /**
+     * Reshapes a tensor.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  x，一个n维输入tensor。
-     * *  InputShape，一个1维tensor，表示输出tensor的shape，需要是一个常量tensor。
+     * * <b>input</b>: <i>n</i>-dimensional input tensor.
+     * * <b>InputShape</b>: shape of the output tensor. The value is a 1D constant tensor.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，输出tensor，数据类型和input一致，shape由inputShape决定。
+     * * <b>output</b>: tensor whose data type is the same as that of <b>input</b> and shape is determined by <b>InputShape</b>.
      */
     OH_NN_OPS_RESHAPE = 45,
 
     /**
-     * 计算input和weight的PReLU激活值。
+     * Calculates the PReLU activation value of <b>input</b> and <b>weight</b>.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  x，一个n维tensor，如果n>=2，则要求inputX的排布为[BatchSize，…，Channels]，第二个维度为通道数。
-     * *  weight，一个1维tensor。weight的长度只能是1或者等于通道数。当weight长度为1，则inputX所有通道共享一个权重值。
-     *       若weight长度等于通道数，每个通道独享一个权重，若inputX维数n<2，weight长度只能为1。
-     * 输出：
+     * * <b>input</b>: <i>n</i>-dimensional tensor. If <i>n</i> is greater than or equal to 2, <b>inputX</b> must be [BatchSize, ..., Channels]. 
+     *       The second dimension is the number of channels.
+     * * <b>weight</b>: 1D tensor. The length of <b>weight</b> must be 1 or equal to the number of channels. If the length of <b>weight</b> is 1, 
+     *       all channels share the same weight.
+     *       If the length of <b>weight</b> is equal to the number of channels, each channel exclusively has a weight. 
+     *       If <i>n</i> is less than 2 for <b>inputX</b>, the <b>weight</b> length must be 1.
      *
-     *    output，x的PReLU激活值。形状和数据类型和inputX保持一致。
+     * Outputs:
+     *
+     * * <b>output</b>: PReLU activation value of <b>x</b>, with the same shape and data type as <b>inputX</b>.
      */
     OH_NN_OPS_PRELU = 46,
 
     /**
-     * 计算input的Relu激活值。
+     * Calculates the Relu activation value of <b>input</b>.
      *
-     * 输入：
+     * Inputs:
      *
-     * * input，一个n维输入tensor。
+     * * <b>input</b>: <i>n</i>-dimensional input tensor.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，n维Relu输出tensor，数据类型和shape和input一致。
+     * * <b>output</b>: <i>n</i>-dimensional tensor, with the same data type and shape as the input tensor.
      */
     OH_NN_OPS_RELU = 47,
 
     /**
-     * 计算input的Relu6激活值，即对input中每个元素x，计算min(max(x，0)，6)。
+     * Calculates the Relu6 activation value of the input, that is, calculate min(max(x, 0), 6) for each element x in the input.
      *
-     * 输入：
+     * Inputs:
      *
-     * * input，一个n维输入tensor。
+     * * <b>input</b>: <i>n</i>-dimensional input tensor.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，n维Relu6输出tensor，数据类型和shape和input一致。
+     * * <b>output</b>: <i>n</i>-dimensional Relu6 tensor, with the same data type and shape as the input tensor.
      */
     OH_NN_OPS_RELU6 = 48,
 
     /**
-     * 对一个tensor从某一axis开始做层归一化。
+     * Applies layer normalization for a tensor from the specified axis.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  input，一个n维输入tensor。
-     * *  gamma，一个m维tensor，gamma维度应该与input做归一化部分的shape一致。
-     * *  beta，一个m维tensor，shape与gamma一样。
+     * * <b>input</b>: <i>n</i>-dimensional input tensor.
+     * * <b>gamma</b>: <i>m</i>-dimensional tensor. The dimensions of <b>gamma</b> must be the same as
+     *       the shape of the part of the input tensor to normalize.
+     * * <b>beta</b>: <i>m</i>-dimensional tensor with the same shape as <b>gamma</b>.
      *
-     * 参数：
+     * Parameters:
      *
-     * *  beginAxis，是一个NN_INT32的标量，指定开始做归一化的轴，取值范围是[1，rank(input))。
-     * *  epsilon，是一个NN_FLOAT32的标量，是归一化公式中的微小量，常用值是1e-7。
+     * * <b>beginAxis</b> is an NN_INT32 scalar that specifies the axis from which normalization starts. The value range is [1, rank(input)).
+     * * <b>epsilon</b> is a scalar of NN_FLOAT32. It is a tiny amount in the normalization formula. The common value is 1e-7.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，n维输出tensor，数据类型和shape和input一致。
+     * * <b>output</b>: <i>n</i>-dimensional tensor, with the same data type and shape as the input tensor.
      */
     OH_NN_OPS_LAYER_NORM = 49,
 
     /**
-     * 当keepDims为false时，过乘以维度中的所有元素来减小张量的维度，减少input的维数；当keepDims为true时，过乘以维度中的所有元素来减小张量的维度，保留相应的维度。
+     * Calculates the accumulated value for a tensor along the specified dimension.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  input，n维输入tensor，n<8。
-     * *  axis，1维tensor，指定计算乘的维度，axis中每个元素的取值范围为[-n，n)。
+     * * <b>input</b>: <i>n</i>-dimensional input tensor, where <i>n</i> is less than 8.
+     * * <b>axis</b>: dimension used to calculate the product. The value is a 1D tensor. The value range of each element in <b>axis</b> is [–n, n).
      *
-     * 参数：
+     * Parameters:
      *
-     * *  keepDims，布尔值，是否保留维度的标志位。
+     * * <b>keepDims</b>: indicates whether to retain the dimension. The value is a Boolean value.
+     *       When its value is <b>true</b>, the number of output dimensions is the same as that of the input.
+     *       When its value is <b>false</b>, the number of output dimensions is reduced.
      *
-     * 输出：
+     * Outputs:
      *
-     * *  output，m维输出tensor，数据类型和input相同。当keepDims为false时，m==n；当keepDims为true时，m<n。
+     * * <b>output</b>: <i>m</i>-dimensional output tensor whose data type is the same as that of the input.
+     *       If <b>keepDims</b> is <b>false</b>, m==n. If <b>keepDims</b> is <b>true</b>, m<n.
      */
     OH_NN_OPS_REDUCE_PROD = 50,
 
     /**
-     * 当keepDims为false时，计算指定维度上的逻辑与，减少input的维数；当keepDims为true时，计算指定维度上的逻辑与，保留相应的维度。
+     * Operates the logical OR in the specified dimension. If <b>keepDims</b> is set to <b>false</b>, 
+     * the number of dimensions is reduced for the input; if <b>keepDims</b> is set to <b>true</b>, the number of dimensions is retained.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  n维输入tensor，n<8。
-     * *  1维tensor，指定计算逻辑与的维度，axis中每个元素的取值范围为[-n，n)。
+     * * A <i>n</i>-dimensional input tensor, where <i>n</i> is less than 8.
+     * * A 1D tensor specifying the dimension used to operate the logical OR. The value range of each element in <b>axis</b> is [–n, n).
      *
-     * 参数：
+     * Parameters:
      *
-     * *  keepDims，布尔值，是否保留维度的标志位。
+     * * <b>keepDims</b>: indicates whether to retain the dimension. The value is a Boolean value.
      *
-     * 输出：
-     * *  output，m维输出tensor，数据类型和input相同。当keepDims为false时，m==n；当keepDims为true时，m<n。
+     * Outputs:
+     * * <b>output</b>: <i>m</i>-dimensional output tensor whose data type is the same as that of the input. 
+     *       If <b>keepDims</b> is <b>false</b>, m==n. If <b>keepDims</b> is <b>true</b>, m<n.
      */
     OH_NN_OPS_REDUCE_ALL = 51,
 
     /**
-     * 数据类型转换。
+     * Converts the data type.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  input，n维tensor。
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * *  src_t，定义输入的数据类型。
-     * *  dst_t，定义输出的数据类型。
+     * * <b>src_t</b>: data type of the input.
+     * * <b>dst_t</b>: data type of the output.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output，n维tensor，数据类型由input2决定  输出shape和输入相同。
+     * * <b>output</b>: <i>n</i>-dimensional tensor. The data type is determined by <b>input2</b>. 
+     *       The output shape is the same as the input shape.
      */
     OH_NN_OPS_QUANT_DTYPE_CAST = 52,
 
     /**
-     * 查找沿最后一个维度的k个最大条目的值和索引。
+     * Obtains the values and indices of the largest <i>k</i> entries in the last dimension.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  x，n维tensor。
-     * *  input k，指明是得到前k个数据以及其index。
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     * * <b>input</b> <i>k</i>: first <i>k</i> records of data and their indices.
      *
-     * 参数：
+     * Parameters:
      *
-     * *  sorted，如果为True，按照大到小排序，如果为False，按照小到大排序。
+     * * <b>sorted</b>: order of sorting. The value <b>true</b> means descending and <b>false</b> means ascending.
      *
-     * 输出：
+     * Outputs:
      *
-     * * output0,最后一维的每个切片中的k个最大元素。
-     * * output1，输入的最后一个维度内的值的索引。
+     * * <b>output0</b>: largest <i>k</i> elements in each slice of the last dimension.
+     * * <b>output1</b>: index of the value in the last dimension of the input.
      */
     OH_NN_OPS_TOP_K = 53,
 
     /**
-     * 返回跨轴的张量最大值的索引。
+     * Returns the index of the maximum tensor value across axes.
      *
-     * 输入：
+     * Inputs:
      *
-     * *  input，n维tensor，输入张量(N，∗)，其中∗意味着任意数量的附加维度。
+     * * <b>input</b>: <i>n</i>-dimensional tensor (N, ∗), where ∗ means any number of additional dimensions.
      *
-     * 参数：
+     * Parameters:
      *
-     * *  axis，指定求最大值索引的维度。
-     * *  keep_dims，bool值，是否维持输入张量维度。
+     * * <b>axis</b>: dimension for calculating the index of the maximum.
+     * * <b>keep_dims</b>: indicates whether to maintain the input tensor dimension. The value is a Boolean value.
      *
-     * 输出：
-     * *  output，tensor，轴上输入张量最大值的索引。
+     * Outputs:
+     * * <b>output</b>: index of the maximum input tensor on the axis. The value is a tensor.
      */
     OH_NN_OPS_ARG_MAX = 54,
 
     /**
-     * 根据输入axis的值。增加一个维度。
+     * Adds a dimension based on the value of <b>axis</b>.
      *
-     * 输入：
-     * * x，n维tensor。
+     * Inputs:
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
      *
-     * 参数：
+     * Parameters:
      *
-     * * axis，指定增加的维度。axis可以是一个整数或一组整数，整数的取值范围为[-n，n)。
+     * * <b>axis</b>: dimension to be added. The value of <b>axis</b> can be an integer or an array of integers. 
+     *       The value range of the integer is [-n, n).
      *
-     * 输出：
-     * * output，输出tensor。
+     * Outputs:
+     * * <b>output</b>: output tensor.
      */
     OH_NN_OPS_UNSQUEEZE = 55,
 
     /**
-     * 高斯误差线性单元激活函数。output=0.5∗x∗(1+tanh(x/2))，不支持int量化输入。
+     * Gaussian error linear unit activation function. The int quantization input is not supported. output=0.5∗input∗(1+tanh(input/2)) 
      *
-     * 输入：
-     * * 一个n维输入tensor。
+     * Inputs:
+     * * An <i>n</i>-dimensional input tensor.
      *
-     * 输出：
-     * * output，n维Relu输出tensor，数据类型和shape和input一致。
+     * Outputs:
+     * * <b>output</b>: <i>n</i>-dimensional tensor, with the same data type and shape as the input tensor.
      */
     OH_NN_OPS_GELU = 56,
 } OH_NN_OperationType;
 
 /**
- * @brief 张量的类型
+ * @brief Enumerates the tensor data types.
  *
- * 张量通常用于设置模型的输入、输出和算子参数。作为模型（或算子）的输入和输出时，需要将张量类型设置为{@link OH_NN_TENSOR}；张量
- * 用于设置算子参数时，需要指定参数类型。假设正在设置{@link OH_NN_OPS_CONV2D}算子的pad参数，则需要将
- * {@link OH_NN_Tensor}实例的type属性设置为{@link OH_NN_CONV2D_PAD}。其他算子参数的设置以此类推，枚举值
- * 的命名遵守 OH_NN_{算子名称}_{属性名} 的格式。
+ * Tensors are usually used to set the input, output, and operator parameters of a model. When a tensor is used 
+ * as the input or output of a model (or operator), set the tensor type to {@link OH_NN_TENSOR}. 
+ * When the tensor is used as an operator parameter, select an enumerated value other than {@link OH_NN_TENSOR} as the tensor type.
+ * Assume that the <b>pad</b> parameter of the {@link OH_NN_OPS_CONV2D} operator is being set. 
+ * You need to set the <b>type</b> attribute of the {@link OH_NN_Tensor} instance to {@link OH_NN_CONV2D_PAD}.
+ * The settings of other operator parameters are similar. The enumerated values are named
+ * in the format OH_NN_{<i>Operator name</i>}_{<i>Attribute name</i>}.
  *
  * @since 9
  * @version 1.0
  */
 typedef enum {
-    /** Tensor类型 */
+    /** This enumerated value is used when the tensor is used as the input or output of a model (or operator). */
     OH_NN_TENSOR = 0,
 
-    /** Add算子的activationType参数 */
+    /** This enumerated value is used when the tensor is used as the <b>activationType</b> parameter of the Add operator. */
     OH_NN_ADD_ACTIVATIONTYPE = 1,
 
-    /** AvgPool算子的kernel_size参数 */
+    /** This enumerated value is used when the tensor is used as the <b>kernel_size</b> parameter of the AvgPool operator. */
     OH_NN_AVG_POOL_KERNEL_SIZE = 2,
-    /** AvgPool算子的stride参数 */
+    /** This enumerated value is used when the tensor is used as the <b>stride</b> parameter of the AvgPool operator. */
     OH_NN_AVG_POOL_STRIDE = 3,
-    /** AvgPool算子的pad_mode参数 */
+    /** This enumerated value is used when the tensor is used as the <b>pad_mode</b> parameter of the AvgPool operator. */
     OH_NN_AVG_POOL_PAD_MODE = 4,
-    /** AvgPool算子的pad参数 */
+    /** This enumerated value is used when the tensor is used as the <b>pad</b> parameter of the AvgPool operator. */
     OH_NN_AVG_POOL_PAD = 5,
-    /** AvgPool算子的activation_type参数 */
+    /** This enumerated value is used when the tensor is used as the <b>activation_type</b> parameter of the AvgPool operator. */
     OH_NN_AVG_POOL_ACTIVATION_TYPE = 6,
 
-    /** BatchNorm算子的eosilon参数 */
+    /** This enumerated value is used when the tensor is used as the <b>eosilon</b> parameter of the BatchNorm operator. */
     OH_NN_BATCH_NORM_EPSILON = 7,
 
-    /** BatchToSpaceND算子的blockSize参数 */
+    /** This enumerated value is used when the tensor is used as the <b>blockSize</b> parameter of the BatchToSpaceND operator. */
     OH_NN_BATCH_TO_SPACE_ND_BLOCKSIZE = 8,
-    /** BatchToSpaceND算子的crops参数 */
+    /** This enumerated value is used when the tensor is used as the <b>crops</b> parameter of the BatchToSpaceND operator. */
     OH_NN_BATCH_TO_SPACE_ND_CROPS = 9,
 
-    /** Concat算子的axis参数 */
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the Concat operator. */
     OH_NN_CONCAT_AXIS = 10,
 
-    /** Conv2D算子的strides参数 */
+    /** This enumerated value is used when the tensor is used as the <b>strides</b> parameter of the Conv2D operator. */
     OH_NN_CONV2D_STRIDES = 11,
-    /** Conv2D算子的pad参数 */
+    /** This enumerated value is used when the tensor is used as the <b>pad</b> parameter of the Conv2D operator. */
     OH_NN_CONV2D_PAD = 12,
-    /** Conv2D算子的dilation参数 */
+    /** This enumerated value is used when the tensor is used as the <b>dilation</b> parameter of the Conv2D operator. */
     OH_NN_CONV2D_DILATION = 13,
-    /** Conv2D算子的padMode参数 */
+    /** This enumerated value is used when the tensor is used as the <b>padMode</b> parameter of the Conv2D operator. */
     OH_NN_CONV2D_PAD_MODE = 14,
-    /** Conv2D算子的activationType参数 */
+    /** This enumerated value is used when the tensor is used as the <b>activationType</b> parameter of the Conv2D operator. */
     OH_NN_CONV2D_ACTIVATION_TYPE = 15,
-    /** Conv2D算子的group参数 */
+    /** This enumerated value is used when the tensor is used as the <b>group</b> parameter of the Conv2D operator. */
     OH_NN_CONV2D_GROUP = 16,
 
-    /** Conv2DTranspose算子的strides参数 */
+    /** This enumerated value is used when the tensor is used as the <b>strides</b> parameter of the Conv2DTranspose operator. */
     OH_NN_CONV2D_TRANSPOSE_STRIDES = 17,
-    /** Conv2DTranspose算子的pad参数 */
+    /** This enumerated value is used when the tensor is used as the <b>pad</b> parameter of the Conv2DTranspose operator. */
     OH_NN_CONV2D_TRANSPOSE_PAD = 18,
-    /** Conv2DTranspose算子的dilation参数 */
+    /** This enumerated value is used when the tensor is used as the <b>dilation</b> parameter of the Conv2DTranspose operator. */
     OH_NN_CONV2D_TRANSPOSE_DILATION = 19,
-    /** Conv2DTranspose算子的outputPaddings参数 */
+    /** This enumerated value is used when the tensor is used as the <b>outputPaddings</b> parameter of the Conv2DTranspose operator. */
     OH_NN_CONV2D_TRANSPOSE_OUTPUT_PADDINGS = 20,
-    /** Conv2DTranspose算子的padMode参数 */
+    /** This enumerated value is used when the tensor is used as the <b>padMode</b> parameter of the Conv2DTranspose operator. */
     OH_NN_CONV2D_TRANSPOSE_PAD_MODE = 21,
-    /** Conv2DTranspose算子的activationType参数 */
+    /** This enumerated value is used when the tensor is used as the <b>activationType</b> parameter of the Conv2DTranspose operator. */
     OH_NN_CONV2D_TRANSPOSE_ACTIVATION_TYPE = 22,
-    /** Conv2DTranspose算子的group参数 */
+    /** This enumerated value is used when the tensor is used as the <b>group</b> parameter of the Conv2DTranspose operator. */
     OH_NN_CONV2D_TRANSPOSE_GROUP = 23,
 
-    /** DepthwiseConv2dNative算子的strides参数 */
+    /** This enumerated value is used when the tensor is used as the <b>strides</b> parameter of the DepthwiseConv2dNative operator. */
     OH_NN_DEPTHWISE_CONV2D_NATIVE_STRIDES = 24,
-    /** DepthwiseConv2dNative算子的pad参数 */
+    /** This enumerated value is used when the tensor is used as the <b>pad</b> parameter of the DepthwiseConv2dNative operator. */
     OH_NN_DEPTHWISE_CONV2D_NATIVE_PAD = 25,
-    /** DepthwiseConv2dNative算子的dilation参数 */
+    /** This enumerated value is used when the tensor is used as the <b>dilation</b> parameter of the DepthwiseConv2dNative operator. */
     OH_NN_DEPTHWISE_CONV2D_NATIVE_DILATION = 26,
-    /** DepthwiseConv2dNative算子的padMode参数 */
+    /** This enumerated value is used when the tensor is used as the <b>padMode</b> parameter of the DepthwiseConv2dNative operator. */
     OH_NN_DEPTHWISE_CONV2D_NATIVE_PAD_MODE = 27,
-    /** DepthwiseConv2dNative算子的activationType参数 */
+    /** This enumerated value is used when the tensor is used as the <b>activationType</b> parameter of the DepthwiseConv2dNative operator. */
     OH_NN_DEPTHWISE_CONV2D_NATIVE_ACTIVATION_TYPE = 28,
 
-    /** Div算子的activationType参数 */
+    /** This enumerated value is used when the tensor is used as the <b>activationType</b> parameter of the Div operator. */
     OH_NN_DIV_ACTIVATIONTYPE = 29,
 
-    /** Eltwise算子的mode参数 */
+    /** This enumerated value is used when the tensor is used as the <b>mode</b> parameter of the Eltwise operator. */
     OH_NN_ELTWISE_MODE = 30,
 
-    /** FullConnection算子的axis参数 */
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the FullConnection operator. */
     OH_NN_FULL_CONNECTION_AXIS = 31,
-    /** FullConnection算子的activationType参数 */
+    /** This enumerated value is used when the tensor is used as the <b>activationType</b> parameter of the FullConnection operator. */
     OH_NN_FULL_CONNECTION_ACTIVATIONTYPE = 32,
 
-    /** Matmul算子的transposeA参数 */
+    /** This enumerated value is used when the tensor is used as the <b>transposeA</b> parameter of the Matmul operator. */
     OH_NN_MATMUL_TRANSPOSE_A = 33,
-    /** Matmul算子的transposeB参数 */
+    /** This enumerated value is used when the tensor is used as the <b>transposeB</b> parameter of the Matmul operator. */
     OH_NN_MATMUL_TRANSPOSE_B = 34,
-    /** Matmul算子的activationType参数 */
+    /** This enumerated value is used when the tensor is used as the <b>activationType</b> parameter of the Matmul operator. */
     OH_NN_MATMUL_ACTIVATION_TYPE = 35,
 
-    /** MaxPool算子的kernel_size参数 */
+    /** This enumerated value is used when the tensor is used as the <b>kernel_size</b> parameter of the MaxPool operator. */
     OH_NN_MAX_POOL_KERNEL_SIZE = 36,
-    /** MaxPool算子的stride参数 */
+    /** This enumerated value is used when the tensor is used as the <b>stride</b> parameter of the MaxPool operator. */
     OH_NN_MAX_POOL_STRIDE = 37,
-    /** MaxPool算子的pad_mode参数 */
+    /** This enumerated value is used when the tensor is used as the <b>pad_mode</b> parameter of the MaxPool operator. */
     OH_NN_MAX_POOL_PAD_MODE = 38,
-    /** MaxPool算子的pad参数 */
+    /** This enumerated value is used when the tensor is used as the <b>pad</b> parameter of the MaxPool operator. */
     OH_NN_MAX_POOL_PAD = 39,
-    /** MaxPool算子的activation_type参数 */
+    /** This enumerated value is used when the tensor is used as the <b>activation_type</b> parameter of the MaxPool operator. */
     OH_NN_MAX_POOL_ACTIVATION_TYPE = 40,
 
-    /** Mul算子的activationType参数 */
+    /** This enumerated value is used when the tensor is used as the <b>activationType</b> parameter of the Mul operator. */
     OH_NN_MUL_ACTIVATION_TYPE = 41,
 
-    /** OneHot算子的axis参数 */
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the OneHot operator. */
     OH_NN_ONE_HOT_AXIS = 42,
 
-    /** Pad算子的constant_value参数 */
+    /** This enumerated value is used when the tensor is used as the <b>constant_value</b> parameter of the Pad operator. */
     OH_NN_PAD_CONSTANT_VALUE = 43,
 
-    /** Scale算子的activationType参数*/
+    /** This enumerated value is used when the tensor is used as the <b>activationType</b> parameter of the Scale operator. */
     OH_NN_SCALE_ACTIVATIONTYPE = 44,
-    /** Scale算子的axis参数*/
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the Scale operator. */
     OH_NN_SCALE_AXIS = 45,
 
-    /** Softmax算子的axis参数 */
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the Softmax operator. */
     OH_NN_SOFTMAX_AXIS = 46,
 
-    /** SpaceToBatchND算子的BlockShape参数 */
+    /** This enumerated value is used when the tensor is used as the <b>BlockShape</b> parameter of the SpaceToBatchND operator. */
     OH_NN_SPACE_TO_BATCH_ND_BLOCK_SHAPE = 47,
-    /** SpaceToBatchND算子的Paddings参数 */
+    /** This enumerated value is used when the tensor is used as the <b>Paddings</b> parameter of the SpaceToBatchND operator. */
     OH_NN_SPACE_TO_BATCH_ND_PADDINGS = 48,
 
-    /** Split算子的Axis参数 */
+    /** This enumerated value is used when the tensor is used as the <b>Axis</b> parameter of the Split operator. */
     OH_NN_SPLIT_AXIS = 49,
-    /** Split算子的OutputNum参数 */
+    /** This enumerated value is used when the tensor is used as the <b>OutputNum</b> parameter of the Split operator. */
     OH_NN_SPLIT_OUTPUT_NUM = 50,
-    /** Split算子的SizeSplits参数 */
+    /** This enumerated value is used when the tensor is used as the <b>SizeSplits</b> parameter of the Split operator. */
     OH_NN_SPLIT_SIZE_SPLITS = 51,
 
-    /** Squeeze算子的Axis参数 */
+    /** This enumerated value is used when the tensor is used as the <b>Axis</b> parameter of the Squeeze operator. */
     OH_NN_SQUEEZE_AXIS = 52,
 
-    /** Stack算子的Axis参数 */
+    /** This enumerated value is used when the tensor is used as the <b>Axis</b> parameter of the Stack operator. */
     OH_NN_STACK_AXIS = 53,
 
-    /** StridedSlice算子的BeginMask参数 */
+    /** This enumerated value is used when the tensor is used as the <b>BeginMask</b> parameter of the StridedSlice operator. */
     OH_NN_STRIDED_SLICE_BEGIN_MASK = 54,
-    /** StridedSlice算子的EndMask参数 */
+    /** This enumerated value is used when the tensor is used as the <b>EndMask</b> parameter of the StridedSlice operator. */
     OH_NN_STRIDED_SLICE_END_MASK = 55,
-    /** StridedSlice算子的EllipsisMask参数 */
+    /** This enumerated value is used when the tensor is used as the <b>EllipsisMask</b> parameter of the StridedSlice operator. */
     OH_NN_STRIDED_SLICE_ELLIPSIS_MASK = 56,
-    /** StridedSlice算子的NewAxisMask参数 */
+    /** This enumerated value is used when the tensor is used as the <b>NewAxisMask</b> parameter of the StridedSlice operator. */
     OH_NN_STRIDED_SLICE_NEW_AXIS_MASK = 57,
-    /** StridedSlice算子的ShrinkAxisMask参数 */
+    /** This enumerated value is used when the tensor is used as the <b>ShrinkAxisMask</b> parameter of the StridedSlice operator. */
     OH_NN_STRIDED_SLICE_SHRINK_AXIS_MASK = 58,
 
-    /** Sub算子的ActivationType参数 */
+    /** This enumerated value is used when the tensor is used as the <b>ActivationType</b> parameter of the Sub operator. */
     OH_NN_SUB_ACTIVATIONTYPE = 59,
 
-    /** ReduceMean算子的keep_dims参数*/
+    /** This enumerated value is used when the tensor is used as the <b>keep_dims</b> parameter of the ReduceMean operator. */
     OH_NN_REDUCE_MEAN_KEEP_DIMS = 60,
 
-    /** ResizeBilinear算子的new_height参数*/
+    /** This enumerated value is used when the tensor is used as the <b>new_height</b> parameter of the ResizeBilinear operator. */
     OH_NN_RESIZE_BILINEAR_NEW_HEIGHT = 61,
-    /** ResizeBilinear算子的new_width参数*/
+    /** This enumerated value is used when the tensor is used as the <b>new_width</b> parameter of the ResizeBilinear operator. */
     OH_NN_RESIZE_BILINEAR_NEW_WIDTH = 62,
-    /** ResizeBilinear算子的preserve_aspect_ratio参数*/
+    /** This enumerated value is used when the tensor is used as the <b>preserve_aspect_ratio</b> parameter of the ResizeBilinear operator. */
     OH_NN_RESIZE_BILINEAR_PRESERVE_ASPECT_RATIO = 63,
-    /** ResizeBilinear算子的coordinate_transform_mode参数*/
+    /** This enumerated value is used when the tensor is used as the <b>coordinate_transform_mode</b> parameter of the ResizeBilinear operator. */
     OH_NN_RESIZE_BILINEAR_COORDINATE_TRANSFORM_MODE = 64,
-    /** ResizeBilinear算子的exclude_outside参数*/
+    /** This enumerated value is used when the tensor is used as the <b>exclude_outside</b> parameter of the ResizeBilinear operator. */
     OH_NN_RESIZE_BILINEAR_EXCLUDE_OUTSIDE = 65,
 
-    /** LayerNorm算子的beginNormAxis参数 */
+    /** This enumerated value is used when the tensor is used as the <b>beginNormAxis</b> parameter of the LayerNorm operator. */
     OH_NN_LAYER_NORM_BEGIN_NORM_AXIS = 66,
-    /** LayerNorm算子的epsilon参数 */
+    /** This enumerated value is used when the tensor is used as the <b>epsilon</b> parameter of the LayerNorm operator. */
     OH_NN_LAYER_NORM_EPSILON = 67,
-    /** LayerNorm算子的beginParamsAxis参数 */
+    /** This enumerated value is used when the tensor is used as the <b>beginParamsAxis</b> parameter of the LayerNorm operator. */
     OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS = 68,
-    /** LayerNorm算子的elementwiseAffine参数 */
+    /** This enumerated value is used when the tensor is used as the <b>elementwiseAffine</b> parameter of the LayerNorm operator. */
     OH_NN_LAYER_NORM_ELEMENTWISE_AFFINE = 69,
 
-    /** ReduceProd算子的keep_dims参数*/
+    /** This enumerated value is used when the tensor is used as the <b>keep_dims</b> parameter of the ReduceProd operator. */
     OH_NN_REDUCE_PROD_KEEP_DIMS = 70,
 
-    /** ReduceAll算子的keep_dims参数*/
+    /** This enumerated value is used when the tensor is used as the <b>keep_dims</b> parameter of the ReduceAll operator. */
     OH_NN_REDUCE_ALL_KEEP_DIMS = 71,
 
-    /** QuantDTypeCast算子的src_t参数*/
+    /** This enumerated value is used when the tensor is used as the <b>src_t</b> parameter of the QuantDTypeCast operator. */
     OH_NN_QUANT_DTYPE_CAST_SRC_T = 72,
-    /** QuantDTypeCast算子的dst_t参数*/
+    /** This enumerated value is used when the tensor is used as the <b>dst_t</b> parameter of the QuantDTypeCast operator. */
     OH_NN_QUANT_DTYPE_CAST_DST_T = 73,
 
-    /** Topk算子的Sorted参数 */
+    /** This enumerated value is used when the tensor is used as the <b>Sorted</b> parameter of the Topk operator. */
     OH_NN_TOP_K_SORTED = 74,
 
-    /** ArgMax算子的axis参数 */
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the ArgMax operator. */
     OH_NN_ARG_MAX_AXIS = 75,
-    /** ArgMax算子的keepDims参数 */
+    /** This enumerated value is used when the tensor is used as the <b>keepDims</b> parameter of the ArgMax operator. */
     OH_NN_ARG_MAX_KEEPDIMS = 76,
 
-    /** Unsqueeze算子的Axis参数 */
+    /** This enumerated value is used when the tensor is used as the <b>Axis</b> parameter of the Unsqueeze operator. */
     OH_NN_UNSQUEEZE_AXIS = 77,
 } OH_NN_TensorType;
 
 /**
- * @brief 自定义的32位无符号整型数组类型
- *
- * 该结构体用于存储32位无符号整型数组，size要求记录数组的长度。
+ * @brief This structure is used to store a 32-bit unsigned integer array.
  *
  * @since 9
  * @version 1.0
  */
 typedef struct OH_NN_UInt32Array {
-    /** 无符号整型数组的指针 */
+    /** Pointer to the unsigned integer array */
     uint32_t *data;
-    /** 数组长度 */
+    /** Array length */
     uint32_t size;
 } OH_NN_UInt32Array;
 
 /**
- * @brief 量化信息
+ * @brief Quantization information.
  *
- * 在量化的场景中，32位浮点型数据需要根据量化参数，按公式 `浮点数=scale*(量化值-zeroPoint)` 量化成比特位更少的数据类型，
- * 其中r是浮点数，q是量化后的结果。
- *
+ * In quantization scenarios, the 32-bit floating-point data type is quantized into the fixed-point data type according to the following formula:
+ \f[
+    q = clamp(round(\frac{r}{s}+z), q_{min}, q_{max})
+ \f]
+ * s and z are quantization parameters, which are stored by <b>scale</b> and <b>zeroPoint</b> in {@link OH_NN_QuantParam}. 
+ * r is a floating point number, q is the quantization result, q_min is the lower bound of the quantization result, and 
+ * q_max is an upper bound of a quantization result. The calculation method is as follows:
+ * 
+ \f[
+  \text{clamp}(x,min,max) = 
+  \begin{cases}
+       q_{min} = -(1 << (numBits - 1)) \\
+       q_{max} = (1 << (numBits - 1)) \\
+   \end{cases}
+ \f]
+ * The clamp function is defined as follows:
+ \f[
+  \text{clamp}(x,min,max) = 
+  \begin{cases}
+       \text{max} & \text{ if } x > \text{ max } \\
+       \text{min} & \text{ if } x < \text{ min } \\
+       x & \text{ otherwise } \\
+   \end{cases}
+ \f]
+ * 
  * @since 9
  * @version 1.0
  */
 typedef struct OH_NN_QuantParam {
-    /** 指定numBits、scale和zeroPoint数组的长度。在per-layer量化的场景下，quantCount通常指定为1，即一个tensor所有通道
-     *  共享一套量化参数；在per-channel量化场景下，quantCount通常和tensor通道数一致，每个通道使用自己的量化参数。
+    /** Specifies the length of the numBits, scale, and zeroPoint arrays. In the per-layer quantization scenario, 
+     *  <b>quantCount</b> is usually set to <b>1</b>. That is, all channels of a tensor share a set of quantization parameters.
+     *  In the per-channel quantization scenario, <b>quantCount</b> is usually the same as the number of tensor channels, 
+     *  and each channel uses its own quantization parameters.
      */
     uint32_t quantCount;
-    /** 量化位数 */
+    /** Number of quantization bits */
     const uint32_t *numBits;
-    /** 指向scale量化信息的指针 */
+    /** Pointer to the scale data in the quantization formula */
     const double *scale;
-    /** 指向zero point量化信息的指针 */
+    /** Pointer to the zero point data in the quantization formula */
     const int32_t *zeroPoint;
 } OH_NN_QuantParam;
 
 /**
- * @brief 张量结构体
+ * @brief Defines the tensor structure.
  *
- * {@link OH_NN_Tensor}类型通常用于构造模型图中的数据节点和算子参数，在构造张量时需要明确数据类型、维数、维度信息和量化信息。
- * type成员指定张量的用途，当张量用作模型图中的输入、输出，则要求type置为{@link OH_NN_TENSOR}；当张量用作算子参数，
- * 则需要指定为具体的枚举值，具体参考{@link OH_NN_TensorType}。
+ * It is usually used to construct data nodes and operator parameters in a model graph. When constructing a tensor,
+ * you need to specify the data type, number of dimensions, dimension information, and quantization information.
  *
  * @since 9
  * @version 1.0
  */
 typedef struct OH_NN_Tensor {
-    /** 指定张量的数据类型，要求从{@link OH_NN_DataType}枚举类型中取值。 */
+    /** Data type of the specified tensor. The value must be an enumerated value of {@link OH_NN_DataType}. */
     OH_NN_DataType dataType;
-    /** 指定张量的维数 */
+    /** Number of dimensions of the specified tensor */
     uint32_t dimensionCount;
-    /** 指定张量的维度信息 */
+    /** Dimension information (shape) of the specified tensor*/
     const int32_t *dimensions;
-    /** 指定张量的量化信息，数据类型要求为{@link OH_NN_QuantParam}。 */
+    /** Quantization information of the specified tensor. The data type must be {@link OH_NN_QuantParam}. */
     const OH_NN_QuantParam *quantParam;
-    /** 指定张量的类型, 要求从{@link OH_NN_TensorType}枚举类型中取值。 */
+    /** Specifies the tensor type. The value of <b>type</b> is related to the tensor usage. 
+     *  When the tensor is used as the input or output of the model, set <b>type</b> to {@link OH_NN_TENSOR}.
+     *  When a tensor is used as an operator parameter, select any enumerated value except {@link OH_NN_TENSOR} from {@link OH_NN_TensorType}.
+     */
     OH_NN_TensorType type;
 } OH_NN_Tensor;
 
 /**
- * @brief 内存结构体
+ * @brief Defines the memory structure.
  *
  * @since 9
  * @version 1.0
  */
 typedef struct OH_NN_Memory {
-    /** 指向共享内存的指针，该共享内存通常由底层硬件驱动申请 */
+    /** Pointer to the shared memory. The shared memory is usually allocated by the underlying hardware driver. */
     void * const data;
-    /** 记录共享内存的字节长度 */
+    /** Records the length of the shared memory, in bytes. */
     const size_t length;
 } OH_NN_Memory;
 
@@ -1643,5 +1779,5 @@ typedef struct OH_NN_Memory {
 }
 #endif // __cplusplus
 
-#endif // NEURAL_NETWORK_RUNTIME_TYPE_H
 /** @} */
+#endif // NEURAL_NETWORK_RUNTIME_TYPE_H
