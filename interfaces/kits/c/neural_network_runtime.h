@@ -17,7 +17,7 @@
  * @addtogroup NeuralNeworkRuntime
  * @{
  *
- * @brief 提供Neural Network Runtime加速模型推理的相关接口。
+ * @brief Provides APIs of Neural Network Runtime for accelerating the model inference.
  *
  * @Syscap SystemCapability.Ai.NeuralNetworkRuntime
  * @since 9
@@ -27,9 +27,9 @@
 /**
  * @file neural_network_runtime.h
  *
- * @brief Neural Network Runtime部件接口定义，通过调用以下接口，在硬件加速器上执行深度学习模型推理计算。
- *
- * 注意：Neural Network Runtime的接口目前均不支持多线程调用。\n 
+ * @brief Defines the Neural Network Runtime APIs. The AI inference framework uses the Native APIs provided by Neural Network Runtime
+ *        to construct and compile models and perform inference and computing on acceleration hardware.
+ * Note: Currently, the APIs of Neural Network Runtime do not support multi-thread calling. \n
  *
  * @since 9
  * @version 1.0
@@ -45,78 +45,84 @@ extern "C" {
 #endif
 
 /**
- * @brief 创建{@link OH_NNModel}类型的模型实例，搭配OH_NNModel模块提供的其他接口，完成模型实例的构造。
+ * @brief Creates a model instance of the {@link OH_NNModel} type and uses other APIs provided by OH_NNModel to construct the model instance.
  *
- * 在开始构图前，先调用{@link OH_NNModel_Construct}创建模型实例，根据模型的拓扑结构，调用
- * {@link OH_NNModel_AddTensor}、{@link OH_NNModel_AddOperation}和
- * {@link OH_NNModel_SetTensorData}方法，填充模型的数据节点和算子节点；然后调用
- * {@link OH_NNModel_SpecifyInputsAndOutputs}指定模型的输入和输出；当构造完模型的拓扑结构，调用
- * {@link OH_NNModel_Finish}完成模型的构建。\n 
+ * Before composition, call {@link OH_NNModel_Construct} to create a model instance. Based on the model topology, 
+ * call the {@link OH_NNModel_AddTensor}, {@link OH_NNModel_AddOperation}, and {@link OH_NNModel_SetTensorData} methods 
+ * to fill in the data and operator nodes of the model, and then call {@link OH_NNModel_SpecifyInputsAndOutputs} to specify the inputs and outputs of the model.
+ * After the model topology is constructed, call {@link OH_NNModel_Finish} to build the model. \n
  *
- * 模型实例使用完毕后，需要调用{@link OH_NNModel_Destroy}销毁模型实例，避免内存泄漏。\n 
+ * After a model instance is used, you need to destroy it by calling {@link OH_NNModel_Destroy} to avoid memory leak. \n
  *
- * @return 返回一个指向{@link OH_NNModel}实例的指针。
+ * @return Returns the pointer to a {@link OH_NNModel} instance.
  * @since 9
  * @version 1.0
  */
 OH_NNModel *OH_NNModel_Construct(void);
 
 /**
- * @brief 向模型实例中添加张量
+ * @brief Adds a tensor to a model instance.
  *
- * Neural Network Runtime模型中的数据节点和算子参数均由模型的张量构成。本方法根据tensor，向model实
- * 例中添加张量。张量添加的顺序是模型中记录张量的索引值，{@link OH_NNModel_SetTensorData}、
- * {@link OH_NNModel_AddOperation}和{@link OH_NNModel_SpecifyInputsAndOutputs}
- * 方法根据该索引值，指定不同的张量。\n 
+ * The data node and operator parameters in the Neural Network Runtime model are composed of tensors of the model. 
+ * This method is used to add tensors to a model instance based on the <b>tensor</b> parameter.
+ * The sequence of adding tensors is specified by the index value recorded in the model. The {@link OH_NNModel_SetTensorData}, {@link OH_NNModel_AddOperation}, 
+ * and {@link OH_NNModel_SpecifyInputsAndOutputs} methods specifies tensors based on the index value. \n
  *
- * Neural Network Runtime支持动态形状输入和输出。在添加动态形状的数据节点时，需要将tensor.dimensions中支持动态
- * 变化的维度设置为-1。例如：一个4维tensor，将tensor.dimensions设置为[1, -1, 2, 2]，表示其第二个维度支持
- * 动态变化。\n 
+ * Neural Network Runtime supports inputs and outputs of the dynamic shape. When adding a data node with a dynamic shape, 
+ * you need to set the dimensions that support dynamic changes in <b>tensor.dimensions</b> to <b>-1</b>.
+ * For example, if <b>tensor.dimensions</b> of a four-dimensional tensor is set to <b>[1, -1, 2, 2]</b>, the second dimension supports dynamic changes. \n
  *
- * @param model 指向{@link OH_NNModel}实例的指针。
- * @param tensor {@link OH_NN_Tensor}张量的指针，tensor指定了添加到模型实例中张量的属性。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param model Pointer to the {@link OH_NNModel} instance.
+ * @param tensor Pointer to the {@link OH_NN_Tensor} tensor. The tensor specifies the attributes of the tensor added to the model instance.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
+ *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNModel_AddTensor(OH_NNModel *model, const OH_NN_Tensor *tensor);
 
 /**
- * @brief 设置张量的数值
+ * @brief Sets the tensor value.
  *
- * 对于具有常量值的张量（如模型的权重），需要在构图阶段使用本方法设置数值。张量的索引值根据张量添加进模型的顺序决定，张量的添加参考
- * {@link OH_NNModel_AddTensor}。\n 
+ * For tensors with constant values (such as model weights), you need to use this method in the composition phase.
+ * The index value of a tensor is determined by the sequence in which the tensor is added to the model. 
+ * For details about how to add a tensor, see {@link OH_NNModel_AddTensor}. \n
  *
- * @param model 指向{@link OH_NNModel}实例的指针。
- * @param index 张量的索引值。
- * @param dataBuffer 指向真实数据的指针。
- * @param length 数据缓冲区的长度。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param model Pointer to the {@link OH_NNModel} instance.
+ * @param index Index value of a tensor.
+ * @param dataBuffer Pointer to real data.
+ * @param length Length of the data buffer.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
+ *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNModel_SetTensorData(OH_NNModel *model, uint32_t index, const void *dataBuffer, size_t length);
 
 /**
- * @brief 向模型实例中添加算子
+ * @brief Adds an operator to a model instance.
  *
- * 本方法向模型实例中添加算子，算子类型由op指定，算子的参数、输入和输出由paramIndices、inputIndices和
- * outputIndices指定。本方法将对算子参数的属性和输入输出的数量进行校验，这些属性需要在调用
- * {@link OH_NNModel_AddTensor}添加张量的时候正确设置。每个算子期望的参数、输入和输出属性请参考
- * {@link OH_NN_OperationType}。\n 
+ * This method is used to add an operator to a model instance. The operator type is specified by <b>op</b>, and 
+ * the operator parameters, inputs, and outputs are specified by <b>paramIndices</b>, <b>inputIndices</b>, and <b>outputIndices</b> respectively.
+ * This method verifies the attributes of operator parameters and the number of input and output parameters. 
+ * These attributes must be correctly set when {@link OH_NNModel_AddTensor} is called to add tensors.
+ * For details about the expected parameters, input attributes, and output attributes of each operator, see {@link OH_NN_OperationType}. \n
  *
- * paramIndices、inputIndices和outputIndices中存储的是张量的索引值，每个索引值根据张量添加进模型的顺序决定，正确
- * 设置并添加算子要求准确设置每个张量的索引值。张量的添加参考{@link OH_NNModel_AddTensor}。\n 
+ * <b>paramIndices</b>, <b>inputIndices</b>, and <b>outputIndices</b> store index values of tensors. 
+ * Index values are determined by the sequence in which tensors are added to the model. 
+ * For details about how to add a tensor, see {@link OH_NNModel_AddTensor}. \n
  *
- * 如果添加算子时，添加了额外的参数（非算子需要的参数），本方法返回{@link OH_NN_INVALID_PARAMETER}；如果没有设置算子参数，
- * 则算子按默认值设置缺省的参数，默认值请参考{@link OH_NN_OperationType}。\n 
+ * If unnecessary parameters are added for adding an operator, this method returns {@link OH_NN_INVALID_PARAMETER}. 
+ * If no operator parameter is set, the operator uses the default parameter value. 
+ * For details about the default values, see {@link OH_NN_OperationType}. \n
  *
- * @param model 指向{@link OH_NNModel}实例的指针。
- * @param op 指定添加的算子类型，取值请参考{@link OH_NN_OperationType}的枚举值。
- * @param paramIndices OH_NN_UInt32Array实例的指针，设置算子的参数。
- * @param inputIndices OH_NN_UInt32Array实例的指针，指定算子的输入。
- * @param outputIndices OH_NN_UInt32Array实例的指针，设置算子的输出。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param model Pointer to the {@link OH_NNModel} instance.
+ * @param op Specifies the type of an operator to be added. For details, see the enumerated values of {@link OH_NN_OperationType}.
+ * @param paramIndices Pointer to the <b>OH_NN_UInt32Array</b> instance, which is used to set operator parameters.
+ * @param inputIndices Pointer to the <b>OH_NN_UInt32Array</b> instance, which is used to set the operator input.
+ * @param outputIndices Pointer to the <b>OH_NN_UInt32Array</b> instance, which is used to set the operator output.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
+ *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
@@ -127,20 +133,21 @@ OH_NN_ReturnCode OH_NNModel_AddOperation(OH_NNModel *model,
                                          const OH_NN_UInt32Array *outputIndices);
 
 /**
- * @brief 指定模型的输入输出
+ * @brief Specifies the inputs and outputs of a model.
  *
- * 模型实例需要指定张量作为端到端的输入和输出，设置为输入和输出的张量不能使用{@link OH_NNModel_SetTensorData}设置
- * 数值，需要在执行阶段调用OH_NNExecutor的方法设置输入、输出数据。\n 
+ * A tensor must be specified as the end-to-end inputs and outputs of a model instance. This type of tensor cannot be set 
+ * using {@link OH_NNModel_SetTensorData}. The <b>OH_NNExecutor</b> method needs to be called in the execution phase to set the input and output data. \n
  *
- * 张量的索引值根据张量添加进模型的顺序决定，张量的添加参考
- * {@link OH_NNModel_AddTensor}。\n 
+ * The index value of a tensor is determined by the sequence in which the tensor is added to the model. 
+ * For details about how to add a tensor, see {@link OH_NNModel_AddTensor}. \n
  *
- * 暂时不支持异步设置模型输入输出。\n 
+ * Currently, the model inputs and outputs cannot be set asynchronously. \n
  *
- * @param model 指向{@link OH_NNModel}实例的指针。
- * @param inputIndices OH_NN_UInt32Array实例的指针，指定算子的输入。
- * @param outputIndices OH_NN_UInt32Array实例的指针，指定算子的输出。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param model Pointer to the {@link OH_NNModel} instance.
+ * @param inputIndices Pointer to the <b>OH_NN_UInt32Array</b> instance, which is used to set the operator input.
+ * @param outputIndices Pointer to the <b>OH_NN_UInt32Array</b> instance, which is used to set the operator output.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
+ *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
@@ -149,52 +156,56 @@ OH_NN_ReturnCode OH_NNModel_SpecifyInputsAndOutputs(OH_NNModel *model,
                                                     const OH_NN_UInt32Array *outputIndices);
 
 /**
- * @brief 完成模型构图
+ * @brief Completes model composition.
  *
- * 完成模型拓扑结构的搭建后，调用本方法指示构图已完成。在调用本方法后，无法进行额外的构图操作，调用
- * {@link OH_NNModel_AddTensor}、{@link OH_NNModel_AddOperation}、
- * {@link OH_NNModel_SetTensorData}和
- * {@link OH_NNModel_SpecifyInputsAndOutputs}将返回
- * {@link OH_NN_OPERATION_FORBIDDEN}。\n 
+ * After the model topology is set up, call this method to indicate that the composition is complete. After this method is called,
+ * additional composition operations cannot be performed. If {@link OH_NNModel_AddTensor}, {@link OH_NNModel_AddOperation}, 
+ * {@link OH_NNModel_SetTensorData}, and {@link OH_NNModel_SpecifyInputsAndOutputs} are called, 
+ * {@link OH_NN_OPERATION_FORBIDDEN} is returned. \n
  *
- * 在调用{@link OH_NNModel_GetAvailableOperations}和{@link OH_NNCompilation_Construct}
- * 之前，必须先调用本方法完成构图。\n 
+ * Before calling {@link OH_NNModel_GetAvailableOperations} and {@link OH_NNCompilation_Construct}, 
+ * you must call this method to complete composition. \n
  *
- * @param model 指向{@link OH_NNModel}实例的指针。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param model Pointer to the {@link OH_NNModel} instance.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
+ *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNModel_Finish(OH_NNModel *model);
 
 /**
- * @brief 释放模型实例。
+ * @brief Releases a model instance.
  *
- * 调用{@link OH_NNModel_Construct}创建的模型实例需要调用本方法主动释放，否则将造成内存泄漏。\n 
+ * This method needs to be called to release the model instance created by calling {@link OH_NNModel_Construct}. Otherwise, memory leak will occur. \n
  *
- * 如果model为空指针或者*model为空指针，本方法只打印warning日志，不执行释放逻辑。\n 
+ * If <b>model</b> or <b>*model</b> is a null pointer, this method only prints warning logs and does not execute the release logic. \n
  *
- * @param model 指向{@link OH_NNModel}实例的二级指针。模型实例销毁后，本方法将*model主动设置为空指针。
+ * @param model Level-2 pointer to the {@link OH_NNModel} instance. After a model instance is destroyed, this method sets <b>*model</b> to a null pointer.
  * @since 9
  * @version 1.0
  */
 void OH_NNModel_Destroy(OH_NNModel **model);
 
 /**
- * @brief 查询硬件对模型内所有算子的支持情况，通过布尔值序列指示支持情况。
+ * @brief Queries whether the device supports operators in the model. The support status is indicated by the Boolean value.
  *
- * 查询底层硬件对模型实例内每个算子的支持情况，硬件由deviceID指定，结果将通过isSupported指向的数组表示。如果支持第i个算子，则
- * (*isSupported)[i] == true，否则为 false。\n 
+ * Queries whether underlying device supports operators in a model instance. The device is specified by <b>deviceID</b>, 
+ * and the result is represented by the array pointed by <b>isSupported</b>. If the <i>i</i>th operator is supported, 
+ * the value of <b>(*isSupported)</b>[<i>i</i>] is <b>true</b>. Otherwise, the value is <b>false</b>. \n
  *
- * 本方法成功执行后，(*isSupported)将指向记录算子支持情况的bool数组，数组长度和模型实例的算子数量相等。该数组对应的内存由
- * Neural Network Runtime管理，在模型实例销毁或再次调用本方法后自动销毁。\n 
+ * After this method is successfully executed, <b>(*isSupported)</b> points to the bool array that records the operator support status. 
+ * The operator quantity for the array length is the same as that for the model instance. The memory corresponding to this array is 
+ * managed by Neural Network Runtime and is automatically destroyed after the model instance is destroyed or this method is called again. \n
  *
- * @param model 指向{@link OH_NNModel}实例的指针。
- * @param deviceID 指定查询的硬件ID，通过{@link OH_NNDevice_GetAllDevicesID}获取。
- * @param isSupported 指向bool数组的指针。调用本方法时，要求(*isSupported)为空指针，否则返回
- *                    {@link OH_NN_INVALID_PARAMETER}。
- * @param opCount 模型实例中算子的数量，对应(*isSupported)数组的长度。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param model Pointer to the {@link OH_NNModel} instance.
+ * @param deviceID Device ID to be queried, which can be obtained by using {@link OH_NNDevice_GetAllDevicesID}.
+ * @param isSupported Pointer to the bool array. When this method is called, <b>(*isSupported)</b> must be a null pointer.
+ *                                      Otherwise, {@link OH_NN_INVALID_PARAMETER} is returned.
+ *                    
+ * @param opCount Number of operators in a model instance, corresponding to the length of the <b>(*isSupported)</b> array.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
+ *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
@@ -205,88 +216,94 @@ OH_NN_ReturnCode OH_NNModel_GetAvailableOperations(OH_NNModel *model,
 
 
 /**
- * @brief 创建{@link OH_NNCompilation}类型的编译实例
+ * @brief Creates a compilation instance of the {@link OH_NNCompilation} type.
  *
- * 使用OH_NNModel模块完成模型的构造后，借助OH_NNCompilation模块提供的接口，将模型传递到底层硬件完成编译。本方法接受一个
- * {@link OH_NNModel}实例，创建出{@link OH_NNCompilation}实例；通过
- * {@link OH_NNCompilation_SetDevice}方法，设置编译的设备，最后调用
- * {@link OH_NNCompilation_Build}完成编译。\n 
+ * After the OH_NNModel module completes model construction, APIs provided by the OH_NNCompilation module pass the model 
+ * to underlying device for compilation. This method creates a {@link OH_NNCompilation} instance 
+ * based on the passed {@link OH_NNModel} instance. The {@link OH_NNCompilation_SetDevice} method is called  
+ * to set the device to compile on, and {@link OH_NNCompilation_Build} is then called to complete compilation.\n
  *
- * 除了计算硬件的选择，OH_NNCompilation模块支持模型缓存、性能偏好、优先级设置、float16计算等特性，参考以下方法：
+ * In addition to computing device selection, the OH_NNCompilation module supports features such as model caching, performance preference, 
+ * priority setting, and float16 computing, which can be implemented by the following methods:
  * - {@link OH_NNCompilation_SetCache}
  * - {@link OH_NNCompilation_SetPerformanceMode}
  * - {@link OH_NNCompilation_SetPriority}
- * - {@link OH_NNCompilation_EnableFloat16}\n 
+ * - {@link OH_NNCompilation_EnableFloat16} \n
  *
- * 调用本方法创建{@link OH_NNCompilation}后，{@link OH_NNModel}实例可以释放。\n 
+ * After {@link OH_NNCompilation} is created by calling this method, the {@link OH_NNModel} instance can be released. \n
  *
- * @param model 指向{@link OH_NNModel}实例的指针。
- * @return 返回一个指向{@link OH_NNCompilation}实例的指针。
+ * @param model Pointer to the {@link OH_NNModel} instance.
+ * @return Returns the pointer to a {@link OH_NNCompilation} instance.
  * @since 9
  * @version 1.0
  */
 OH_NNCompilation *OH_NNCompilation_Construct(const OH_NNModel *model);
 
 /**
- * @brief 指定模型编译和计算的硬件。
+ * @brief Specifies the device for model compilation and computing.
  *
- * 编译阶段，需要指定模型编译和执行计算的硬件设备。先调用{@link OH_NNDevice_GetAllDevicesID}获取可用的设备ID，
- * 通过{@link OH_NNDevice_GetType}和{@link OH_NNDevice_GetType}获取设备信息后，将期望编译执行的
- * 设备ID传入本方法进行设置。\n 
+ * In the compilation phase, you need to specify the device for model compilation and computing. Call {@link OH_NNDevice_GetAllDevicesID} 
+ * to obtain available device IDs. Call {@link OH_NNDevice_GetType} and {@link OH_NNDevice_GetName} to obtain device information 
+ * and pass target device IDs to this method for setting. \n
  *
- * @param compilation 指向{@link OH_NNCompilation}实例的指针。
- * @param deviceID 指定的硬件ID。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param compilation Pointer to the {@link OH_NNCompilation} instance.
+ * @param deviceID Device ID.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
+ *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNCompilation_SetDevice(OH_NNCompilation *compilation, size_t deviceID);
 
 /**
- * @brief 设置编译后的模型缓存路径和缓存版本。
+ * @brief Set the cache directory and version of the compiled model.
  *
- * 在支持缓存的硬件上，模型在硬件驱动层编译后可以保存为缓存文件，下次编译时直接从缓存文件读取模型，减少重新编译的耗时。本方法接受缓存路径和版本，根据缓存
- * 路径中和版本的不同情况，本方法采取不同的行为：\n 
+ * On the device that supports caching, a model can be saved as a cache file after being compiled at the device driver layer. 
+ * The model can be directly read from the cache file in the next compilation, saving recompilation time. 
+ * This method performs different operations based on the passed cache directory and version:\n
  *
- * - 缓存路径指定的目录下没有文件：
- * 将编译后的模型缓存到目录下，设置缓存版本等于version。\n 
+ * - No file exists in the cache directory:
+ * Caches the compiled model to the directory and sets the cache version to <b>version</b>. \n
  *
- * - 缓存路径指定的目录下存在完整的缓存文件，且版本号 == version：
- * 读取路径下的缓存文件，传递到底层硬件中转换为可以执行的模型实例。\n 
+ * - A complete cache file exists in the cache directory, and its version is <b>version</b>:
+ * Reads the cache file in the path and passes the data to the underlying device for conversion into executable model instances. \n
  *
- * - 缓存路径指定的目录下存在完整的缓存文件，但版本号 < version：
- * 路径下的缓存文件需要更新，模型在底层硬件完成编译后，覆写路径下的缓存文件，将版本号更新为version。\n 
+ * - A complete cache file exists in the cache directory, and its version is earlier than <b>version</b>:
+ * When model compilation is complete on the underlying device, overwrites the cache file and changes the version number to <b>version</b>. \n
  *
- * - 缓存路径指定的目录下存在完整的缓存文件，但版本号 > version：
- * 路径下的缓存文件版本高于version，不读取缓存文件，同时返回{@link OH_NN_INVALID_PARAMETER}错误码。\n 
+ * - A complete cache file exists in the cache directory, and its version is later than <b>version</b>:
+ * Returns the {@link OH_NN_INVALID_PARAMETER} error code without reading the cache file. \n
  *
- * - 缓存路径指定的目录下的缓存文件不完整或没有缓存文件的访问权限：
- * 返回{@link OH_NN_INVALID_FILE}错误码。\n 
+ * - The cache file in the cache directory is incomplete or you do not have the permission to access the cache file.
+ * Returns the {@link OH_NN_INVALID_FILE} error code. \n
  *
- * - 缓存目录不存在，或者没有访问权限：
- * 返回{@link OH_NN_INVALID_PATH}错误码。\n 
+ * - The cache directory does not exist or you do not have the access permission.
+ * Returns the {@link OH_NN_INVALID_PATH} error code. \n
  *
- * @param compilation 指向{@link OH_NNCompilation}实例的指针。
- * @param cachePath 模型缓存文件目录，本方法在cachePath目录下为不同的硬件创建缓存目录。建议每个模型使用单独的缓存目录。
- * @param version 缓存版本。
- * @return  函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param compilation Pointer to the {@link OH_NNCompilation} instance.
+ * @param cachePath Directory for storing model cache files. This method creates directories for different devices in the <b>cachePath</b> directory. 
+ *                  You are advised to use a separate cache directory for each model.
+ * @param version Cache version.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails,
+ *         an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNCompilation_SetCache(OH_NNCompilation *compilation, const char *cachePath, uint32_t version);
 
 /**
- * @brief 设置模型计算的性能模式。
+ * @brief Sets the performance mode for model computing.
  *
- * Neural Network Runtime 支持为模型计算设置性能模式，满足低功耗到极致性能的需求。如果编译阶段没有调用本方法设置性能模式，
- * 编译实例为模型默认分配{@link OH_NN_PERFORMANCE_NONE}模式。在{@link OH_NN_PERFORMANCE_NONE}
- * 模式下，硬件按默认的性能模式执行计算。\n 
+ * Neural Network Runtime allows you to set the performance mode for model computing to meet the requirements of low power consumption
+ * and ultimate performance. If this method is not called to set the performance mode in the compilation phase, the compilation instance assigns
+ * the {@link OH_NN_PERFORMANCE_NONE} mode for the model by default. In this case, the device performs computing in the default performance mode. \n
  *
- * 在不支持性能模式设置的硬件上调用本方法，将返回{@link OH_NN_UNAVALIDABLE_DEVICE}错误码。\n 
+ * If this method is called on the device that does not support the setting of the performance mode, the {@link OH_NN_UNAVALIDABLE_DEVICE} error code is returned. \n
  *
- * @param compilation 指向{@link OH_NNCompilation}实例的指针。
- * @param performanceMode 指定性能模式，可选的性能模式参考{@link OH_NN_PerformanceMode}。
- * @return  函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param compilation Pointer to the {@link OH_NNCompilation} instance.
+ * @param performanceMode Performance mode. For details about the available performance modes, see {@link OH_NN_PerformanceMode}.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails,
+ *         an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
@@ -294,61 +311,66 @@ OH_NN_ReturnCode OH_NNCompilation_SetPerformanceMode(OH_NNCompilation *compilati
                                                      OH_NN_PerformanceMode performanceMode);
 
 /**
- * @brief 设置模型计算的优先级。
+ * @brief Sets the model computing priority.
  *
- * Neural Network Runtime 支持为模型设置计算优先级，优先级仅作用于相同uid进程创建的模型，不同uid进程、不同设备的优先级不会
- * 相互影响。\n 
+ * Neural Network Runtime allows you to set computing priorities for models.  
+ * The priorities apply only to models created by the process with the same UID.
+ * The settings will not affect models created by processes with different UIDs on different devices. \n
  *
- * 在不支持优先级设置的硬件上调用本方法，将返回{@link OH_NN_UNAVALIDABLE_DEVICE}错误码。\n 
+ * If this method is called on the device that does not support the priority setting, the {@link OH_NN_UNAVALIDABLE_DEVICE} error code is returned. \n
  *
- * @param compilation 指向{@link OH_NNCompilation}实例的指针。
- * @param priority 指定优先级，可选的优先级参考{@link OH_NN_Priority}。
- * @return  函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param compilation Pointer to the {@link OH_NNCompilation} instance.
+ * @param priority Priority. For details about the optional priorities, see {@link OH_NN_Priority}.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails, 
+ *         an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNCompilation_SetPriority(OH_NNCompilation *compilation, OH_NN_Priority priority);
 
 /**
- * @brief 是否以float16的浮点数精度计算。
+ * @brief Enables float16 for computing.
  *
- * Neural Network Runtime目前仅支持构造float32浮点模型和int8量化模型。在支持float16精度的硬件上调用本方法，
- * float32浮点数精度的模型将以float16的精度执行计算，以减少内存占用和执行时间。\n 
+ * Currently, Neural Network Runtime supports only float32 and int8. If this method is called on a device that supports float16, 
+ * float16 will be used for computing the float32 model to reduce memory usage and execution time. \n
  *
- * 在不支持float16精度计算的硬件上调用本方法，将返回{@link OH_NN_UNAVALIDABLE_DEVICE}错误码。\n 
+ * If this method is called on the device that does not support float16, the {@link OH_NN_UNAVALIDABLE_DEVICE} error code is returned. \n
  *
- * @param compilation 指向{@link OH_NNCompilation}实例的指针。
- * @param enableFloat16 Float16低精度计算标志位。设置为true时，执行Float16推理；设置为false时，执行float32推理。
- * @return  函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param compilation Pointer to the {@link OH_NNCompilation} instance.
+ * @param enableFloat16 Indicates whether to enable float16. If this parameter is set to <b>true</b>, float16 inference is performed. 
+ *                      If this parameter is set to <b>false</b>, float32 inference is performed.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails, an error code is returned.
+ *         For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNCompilation_EnableFloat16(OH_NNCompilation *compilation, bool enableFloat16);
 
 /**
- * @brief 进行模型编译
+ * @brief Compiles a model.
  *
- * 完成编译配置后，调用本方法指示模型编译已完成。编译实例将模型和编译选项推送至硬件设备进行编译。在调用本方法后，无法进行额外的编译操作，调用
- * {@link OH_NNCompilation_SetDevice}、{@link OH_NNCompilation_SetCache}、
- * {@link OH_NNCompilation_SetPerformanceMode}、
- * {@link OH_NNCompilation_SetPriority}和{@link OH_NNCompilation_EnableFloat16}
- * 方法将返回{@link OH_NN_OPERATION_FORBIDDEN}。\n 
+ * After the compilation configuration is complete, call this method to return the compilation result. The compilation instance pushes the model and
+ * compilation options to the device for compilation. After this method is called, additional compilation operations cannot be performed. 
+ * If the {@link OH_NNCompilation_SetDevice}, {@link OH_NNCompilation_SetCache}, {@link OH_NNCompilation_SetPerformanceMode}, 
+ * {@link OH_NNCompilation_SetPriority}, and {@link OH_NNCompilation_EnableFloat16} methods are called, {@link OH_NN_OPERATION_FORBIDDEN} is returned. \n
  *
- * @param compilation 指向{@link OH_NNCompilation}实例的指针。
- * @return  函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param compilation Pointer to the {@link OH_NNCompilation} instance.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
+ *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation);
 
 /**
- * @brief 释放Compilation对象。
+ * @brief Releases the <b>Compilation</b> object.
  *
- * 调用{@link OH_NNCompilation_Construct}创建的编译实例需要调用本方法主动释放，否则将造成内存泄漏。\n 
+ * This method needs to be called to release the compilation instance created by calling {@link OH_NNCompilation_Construct}. Otherwise, memory leak will occur. \n
  *
- * 如果compilation为空指针或者*compilation为空指针，本方法只打印warning日志，不执行释放逻辑。\n 
+ * If <b>compilation</b> or <b>*compilation</b> is a null pointer, this method only prints warning logs and does not execute the release logic. \n
  *
- * @param compilation 指向{@link OH_NNCompilation}实例的二级指针。编译实例销毁后，本方法将*compilation主动设置为空指针。
+ * @param compilation Level-2 pointer to the {@link OH_NNCompilation} instance. After a compilation instance is destroyed, 
+ *                    this method sets <b>*compilation</b> to a null pointer.
  * @since 9
  * @version 1.0
  */
@@ -356,45 +378,50 @@ void OH_NNCompilation_Destroy(OH_NNCompilation **compilation);
 
 
 /**
- * @brief 创建{@link OH_NNExecutor}类型的执行器实例
+ * @brief Creates an executor instance of the {@link OH_NNExecutor} type.
  *
- * 本方法接受一个编译器，构造一个与硬件关联的模型推理执行器。通过{@link OH_NNExecutor_SetInput}设置模型输入数据，
- * 设置输入数据后，调用{@link OH_NNExecutor_Run}方法执行推理，最后通过
- * {@link OH_NNExecutor_SetOutput}获取计算结果。\n 
+ * This method constructs a model inference executor associated with the device based on the passed compiler. Use {@link OH_NNExecutor_SetInput}
+ * to set the model input data. After the input data is set, call {@link OH_NNExecutor_Run} to perform inference and then call 
+ * {@link OH_NNExecutor_SetOutput} to obtain the computing result. \n
  *
- * 调用本方法创建{@link OH_NNExecutor}实例后，如果不需要创建其他执行器，可以安全释放{@link OH_NNCompilation}实例。\n 
+ * After calling this method to create the {@link OH_NNExecutor} instance, you can release the {@link OH_NNCompilation} 
+ * instance if you do not need to create any other executors. \n
  *
- * @param compilation 指向{@link OH_NNCompilation}实例的指针。
- * @return 返回指向{@link OH_NNExecutor}实例的指针。
+ * @param compilation Pointer to the {@link OH_NNCompilation} instance.
+ * @return Pointer to a {@link OH_NNExecutor} instance.
  * @since 9
  * @version 1.0
  */
 OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation);
 
 /**
- * @brief 设置模型单个输入的数据。
+ * @brief Sets the single input data for a model.
  *
- * 本方法将dataBuffer中，长度为length个字节的数据，拷贝到底层硬件的共享内存。inputIndex指定设置的输入，tensor用于设置输入的
- * 形状、类型、量化参数等信息。\n 
+ * This method copies the data whose length is specified by <b>length</b> (in bytes) in <b>dataBuffer</b> to the shared memory 
+ * of the underlying device. <b>inputIndex</b> specifies the input to be set and <b>tensor</b> sets information such as the input shape,
+ * type, and quantization parameters. \n
  *
- * 由于Neural Network Runtime支持动态输入形状的模型，在固定形状输入和动态形状输入的场景下，本方法采取不同的处理策略：
+ * Neural Network Runtime supports models with dynamical shape input. For fixed shape input and dynamic shape input scenarios, 
+ * this method uses different processing policies.
  *
- * - 固定形状输入的场景：tensor各属性必须和构图阶段调用{@link OH_NNModel_AddTensor}添加的张量保持一致；
- * - 动态形状输入的场景：在构图阶段，由于动态输入的形状不确定，调用本方法时，要求tensor.dimensions中的每个值必须大于0，
- * 以确定执行计算阶段输入的形状。设置形状时，只允许调整数值为-1的维度。假设在构图阶段，输入A的维度为
- * [-1, 224, 224, 3]，调用本方法时，只能调整第一个维度的尺寸，如：[3, 224, 224, 3]。调整其他维度将返回
- * {@link OH_NN_INVALID_PARAMETER}。\n 
+ * - Fixed shape input: The attributes of <b>tensor</b> must be the same as those of the tensor added by calling 
+ *   {@link OH_NNModel_AddTensor} in the composition phase.
+ * - Dynamic shape input: In the composition phase, because the shape is not fixed, each value in <b>tensor.dimensions</b> must be greater than 
+ *   <b>0</b> in the method calls to determine the shape input in the calculation phase. When setting the shape, you can modify 
+ *   only the dimension whose value is <b>-1</b>. Assume that <b>[-1, 224, 224, 3]</b> is input as the the dimension of A in the composition phase.
+ *   When this method is called, only the size of the first dimension can be modified, for example, to <b>[3, 224, 224, 3]</b>.
+ *   If other dimensions are adjusted, {@link OH_NN_INVALID_PARAMETER} is returned. \n
  *
- * inputIndex的值，从0开始，根据调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，指定输入的顺序，
- * 依次加一。假设调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，inputIndices为{1，2，3}，
- * 则在执行阶段，三个输入的索引值分别为{0, 1, 2}。\n 
+ * @param executor Pointer to the {@link OH_NNExecutor} instance.
+ * @param inputIndex Input index value, which is in the same sequence of the data input when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                   Assume that the value of <b>inputIndices</b> is <b>{1, 5, 9}</b> when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                   In input settings, the index value for the three inputs is <b>{0, 1, 2}</b>. \n
  *
- * @param executor 指向{@link OH_NNExecutor}实例的指针。
- * @param inputIndex 输入的索引值。
- * @param tensor 设置输入数据对应的张量。
- * @param dataBuffer 指向输入数据的指针。
- * @param length 数据缓冲区的字节长度。
- * @return  函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param tensor Sets the tensor corresponding to the input data.
+ * @param dataBuffer Pointer to the input data.
+ * @param length Length of the data buffer, in bytes.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails,
+ *         an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
@@ -405,26 +432,28 @@ OH_NN_ReturnCode OH_NNExecutor_SetInput(OH_NNExecutor *executor,
                                         size_t length);
 
 /**
- * @brief 设置模型单个输出的缓冲区。
+ * @brief Sets the buffer for a single output of a model.
  *
- * 本方法将dataBuffer指向的缓冲区与outputIndex指定的输出绑定，缓冲区的长度由length指定。\n 
+ * This method binds the buffer to which <b>dataBuffer</b> points to the output specified by <b>outputIndex</b>.
+ * The length of the buffer is specified by <b>length</b>. \n
  *
- * 调用{@link OH_NNExecutor_Run}完成单次模型推理后，Neural Network Runtime将比对dataBuffer指向的缓冲区与
- * 输出数据的长度，根据不同情况，返回不同结果：\n 
+ * After {@link OH_NNExecutor_Run} is called to complete a single model inference, Neural Network Runtime compares 
+ * the length of the buffer to which <b>dataBuffer</b> points with the length of the output data and returns different results
+ * based on the actual situation. \n
  *
- * - 如果缓冲区大于或等于数据长度：则推理后的结果将拷贝至缓冲区，并返回{@link OH_NN_SUCCESS}，可以通过访问dataBuffer读取推理结果。
- * - 如果缓冲区小于数据长度：则{@link OH_NNExecutor_Run}将返回{@link OH_NN_INVALID_PARAMETER}，
- * 并输出日志告知缓冲区太小的信息。\n 
+ * - If the buffer length is greater than or equal to the data length, the inference result is copied to the buffer and 
+ *   {@link OH_NN_SUCCESS} is returned. You can read the inference result from <b>dataBuffer</b>.
+ * - If the buffer length is smaller than the data length, {@link OH_NNExecutor_Run} returns {@link OH_NN_INVALID_PARAMETER} 
+ *   and generates a log indicating that the buffer is too small. \n
  *
- * outputIndex的值，从0开始，根据调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，指定输出的顺序，
- * 依次加一。假设调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，outputIndices为{4, 5, 6}，
- * 则在执行阶段，三个输出的索引值分别为{0, 1, 2}。\n 
- *
- * @param executor 指向{@link OH_NNExecutor}实例的指针。
- * @param outputIndex 输出的索引值。
- * @param dataBuffer 指向输出数据的指针。
- * @param length 数据缓冲区的字节长度。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param executor Pointer to the {@link OH_NNExecutor} instance.
+ * @param outputIndex Output Index value, which is in the same sequence of the data output when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                    Assume that the value of <b>outputIndices</b> is <b>{4, 6, 8}</b> when {@link OH_NNModel_SpecifyInputsAndOutputs}
+ *                    is called. In output buffer settings, the index value for the three outputs is <b>{0, 1, 2}</b>.
+ * @param dataBuffer Pointer to the output data.
+ * @param length Length of the data buffer, in bytes.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails,
+ *                an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
@@ -434,19 +463,21 @@ OH_NN_ReturnCode OH_NNExecutor_SetOutput(OH_NNExecutor *executor,
                                          size_t length);
 
 /**
- * @brief 获取输出tensor的维度信息。
+ * @brief Obtains the dimension information about the output tensor.
  *
- * 调用{@link OH_NNExecutor_Run}完成单次推理后，本方法获取指定输出的维度信息和维数。在动态形状输入、输出的场景中常用。\n 
+ * After {@link OH_NNExecutor_Run} is called to complete a single inference, call this method to obtain the specified output dimension
+ * information and number of dimensions. It is commonly used in dynamic shape input and output scenarios. \n
  *
- * outputIndex的值，从0开始，根据调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，指定输出的顺序，
- * 依次加一。假设调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，outputIndices为{4, 5, 6}，
- * 则在执行阶段，三个输出的索引值分别为{0, 1, 2}。\n 
+ * @param executor Pointer to the {@link OH_NNExecutor} instance.
+ * @param outputIndex Output Index value, which is in the same sequence of the data output when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                                      Assume that <b>outputIndices</b> is <b>{4, 6, 8}</b> when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                                      When {@link OH_NNExecutor_GetOutputShape} is called to obtain dimension information about the output tensor, 
+ *                                      <b>outputIndices</b> is <b>{0, 1, 2}</b>.
  *
- * @param executor 指向{@link OH_NNExecutor}实例的指针。
- * @param outputIndex 输出的索引值。
- * @param shape 指向int32_t数组的指针，数组中的每个元素值，是输出tensor在每个维度上的长度。
- * @param shapeLength uint32_t类型的指针，返回输出的维数。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param shape Pointer to the int32_t array. The value of each element in the array is the length of the output tensor in each dimension.
+ * @param shapeLength Pointer to the uint32_t type. The number of output dimensions is returned.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails, 
+ *         an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
@@ -456,110 +487,106 @@ OH_NN_ReturnCode OH_NNExecutor_GetOutputShape(OH_NNExecutor *executor,
                                               uint32_t *shapeLength);
 
 /**
- * @brief 执行推理。
+ * @brief Performs inference.
  *
- * 在执行器关联的硬件上，执行模型的端到端推理计算。\n 
+ * Performs end-to-end inference and computing of the model on the device associated with the executor. \n
  *
- * @param executor 指向{@link OH_NNExecutor}实例的指针。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param executor Pointer to the {@link OH_NNExecutor} instance.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails,
+ *         an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNExecutor_Run(OH_NNExecutor *executor);
 
 /**
- * @brief 在硬件上为单个输入申请共享内存。
+ * @brief Allocates shared memory to a single input on a device.
  *
- * Neural Network Runtime 提供主动申请硬件共享内存的方法。通过指定执行器和输入索引值，本方法在单个输入关联的硬件
- * 上，申请大小为length的共享内存，通过{@link OH_NN_Memory}实例返回。\n 
+ * Neural Network Runtime provides a method for proactively allocating shared memory on a device. By specifying the executor and input index value,
+ * this method allocates shared memory whose size is specified by <b>length</b> on the device associated with a single input and returns the
+ * operation result through the {@link OH_NN_Memory} instance. \n
  *
- * inputIndex的值，从0开始，根据调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，指定输入的顺序，
- * 依次加一。假设调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，inputIndices为{1，2，3}，
- * 则在执行阶段，三个输入的索引值分别为{0, 1, 2}。\n 
- *
- * @param executor 指向{@link OH_NNExecutor}实例的指针。
- * @param inputIndex 输入的索引值。
- * @param length 申请的内存字节。
- * @return 指向{@link OH_NN_Memory}实例的指针。
+ * @param executor Pointer to the {@link OH_NNExecutor} instance.
+ * @param inputIndex Input index value, which is in the same sequence of the data input when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                   Assume that the value of <b>inputIndices</b> is <b>{1, 5, 9}</b> when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                   In the memory input application, the index value for the three inputs is <b>{0, 1, 2}</b>.
+ * @param length Memory size to be applied for, in bytes.
+ * @return Pointer to a {@link OH_NN_Memory} instance.
  * @since 9
  * @version 1.0
  */
 OH_NN_Memory *OH_NNExecutor_AllocateInputMemory(OH_NNExecutor *executor, uint32_t inputIndex, size_t length);
 
 /**
- * @brief 在硬件上为单个输出申请共享内存。
+ * @brief Allocates shared memory to a single output on a device.
  *
- * Neural Network Runtime 提供主动申请硬件共享内存的方法。通过指定执行器和输出索引值，本方法在单个输出关联的硬件
- * 上，申请大小为length的共享内存，通过{@link OH_NN_Memory}实例返回。\n 
+ * Neural Network Runtime provides a method for proactively allocating shared memory on a device. By specifying the executor and
+ * output index value, this method allocates shared memory whose size is specified by <b>length</b> on the device associated with
+ * a single output and returns the operation result through the {@link OH_NN_Memory} instance. \n
  *
- * outputIndex的值，从0开始，根据调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，指定输出的顺序，
- * 依次加一。假设调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，outputIndices为{4, 5, 6}，
- * 则在执行阶段，三个输出的索引值分别为{0, 1, 2}。\n 
- *
- * @param executor 指向{@link OH_NNExecutor}实例的指针。
- * @param outputIndex 输出的索引值。
- * @param length 申请的内存字节。
- * @return 指向{@link OH_NN_Memory}实例的指针。
+ * @param executor Pointer to the {@link OH_NNExecutor} instance.
+ * @param outputIndex Output Index value, which is in the same sequence of the data output when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                    Assume that the value of <b>outputIndices</b> is <b>{4, 6, 8}</b> when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                    In output memory application, the index value for the three outputs is <b>{0, 1, 2}</b>.
+ * @param length Memory size to be applied for, in bytes.
+ * @return Pointer to a {@link OH_NN_Memory} instance.
  * @since 9
  * @version 1.0
  */
 OH_NN_Memory *OH_NNExecutor_AllocateOutputMemory(OH_NNExecutor *executor, uint32_t outputIndex, size_t length);
 
 /**
- * @brief 释放{@link OH_NN_Memory}实例指向的输入内存。
+ * @brief Releases the input memory to which the {@link OH_NN_Memory} instance points.
  *
- * 调用{@link OH_NNExecutor_AllocateInputMemory}创建的内存实例，需要主动调用本方法进行释放，否则将造成内存泄漏。
- * inputIndex和memory的对应关系需要和创建内存实例时保持一致。\n 
+ * This method needs to be called to release the memory instance created by calling {@link OH_NNExecutor_AllocateInputMemory}. 
+ * Otherwise, memory leak will occur.
+ * The mapping between <b>inputIndex</b> and <b>memory</b> must be the same as that in memory instance creation. \n
  *
- * 如果memory或*memory为空指针，本方法只打印warning日志，不执行释放逻辑。\n 
- * 
- * inputIndex的值，从0开始，根据调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，指定输入的顺序，
- * 依次加一。假设调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，inputIndices为{1，2，3}，
- * 则在执行阶段，三个输入的索引值分别为{0, 1, 2}。\n 
+ * If <b>memory</b> or <b>*memory</b> is a null pointer, this method only prints warning logs and does not execute the release logic. \n
  *
- * @param executor 指向{@link OH_NNExecutor}实例的指针。
- * @param inputIndex 输入的索引值。
- * @param memory 指向{@link OH_NN_Memory}实例的二级指针。共享内存销毁后，本方法将*memory主动设置为空指针。
+ * @param executor Pointer to the {@link OH_NNExecutor} instance.
+ * @param inputIndex Input index value, which is in the same sequence of the data input when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                   Assume that the value of <b>inputIndices</b> is <b>{1, 5, 9}</b> when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                   In memory input release, the index value for the three inputs is <b>{0, 1, 2}</b>.
+ * @param memory Level-2 pointer to the {@link OH_NN_Memory} instance. After shared memory is destroyed, this method sets <b>*memory</b> to a null pointer.
  * @since 9
  * @version 1.0
  */
 void OH_NNExecutor_DestroyInputMemory(OH_NNExecutor *executor, uint32_t inputIndex, OH_NN_Memory **memory);
 
 /**
- * @brief 释放{@link OH_NN_Memory}实例指向的输出内存。
+ * @brief Releases the output memory to which the {@link OH_NN_Memory} instance points.
  *
- * 调用{@link OH_NNExecutor_AllocateOutputMemory}创建的内存实例，需要主动调用本方法进行释放，否则将造成内存泄漏。
- * outputIndex和memory的对应关系需要和创建内存实例时保持一致。\n 
+ * This method needs to be called to release the memory instance created by calling {@link OH_NNExecutor_AllocateOutputMemory}. Otherwise, memory leak will occur.
+ * The mapping between <b>outputIndex</b> and <b>memory</b> must be the same as that in memory instance creation. \n
  *
- * 如果memory或*memory为空指针，本方法只打印warning日志，不执行释放逻辑。\n 
- * 
- * outputIndex的值，从0开始，根据调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，指定输出的顺序，
- * 依次加一。假设调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，outputIndices为{4, 5, 6}，
- * 则在执行阶段，三个输出的索引值分别为{0, 1, 2}。\n 
+ * If <b>memory</b> or <b>*memory</b> is a null pointer, this method only prints warning logs and does not execute the release logic. \n
  *
- * @param executor 指向{@link OH_NNExecutor}实例的指针。
- * @param outputIndex 输出的索引值。
- * @param memory 指向{@link OH_NN_Memory}实例的二级指针。共享内存销毁后，本方法将*memory主动设置为空指针。
+ * @param executor Pointer to the {@link OH_NNExecutor} instance.
+ * @param outputIndex Output Index value, which is in the same sequence of the data output when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                    Assume that the value of <b>outputIndices</b> is <b>{4, 6, 8}</b> when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                    In output memory release, the index value for the three outputs is <b>{0, 1, 2}</b>.
+ * @param memory Level-2 pointer to the {@link OH_NN_Memory} instance. After shared memory is destroyed, this method sets <b>*memory</b> to a null pointer.
  * @since 9
  * @version 1.0
  */
 void OH_NNExecutor_DestroyOutputMemory(OH_NNExecutor *executor, uint32_t outputIndex, OH_NN_Memory **memory);
 
 /**
- * @brief 将{@link OH_NN_Memory}实例指向的硬件共享内存，指定为单个输入使用的共享内存。
+ * @brief Specifies the hardware shared memory pointed to by the {@link OH_NN_Memory} instance as the shared memory used by a single input.
  *
- * 在需要自行管理内存的场景下，本方法将执行输入和{@link OH_NN_Memory}内存实例绑定。执行计算时，底层硬件从内存实例指向的共享内存中读取
- * 输入数据。通过本方法，可以实现设置输入、执行计算、读取输出的并发执行，提升数据流的推理效率。\n 
- * 
- * inputIndex的值，从0开始，根据调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，指定输入的顺序，
- * 依次加一。假设调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，inputIndices为{1，2，3}，
- * 则在执行阶段，三个输入的索引值分别为{0, 1, 2}。\n 
+ * In scenarios where memory needs to be managed by yourself, this method binds the execution input to the {@link OH_NN_Memory} memory instance.
+ * During computing, the underlying device reads the input data from the shared memory pointed to by the memory instance.
+ * By using this method, concurrent execution of input setting, computing, and read can be implemented to improve inference efficiency of a data flow. \n
  *
- * @param executor 指向{@link OH_NNExecutor}实例的指针。
- * @param inputIndex 输入的索引值。
- * @param tensor 指向{@link OH_NN_Tensor}的指针，设置单个输入所对应的张量。
- * @param memory 指向{@link OH_NN_Memory}的指针。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param executor Pointer to the {@link OH_NNExecutor} instance.
+ * @param inputIndex Input index value, which is in the same sequence of the data input when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                   Assume that the value of <b>inputIndices</b> is <b>{1, 5, 9}</b> when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                   When the input shared memory is specified, the index value for the three inputs is <b>{0, 1, 2}</b>.
+ * @param tensor Pointer to {@link OH_NN_Tensor}, used to set the tensor corresponding to a single input.
+ * @param memory Pointer to {@link OH_NN_Memory}.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails, 
+ *         an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
@@ -569,19 +596,19 @@ OH_NN_ReturnCode OH_NNExecutor_SetInputWithMemory(OH_NNExecutor *executor,
                                                   const OH_NN_Memory *memory);
 
 /**
- * @brief 将{@link OH_NN_Memory}实例指向的硬件共享内存，指定为单个输出使用的共享内存。
+ * @brief Specifies the hardware shared memory pointed to by the {@link OH_NN_Memory} instance as the shared memory used by a single output.
  *
- * 在需要自行管理内存的场景下，本方法将执行输出和{@link OH_NN_Memory}内存实例绑定。执行计算时，底层硬件将计算结果直接写入内存实例指向
- * 的共享内存。通过本方法，可以实现设置输入、执行计算、读取输出的并发执行，提升数据流的推理效率。\n 
- * 
- * outputIndex的值，从0开始，根据调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，指定输出的顺序，
- * 依次加一。假设调用{@link OH_NNModel_SpecifyInputsAndOutputs}时，outputIndices为{4, 5, 6}，
- * 则在执行阶段，三个输出的索引值分别为{0, 1, 2}。\n 
+ * In scenarios where memory needs to be managed by yourself, this method binds the execution output to the {@link OH_NN_Memory} memory instance.
+ * When computing is performed, the underlying hardware directly writes the computing result to the shared memory to which the memory instance points.
+ * By using this method, concurrent execution of input setting, computing, and read can be implemented to improve inference efficiency of a data flow. \n
  *
- * @param executor 执行器。
- * @param outputIndex 输出的索引值。
- * @param memory 指向{@link OH_NN_Memory}的指针。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param executor Executor.
+ * @param outputIndex Output Index value, which is in the same sequence of the data output when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                    Assume that the value of <b>outputIndices</b> is <b>{4, 6, 8}</b> when {@link OH_NNModel_SpecifyInputsAndOutputs} is called.
+ *                    When output shared memory is specified, the index value for the three outputs is <b>{0, 1, 2}</b>.
+ * @param memory Pointer to {@link OH_NN_Memory}.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails,
+ *         an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
@@ -590,13 +617,14 @@ OH_NN_ReturnCode OH_NNExecutor_SetOutputWithMemory(OH_NNExecutor *executor,
                                                    const OH_NN_Memory *memory);
 
 /**
- * @brief 销毁执行器实例，释放执行器占用的内存。
+ * @brief Destroys an executor instance to release the memory occupied by the executor.
  *
- * 调用{@link OH_NNExecutor_Construct}创建的执行器实例需要调用本方法主动释放，否则将造成内存泄漏。\n 
+ * This method needs to be called to release the executor instance created by calling {@link OH_NNExecutor_Construct}. Otherwise,
+ * memory leak will occur. \n
  *
- * 如果executor为空指针或者*executor为空指针，本方法只打印warning日志，不执行释放逻辑。\n 
+ * If <b>executor</b> or <b>*executor</b> is a null pointer, this method only prints warning logs and does not execute the release logic. \n
  *
- * @param executor 指向{@link OH_NNExecutor}实例的二级指针。
+ * @param executor Level-2 pointer to the {@link OH_NNExecutor} instance.
  * @since 9
  * @version 1.0
  */
@@ -604,48 +632,51 @@ void OH_NNExecutor_Destroy(OH_NNExecutor **executor);
 
 
 /**
- * @brief 获取对接到 Neural Network Runtime 的硬件ID。
+ * @brief Obtains the ID of the device connected to Neural Network Runtime.
  *
- * 每个硬件在 Neural Network Runtime 中存在唯一且固定ID，本方法通过uin32_t数组返回当前设备上已经对接的硬件ID。\n 
+ * Each device has a unique and fixed ID in Neural Network Runtime. This method returns device IDs on the current device through the uint32_t array. \n
  *
- * 硬件ID通过size_t数组返回，数组的每个元素是单个硬件的ID值。数组内存由Neural Network Runtime管理。在下次调用本方法前，
- * 数据指针有效。\n 
+ * Device IDs are returned through the size_t array. Each element of the array is the ID of a single device. 
+ * The array memory is managed by Neural Network Runtime. 
+ * The data pointer is valid before this method is called next time. \n
  *
- * @param allDevicesID 指向size_t数组的指针。要求传入的(*allDevicesID)为空指针，否则返回
- *                     {@link OH_NN_INVALID_PARAMETER}。
- * @param deviceCount uint32_t类型的指针，用于返回(*allDevicesID)的长度。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param allDevicesID Pointer to the size_t array. The input <b>*allDevicesID</b> must be a null pointer. Otherwise, {@link OH_NN_INVALID_PARAMETER} is returned.
+ * @param deviceCount Pointer of the uint32_t type, which is used to return the length of <b>(*allDevicesID)</b>.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
+ *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNDevice_GetAllDevicesID(const size_t **allDevicesID, uint32_t *deviceCount);
 
 /**
- * @brief 获取指定硬件的类型信息。
+ * @brief Obtains the name of the specified device.
  *
- * 通过deviceID指定计算硬件，获取硬件的名称。硬件ID需要调用{@link OH_NNDevice_GetAllDevicesID}获取。\n 
+ * <b>deviceID</b> specifies the device whose name will be obtained. The device ID needs to be obtained by calling {@link OH_NNDevice_GetAllDevicesID}. \n
  *
- * @param deviceID 指定硬件ID。
- * @param name 指向char数组的指针，要求传入的(*char)为空指针，否则返回
- *             {@link OH_NN_INVALID_PARAMETER}。（*name）以C风格字符串保存硬件名称，数组以\0结尾。
- * @return 函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param deviceID Device ID.
+ * @param name Pointer to the char array. The passed <b>(*char)</b> must be a null pointer. Otherwise, {@link OH_NN_INVALID_PARAMETER} is returned.
+ *             The value of <b>(*name)</b> is a C-style string ended with <b>'\0'</b>.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails,
+ *         an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNDevice_GetName(size_t deviceID, const char **name);
 
 /**
- * @brief 获取指定硬件的类别信息。
+ * @brief Obtains the type information of the specified device.
  *
- * 通过deviceID指定计算硬件，获取硬件的类别。目前 Neural Network Runtime 支持的设备类型有：
- * - CPU设备：OH_NN_CPU
- * - GPU设备：OH_NN_GPU
- * - 机器学习专用加速器：OH_NN_ACCELERATOR
- * - 不属于以上类型的其他硬件类型：OH_NN_OTHERS\n 
+ * <b>deviceID</b> specifies the device whose type will be obtained. Currently, Neural Network Runtime supports the following device types:
+ * - <b>OH_NN_CPU</b>: CPU device.
+ * - <b>OH_NN_GPU</b>: GPU device.
+ * - <b>OH_NN_ACCELERATOR</b>: machine learning dedicated accelerator.
+ * - <b>OH_NN_OTHERS</b>: other hardware types. \n
  *
- * @param deviceID 指定硬件ID。
- * @param deviceType 指向{@link OH_NN_DeviceType}实例的指针，返回硬件的类别信息。
- * @return  函数执行的结果状态。执行成功返回OH_NN_SUCCESS；失败返回具体错误码，具体失败错误码可参考{@link OH_NN_ReturnCode}。
+ * @param deviceID Device ID.
+ * @param deviceType Pointer to the {@link OH_NN_DeviceType} instance. The device type information is returned.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. If the operation fails,
+ *         an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
  * @version 1.0
  */
@@ -655,5 +686,5 @@ OH_NN_ReturnCode OH_NNDevice_GetType(size_t deviceID, OH_NN_DeviceType *deviceTy
 }
 #endif // __cplusplus
 
-#endif // NEURAL_NETWORK_RUNTIME_H
 /** @} */
+#endif // NEURAL_NETWORK_RUNTIME_H
