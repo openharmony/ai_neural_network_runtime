@@ -14,15 +14,13 @@
 import("//build/ohos.gni")
 
 group("nnrt_target") {
-  deps = [
-    "frameworks:libneural_network_runtime"
-  ]
+  deps = [ "frameworks:libneural_network_runtime" ]
 }
 
 group("nnrt_test_target") {
   testonly = true
   deps = [
+    "test/system_test:system_test",
     "test/unittest:unittest",
-    "test/system_test:system_test"
   ]
 }
