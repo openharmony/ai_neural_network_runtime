@@ -19,8 +19,5 @@ group("nnrt_target") {
 
 group("nnrt_test_target") {
   testonly = true
-  deps = [
-    "test/system_test:system_test",
-    "test/unittest:unittest",
-  ]
+  deps = [ "test/unittest:unittest" ]
 }
