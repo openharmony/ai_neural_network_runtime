@@ -170,7 +170,7 @@ HWTEST_F(AddFusionBuilderTest, add_build_007, TestSize.Level1)
 
     m_paramsIndex = m_param;
     std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT32, m_param_dim, nullptr, OH_NN_ADD_ACTIVATIONTYPE);
-    int32_t* activationValueTest = new (std::nothrow) int32_t[0];
+    int32_t* activationValueTest = new (std::nothrow) int32_t(0);
     EXPECT_NE(nullptr, activationValueTest);
     tensor->SetBuffer(activationValueTest, sizeof(int32_t));
     m_allTensors.emplace_back(tensor);
@@ -189,7 +189,7 @@ HWTEST_F(AddFusionBuilderTest, add_build_008, TestSize.Level1)
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
 
     std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT8, m_param_dim, nullptr, OH_NN_ADD_ACTIVATIONTYPE);
-    int8_t* activationValueTest = new (std::nothrow) int8_t[40];
+    int8_t* activationValueTest = new (std::nothrow) int8_t(40);
     EXPECT_NE(nullptr, activationValueTest);
     tensor->SetBuffer(activationValueTest, sizeof(int8_t));
     m_allTensors.emplace_back(tensor);
@@ -209,7 +209,7 @@ HWTEST_F(AddFusionBuilderTest, add_build_009, TestSize.Level1)
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
 
     std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT8, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
-    int8_t* activationValueTest = new (std::nothrow) int8_t[0];
+    int8_t* activationValueTest = new (std::nothrow) int8_t(0);
     EXPECT_NE(nullptr, activationValueTest);
     tensor->SetBuffer(activationValueTest, sizeof(int8_t));
     m_allTensors.emplace_back(tensor);
