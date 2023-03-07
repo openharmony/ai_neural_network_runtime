@@ -18,29 +18,29 @@ config("nnrt_config") {
 }
 
 nnrt_sources = [
+  "native/compilation.cpp",
   "native/device_manager.cpp",
   "native/device_registrar.cpp",
-  "native/hdi_device.cpp",
-  "native/hdi_prepared_model.cpp",
-  "native/memory_manager.cpp",
-  "native/transform.cpp",
-  "native/nn_tensor.cpp",
-  "native/validation.cpp",
-  "native/inner_model.cpp",
-  "native/compilation.cpp",
   "native/execution_plan.cpp",
   "native/executor.cpp",
+  "native/hdi_device.cpp",
+  "native/hdi_prepared_model.cpp",
+  "native/inner_model.cpp",
+  "native/memory_manager.cpp",
   "native/neural_network_runtime.cpp",
+  "native/nn_tensor.cpp",
   "native/ops_builder.cpp",
   "native/ops_registry.cpp",
+  "native/transform.cpp",
+  "native/validation.cpp",
 ]
 
 ops_sources = [
   "native/ops/add_builder.cpp",
   "native/ops/argmax_builder.cpp",
   "native/ops/avgpool_builder.cpp",
-  "native/ops/pooling_builder.cpp",
   "native/ops/batch_to_space_nd_builder.cpp",
+  "native/ops/batchnorm_builder.cpp",
   "native/ops/bias_add_builder.cpp",
   "native/ops/cast_builder.cpp",
   "native/ops/concat_builder.cpp",
@@ -50,8 +50,34 @@ ops_sources = [
   "native/ops/div_builder.cpp",
   "native/ops/eltwise_builder.cpp",
   "native/ops/expandims_builder.cpp",
+  "native/ops/fill_builder.cpp",
   "native/ops/fullconnection_builder.cpp",
+  "native/ops/gather_builder.cpp",
+  "native/ops/gelu_builder.cpp",
+  "native/ops/hswish_builder.cpp",
+  "native/ops/layernorm_builder.cpp",
+  "native/ops/lessequal_builder.cpp",
+  "native/ops/matmul_builder.cpp",
+  "native/ops/maximum_builder.cpp",
   "native/ops/maxpool_builder.cpp",
+  "native/ops/mul_builder.cpp",
+  "native/ops/onehot_builder.cpp",
+  "native/ops/pad_builder.cpp",
+  "native/ops/pooling_builder.cpp",
+  "native/ops/pow_builder.cpp",
+  "native/ops/prelu_builder.cpp",
+  "native/ops/quant_dtype_cast_builder.cpp",
+  "native/ops/reduceall_builder.cpp",
+  "native/ops/reducemean_builder.cpp",
+  "native/ops/reduceprod_builder.cpp",
+  "native/ops/relu6_builder.cpp",
+  "native/ops/relu_builder.cpp",
+  "native/ops/reshape_builder.cpp",
+  "native/ops/resize_bilinear_builder.cpp",
+  "native/ops/rsqrt_builder.cpp",
+  "native/ops/scale_builder.cpp",
+  "native/ops/shape_builder.cpp",
+  "native/ops/sigmoid_builder.cpp",
   "native/ops/slice_builder.cpp",
   "native/ops/softmax_builder.cpp",
   "native/ops/space_to_batch_nd_builder.cpp",
@@ -67,32 +93,6 @@ ops_sources = [
   "native/ops/top_k_builder.cpp",
   "native/ops/transpose_builder.cpp",
   "native/ops/unsqueeze_builder.cpp",
-  "native/ops/batchnorm_builder.cpp",
-  "native/ops/fill_builder.cpp",
-  "native/ops/matmul_builder.cpp",
-  "native/ops/gather_builder.cpp",
-  "native/ops/gelu_builder.cpp",
-  "native/ops/hswish_builder.cpp",
-  "native/ops/layernorm_builder.cpp",
-  "native/ops/maximum_builder.cpp",
-  "native/ops/lessequal_builder.cpp",
-  "native/ops/mul_builder.cpp",
-  "native/ops/onehot_builder.cpp",
-  "native/ops/pad_builder.cpp",
-  "native/ops/pow_builder.cpp",
-  "native/ops/prelu_builder.cpp",
-  "native/ops/quant_dtype_cast_builder.cpp",
-  "native/ops/reduceall_builder.cpp",
-  "native/ops/reducemean_builder.cpp",
-  "native/ops/reduceprod_builder.cpp",
-  "native/ops/relu_builder.cpp",
-  "native/ops/relu6_builder.cpp",
-  "native/ops/reshape_builder.cpp",
-  "native/ops/resize_bilinear_builder.cpp",
-  "native/ops/rsqrt_builder.cpp",
-  "native/ops/scale_builder.cpp",
-  "native/ops/shape_builder.cpp",
-  "native/ops/sigmoid_builder.cpp",
 ]
 
 ohos_shared_library("libneural_network_runtime") {
@@ -109,23 +109,23 @@ ohos_shared_library("libneural_network_runtime") {
     "//foundation/ai/neural_network_runtime",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//third_party/googletest/googletest/include/gtest",
-    "//third_party/mindspore/mindspore/lite/mindir/include"
+    "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
   ]
 
   install_images = [
     "system",
-    "updater"
+    "updater",
   ]
 
   public_configs = [ ":nnrt_config" ]
 
   external_deps = [
+    "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hdf_core:libhdf_utils",
     "hilog_native:libhilog",
     "hitrace_native:libhitracechain",
-    "c_utils:utils",
-    "hdf_core:libhdf_utils",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 
   subsystem_name = "ai"

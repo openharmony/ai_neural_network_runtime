@@ -20,7 +20,7 @@ config("system_test_config") {
 
   include_dirs = [
     "//foundation/ai/neural_network_runtime",
-    "//third_party/mindspore/mindspore/lite/mindir/include"
+    "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
   ]
 
   cflags = [
@@ -32,7 +32,7 @@ config("system_test_config") {
 
 ohos_systemtest("DeviceTest") {
   module_out_path = module_output_path
-  sources = ["//foundation/ai/neural_network_runtime/test/system_test/device_test.cpp"]
+  sources = [ "./device_test.cpp" ]
 
   configs = [ ":system_test_config" ]
 
@@ -42,19 +42,19 @@ ohos_systemtest("DeviceTest") {
   ]
 
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
     "c_utils:utils",
-    "hitrace_native:hitrace_meter",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
+    "hitrace_native:hitrace_meter",
+    "hiviewdfx_hilog_native:libhilog",
   ]
 }
 
 ohos_systemtest("End2EndTest") {
   module_out_path = module_output_path
   sources = [
-    "//foundation/ai/neural_network_runtime/test/system_test/end_to_end_test.cpp",
-    "//foundation/ai/neural_network_runtime/test/system_test/common/nnrt_test.cpp",
+    "./common/nnrt_test.cpp",
+    "./end_to_end_test.cpp",
   ]
 
   configs = [ ":system_test_config" ]
@@ -65,22 +65,22 @@ ohos_systemtest("End2EndTest") {
   ]
 
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
     "c_utils:utils",
-    "hitrace_native:libhitracechain",
-    "hitrace_native:hitrace_meter",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "mindspore:mindir"
+    "hitrace_native:hitrace_meter",
+    "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
+    "mindspore:mindir",
   ]
 }
 
 ohos_systemtest("StressTest") {
   module_out_path = module_output_path
   sources = [
-      "//foundation/ai/neural_network_runtime/test/system_test/stress_test.cpp",
-      "//foundation/ai/neural_network_runtime/test/system_test/common/nnrt_test.cpp",
-      ]
+    "./common/nnrt_test.cpp",
+    "./stress_test.cpp",
+  ]
 
   configs = [ ":system_test_config" ]
 
@@ -90,18 +90,17 @@ ohos_systemtest("StressTest") {
   ]
 
   external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
     "c_utils:utils",
-    "mindspore:mindir"
+    "hiviewdfx_hilog_native:libhilog",
+    "mindspore:mindir",
   ]
 }
 
 group("system_test") {
   testonly = true
   deps = [
-      ":DeviceTest",
-      ":End2EndTest",
-      ":StressTest"
+    ":DeviceTest",
+    ":End2EndTest",
+    ":StressTest",
   ]
 }
-
