@@ -22,98 +22,96 @@ config("module_private_config") {
     "//third_party/googletest/googlemock/include",
     "//foundation/ai/neural_network_runtime",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//third_party/mindspore/mindspore/lite/mindir/include"
+    "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
   ]
 }
 
 ohos_unittest("OpsUnittest") {
   module_out_path = module_output_path
 
-  sources = [ "//foundation/ai/neural_network_runtime/test/unittest/ops/add_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/argmax_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/avgpool_pad_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/avgpool_padmod_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/batch_to_space_nd_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/batchnorm_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/biasadd_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/cast_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/concat_three_inputs_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/concat_two_inputs_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/conv2d_pad_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/conv2d_padmode_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/conv2d_tranpose_padmode_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/conv2d_transpose_pad_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/depthwise_conv2d_native_pad_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/depthwise_conv2d_native_padmode_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/div_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/eltwise_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/expandims_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/fullconnection_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/fullconnection_with_axis_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/fill_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/gather_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/gelu_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/hswish_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/layernorm_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/lessequal_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/maximum_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/maxpool_pad_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/maxpool_padmode_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/matmul_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/mul_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/onehot_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/pad_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/pow_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/prelu_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/quant_dtype_cast_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/reduce_all_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/reduce_mean_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/reduce_prod_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/relu_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/relu6_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/reshape_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/resize_bilinear_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/rsqrt_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/scale_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/shape_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/sigmoid_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/slice_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/softmax_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/spacetobatchnd_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/split_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/sqrt_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/squared_difference_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/squeeze_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/stack_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/strided_slice_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/sub_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/tanh_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/tile_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/topk_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/transpose_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/unsqueeze_builder_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/ops/ops_test.cpp" ]
-  sources += [ "//foundation/ai/neural_network_runtime/test/unittest/common/base_test.cpp" ]
+  sources = [ "./add_test.cpp" ]
+  sources += [ "./argmax_test.cpp" ]
+  sources += [ "./avgpool_pad_test.cpp" ]
+  sources += [ "./avgpool_padmod_test.cpp" ]
+  sources += [ "./batch_to_space_nd_test.cpp" ]
+  sources += [ "./batchnorm_builder_test.cpp" ]
+  sources += [ "./biasadd_test.cpp" ]
+  sources += [ "./cast_test.cpp" ]
+  sources += [ "./concat_three_inputs_test.cpp" ]
+  sources += [ "./concat_two_inputs_test.cpp" ]
+  sources += [ "./conv2d_pad_test.cpp" ]
+  sources += [ "./conv2d_padmode_test.cpp" ]
+  sources += [ "./conv2d_tranpose_padmode_test.cpp" ]
+  sources += [ "./conv2d_transpose_pad_test.cpp" ]
+  sources += [ "./depthwise_conv2d_native_pad_test.cpp" ]
+  sources += [ "./depthwise_conv2d_native_padmode_test.cpp" ]
+  sources += [ "./div_test.cpp" ]
+  sources += [ "./eltwise_test.cpp" ]
+  sources += [ "./expandims_test.cpp" ]
+  sources += [ "./fullconnection_test.cpp" ]
+  sources += [ "./fullconnection_with_axis_test.cpp" ]
+  sources += [ "./fill_builder_test.cpp" ]
+  sources += [ "./gather_builder_test.cpp" ]
+  sources += [ "./gelu_builder_test.cpp" ]
+  sources += [ "./hswish_builder_test.cpp" ]
+  sources += [ "./layernorm_builder_test.cpp" ]
+  sources += [ "./lessequal_builder_test.cpp" ]
+  sources += [ "./maximum_builder_test.cpp" ]
+  sources += [ "./maxpool_pad_test.cpp" ]
+  sources += [ "./maxpool_padmode_test.cpp" ]
+  sources += [ "./matmul_builder_test.cpp" ]
+  sources += [ "./mul_builder_test.cpp" ]
+  sources += [ "./onehot_builder_test.cpp" ]
+  sources += [ "./pad_builder_test.cpp" ]
+  sources += [ "./pow_builder_test.cpp" ]
+  sources += [ "./prelu_builder_test.cpp" ]
+  sources += [ "./quant_dtype_cast_builder_test.cpp" ]
+  sources += [ "./reduce_all_builder_test.cpp" ]
+  sources += [ "./reduce_mean_builder_test.cpp" ]
+  sources += [ "./reduce_prod_builder_test.cpp" ]
+  sources += [ "./relu_builder_test.cpp" ]
+  sources += [ "./relu6_builder_test.cpp" ]
+  sources += [ "./reshape_builder_test.cpp" ]
+  sources += [ "./resize_bilinear_builder_test.cpp" ]
+  sources += [ "./rsqrt_builder_test.cpp" ]
+  sources += [ "./scale_builder_test.cpp" ]
+  sources += [ "./shape_builder_test.cpp" ]
+  sources += [ "./sigmoid_builder_test.cpp" ]
+  sources += [ "./slice_builder_test.cpp" ]
+  sources += [ "./softmax_builder_test.cpp" ]
+  sources += [ "./spacetobatchnd_builder_test.cpp" ]
+  sources += [ "./split_builder_test.cpp" ]
+  sources += [ "./sqrt_builder_test.cpp" ]
+  sources += [ "./squared_difference_builder_test.cpp" ]
+  sources += [ "./squeeze_builder_test.cpp" ]
+  sources += [ "./stack_builder_test.cpp" ]
+  sources += [ "./strided_slice_builder_test.cpp" ]
+  sources += [ "./sub_builder_test.cpp" ]
+  sources += [ "./tanh_builder_test.cpp" ]
+  sources += [ "./tile_builder_test.cpp" ]
+  sources += [ "./topk_builder_test.cpp" ]
+  sources += [ "./transpose_builder_test.cpp" ]
+  sources += [ "./unsqueeze_builder_test.cpp" ]
+  sources += [ "./ops_test.cpp" ]
+  sources += [ "../common/base_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
 group("ops_unittest") {
   testonly = true
-  deps = [
-    ":OpsUnittest",
-  ]
+  deps = [ ":OpsUnittest" ]
 }

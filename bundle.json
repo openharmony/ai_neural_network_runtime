@@ -1,7 +1,7 @@
 {
     "name": "@ohos/neural_network_runtime",
     "description": "The Neural Network Runtime that bridges the inference framework and the device accelerator.",
-    "version": "3.2",
+    "version": "4.0",
     "license": "MIT",
     "publishAs": "code-segment",
     "segment": {
