@@ -22,7 +22,7 @@ config("module_private_config") {
     "//third_party/googletest/googlemock/include",
     "//foundation/ai/neural_network_runtime",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//third_party/mindspore/mindspore/lite/mindir/include"
+    "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
   ]
 }
 
@@ -35,17 +35,17 @@ ohos_unittest("CompilationTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -58,17 +58,17 @@ ohos_unittest("ExecutorTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -81,16 +81,16 @@ ohos_unittest("DeviceManagerTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -103,16 +103,16 @@ ohos_unittest("DeviceRegistrarTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -126,16 +126,16 @@ ohos_unittest("HDIDeviceTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -149,16 +149,16 @@ ohos_unittest("HDIPreparedModelTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -171,15 +171,15 @@ ohos_unittest("MemoryManagerTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -191,15 +191,15 @@ ohos_unittest("TransformTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -212,17 +212,17 @@ ohos_unittest("InnerModelTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -234,17 +234,17 @@ ohos_unittest("NnTensorTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -256,17 +256,17 @@ ohos_unittest("NnValidationTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -278,17 +278,17 @@ ohos_unittest("OpsRegistryTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -302,17 +302,17 @@ ohos_unittest("NeuralNetworkRuntimeTest") {
 
   deps = [
     "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
     "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 
@@ -320,17 +320,17 @@ group("components_unittest") {
   testonly = true
   deps = [
     ":CompilationTest",
-    ":ExecutorTest",
     ":DeviceManagerTest",
     ":DeviceRegistrarTest",
+    ":ExecutorTest",
     ":HDIDeviceTest",
     ":HDIPreparedModelTest",
-    ":MemoryManagerTest",
-    ":TransformTest",
     ":InnerModelTest",
+    ":MemoryManagerTest",
+    ":NeuralNetworkRuntimeTest",
     ":NnTensorTest",
     ":NnValidationTest",
     ":OpsRegistryTest",
-    ":NeuralNetworkRuntimeTest",
+    ":TransformTest",
   ]
 }
