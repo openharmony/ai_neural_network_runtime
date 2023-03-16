@@ -148,7 +148,7 @@ void DeviceManager::AddDevice(const std::string& deviceName, const std::string& 
     m_devices.emplace(std::hash<std::string>{}(uniqueName), device);
 }
 
-void DiscoverHDIDevices()
+void DeviceManager::DiscoverHDIDevices()
 {
     std::string deviceName;
     std::string vendorName;

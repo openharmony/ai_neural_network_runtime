@@ -26,24 +26,26 @@ std::shared_ptr<Device> DiscoverHDIDevicesV2_0(std::string& deviceName, std::str
     OHOS::sptr<V2_0::INnrtDevice> iDevice = V2_0::INnrtDevice::Get();
     if (iDevice == nullptr) {
         LOGW("Get HDI device failed.");
-        return;
+        return nullptr;
     }
 
     auto hdiRet = iDevice->GetDeviceName(deviceName);
     if (hdiRet != HDF_SUCCESS) {
         LOGW("Get device name failed. ErrorCode=%d", hdiRet);
-        return;
+        return nullptr;
     }
     hdiRet = iDevice->GetVendorName(vendorName);
     if (hdiRet != HDF_SUCCESS) {
         LOGW("Get vendor name failed. ErrorCode=%d", hdiRet);
-        return;
+        return nullptr;
     }
-    hdiRet = iDevice->GetVersion(version);
+    std::pair<uint32_t, uint32_t> hdiVersion;
+    hdiRet = iDevice->GetVersion(hdiVersion.first, hdiVersion.second);
     if (hdiRet != HDF_SUCCESS) {
         LOGW("Get version failed. ErrorCode=%d", hdiRet);
-        return;
+        return nullptr;
     }
+    version = 'v' + std::to_string(hdiVersion.first) + '_' + std::to_string(hdiVersion.second);
 
     std::shared_ptr<Device> device = CreateSharedPtr<HDIDeviceV2_0>(iDevice);
     if (device == nullptr) {
