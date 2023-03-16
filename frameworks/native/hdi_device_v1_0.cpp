@@ -19,7 +19,7 @@
 #include "mindir.h"
 
 #include "device_registrar.h"
-#include "hdi_prepared_model.h"
+#include "hdi_prepared_model_v1_0.h"
 #include "memory_manager.h"
 #include "transform.h"
 #include "common/log.h"
@@ -280,7 +280,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(std::shared_ptr<const mindspore::li
         return OH_NN_FAILED;
     }
 
-    preparedModel = CreateSharedPtr<HDIPreparedModel>(iPreparedModel);
+    preparedModel = CreateSharedPtr<HDIPreparedModelV1_0>(iPreparedModel);
     if (preparedModel == nullptr) {
         LOGE("Prepare model failed, because fail to create preparedModel instance.");
         return OH_NN_MEMORY_ERROR;
@@ -319,7 +319,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModelFromModelCache(const std::vector<Mod
         return OH_NN_UNAVALIDABLE_DEVICE;
     }
 
-    preparedModel = CreateSharedPtr<HDIPreparedModel>(iPreparedModel);
+    preparedModel = CreateSharedPtr<HDIPreparedModelV1_0>(iPreparedModel);
     if (preparedModel == nullptr) {
         LOGE("Prepare model from model cache failed, because fail to create preparedModel instance.");
         return OH_NN_MEMORY_ERROR;
