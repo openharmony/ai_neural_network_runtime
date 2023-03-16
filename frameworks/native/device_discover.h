@@ -13,17 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef NEURAL_NETWORK_RUNTIME_HDI_INTERFACES_H
-#define NEURAL_NETWORK_RUNTIME_HDI_INTERFACES_H
+#ifndef NEURAL_NETWORK_RUNTIME_DEVICE_DISCOVER_H
+#define NEURAL_NETWORK_RUNTIME_DEVICE_DISCOVER_H
 
-#include <v1_0/nnrt_types.h>
-#include <v1_0/innrt_device.h>
-#include <v1_0/iprepared_model.h>
+#include <unordered_map>
+#include <memory>
+
+#include "device.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-namespace V1_0 = OHOS::HDI::Nnrt::V1_0;
+std::shared_ptr<Device> DiscoverHDIDevicesV1_0(std::string& deviceName, std::string& vendorName, std::string& version);
+std::shared_ptr<Device> DiscoverHDIDevicesV2_0(std::string& deviceName, std::string& vendorName, std::string& version);
+
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
-
-#endif // NEURAL_NETWORK_RUNTIME_HDI_INTERFACES_H
+#endif // NEURAL_NETWORK_RUNTIME_DEVICE_DISCOVER_H

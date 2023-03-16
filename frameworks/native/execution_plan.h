@@ -29,6 +29,9 @@ public:
     ExecutionPlan(std::shared_ptr<PreparedModel> preparedModel, std::shared_ptr<Device> device)
         : m_preparedModel(preparedModel),
           m_device(device) {};
+    
+    OH_NN_ReturnCode GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
+                                       std::vector<std::vector<uint32_t>>& maxInputDims);
 
     OH_NN_ReturnCode Run(const std::vector<std::shared_ptr<NNTensor>>& inputTensors,
                          std::vector<std::shared_ptr<NNTensor>>& outputTensors);

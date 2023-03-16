@@ -57,7 +57,6 @@ OH_NN_ReturnCode CastBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         LOGE("[Cast] Type of cast operator is not validation.");
         return OH_NN_INVALID_PARAMETER;
     }
-    *castTypeInt = (OH_NN_DataType)NNToHDI::TransDataType(*castTypeInt);
 
     if (!paramsIndex.empty()) {
         LOGE("[Cast] Cast expects no parameters");
