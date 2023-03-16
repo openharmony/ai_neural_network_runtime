@@ -24,7 +24,6 @@
 #include "common/utils.h"
 #include "common/scoped_trace.h"
 #include "device_manager.h"
-#include "hdi_device.h"
 #include "validation.h"
 #include "ops_builder.h"
 #include "ops_registry.h"
