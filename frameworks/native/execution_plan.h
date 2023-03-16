@@ -30,9 +30,9 @@ public:
         : m_preparedModel(preparedModel),
           m_device(device) {};
     
-    OH_NN_ReturnCode ExecutionPlan::GetInputDimRanges(uint32_t index,
-                                                      std::vector<uint32_t>& minInputDims,
-                                                      std::vector<uint32_t>& maxInputDims)
+    OH_NN_ReturnCode GetInputDimRanges(uint32_t index,
+                                       std::vector<uint32_t>& minInputDims,
+                                       std::vector<uint32_t>& maxInputDims);
 
     OH_NN_ReturnCode Run(const std::vector<std::shared_ptr<NNTensor>>& inputTensors,
                          std::vector<std::shared_ptr<NNTensor>>& outputTensors);

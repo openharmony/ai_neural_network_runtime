@@ -34,7 +34,7 @@ public:
 
     OH_NN_ReturnCode GetDeviceName(std::string& name) override;
     OH_NN_ReturnCode GetVendorName(std::string& name) override;
-    OH_NN_ReturnCode GetVersion(std::string& name) override;
+    OH_NN_ReturnCode GetVersion(std::string& version) override;
     OH_NN_ReturnCode GetDeviceType(OH_NN_DeviceType& deviceType) override;
     OH_NN_ReturnCode GetDeviceStatus(DeviceStatus& status) override;
     OH_NN_ReturnCode GetSupportedOperation(std::shared_ptr<const mindspore::lite::LiteGraph> model,

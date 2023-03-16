@@ -138,7 +138,7 @@ OH_NN_ReturnCode Executor::CheckInputDimRanges(uint32_t index, const OH_NN_Tenso
         }
         uint32_t dim = static_cast<uint32_t>(tensorShape[j]);
         if (dim < minInputDims[j] || dim > maxInputDims[j]) {
-            LOGE("The %zuth dimension of the %uth input is %u, which is out of range(%u, %u)",
+            LOGE("The %zuth dimension of the %uth input is %u, which is out of range [%u, %u]",
                 j, index, dim, minInputDims[j], maxInputDims[j]);
             return OH_NN_INVALID_PARAMETER;
         }
@@ -152,7 +152,7 @@ OH_NN_ReturnCode Executor::SetInput(uint32_t index, const OH_NN_Tensor& nnTensor
 {
     auto nnRet = CheckInputDimRanges(index, nnTensor);
     if (nnRet == OH_NN_OPERATION_FORBIDDEN) {
-        LOGI("Skip input demension bounds check.");
+        LOGI("Skip input dimension bounds check.");
     } else if (nnRet != OH_NN_SUCCESS) {
         LOGE("SetInput failed, Check the range of the %uth input dimension ranges failed.", index);
         return nnRet;
@@ -226,7 +226,7 @@ OH_NN_ReturnCode Executor::SetInputFromMemory(uint32_t index, const OH_NN_Tensor
 {
     auto nnRet = CheckInputDimRanges(index, nnTensor);
     if (nnRet == OH_NN_OPERATION_FORBIDDEN) {
-        LOGI("Skip input demension bounds check.");
+        LOGI("Skip input dimension bounds check.");
     } else if (nnRet != OH_NN_SUCCESS) {
         LOGE("SetInputFromMemory failed, Check the range of the %uth input dimension ranges failed.", index);
         return nnRet;

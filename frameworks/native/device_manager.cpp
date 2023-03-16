@@ -79,7 +79,8 @@ const std::string& DeviceManager::GetDeviceName(size_t deviceId)
     return m_tmpDeviceName;
 }
 
-std::string DeviceManager::GenUniqueName(const std::string& deviceName, const std::string& vendorName, const std::string& version) const
+std::string DeviceManager::GenUniqueName(
+    const std::string& deviceName, const std::string& vendorName, const std::string& version) const
 {
     return deviceName + "_" + vendorName + "_" + version;
 }

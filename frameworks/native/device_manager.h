@@ -48,7 +48,8 @@ private:
     DeviceManager(const DeviceManager&) = delete;
     DeviceManager& operator=(const DeviceManager&) = delete;
 
-    std::string GenUniqueName(const std::string& deviceName, const std::string& vendorName) const;
+    std::string GenUniqueName(
+        const std::string& deviceName, const std::string& vendorName, const std::string& version) const;
     bool IsValidDevice(std::shared_ptr<Device> device) const;
 
 private:
