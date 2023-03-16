@@ -14,6 +14,7 @@
  */
 
 #include "device_manager.h"
+#include "device_discover.h"
 
 #include "common/log.h"
 #include "common/utils.h"
@@ -130,6 +131,37 @@ OH_NN_ReturnCode DeviceManager::RegisterDevice(std::function<std::shared_ptr<Dev
 
     m_devices.emplace(std::hash<std::string>{}(uniqueName), regDevice);
     return OH_NN_SUCCESS;
+}
+
+void DeviceManager::AddDevice(const std::string& deviceName, const std::string& vendorName,
+    const std::string& version, std::shared_ptr<Device> device)
+{
+    std::string uniqueName = GenUniqueName(deviceName, vendorName, version);
+    const std::lock_guard<std::mutex> lock(m_mtx);
+    auto setResult = m_uniqueName.emplace(uniqueName);
+    if (!setResult.second) {
+        LOGW("Device already exists, cannot register again. deviceName=%s, vendorName=%s",
+            deviceName.c_str(), vendorName.c_str());
+        return;
+    }
+
+    m_devices.emplace(std::hash<std::string>{}(uniqueName), device);
+}
+
+void DiscoverHDIDevices()
+{
+    std::string deviceName;
+    std::string vendorName;
+    std::string version;
+    std::shared_ptr<Device> deviceV1_0 = DiscoverHDIDevicesV1_0(deviceName, vendorName, version);
+    if (deviceV1_0 != nullptr) {
+        AddDevice(deviceName, vendorName, version, deviceV1_0);
+    }
+
+    std::shared_ptr<Device> deviceV2_0 = DiscoverHDIDevicesV2_0(deviceName, vendorName, version);
+    if (deviceV2_0 != nullptr) {
+        AddDevice(deviceName, vendorName, version, deviceV2_0);
+    }
 }
 
 bool DeviceManager::IsValidDevice(std::shared_ptr<Device> device) const

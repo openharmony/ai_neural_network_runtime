@@ -18,7 +18,6 @@
 #include "hdf_base.h"
 #include "mindir.h"
 
-#include "device_registrar.h"
 #include "hdi_prepared_model_v1_0.h"
 #include "memory_manager.h"
 #include "transform.h"
@@ -394,24 +393,5 @@ OH_NN_ReturnCode HDIDeviceV1_0::ReleaseSharedBuffer(const V1_0::SharedBuffer& bu
     }
     return OH_NN_SUCCESS;
 }
-
-std::shared_ptr<Device> HDIDeviceV1_0Creator()
-{
-    // only one device from HDI now
-    OHOS::sptr<V1_0::INnrtDevice> iDevice = V1_0::INnrtDevice::Get();
-    if (iDevice == nullptr) {
-        LOGE("Get HDI device failed.");
-        return nullptr;
-    }
-
-    std::shared_ptr<Device> device = CreateSharedPtr<HDIDeviceV1_0>(iDevice);
-    if (device == nullptr) {
-        LOGE("Create device failed.");
-    }
-
-    return device;
-}
-
-REGISTER_DEVICE(DeviceV1_0, VendorV1_0, HDIDeviceV1_0Creator)
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
