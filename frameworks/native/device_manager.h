@@ -40,7 +40,6 @@ public:
     static DeviceManager& GetInstance()
     {
         static DeviceManager instance;
-        instance.DiscoverHDIDevices();
         return instance;
     }
 
@@ -49,7 +48,6 @@ private:
     DeviceManager(const DeviceManager&) = delete;
     DeviceManager& operator=(const DeviceManager&) = delete;
 
-    void DiscoverHDIDevices();
     std::string GenUniqueName(const std::string& deviceName, const std::string& vendorName) const;
     bool IsValidDevice(std::shared_ptr<Device> device) const;
 

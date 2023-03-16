@@ -23,6 +23,18 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
+OH_NN_ReturnCode ExecutionPlan::GetInputDimRanges(uint32_t index, std::vector<uint32_t>& minInputDims,
+    std::vector<uint32_t>& maxInputDims)
+{
+    // todo
+    // OH_NN_ReturnCode ret = m_preparedModel->GetInputDimRanges(index, minInputDims, maxInputDims);
+    // if (ret != OH_NN_SUCCESS) {
+    //     LOGE("ExecutionPlan GetInputDimRanges() failed.");
+    //     return ret;
+    // }
+
+    return OH_NN_SUCCESS;
+}
 OH_NN_ReturnCode ExecutionPlan::Run(const std::vector<std::shared_ptr<NNTensor>>& inputTensors,
                                     std::vector<std::shared_ptr<NNTensor>>& outputTensors)
 {

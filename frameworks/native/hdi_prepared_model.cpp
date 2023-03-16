@@ -21,6 +21,78 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
+namespace {
+V1_0::DataType TransDataType(const OH_NN_DataType& dataType)
+{
+    switch (dataType) {
+        case OH_NN_BOOL:
+            return V1_0::DataType::DATA_TYPE_BOOL;
+        case OH_NN_INT8:
+            return V1_0::DataType::DATA_TYPE_INT8;
+        case OH_NN_INT16:
+            return V1_0::DataType::DATA_TYPE_INT16;
+        case OH_NN_INT32:
+            return V1_0::DataType::DATA_TYPE_INT32;
+        case OH_NN_INT64:
+            return V1_0::DataType::DATA_TYPE_INT64;
+        case OH_NN_UINT8:
+            return V1_0::DataType::DATA_TYPE_UINT8;
+        case OH_NN_UINT16:
+            return V1_0::DataType::DATA_TYPE_UINT16;
+        case OH_NN_UINT32:
+            return V1_0::DataType::DATA_TYPE_UINT32;
+        case OH_NN_UINT64:
+            return V1_0::DataType::DATA_TYPE_UINT64;
+        case OH_NN_FLOAT16:
+            return V1_0::DataType::DATA_TYPE_FLOAT16;
+        case OH_NN_FLOAT32:
+            return V1_0::DataType::DATA_TYPE_FLOAT32;
+        case OH_NN_FLOAT64:
+            return V1_0::DataType::DATA_TYPE_FLOAT64;
+        default:
+            return V1_0::DataType::DATA_TYPE_UNKNOWN;
+    }
+}
+
+V1_0::Format TransFormat(const OH_NN_Format& format)
+{
+    switch (format) {
+        case OH_NN_FORMAT_NCHW:
+            return V1_0::Format::FORMAT_NCHW;
+        case OH_NN_FORMAT_NHWC:
+            return V1_0::Format::FORMAT_NHWC;
+        default:
+            return V1_0::Format::FORMAT_NONE;
+    }
+}
+
+V1_0::IOTensor TransIOTensor(const IOTensor& tensor)
+{
+    V1_0::IOTensor iTensor;
+    iTensor.name = tensor.name;
+    iTensor.dataType = TransDataType(tensor.dataType);
+    iTensor.dimensions = tensor.dimensions;
+    iTensor.format = TransFormat(tensor.format);
+
+    V1_0::SharedBuffer iBuffer {INVALID_FD, 0, 0, 0};
+    if (tensor.data != nullptr) {
+        auto memManager = MemoryManager::GetInstance();
+        Memory memory;
+        auto ret = memManager->GetMemory(tensor.data, memory);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("Invalid Tensor buffer, cannot transform to fd.");
+        } else {
+            iBuffer.fd = memory.fd;
+            iBuffer.bufferSize = memory.length;
+            iBuffer.offset = 0;
+            iBuffer.dataSize = memory.length;
+        }
+    }
+    iTensor.data = iBuffer;
+
+    return iTensor;
+}
+}
 HDIPreparedModel::HDIPreparedModel(OHOS::sptr<V1_0::IPreparedModel> hdiPreparedModel)
     : m_hdiPreparedModel(hdiPreparedModel)
 {
@@ -61,7 +133,7 @@ OH_NN_ReturnCode HDIPreparedModel::Run(const std::vector<IOTensor>& inputs, cons
     V1_0::IOTensor iTensor;
     std::vector<V1_0::IOTensor> iInputTensors;
     for (auto& input: inputs) {
-        iTensor = NNToHDI::TransIOTensor(input);
+        iTensor = TransIOTensor(input);
         if (iTensor.data.fd == INVALID_FD) {
             LOGE("Transform inputs tensor failed, cannot find data file descriptor.");
             return OH_NN_INVALID_PARAMETER;
@@ -71,7 +143,7 @@ OH_NN_ReturnCode HDIPreparedModel::Run(const std::vector<IOTensor>& inputs, cons
 
     std::vector<V1_0::IOTensor> iOutputTensors;
     for (auto& output: outputs) {
-        iTensor = NNToHDI::TransIOTensor(output);
+        iTensor = TransIOTensor(output);
         if (iTensor.data.fd == INVALID_FD) {
             LOGE("Transform outputs tensor failed, cannot find data file descriptor.");
             return OH_NN_INVALID_PARAMETER;
