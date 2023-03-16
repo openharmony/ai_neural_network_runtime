@@ -19,6 +19,7 @@
 
 #include "common/utils.h"
 #include "common/scoped_trace.h"
+#include "transform.h"
 
 
 namespace OHOS {
@@ -113,8 +114,50 @@ void Executor::SetInputTensorWithNewBuffer(uint32_t index,
 }
 
 
+OH_NN_ReturnCode Executor::CheckInputDimRanges(uint32_t index, const OH_NN_Tensor& nnTensor) const
+{
+    std::vector<uint32_t> minInputDims;
+    std::vector<uint32_t> maxInputDims;
+    auto ret = m_executionPlan->GetInputDimRanges(index, minInputDims, maxInputDims);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("Get the dimension ranges of input %u failed. ErrorCode=%d", index, ret);
+        return ret;
+    }
+
+    std::vector<int32_t> tensorShape = ConstructVectorFromArray(nnTensor.dimensions, nnTensor.dimensionCount);
+    if (minInputDims.size() != maxInputDims.size() && maxInputDims.size() != tensorShape.size()) {
+        LOGE("Size of minInputDims, maxInputDims and tensorShape of input %u are not equal.", index);
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    for (size_t j = 0; j < tensorShape.size(); ++j) {
+        // Dimensions cannot be negative
+        if (tensorShape[j] < 0) {
+            LOGE("Dimension %zu of input %u is %d.", j, index, tensorShape[j]);
+            return OH_NN_INVALID_PARAMETER;
+        }
+        uint32_t dim = static_cast<uint32_t>(tensorShape[j]);
+        if (dim < minInputDims[j] || dim > maxInputDims[j]) {
+            LOGE("The %zuth dimension of the %uth input is %u, which is out of range(%u, %u)",
+                j, index, dim, minInputDims[j], maxInputDims[j]);
+            return OH_NN_INVALID_PARAMETER;
+        }
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+
 OH_NN_ReturnCode Executor::SetInput(uint32_t index, const OH_NN_Tensor& nnTensor, const void* buffer, size_t length)
 {
+    auto nnRet = CheckInputDimRanges(index, nnTensor);
+    if (nnRet == OH_NN_OPERATION_FORBIDDEN) {
+        LOGI("Skip input demension bounds check.");
+    } else if (nnRet != OH_NN_SUCCESS) {
+        LOGE("SetInput failed, Check the range of the %uth input dimension ranges failed.", index);
+        return nnRet;
+    }
+
     std::shared_ptr<NNTensor> inputTensor = CreateSharedPtr<NNTensor>();
     if (inputTensor == nullptr) {
         LOGE("SetInput failed, error happened when creating NNTensor.");
@@ -181,6 +224,14 @@ OH_NN_ReturnCode Executor::SetInput(uint32_t index, const OH_NN_Tensor& nnTensor
 
 OH_NN_ReturnCode Executor::SetInputFromMemory(uint32_t index, const OH_NN_Tensor& nnTensor, const OH_NN_Memory& memory)
 {
+    auto nnRet = CheckInputDimRanges(index, nnTensor);
+    if (nnRet == OH_NN_OPERATION_FORBIDDEN) {
+        LOGI("Skip input demension bounds check.");
+    } else if (nnRet != OH_NN_SUCCESS) {
+        LOGE("SetInputFromMemory failed, Check the range of the %uth input dimension ranges failed.", index);
+        return nnRet;
+    }
+
     // Build a input tensor
     std::shared_ptr<NNTensor> inputTensor = CreateSharedPtr<NNTensor>();
     if (inputTensor == nullptr) {
