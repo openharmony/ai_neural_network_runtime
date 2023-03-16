@@ -163,7 +163,13 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::Run(const std::vector<IOTensor>& inputs, 
 OH_NN_ReturnCode HDIPreparedModelV2_0::GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
                                                          std::vector<std::vector<uint32_t>>& maxInputDims)
 {
-    return OH_NN_OPERATION_FORBIDDEN;
+    auto ret = m_hdiPreparedModel->GetInputDimRanges(minInputDims, maxInputDims);
+    if (ret != HDF_SUCCESS) {
+        LOGE("GetInputDimRanges failed. ErrorCode=%d", ret);
+        return OH_NN_UNAVALIDABLE_DEVICE;
+    }
+
+    return OH_NN_SUCCESS;
 }
 } // namespace NeuralNetworkRuntime
 } // OHOS

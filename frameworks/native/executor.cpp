@@ -116,30 +116,44 @@ void Executor::SetInputTensorWithNewBuffer(uint32_t index,
 
 OH_NN_ReturnCode Executor::CheckInputDimRanges(uint32_t index, const OH_NN_Tensor& nnTensor) const
 {
-    std::vector<uint32_t> minInputDims;
-    std::vector<uint32_t> maxInputDims;
-    auto ret = m_executionPlan->GetInputDimRanges(index, minInputDims, maxInputDims);
+    std::vector<std::vector<uint32_t>> minInputDims;
+    std::vector<std::vector<uint32_t>> maxInputDims;
+    auto ret = m_executionPlan->GetInputDimRanges(minInputDims, maxInputDims);
     if (ret != OH_NN_SUCCESS) {
         LOGE("Get the dimension ranges of input %u failed. ErrorCode=%d", index, ret);
         return ret;
     }
 
-    std::vector<int32_t> tensorShape = ConstructVectorFromArray(nnTensor.dimensions, nnTensor.dimensionCount);
-    if (minInputDims.size() != maxInputDims.size() && maxInputDims.size() != tensorShape.size()) {
-        LOGE("Size of minInputDims, maxInputDims and tensorShape of input %u are not equal.", index);
+    if (index >= minInputDims.size()) {
+        LOGE("index is %u, which exceeds the size of minInputDims:%zu.", index, minInputDims.size());
         return OH_NN_INVALID_PARAMETER;
     }
 
-    for (size_t j = 0; j < tensorShape.size(); ++j) {
+    if (index >= maxInputDims.size()) {
+        LOGE("index is %u, which exceeds the size of maxInputDims:%zu.", index, maxInputDims.size());
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    const std::vector<uint32_t>& minSingleInputDims = minInputDims[index];
+    const std::vector<uint32_t>& maxSingleInputDims = maxInputDims[index];
+
+    std::vector<int32_t> tensorShape = ConstructVectorFromArray(nnTensor.dimensions, nnTensor.dimensionCount);
+    size_t tensorShapeSize = tensorShape.size();
+    if (minSingleInputDims.size() != tensorShapeSize || maxSingleInputDims.size() != tensorShapeSize) {
+        LOGE("Size of minSingleInputDims, maxSingleInputDims and tensorShape of input %u are not equal.", index);
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    for (size_t j = 0; j < tensorShapeSize; ++j) {
         // Dimensions cannot be negative
         if (tensorShape[j] < 0) {
             LOGE("Dimension %zu of input %u is %d.", j, index, tensorShape[j]);
             return OH_NN_INVALID_PARAMETER;
         }
         uint32_t dim = static_cast<uint32_t>(tensorShape[j]);
-        if (dim < minInputDims[j] || dim > maxInputDims[j]) {
-            LOGE("The %zuth dimension of the %uth input is %u, which is out of range [%u, %u]",
-                j, index, dim, minInputDims[j], maxInputDims[j]);
+        if (dim < minSingleInputDims[j] || dim > maxSingleInputDims[j]) {
+            LOGE("Dimension %zu of input %u is %u, which is out of range [%u, %u]",
+                j, index, dim, minSingleInputDims[j], maxSingleInputDims[j]);
             return OH_NN_INVALID_PARAMETER;
         }
     }

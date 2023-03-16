@@ -18,8 +18,7 @@
 #include "hdf_base.h"
 #include "mindir.h"
 
-#include "device_registrar.h"
-#include "prepared_model.h" // todo
+#include "hdi_prepared_model_v2_0.h"
 #include "memory_manager.h"
 #include "transform.h"
 #include "common/log.h"
@@ -280,11 +279,11 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::li
         return OH_NN_FAILED;
     }
 
-    // preparedModel = CreateSharedPtr<HDIPreparedModel>(iPreparedModel); // todo
-    // if (preparedModel == nullptr) {
-    //     LOGE("Prepare model failed, because fail to create preparedModel instance.");
-    //     return OH_NN_MEMORY_ERROR;
-    // }
+    preparedModel = CreateSharedPtr<HDIPreparedModelV2_0>(iPreparedModel);
+    if (preparedModel == nullptr) {
+        LOGE("Prepare model failed, because fail to create preparedModel instance.");
+        return OH_NN_MEMORY_ERROR;
+    }
 
     return OH_NN_SUCCESS;
 }
@@ -319,11 +318,11 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<Mod
         return OH_NN_UNAVALIDABLE_DEVICE;
     }
 
-    // preparedModel = CreateSharedPtr<HDIPreparedModel>(iPreparedModel); // todo
-    // if (preparedModel == nullptr) {
-    //     LOGE("Prepare model from model cache failed, because fail to create preparedModel instance.");
-    //     return OH_NN_MEMORY_ERROR;
-    // }
+    preparedModel = CreateSharedPtr<HDIPreparedModelV2_0>(iPreparedModel);
+    if (preparedModel == nullptr) {
+        LOGE("Prepare model from model cache failed, because fail to create preparedModel instance.");
+        return OH_NN_MEMORY_ERROR;
+    }
     return OH_NN_SUCCESS;
 }
 
@@ -394,24 +393,5 @@ OH_NN_ReturnCode HDIDeviceV2_0::ReleaseSharedBuffer(const V2_0::SharedBuffer& bu
     }
     return OH_NN_SUCCESS;
 }
-
-std::shared_ptr<Device> HDIDeviceV2_0Creator()
-{
-    // only one device from HDI now
-    OHOS::sptr<V2_0::INnrtDevice> iDevice = V2_0::INnrtDevice::Get();
-    if (iDevice == nullptr) {
-        LOGE("Get HDI device failed.");
-        return nullptr;
-    }
-
-    std::shared_ptr<Device> device = CreateSharedPtr<HDIDeviceV2_0>(iDevice);
-    if (device == nullptr) {
-        LOGE("Create device failed.");
-    }
-
-    return device;
-}
-
-REGISTER_DEVICE(DeviceV2_0, VendorV2_0, HDIDeviceV2_0Creator)
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
