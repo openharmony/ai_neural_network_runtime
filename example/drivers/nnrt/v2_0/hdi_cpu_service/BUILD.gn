@@ -15,17 +15,17 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_prebuilt_shared_library("mindspore_demo") {
-  source = "//drivers/peripheral/nnrt/mindspore/mindspore/libmindspore-lite.huawei.so"
+  source = "//drivers/peripheral/nnrt/v2_0/mindspore/mindspore/libmindspore-lite.huawei.so"
 
   install_images = [chipset_base_dir]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_nnrt"
 }
 
-ohos_shared_library("libnnrt_device_service_1.0") {
+ohos_shared_library("libnnrt_device_service_2.0") {
   include_dirs = [
-    "//drivers/peripheral/nnrt/hdi_cpu_service/include",
-    "//drivers/peripheral/nnrt/mindspore",
+    "//drivers/peripheral/nnrt/v2_0/hdi_cpu_service/include",
+    "//drivers/peripheral/nnrt/v2_0/mindspore",
     "//third_party/flatbuffers/include",
     "//commonlibrary/c_utils/base/include"
   ]
@@ -39,15 +39,15 @@ ohos_shared_library("libnnrt_device_service_1.0") {
   ]
 
   deps = [
-    "//drivers/interface/nnrt/v1_0:nnrt_idl_headers",
-    "//drivers/interface/nnrt/v1_0:libnnrt_stub_1.0",
+    "//drivers/interface/nnrt/v2_0:nnrt_idl_headers",
+    "//drivers/interface/nnrt/v2_0:libnnrt_stub_2.0",
     ":mindspore_demo"
   ]
 
   external_deps = [
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_single",
+    "ipc:ipc_core",
     "c_utils:utils"
   ]
 
@@ -62,8 +62,8 @@ ohos_shared_library("libnnrt_driver") {
     "src/nnrt_device_driver.cpp"
   ]
   deps = [
-    "//drivers/peripheral/nnrt/hdi_cpu_service:libnnrt_device_service_1.0",
-    "//drivers/interface/nnrt/v1_0:libnnrt_stub_1.0"
+    "//drivers/peripheral/nnrt/v2_0/hdi_cpu_service:libnnrt_device_service_2.0",
+    "//drivers/interface/nnrt/v2_0:libnnrt_stub_2.0"
   ]
 
   external_deps = [
@@ -71,7 +71,7 @@ ohos_shared_library("libnnrt_driver") {
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_single",
+    "ipc:ipc_core",
     "c_utils:utils",
     "hdf_core:libhdi"
   ]
@@ -85,6 +85,6 @@ group("hdf_nnrt_service") {
   deps = [
     ":mindspore_demo",
     ":libnnrt_driver",
-    ":libnnrt_device_service_1.0",
+    ":libnnrt_device_service_2.0",
   ]
 }
