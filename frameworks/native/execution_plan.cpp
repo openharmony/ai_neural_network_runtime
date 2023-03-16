@@ -35,6 +35,7 @@ OH_NN_ReturnCode ExecutionPlan::GetInputDimRanges(uint32_t index, std::vector<ui
 
     return OH_NN_SUCCESS;
 }
+
 OH_NN_ReturnCode ExecutionPlan::Run(const std::vector<std::shared_ptr<NNTensor>>& inputTensors,
                                     std::vector<std::shared_ptr<NNTensor>>& outputTensors)
 {

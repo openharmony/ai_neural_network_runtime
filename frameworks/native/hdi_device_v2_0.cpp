@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdi_device.h"
+#include "hdi_device_v2_0.h"
 
 #include "hdf_base.h"
 #include "mindir.h"
