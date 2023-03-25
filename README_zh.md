@@ -49,9 +49,8 @@ Neural Network Runtime与MindSpore Lite使用MindIR统一模型的中间表达�
 
 ### 接口说明
 
-Native接口文档请参考：[Native接口](https://gitee.com/openharmony-sig/interface_native_header/pulls/182)。
-
-HDI接口文档请参考：[HDI接口](https://gitee.com/openharmony-sig/interface_native_header/pulls/179)。
+- Native接口文档请参考：[Native接口](https://gitee.com/openharmony/ai_neural_network_runtime/tree/master/interfaces/kits/c)。
+- HDI接口文档请参考：[HDI接口](https://gitee.com/openharmony/drivers_interface/tree/master/nnrt)。
 
 ### 使用说明
 

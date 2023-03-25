@@ -49,9 +49,8 @@ In the root directory of the OpenHarmony source code, call the following command
 
 ### API Description
 
-[Native API reference](https://gitee.com/openharmony-sig/interface_native_header/tree/master/en/native_sdk/ai)
-
-[HDI API reference](https://gitee.com/openharmony-sig/interface_native_header/tree/master/en/device_api/hdi)
+- [Native API reference](https://gitee.com/openharmony-sig/interface_native_header/tree/master/en/native_sdk/ai)
+- [HDI API reference](https://gitee.com/openharmony/drivers_interface/tree/master/nnrt)
 
 ### How to Use
 
