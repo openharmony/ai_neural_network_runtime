@@ -26,7 +26,8 @@ template<typename T>
 OH_NN_ReturnCode ValidateArray(const T* data, size_t size)
 {
     if ((data != nullptr) != (size > 0)) {
-        LOGE("ValidateArray failed, data is %p but the length is %zu", data, size);
+        LOGE("ValidateArray failed, data should passed a valid pointer when size is larger than 0, "
+            "otherwise, data should be nullptr when size is 0.");
         return OH_NN_INVALID_PARAMETER;
     }
     return OH_NN_SUCCESS;

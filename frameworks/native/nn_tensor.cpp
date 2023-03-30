@@ -390,8 +390,8 @@ bool NNTensor::CompareAttribute(const NNTensor& tensor) const
         return false;
     }
 
-    for (auto i = 0; i < dimensions.size(); i++) {
-        if (m_dimensions[i] != -1 && m_dimensions[i] != dimensions[i]) {
+    for (size_t i = 0; i < dimensions.size(); i++) {
+        if ((m_dimensions[i] != -1) && (m_dimensions[i] != dimensions[i])) {
             LOGI("Tensors have different dimension: dimension index: %u, dimension value: %d and %d.",
                  i, m_dimensions[i], dimensions[i]);
             return false;
