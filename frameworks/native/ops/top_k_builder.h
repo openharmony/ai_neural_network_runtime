@@ -36,7 +36,7 @@ private:
     OH_NN_ReturnCode SetSorted(std::shared_ptr<NNTensor> tensor);
 
 private:
-    bool m_sorted;
+    bool m_sorted {true}; // true means sorting in the descending order.
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

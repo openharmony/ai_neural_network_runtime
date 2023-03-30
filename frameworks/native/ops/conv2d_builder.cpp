@@ -96,7 +96,7 @@ OH_NN_ReturnCode Conv2DBuilder::SetStrides(std::shared_ptr<NNTensor> tensor)
         return OH_NN_INVALID_PARAMETER;
     }
     const int64_t* pStrides = reinterpret_cast<const int64_t*>(buffer);
-    int stridesSize = tensor->GetElementCount();
+    uint32_t stridesSize = tensor->GetElementCount();
     m_strides.assign(pStrides, pStrides + stridesSize);
 
     return OH_NN_SUCCESS;
@@ -117,7 +117,7 @@ OH_NN_ReturnCode Conv2DBuilder::SetDilation(std::shared_ptr<NNTensor> tensor)
         return OH_NN_INVALID_PARAMETER;
     }
     const int64_t* pDilation = reinterpret_cast<const int64_t*>(buffer);
-    int dilationSize = tensor->GetElementCount();
+    uint32_t dilationSize = tensor->GetElementCount();
     m_dilation.assign(pDilation, pDilation + dilationSize);
 
     return OH_NN_SUCCESS;
@@ -161,7 +161,7 @@ OH_NN_ReturnCode Conv2DBuilder::SetPad(std::shared_ptr<NNTensor> tensor)
         }
 
         int64_t* pPadList = static_cast<int64_t*>(buffer);
-        int padListSize = tensor->GetElementCount();
+        uint32_t padListSize = tensor->GetElementCount();
         m_pad.assign(pPadList, pPadList + padListSize);
     }
 
