@@ -113,7 +113,7 @@ OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetStrides(std::shared_ptr<NNTens
         return OH_NN_INVALID_PARAMETER;
     }
     const int64_t* pStrides = reinterpret_cast<const int64_t*>(buffer);
-    int stridesSize = tensor->GetElementCount();
+    uint32_t stridesSize = tensor->GetElementCount();
     m_strides.assign(pStrides, pStrides + stridesSize);
 
     return OH_NN_SUCCESS;
@@ -132,7 +132,7 @@ OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetDilation(std::shared_ptr<NNTen
         return OH_NN_INVALID_PARAMETER;
     }
     const int64_t* pDilation = reinterpret_cast<const int64_t*>(buffer);
-    int dilationSize = tensor->GetElementCount();
+    uint32_t dilationSize = tensor->GetElementCount();
     m_dilation.assign(pDilation, pDilation + dilationSize);
 
     return OH_NN_SUCCESS;
@@ -174,7 +174,7 @@ OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetPadModeOrPaddings(
         }
 
         const int64_t* pPadList = reinterpret_cast<const int64_t*>(buffer);
-        int padListSize = tensor->GetElementCount();
+        uint32_t padListSize = tensor->GetElementCount();
         m_pad.assign(pPadList, pPadList + padListSize);
     }
     return OH_NN_SUCCESS;

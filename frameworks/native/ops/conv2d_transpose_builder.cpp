@@ -89,7 +89,7 @@ OH_NN_ReturnCode Conv2DTransposeBuilder::SetStrides(std::shared_ptr<NNTensor> te
         return OH_NN_INVALID_PARAMETER;
     }
     const int64_t* pStrides = reinterpret_cast<const int64_t*>(buffer);
-    int elementSize = tensor->GetElementCount();
+    uint32_t elementSize = tensor->GetElementCount();
     m_strides.assign(pStrides, pStrides + elementSize);
 
     return OH_NN_SUCCESS;
@@ -110,7 +110,7 @@ OH_NN_ReturnCode Conv2DTransposeBuilder::SetDilation(std::shared_ptr<NNTensor> t
         return OH_NN_INVALID_PARAMETER;
     }
     const int64_t* pDilation = reinterpret_cast<const int64_t*>(buffer);
-    int dilationSize = tensor->GetElementCount();
+    uint32_t dilationSize = tensor->GetElementCount();
     m_dilation.assign(pDilation, pDilation + dilationSize);
 
     return OH_NN_SUCCESS;
@@ -154,7 +154,7 @@ OH_NN_ReturnCode Conv2DTransposeBuilder::SetPad(std::shared_ptr<NNTensor> tensor
         }
 
         const int64_t* pPadList = reinterpret_cast<const int64_t*>(buffer);
-        int padListPadSize = tensor->GetElementCount();
+        uint32_t padListPadSize = tensor->GetElementCount();
         m_padList.assign(pPadList, pPadList + padListPadSize);
     }
 
@@ -200,7 +200,7 @@ OH_NN_ReturnCode Conv2DTransposeBuilder::SetOutPadding(std::shared_ptr<NNTensor>
         return OH_NN_INVALID_PARAMETER;
     }
     const int64_t* pOutputPadding = reinterpret_cast<const int64_t*>(buffer);
-    int outputPadSize = tensor->GetElementCount();
+    uint32_t outputPadSize = tensor->GetElementCount();
     m_outputPaddings.assign(pOutputPadding, pOutputPadding + outputPadSize);
 
     return OH_NN_SUCCESS;

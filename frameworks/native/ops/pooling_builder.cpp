@@ -113,7 +113,7 @@ OH_NN_ReturnCode PoolingBuilder::SetKernel(std::shared_ptr<NNTensor> tensor)
     }
 
     const int64_t* pKernelSize = reinterpret_cast<const int64_t*>(buffer);
-    int kernelSize = tensor->GetElementCount();
+    uint32_t kernelSize = tensor->GetElementCount();
     m_kernelSize.assign(pKernelSize, pKernelSize + kernelSize);
 
     return OH_NN_SUCCESS;
@@ -135,7 +135,7 @@ OH_NN_ReturnCode PoolingBuilder::SetStrides(std::shared_ptr<NNTensor> tensor)
     }
 
     const int64_t* pStrides = reinterpret_cast<const int64_t*>(buffer);
-    int strideslSize = tensor->GetElementCount();
+    uint32_t strideslSize = tensor->GetElementCount();
     m_strides.assign(pStrides, pStrides + strideslSize);
 
     return OH_NN_SUCCESS;
