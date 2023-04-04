@@ -607,6 +607,26 @@ OH_NN_ReturnCode Compilation::InnerBuild()
 {
     OH_NN_ReturnCode ret;
     std::shared_ptr<PreparedModel> preparedModel;
+
+    // Prepare from offline model.
+    bool isOfflineModel{false};
+    ret = IsOfflineModel(isOfflineModel);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Compilation] Failed when identifying the offline model.");
+        return ret;
+    }
+
+    if (isOfflineModel) {
+        ret = BuildOfflineModel(preparedModel);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[Compilation] Failed to build offline model.");
+            return ret;
+        }
+
+        m_isBuild = true;
+        return OH_NN_SUCCESS;
+    }
+
     if (m_cachePath.empty()) {
         ret = NormalBuild(preparedModel);
         if (ret != OH_NN_SUCCESS) {
@@ -709,6 +729,57 @@ bool Compilation::IsDynamicShape() const
         }
     }
     return false;
+}
+
+OH_NN_ReturnCode Compilation::IsOfflineModel(bool& isOfflineModel) const
+{
+    isOfflineModel = false; // Initialize the returned value
+    if (m_liteGraph == nullptr) {
+        LOGE("[Compilation] LiteGraph is empty when identifying the offline model.");
+        return OH_NN_NULL_PTR;
+    }
+
+    if (m_liteGraph->all_nodes_.size() == 0) {
+        LOGE("[Compilation] Find empty node in the model.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    // If the model consists of more than 1 node, it will not be considered as offline model.
+    if (m_liteGraph->all_nodes_.size() > 1) {
+        isOfflineModel = false;
+        return OH_NN_SUCCESS;
+    }
+
+    const mindspore::lite::LiteGraph::Node* pNode = m_liteGraph->all_nodes_[0];
+    if (pNode == nullptr) {
+        LOGE("[Compilation] Find invalid node in the model.");
+        return OH_NN_NULL_PTR;
+    }
+
+    const mindspore::lite::NodeType& nodeType = mindspore::lite::MindIR_Primitive_GetType(pNode->primitive_);
+    if (nodeType == mindspore::lite::NodeType::NODE_TYPE_CUSTOM) {
+        isOfflineModel = true;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode Compilation::BuildOfflineModel(std::shared_ptr<PreparedModel>& preparedModel)
+{
+    ModelConfig config {m_enableFp16, m_performance, m_priority};
+    OH_NN_ReturnCode ret = m_device->PrepareOfflineModel(m_liteGraph, config, preparedModel);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Compilation] Preparing model failed when building from offline model.");
+        return ret;
+    }
+
+    m_executionPlan = CreateSharedPtr<ExecutionPlan>(preparedModel, m_device);
+    if (m_executionPlan == nullptr) {
+        LOGE("[Compilation] Failed to create ExecutionPlan when building from offline model.");
+        return OH_NN_MEMORY_ERROR;
+    }
+
+    return OH_NN_SUCCESS;
 }
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
