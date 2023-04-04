@@ -393,5 +393,13 @@ OH_NN_ReturnCode HDIDeviceV1_0::ReleaseSharedBuffer(const V1_0::SharedBuffer& bu
     }
     return OH_NN_SUCCESS;
 }
+
+OH_NN_ReturnCode HDIDeviceV1_0::PrepareOfflineModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
+                                                    const ModelConfig& config,
+                                                    std::shared_ptr<PreparedModel>& preparedModel)
+{
+    LOGE("HDIDeviceV1.0 not support PrepareOfflineModel.");
+    return OH_NN_OPERATION_FORBIDDEN;
+}
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
