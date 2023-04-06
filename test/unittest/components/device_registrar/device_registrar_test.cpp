@@ -72,8 +72,8 @@ public:
 
     virtual int32_t GetVersion(uint32_t& majorVer, uint32_t& minorVer)
     {
-        majorVer = INNRT_DEVICE_MAJOR_VERSION;
-        minorVer = INNRT_DEVICE_MINOR_VERSION;
+        majorVer = 1;
+        minorVer = 0;
         return HDF_SUCCESS;
     }
 };
