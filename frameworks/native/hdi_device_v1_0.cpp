@@ -150,7 +150,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetSupportedOperation(std::shared_ptr<const mind
         return OH_NN_NULL_PTR;
     }
 
-    V1_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
     size_t tensorSize = mindspore::lite::MindIR_LiteGraph_GetConstTensorSize(model.get());
     int32_t hdiRet {0};
     if (tensorSize > 0) {
@@ -242,7 +242,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(std::shared_ptr<const mindspore::li
         return OH_NN_INVALID_PARAMETER;
     }
 
-    V1_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
     size_t tensorSize = mindspore::lite::MindIR_LiteGraph_GetConstTensorSize(model.get());
     int32_t hdiRet {0};
     if (tensorSize > 0) {
