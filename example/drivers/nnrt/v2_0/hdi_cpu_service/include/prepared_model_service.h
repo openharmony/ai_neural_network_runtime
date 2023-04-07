@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_NNR_V2_0_PREPAREDMODELSERVICE_H
-#define OHOS_HDI_NNR_V2_0_PREPAREDMODELSERVICE_H
+#ifndef OHOS_HDI_NNRT_V2_0_PREPAREDMODELSERVICE_H
+#define OHOS_HDI_NNRT_V2_0_PREPAREDMODELSERVICE_H
 
 #include "v2_0/iprepared_model.h"
 #include "include/api/data_type.h"
@@ -37,26 +37,26 @@ public:
 
     explicit PreparedModelService(std::shared_ptr<mindspore::Context> context);
 
-    int32_t Compile(std::shared_ptr<mindspore::schema::MetaGraphT> graph);
+    NNRT_ReturnCode Compile(std::shared_ptr<mindspore::schema::MetaGraphT> graph);
 
-    int32_t Compile(const void* modelBuffer, size_t length);
+    NNRT_ReturnCode Compile(const void* modelBuffer, size_t length);
 
-    int32_t ExportModelCache(std::vector<SharedBuffer>& modelCache) override;
+    int32_t ExportModelCache(std::vector<SharedBuffer>& modelCache, NNRT_ReturnCode& returnCode) override;
 
     int32_t Run(const std::vector<IOTensor>& inputs, const std::vector<IOTensor>& outputs,
-        std::vector<std::vector<int32_t>>& outputsDims, std::vector<bool>& isOutputBufferEnough) override;
+        std::vector<std::vector<int32_t>>& outputsDims, NNRT_ReturnCode& returnCode) override;
 
     int32_t GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
-        std::vector<std::vector<uint32_t>>& maxInputDims) override;
+        std::vector<std::vector<uint32_t>>& maxInputDims, NNRT_ReturnCode& returnCode) override;
 
 private:
-    int32_t SetInputs(const std::vector<IOTensor>& inputs);
-    int32_t SetOutputs(const std::vector<IOTensor>& outputs);
-    int32_t GetMSInputsAndOutputs();
-    int32_t CompareTensor(const IOTensor& tensor, const mindspore::MSTensor& msTensor);
+    NNRT_ReturnCode SetInputs(const std::vector<IOTensor>& inputs);
+    NNRT_ReturnCode SetOutputs(const std::vector<IOTensor>& outputs);
+    NNRT_ReturnCode GetMSInputsAndOutputs();
+    NNRT_ReturnCode CompareTensor(const IOTensor& tensor, const mindspore::MSTensor& msTensor);
     sptr<Ashmem> ParseBuffer(const SharedBuffer& buffer);
-    int32_t UpdateOutput(const std::vector<IOTensor>& outputs,
-        std::vector<std::vector<int32_t>>& outputsDims, std::vector<bool>& isOutputBufferEnough);
+    NNRT_ReturnCode UpdateOutput(const std::vector<IOTensor>& outputs,
+        std::vector<std::vector<int32_t>>& outputsDims, bool& isOutputBufferEnough);
     void ResetInputAndOutput();
 
 private:
