@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_NNRT_VALIDATION_H
-#define OHOS_HDI_NNRT_VALIDATION_H
+#ifndef OHOS_HDI_NNRT_V2_0_VALIDATION_H
+#define OHOS_HDI_NNRT_V2_0_VALIDATION_H
 
 #include "v2_0/nnrt_types.h"
 

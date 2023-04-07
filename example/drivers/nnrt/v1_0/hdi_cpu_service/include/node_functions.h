@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_NNR_NODE_FUNCTIONS_H
-#define OHOS_HDI_NNR_NODE_FUNCTIONS_H
+#ifndef OHOS_HDI_NNRT_V1_0_NODE_FUNCTIONS_H
+#define OHOS_HDI_NNRT_V1_0_NODE_FUNCTIONS_H
 
 #include <functional>
 

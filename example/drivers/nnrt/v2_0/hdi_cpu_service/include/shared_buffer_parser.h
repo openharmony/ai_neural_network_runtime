@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_NNR_V2_0_SHARED_BUFFER_PARSER_H
-#define OHOS_HDI_NNR_V2_0_SHARED_BUFFER_PARSER_H
+#ifndef OHOS_HDI_NNRT_V2_0_SHARED_BUFFER_PARSER_H
+#define OHOS_HDI_NNRT_V2_0_SHARED_BUFFER_PARSER_H
 
 #include "ashmem.h"
 #include "v2_0/nnrt_types.h"

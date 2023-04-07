@@ -33,48 +33,53 @@ public:
     NnrtDeviceService() = default;
     virtual ~NnrtDeviceService();
 
-    int32_t GetDeviceName(std::string& name) override;
+    int32_t GetDeviceName(std::string& name, NNRT_ReturnCode& returnCode) override;
 
-    int32_t GetVendorName(std::string& name) override;
+    int32_t GetVendorName(std::string& name, NNRT_ReturnCode& returnCode) override;
 
-    int32_t GetDeviceType(DeviceType& deviceType) override;
+    int32_t GetDeviceType(DeviceType& deviceType, NNRT_ReturnCode& returnCode) override;
 
-    int32_t GetDeviceStatus(DeviceStatus& status) override;
+    int32_t GetDeviceStatus(DeviceStatus& status, NNRT_ReturnCode& returnCode) override;
 
-    int32_t GetSupportedOperation(const Model& model, std::vector<bool>& ops) override;
+    int32_t GetSupportedOperation(const Model& model, std::vector<bool>& ops, NNRT_ReturnCode& returnCode) override;
 
-    int32_t IsFloat16PrecisionSupported(bool& isSupported) override;
+    int32_t IsFloat16PrecisionSupported(bool& isSupported, NNRT_ReturnCode& returnCode) override;
 
-    int32_t IsPerformanceModeSupported(bool& isSupported) override;
+    int32_t IsPerformanceModeSupported(bool& isSupported, NNRT_ReturnCode& returnCode) override;
 
-    int32_t IsPrioritySupported(bool& isSupported) override;
+    int32_t IsPrioritySupported(bool& isSupported, NNRT_ReturnCode& returnCode) override;
 
-    int32_t IsDynamicInputSupported(bool& isSupported) override;
+    int32_t IsDynamicInputSupported(bool& isSupported, NNRT_ReturnCode& returnCode) override;
 
-    int32_t PrepareModel(const Model& model, const ModelConfig& config, sptr<IPreparedModel>& preparedModel) override;
+    int32_t PrepareModel(const Model& model, const ModelConfig& config, sptr<IPreparedModel>& preparedModel,
+        NNRT_ReturnCode& returnCode) override;
 
-    int32_t IsModelCacheSupported(bool& isSupported) override;
+    int32_t PrepareOfflineModel(const std::vector<SharedBuffer>& modelBuffer, const ModelConfig& config,
+        sptr<IPreparedModel>& preparedModel, NNRT_ReturnCode& returnCode) override;
+
+    int32_t IsModelCacheSupported(bool& isSupported, NNRT_ReturnCode& returnCode) override;
 
     int32_t PrepareModelFromModelCache(const std::vector<SharedBuffer>& modelCache, const ModelConfig& config,
-         sptr<IPreparedModel>& preparedModel) override;
+         sptr<IPreparedModel>& preparedModel, NNRT_ReturnCode& returnCode) override;
 
-    int32_t AllocateBuffer(uint32_t length, SharedBuffer& buffer) override;
+    int32_t AllocateBuffer(uint32_t length, SharedBuffer& buffer, NNRT_ReturnCode& returnCode) override;
 
-    int32_t ReleaseBuffer(const SharedBuffer& buffer) override;
+    int32_t ReleaseBuffer(const SharedBuffer& buffer, NNRT_ReturnCode& returnCode) override;
 
 private:
-    int32_t ValidateModelConfig(const ModelConfig& config) const;
-    int32_t ValidateModel(const Model& model) const;
-    std::shared_ptr<mindspore::schema::MetaGraphT> TransModelToGraph(const Model& model) const;
-    std::unique_ptr<mindspore::schema::TensorT> TransTensor(const Tensor& tensor) const;
-    std::unique_ptr<mindspore::schema::CNodeT> TransNode(const Node& node) const;
+    NNRT_ReturnCode ValidateModelConfig(const ModelConfig& config) const;
+    NNRT_ReturnCode ValidateModel(const Model& model) const;
+    std::shared_ptr<mindspore::schema::MetaGraphT> TransModelToGraph(const Model& model,
+        NNRT_ReturnCode& returnCode) const;
+    std::unique_ptr<mindspore::schema::TensorT> TransTensor(const Tensor& tensor, NNRT_ReturnCode& returnCode) const;
+    std::unique_ptr<mindspore::schema::CNodeT> TransNode(const Node& node, NNRT_ReturnCode& returnCode) const;
     std::unique_ptr<mindspore::schema::SubGraphT> TransSubGraph(const SubGraph& graph, const size_t numTensor) const;
     std::shared_ptr<mindspore::Context> TransModelConfig(const ModelConfig& config) const;
-    int32_t ShowCustomAttributes(const std::map<std::string, std::vector<int8_t>>& extensions) const;
-    int32_t ParseCustomAttributes(const std::map<std::string, std::vector<int8_t>>& extensions, float& attr1,
+    NNRT_ReturnCode ShowCustomAttributes(const std::map<std::string, std::vector<int8_t>>& extensions) const;
+    NNRT_ReturnCode ParseCustomAttributes(const std::map<std::string, std::vector<int8_t>>& extensions, float& attr1,
         std::string& attr2) const;
-    int32_t ConvertVecToFloat(std::vector<int8_t> vecFloat, float& result) const;
-    int32_t ConvertVecToString(std::vector<int8_t> vecFloat, std::string& result) const;
+    NNRT_ReturnCode ConvertVecToFloat(std::vector<int8_t> vecFloat, float& result) const;
+    NNRT_ReturnCode ConvertVecToString(std::vector<int8_t> vecFloat, std::string& result) const;
 
 private:
     std::shared_ptr<mindspore::Model> m_model {nullptr};
