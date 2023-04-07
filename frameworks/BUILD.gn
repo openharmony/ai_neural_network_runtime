@@ -29,6 +29,7 @@ nnrt_sources = [
   "native/hdi_device_v2_0.cpp",
   "native/hdi_prepared_model_v1_0.cpp",
   "native/hdi_prepared_model_v2_0.cpp",
+  "native/hdi_returncode_transform.cpp",
   "native/inner_model.cpp",
   "native/memory_manager.cpp",
   "native/neural_network_runtime.cpp",

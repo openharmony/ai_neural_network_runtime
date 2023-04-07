@@ -15,6 +15,7 @@
 
 #include "device_discover.h"
 #include "hdi_device_v2_0.h"
+#include "hdi_returncode_transform.h"
 #include "common/log.h"
 #include "common/utils.h"
 
@@ -29,20 +30,23 @@ std::shared_ptr<Device> DiscoverHDIDevicesV2_0(std::string& deviceName, std::str
         return nullptr;
     }
 
-    auto hdiRet = iDevice->GetDeviceName(deviceName);
+    V2_0::NNRT_ReturnCode returnCode;
+    auto hdiRet = iDevice->GetDeviceName(deviceName, returnCode);
     if (hdiRet != HDF_SUCCESS) {
-        LOGW("Get device name failed. ErrorCode=%d", hdiRet);
+        LOGW("Get device name failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
+            hdiRet, ConverterRetToString(returnCode).c_str());
         return nullptr;
     }
-    hdiRet = iDevice->GetVendorName(vendorName);
+    hdiRet = iDevice->GetVendorName(vendorName, returnCode);
     if (hdiRet != HDF_SUCCESS) {
-        LOGW("Get vendor name failed. ErrorCode=%d", hdiRet);
+        LOGW("Get vendor name failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
+            hdiRet, ConverterRetToString(returnCode).c_str());
         return nullptr;
     }
     std::pair<uint32_t, uint32_t> hdiVersion;
     hdiRet = iDevice->GetVersion(hdiVersion.first, hdiVersion.second);
     if (hdiRet != HDF_SUCCESS) {
-        LOGW("Get version failed. ErrorCode=%d", hdiRet);
+        LOGW("Get version failed. ErrorCode=%{public}d", hdiRet);
         return nullptr;
     }
     version = 'v' + std::to_string(hdiVersion.first) + '_' + std::to_string(hdiVersion.second);
