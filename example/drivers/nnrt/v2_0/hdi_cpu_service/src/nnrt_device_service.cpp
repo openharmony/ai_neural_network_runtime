@@ -170,6 +170,9 @@ int32_t NnrtDeviceService::PrepareOfflineModel(const std::vector<SharedBuffer>& 
     auto ret = PrepareModelFromModelCache(offlineModels, config, preparedModel, returnCode);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("Prepare offline model failed.");
+        if (returnCode == NNRT_ReturnCode::NNRT_INVALID_MODEL_CACHE) {
+            returnCode = NNRT_ReturnCode::NNRT_INVALID_MODEL;
+        }
         return ret;
     }
 
