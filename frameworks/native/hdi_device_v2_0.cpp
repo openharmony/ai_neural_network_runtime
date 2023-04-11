@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "hdi_device.h"
+#include "hdi_device_v2_0.h"
 
 #include "hdf_base.h"
 #include "mindir.h"
 
-#include "hdi_prepared_model.h"
+#include "hdi_prepared_model_v2_0.h"
 #include "memory_manager.h"
 #include "transform.h"
 #include "common/log.h"
@@ -26,12 +26,72 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-HDIDevice::HDIDevice(OHOS::sptr<V1_0::INnrtDevice> device) : m_iDevice(device)
+namespace {
+OH_NN_DeviceType TransHDIDeviceV2_0Type(const V2_0::DeviceType& iDeviceType)
+{
+    switch (iDeviceType) {
+        case V2_0::DeviceType::CPU:
+            return OH_NN_CPU;
+        case V2_0::DeviceType::GPU:
+            return OH_NN_GPU;
+        case V2_0::DeviceType::ACCELERATOR:
+            return OH_NN_ACCELERATOR;
+        default:
+            return OH_NN_OTHERS;
+    }
+}
+
+DeviceStatus TransHDIDeviceV2_0Status(const V2_0::DeviceStatus& iDeviceStatus)
+{
+    switch (iDeviceStatus) {
+        case V2_0::DeviceStatus::AVAILABLE:
+            return DeviceStatus::AVAILABLE;
+        case V2_0::DeviceStatus::BUSY:
+            return DeviceStatus::BUSY;
+        case V2_0::DeviceStatus::OFFLINE:
+            return DeviceStatus::OFFLINE;
+        default:
+            return DeviceStatus::UNKNOWN;
+    }
+}
+
+V2_0::PerformanceMode TransPerformanceMode(const OH_NN_PerformanceMode& mode)
+{
+    switch (mode) {
+        case OH_NN_PERFORMANCE_LOW:
+            return V2_0::PerformanceMode::PERFORMANCE_LOW;
+        case OH_NN_PERFORMANCE_MEDIUM:
+            return V2_0::PerformanceMode::PERFORMANCE_MEDIUM;
+        case OH_NN_PERFORMANCE_HIGH:
+            return V2_0::PerformanceMode::PERFORMANCE_HIGH;
+        case OH_NN_PERFORMANCE_EXTREME:
+            return V2_0::PerformanceMode::PERFORMANCE_EXTREME;
+        default:
+            return V2_0::PerformanceMode::PERFORMANCE_NONE;
+    }
+}
+
+V2_0::Priority TransPriority(const OH_NN_Priority& priority)
+{
+    switch (priority) {
+        case OH_NN_PRIORITY_LOW:
+            return V2_0::Priority::PRIORITY_LOW;
+        case OH_NN_PRIORITY_MEDIUM:
+            return V2_0::Priority::PRIORITY_MEDIUM;
+        case OH_NN_PRIORITY_HIGH:
+            return V2_0::Priority::PRIORITY_HIGH;
+        default:
+            return V2_0::Priority::PRIORITY_NONE;
+    }
+}
+}
+
+HDIDeviceV2_0::HDIDeviceV2_0(OHOS::sptr<V2_0::INnrtDevice> device) : m_iDevice(device)
 {
     device->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
 }
 
-OH_NN_ReturnCode HDIDevice::GetDeviceName(std::string& name)
+OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceName(std::string& name)
 {
     auto ret = m_iDevice->GetDeviceName(name);
     if (ret != HDF_SUCCESS) {
@@ -41,7 +101,7 @@ OH_NN_ReturnCode HDIDevice::GetDeviceName(std::string& name)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::GetVendorName(std::string& name)
+OH_NN_ReturnCode HDIDeviceV2_0::GetVendorName(std::string& name)
 {
     auto ret = m_iDevice->GetVendorName(name);
     if (ret != HDF_SUCCESS) {
@@ -51,32 +111,38 @@ OH_NN_ReturnCode HDIDevice::GetVendorName(std::string& name)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::GetDeviceType(OH_NN_DeviceType& deviceType)
+OH_NN_ReturnCode HDIDeviceV2_0::GetVersion(std::string& version)
 {
-    V1_0::DeviceType iDeviceType;
+    version = 'v' + std::to_string(m_hdiVersion.first) + '_' + std::to_string(m_hdiVersion.second);
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceType(OH_NN_DeviceType& deviceType)
+{
+    V2_0::DeviceType iDeviceType;
     auto ret = m_iDevice->GetDeviceType(iDeviceType);
     if (ret != HDF_SUCCESS) {
         LOGE("Get HDI device type failed. ErrorCode=%d", ret);
         return OH_NN_UNAVALIDABLE_DEVICE;
     }
 
-    deviceType = HDIToNN::TransHDIDeviceType(iDeviceType);
+    deviceType = TransHDIDeviceV2_0Type(iDeviceType);
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::GetDeviceStatus(DeviceStatus& status)
+OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceStatus(DeviceStatus& status)
 {
-    V1_0::DeviceStatus iDeviceStatus;
+    V2_0::DeviceStatus iDeviceStatus;
     auto ret = m_iDevice->GetDeviceStatus(iDeviceStatus);
     if (ret != HDF_SUCCESS) {
         LOGE("Get HDI device status failed. ErrorCode=%d", ret);
         return OH_NN_UNAVALIDABLE_DEVICE;
     }
-    status = HDIToNN::TransHDIDeviceStatus(iDeviceStatus);
+    status = TransHDIDeviceV2_0Status(iDeviceStatus);
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::GetSupportedOperation(std::shared_ptr<const mindspore::lite::LiteGraph> model,
+OH_NN_ReturnCode HDIDeviceV2_0::GetSupportedOperation(std::shared_ptr<const mindspore::lite::LiteGraph> model,
                                                   std::vector<bool>& ops)
 {
     if (model == nullptr) {
@@ -84,7 +150,7 @@ OH_NN_ReturnCode HDIDevice::GetSupportedOperation(std::shared_ptr<const mindspor
         return OH_NN_NULL_PTR;
     }
 
-    V1_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
+    V2_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
     size_t tensorSize = mindspore::lite::MindIR_LiteGraph_GetConstTensorSize(model.get());
     int32_t hdiRet {0};
     if (tensorSize > 0) {
@@ -117,7 +183,7 @@ OH_NN_ReturnCode HDIDevice::GetSupportedOperation(std::shared_ptr<const mindspor
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::IsFloat16PrecisionSupported(bool& isSupported)
+OH_NN_ReturnCode HDIDeviceV2_0::IsFloat16PrecisionSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsFloat16PrecisionSupported(isSupported);
     if (ret != HDF_SUCCESS) {
@@ -127,7 +193,7 @@ OH_NN_ReturnCode HDIDevice::IsFloat16PrecisionSupported(bool& isSupported)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::IsPerformanceModeSupported(bool& isSupported)
+OH_NN_ReturnCode HDIDeviceV2_0::IsPerformanceModeSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsPerformanceModeSupported(isSupported);
     if (ret != HDF_SUCCESS) {
@@ -137,7 +203,7 @@ OH_NN_ReturnCode HDIDevice::IsPerformanceModeSupported(bool& isSupported)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::IsPrioritySupported(bool& isSupported)
+OH_NN_ReturnCode HDIDeviceV2_0::IsPrioritySupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsPrioritySupported(isSupported);
     if (ret != HDF_SUCCESS) {
@@ -147,7 +213,7 @@ OH_NN_ReturnCode HDIDevice::IsPrioritySupported(bool& isSupported)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::IsDynamicInputSupported(bool& isSupported)
+OH_NN_ReturnCode HDIDeviceV2_0::IsDynamicInputSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsDynamicInputSupported(isSupported);
     if (ret != HDF_SUCCESS) {
@@ -157,7 +223,7 @@ OH_NN_ReturnCode HDIDevice::IsDynamicInputSupported(bool& isSupported)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::IsModelCacheSupported(bool& isSupported)
+OH_NN_ReturnCode HDIDeviceV2_0::IsModelCacheSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsModelCacheSupported(isSupported);
     if (ret != HDF_SUCCESS) {
@@ -167,7 +233,7 @@ OH_NN_ReturnCode HDIDevice::IsModelCacheSupported(bool& isSupported)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
+OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
                                          const ModelConfig& config,
                                          std::shared_ptr<PreparedModel>& preparedModel)
 {
@@ -176,7 +242,7 @@ OH_NN_ReturnCode HDIDevice::PrepareModel(std::shared_ptr<const mindspore::lite::
         return OH_NN_INVALID_PARAMETER;
     }
 
-    V1_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
+    V2_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
     size_t tensorSize = mindspore::lite::MindIR_LiteGraph_GetConstTensorSize(model.get());
     int32_t hdiRet {0};
     if (tensorSize > 0) {
@@ -187,18 +253,18 @@ OH_NN_ReturnCode HDIDevice::PrepareModel(std::shared_ptr<const mindspore::lite::
         }
     }
 
-    V1_0::Model* iModel = mindspore::lite::MindIR_LiteGraph_To_Model(model.get(), tensorBuffer);
+    V2_0::Model* iModel = mindspore::lite::MindIR_LiteGraph_To_Model(model.get(), tensorBuffer);
     if (iModel == nullptr) {
         LOGE("Parse litegraph to hdi model failed.");
         ReleaseSharedBuffer(tensorBuffer);
         return OH_NN_FAILED;
     }
 
-    V1_0::ModelConfig iModelConfig;
+    V2_0::ModelConfig iModelConfig;
     iModelConfig.enableFloat16 = config.enableFloat16;
-    iModelConfig.mode = NNToHDI::TransPerformanceMode(config.mode);
-    iModelConfig.priority = NNToHDI::TransPriority(config.priority);
-    OHOS::sptr<V1_0::IPreparedModel> iPreparedModel;
+    iModelConfig.mode = TransPerformanceMode(config.mode);
+    iModelConfig.priority = TransPriority(config.priority);
+    OHOS::sptr<V2_0::IPreparedModel> iPreparedModel;
 
     auto preparedRet = m_iDevice->PrepareModel(*iModel, iModelConfig, iPreparedModel);
 
@@ -213,7 +279,7 @@ OH_NN_ReturnCode HDIDevice::PrepareModel(std::shared_ptr<const mindspore::lite::
         return OH_NN_FAILED;
     }
 
-    preparedModel = CreateSharedPtr<HDIPreparedModel>(iPreparedModel);
+    preparedModel = CreateSharedPtr<HDIPreparedModelV2_0>(iPreparedModel);
     if (preparedModel == nullptr) {
         LOGE("Prepare model failed, because fail to create preparedModel instance.");
         return OH_NN_MEMORY_ERROR;
@@ -222,11 +288,11 @@ OH_NN_ReturnCode HDIDevice::PrepareModel(std::shared_ptr<const mindspore::lite::
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
+OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
                                                        const ModelConfig& config,
                                                        std::shared_ptr<PreparedModel>& preparedModel)
 {
-    std::vector<V1_0::SharedBuffer> iBuffers;
+    std::vector<V2_0::SharedBuffer> iBuffers;
     auto memManager = MemoryManager::GetInstance();
     Memory memory;
     OH_NN_ReturnCode ret;
@@ -237,22 +303,22 @@ OH_NN_ReturnCode HDIDevice::PrepareModelFromModelCache(const std::vector<ModelBu
             LOGE("The %zuth model cache is invalid. Please put valid model cache.", i + 1);
             return ret;
         }
-        iBuffers.emplace_back(V1_0::SharedBuffer {memory.fd, memory.length, 0, memory.length});
+        iBuffers.emplace_back(V2_0::SharedBuffer {memory.fd, memory.length, 0, memory.length});
     }
 
-    V1_0::ModelConfig iModelConfig;
+    V2_0::ModelConfig iModelConfig;
     iModelConfig.enableFloat16 = config.enableFloat16;
-    iModelConfig.mode = NNToHDI::TransPerformanceMode(config.mode);
-    iModelConfig.priority = NNToHDI::TransPriority(config.priority);
+    iModelConfig.mode = TransPerformanceMode(config.mode);
+    iModelConfig.priority = TransPriority(config.priority);
 
-    OHOS::sptr<V1_0::IPreparedModel> iPreparedModel;
+    OHOS::sptr<V2_0::IPreparedModel> iPreparedModel;
     auto hdiRet = m_iDevice->PrepareModelFromModelCache(iBuffers, iModelConfig, iPreparedModel);
     if (hdiRet != HDF_SUCCESS) {
         LOGE("Prepare model from cache failed. ErrorCode=%d", hdiRet);
         return OH_NN_UNAVALIDABLE_DEVICE;
     }
 
-    preparedModel = CreateSharedPtr<HDIPreparedModel>(iPreparedModel);
+    preparedModel = CreateSharedPtr<HDIPreparedModelV2_0>(iPreparedModel);
     if (preparedModel == nullptr) {
         LOGE("Prepare model from model cache failed, because fail to create preparedModel instance.");
         return OH_NN_MEMORY_ERROR;
@@ -260,14 +326,14 @@ OH_NN_ReturnCode HDIDevice::PrepareModelFromModelCache(const std::vector<ModelBu
     return OH_NN_SUCCESS;
 }
 
-void* HDIDevice::AllocateBuffer(size_t length)
+void* HDIDeviceV2_0::AllocateBuffer(size_t length)
 {
     if (length == 0) {
         LOGE("The length param is invalid, length=0");
         return nullptr;
     }
 
-    V1_0::SharedBuffer buffer;
+    V2_0::SharedBuffer buffer;
     auto ret = m_iDevice->AllocateBuffer(length, buffer);
     if (ret != HDF_SUCCESS) {
         LOGE("Allocate buffer error. ErrorCode: %d", ret);
@@ -282,7 +348,7 @@ void* HDIDevice::AllocateBuffer(size_t length)
     return addr;
 }
 
-OH_NN_ReturnCode HDIDevice::ReleaseBuffer(const void* buffer)
+OH_NN_ReturnCode HDIDeviceV2_0::ReleaseBuffer(const void* buffer)
 {
     if (buffer == nullptr) {
         LOGE("Buffer is nullptr, no need to release.");
@@ -297,7 +363,7 @@ OH_NN_ReturnCode HDIDevice::ReleaseBuffer(const void* buffer)
         return ret;
     }
 
-    V1_0::SharedBuffer hdiBuffer {memory.fd, memory.length, 0, memory.length};
+    V2_0::SharedBuffer hdiBuffer {memory.fd, memory.length, 0, memory.length};
     auto deviceResult = m_iDevice->ReleaseBuffer(hdiBuffer);
     if (deviceResult != HDF_SUCCESS) {
         LOGE("Device release buffer error. ErrorCode: %d", deviceResult);
@@ -313,7 +379,7 @@ OH_NN_ReturnCode HDIDevice::ReleaseBuffer(const void* buffer)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDevice::ReleaseSharedBuffer(const V1_0::SharedBuffer& buffer)
+OH_NN_ReturnCode HDIDeviceV2_0::ReleaseSharedBuffer(const V2_0::SharedBuffer& buffer)
 {
     if (buffer.fd == INVALID_FD) {
         LOGI("No need to release. fd=%d", INVALID_FD);

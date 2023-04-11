@@ -34,7 +34,7 @@ public:
 
 #define REGISTER_DEVICE(deviceName, vendorName, creator)                                                         \
     namespace {                                                                                                  \
-    static OHOS::NeuralNetworkRuntime::DeviceRegistrar g_##deviceName##_##vendorName##_device_registrar(creator) \
+    static OHOS::NeuralNetworkRuntime::DeviceRegistrar g_##deviceName##_##vendorName##_device_registrar(creator); \
     } // namespace
 } // namespace NeuralNetworkRuntime
 } // OHOS
