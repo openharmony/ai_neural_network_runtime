@@ -22,7 +22,7 @@ config("module_private_config") {
     "//third_party/googletest/googlemock/include",
     "//foundation/ai/neural_network_runtime",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//third_party/mindspore/mindspore/lite/mindir/include"
+    "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
   ]
 
   cflags = [
@@ -32,14 +32,12 @@ config("module_private_config") {
     "--coverage",
   ]
 
-  ldflags = [
-    "--coverage",
-  ]
+  ldflags = [ "--coverage" ]
 }
 
 ohos_unittest("NeuralNetworkRuntimeInnerTest") {
   module_out_path = module_output_path
-  sources = ["//foundation/ai/neural_network_runtime/test/unittest/inner_kits/neural_network_runtime_inner_test.cpp"]
+  sources = [ "./neural_network_runtime_inner_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
@@ -49,12 +47,12 @@ ohos_unittest("NeuralNetworkRuntimeInnerTest") {
   ]
 
   external_deps = [
+    "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hdf_core:libhdf_utils",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "c_utils:utils",
-    "hdf_core:libhdf_utils",
-    "mindspore:mindir"
+    "mindspore:mindir",
   ]
 }
 

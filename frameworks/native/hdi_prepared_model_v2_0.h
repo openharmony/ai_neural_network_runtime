@@ -14,21 +14,26 @@
  */
 
 
-#ifndef NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_H
-#define NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_H
+#ifndef NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_V2_0_H
+#define NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_V2_0_H
 
 #include <vector>
 
+#include <v2_0/nnrt_types.h>
+#include <v2_0/innrt_device.h>
+#include <v2_0/iprepared_model.h>
+
 #include "refbase.h"
-#include "hdi_interfaces.h"
 #include "prepared_model.h"
 #include "cpp_type.h"
 
+namespace V2_0 = OHOS::HDI::Nnrt::V2_0;
+
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-class HDIPreparedModel : public PreparedModel {
+class HDIPreparedModelV2_0 : public PreparedModel {
 public:
-    explicit HDIPreparedModel(OHOS::sptr<V1_0::IPreparedModel> hdiPreparedModel);
+    explicit HDIPreparedModelV2_0(OHOS::sptr<V2_0::IPreparedModel> hdiPreparedModel);
 
     OH_NN_ReturnCode ExportModelCache(std::vector<ModelBuffer>& modelCache) override;
 
@@ -37,11 +42,14 @@ public:
                          std::vector<std::vector<int32_t>>& outputsDims,
                          std::vector<bool>& isOutputBufferEnough) override;
 
+    OH_NN_ReturnCode GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
+                                       std::vector<std::vector<uint32_t>>& maxInputDims) override;
+
 private:
     // first: major version, second: minor version
     std::pair<uint32_t, uint32_t> m_hdiVersion;
-    OHOS::sptr<V1_0::IPreparedModel> m_hdiPreparedModel {nullptr};
+    OHOS::sptr<V2_0::IPreparedModel> m_hdiPreparedModel {nullptr};
 };
 } // namespace NeuralNetworkRuntime
 } // OHOS
-#endif // NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_H
+#endif // NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_V2_0_H

@@ -34,6 +34,7 @@ public:
 
     virtual OH_NN_ReturnCode GetDeviceName(std::string& name) = 0;
     virtual OH_NN_ReturnCode GetVendorName(std::string& name) = 0;
+    virtual OH_NN_ReturnCode GetVersion(std::string& version) = 0;
     virtual OH_NN_ReturnCode GetDeviceType(OH_NN_DeviceType& deviceType) = 0;
     virtual OH_NN_ReturnCode GetDeviceStatus(DeviceStatus& status) = 0;
     virtual OH_NN_ReturnCode GetSupportedOperation(std::shared_ptr<const mindspore::lite::LiteGraph> model,
