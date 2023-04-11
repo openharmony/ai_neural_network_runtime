@@ -26,6 +26,8 @@ namespace OHOS {
 namespace HDI {
 namespace Nnrt {
 namespace V2_0 {
+constexpr uint32_t MIN_DIM = 1;
+constexpr uint32_t MAX_DIM = 10;
 PreparedModelService::PreparedModelService(std::shared_ptr<mindspore::Context> context)
     : m_context(context) {}
 
@@ -170,8 +172,8 @@ int32_t PreparedModelService::GetInputDimRanges(std::vector<std::vector<uint32_t
                 minInputShape.push_back(static_cast<uint32_t>(dim));
                 maxInputShape.push_back(static_cast<uint32_t>(dim));
             } else {                        // Dimension range is [1, 10].
-                minInputShape.push_back(1);
-                maxInputShape.push_back(10);
+                minInputShape.push_back(MIN_DIM);
+                maxInputShape.push_back(MAX_DIM);
             }
         }
         minInputDims.push_back(std::move(minInputShape));
@@ -283,7 +285,7 @@ NNRT_ReturnCode PreparedModelService::Compile(const void* modelBuffer, size_t le
 {
     if (modelBuffer == nullptr || length == 0) {
         HDF_LOGE("ModelBuffer cannot be nullptr and length cannot be zero.");
-        return NNRT_ReturnCode::NNRT_INVALID_MODEL_CACHE;
+        return NNRT_ReturnCode::NNRT_INVALID_BUFFER;
     }
 
     m_model = std::make_shared<mindspore::Model>();
@@ -334,7 +336,7 @@ NNRT_ReturnCode PreparedModelService::SetInputs(const std::vector<IOTensor>& inp
         auto& msInput = m_inputs[i];
         ret = CompareTensor(input, msInput);
         if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
-            HDF_LOGE("Inputs tensor is not match that of model. Please check input tensor.");
+            HDF_LOGE("Input tensor %{public}zu is not match that of model. Please check the input tensor.", i);
             return ret;
         }
         tmpAllDims.emplace_back(input.dimensions.begin(), input.dimensions.end());
@@ -436,9 +438,16 @@ NNRT_ReturnCode PreparedModelService::CompareTensor(const IOTensor& tensor, cons
     }
 
     for (size_t i = 0; i < tensor.dimensions.size(); i++) {
-        if (msTensor.Shape()[i] != DYNAMIC_SHAPE_FLAG && tensor.dimensions[i] != msTensor.Shape()[i]) {
-            HDF_LOGE("The Shape of tensor dose not match that of model.");
-            return NNRT_ReturnCode::NNRT_INVALID_SHAPE;
+        int modelDim = static_cast<int>(msTensor.Shape()[i]);
+        int tensorDim = tensor.dimensions[i];
+        if (modelDim != DYNAMIC_SHAPE_FLAG) {
+            if (tensorDim != modelDim) {
+                HDF_LOGE("Dimension %{public}zu of tensor dose not match that of model.", i);
+                return NNRT_ReturnCode::NNRT_INVALID_SHAPE;
+            }
+        } else if (tensorDim < MIN_DIM || tensorDim > MAX_DIM) {
+                HDF_LOGE("Dimension %{public}zu of tensor is out of dynamic range.", i);
+                return NNRT_ReturnCode::NNRT_OUT_OF_DIMENTION_RANGES;
         }
     }
 
