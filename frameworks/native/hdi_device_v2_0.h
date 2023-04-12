@@ -16,18 +16,16 @@
 #ifndef NEURAL_NETWORK_RUNTIME_HDI_DEVICE_V2_0_H
 #define NEURAL_NETWORK_RUNTIME_HDI_DEVICE_V2_0_H
 
-#include "refbase.h"
 #include <v2_0/nnrt_types.h>
 #include <v2_0/innrt_device.h>
 #include <v2_0/iprepared_model.h>
+#include "refbase.h"
 
 #include "device.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-
 namespace V2_0 = OHOS::HDI::Nnrt::V2_0;
-
 class HDIDeviceV2_0 : public Device {
 public:
     explicit HDIDeviceV2_0(OHOS::sptr<V2_0::INnrtDevice> device);
