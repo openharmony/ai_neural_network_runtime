@@ -16,7 +16,7 @@
 #include "nnrt_device_service.h"
 
 #include <hdf_base.h>
-#include "utils/hdf_log.h"
+#include "hdf_log.h"
 #include "ashmem.h"
 #include "securec.h"
 

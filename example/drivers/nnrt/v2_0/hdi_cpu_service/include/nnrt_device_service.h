@@ -33,38 +33,37 @@ public:
     NnrtDeviceService() = default;
     virtual ~NnrtDeviceService();
 
-    int32_t GetDeviceName(std::string& name, NNRT_ReturnCode& returnCode) override;
+    int32_t GetDeviceName(std::string& name) override;
 
-    int32_t GetVendorName(std::string& name, NNRT_ReturnCode& returnCode) override;
+    int32_t GetVendorName(std::string& name) override;
 
-    int32_t GetDeviceType(DeviceType& deviceType, NNRT_ReturnCode& returnCode) override;
+    int32_t GetDeviceType(DeviceType& deviceType) override;
 
-    int32_t GetDeviceStatus(DeviceStatus& status, NNRT_ReturnCode& returnCode) override;
+    int32_t GetDeviceStatus(DeviceStatus& status) override;
 
-    int32_t GetSupportedOperation(const Model& model, std::vector<bool>& ops, NNRT_ReturnCode& returnCode) override;
+    int32_t GetSupportedOperation(const Model& model, std::vector<bool>& ops) override;
 
-    int32_t IsFloat16PrecisionSupported(bool& isSupported, NNRT_ReturnCode& returnCode) override;
+    int32_t IsFloat16PrecisionSupported(bool& isSupported) override;
 
-    int32_t IsPerformanceModeSupported(bool& isSupported, NNRT_ReturnCode& returnCode) override;
+    int32_t IsPerformanceModeSupported(bool& isSupported) override;
 
-    int32_t IsPrioritySupported(bool& isSupported, NNRT_ReturnCode& returnCode) override;
+    int32_t IsPrioritySupported(bool& isSupported) override;
 
-    int32_t IsDynamicInputSupported(bool& isSupported, NNRT_ReturnCode& returnCode) override;
+    int32_t IsDynamicInputSupported(bool& isSupported) override;
 
-    int32_t PrepareModel(const Model& model, const ModelConfig& config, sptr<IPreparedModel>& preparedModel,
-        NNRT_ReturnCode& returnCode) override;
+    int32_t PrepareModel(const Model& model, const ModelConfig& config, sptr<IPreparedModel>& preparedModel) override;
 
     int32_t PrepareOfflineModel(const std::vector<SharedBuffer>& modelBuffer, const ModelConfig& config,
-        sptr<IPreparedModel>& preparedModel, NNRT_ReturnCode& returnCode) override;
+        sptr<IPreparedModel>& preparedModel) override;
 
-    int32_t IsModelCacheSupported(bool& isSupported, NNRT_ReturnCode& returnCode) override;
+    int32_t IsModelCacheSupported(bool& isSupported) override;
 
     int32_t PrepareModelFromModelCache(const std::vector<SharedBuffer>& modelCache, const ModelConfig& config,
-         sptr<IPreparedModel>& preparedModel, NNRT_ReturnCode& returnCode) override;
+         sptr<IPreparedModel>& preparedModel) override;
 
-    int32_t AllocateBuffer(uint32_t length, SharedBuffer& buffer, NNRT_ReturnCode& returnCode) override;
+    int32_t AllocateBuffer(uint32_t length, SharedBuffer& buffer) override;
 
-    int32_t ReleaseBuffer(const SharedBuffer& buffer, NNRT_ReturnCode& returnCode) override;
+    int32_t ReleaseBuffer(const SharedBuffer& buffer) override;
 
 private:
     NNRT_ReturnCode ValidateModelConfig(const ModelConfig& config) const;

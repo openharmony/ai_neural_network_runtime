@@ -41,13 +41,13 @@ public:
 
     NNRT_ReturnCode Compile(const void* modelBuffer, size_t length);
 
-    int32_t ExportModelCache(std::vector<SharedBuffer>& modelCache, NNRT_ReturnCode& returnCode) override;
+    int32_t ExportModelCache(std::vector<SharedBuffer>& modelCache) override;
 
     int32_t Run(const std::vector<IOTensor>& inputs, const std::vector<IOTensor>& outputs,
-        std::vector<std::vector<int32_t>>& outputsDims, NNRT_ReturnCode& returnCode) override;
+        std::vector<std::vector<int32_t>>& outputsDims) override;
 
     int32_t GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
-        std::vector<std::vector<uint32_t>>& maxInputDims, NNRT_ReturnCode& returnCode) override;
+        std::vector<std::vector<uint32_t>>& maxInputDims) override;
 
 private:
     NNRT_ReturnCode SetInputs(const std::vector<IOTensor>& inputs);

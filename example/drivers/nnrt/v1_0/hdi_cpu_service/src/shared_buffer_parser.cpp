@@ -21,7 +21,7 @@
 #include <hdf_base.h>
 #include "ashmem.h"
 #include "v1_0/nnrt_types.h"
-#include "utils/hdf_log.h"
+#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
