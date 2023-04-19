@@ -20,7 +20,6 @@
 #include "hdf_log.h"
 
 #include "shared_buffer_parser.h"
-#include "utils.h"
 
 namespace OHOS {
 namespace HDI {
@@ -48,12 +47,11 @@ PreparedModelService::~PreparedModelService()
     }
 }
 
-int32_t PreparedModelService::ExportModelCache(std::vector<SharedBuffer>& modelCache, NNRT_ReturnCode& returnCode)
+int32_t PreparedModelService::ExportModelCache(std::vector<SharedBuffer>& modelCache)
 {
     if (!modelCache.empty()) {
         HDF_LOGE("The parameters of ExportModelCache should be an empty vector.");
-        returnCode = NNRT_ReturnCode::NNRT_INVALID_PARAMETER;
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_PARAMETER;
     }
 
     if (m_cacheBuffer != nullptr) {
@@ -71,23 +69,20 @@ int32_t PreparedModelService::ExportModelCache(std::vector<SharedBuffer>& modelC
     sptr<Ashmem> cache = Ashmem::CreateAshmem(name, size);
     if (cache == nullptr) {
         HDF_LOGE("Create shared memory failed.");
-        returnCode = NNRT_ReturnCode::NNRT_OUT_OF_MEMORY;
-        return HDF_ERR_MALLOC_FAIL;
+        return NNRT_ReturnCode::NNRT_OUT_OF_MEMORY;
     }
 
     bool ret = cache->MapReadAndWriteAshmem();
     if (!ret) {
         HDF_LOGE("Map fd to write cache failed.");
-        returnCode = NNRT_ReturnCode::NNRT_FAILED;
-        return HDF_FAILURE;
+        return NNRT_ReturnCode::NNRT_FAILED;
     }
 
     ret = cache->WriteToAshmem(buffer, size, 0);
     cache->UnmapAshmem();
     if (!ret) {
         HDF_LOGE("Write cache failed.");
-        returnCode = NNRT_ReturnCode::NNRT_FAILED;
-        return HDF_FAILURE;
+        return NNRT_ReturnCode::NNRT_FAILED;
     }
 
     m_cacheBuffer = cache;
@@ -95,65 +90,57 @@ int32_t PreparedModelService::ExportModelCache(std::vector<SharedBuffer>& modelC
     // SharedBuffer: fd, bufferSize, offset, dataSize
     modelCache.emplace_back(SharedBuffer {cache->GetAshmemFd(), cache->GetAshmemSize(), 0, cache->GetAshmemSize()});
 
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t PreparedModelService::Run(const std::vector<IOTensor>& inputs, const std::vector<IOTensor>& outputs,
-    std::vector<std::vector<int32_t>>& outputsDims, NNRT_ReturnCode& returnCode)
+    std::vector<std::vector<int32_t>>& outputsDims)
 {
     auto ret = SetInputs(inputs);
     if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("Inputs tensor is invalid.");
-        returnCode = ret;
-        return GetHDFReturnCode(returnCode);
+        return ret;
     }
 
     if (!m_isDynamicShape) {
         ret = SetOutputs(outputs);
         if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
             HDF_LOGE("Output tensor is invalid.");
-            returnCode = ret;
             ResetInputAndOutput();
-            return GetHDFReturnCode(returnCode);
+            return ret;
         }
     }
 
     auto msRet = m_model->Predict(m_inputs, &m_outputs);
     if (msRet != mindspore::kSuccess) {
         HDF_LOGE("Run model failed.");
-        returnCode = NNRT_ReturnCode::NNRT_FAILED;
         ResetInputAndOutput();
-        return HDF_FAILURE;
+        return NNRT_ReturnCode::NNRT_FAILED;
     }
 
     bool isOutputBufferEnough{false};
     ret = UpdateOutput(outputs, outputsDims, isOutputBufferEnough);
     if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("Update output dimension or data failed.");
-        returnCode = ret;
         ResetInputAndOutput();
-        return GetHDFReturnCode(returnCode);
+        return ret;
     }
 
     if (!isOutputBufferEnough) {
         HDF_LOGE("Output buffer is not enough.");
-        returnCode = NNRT_ReturnCode::NNRT_INSUFFICIENT_BUFFER;
-        return HDF_FAILURE;
+        return NNRT_ReturnCode::NNRT_INSUFFICIENT_BUFFER;
     }
 
     ResetInputAndOutput();
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t PreparedModelService::GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
-    std::vector<std::vector<uint32_t>>& maxInputDims, NNRT_ReturnCode& returnCode)
+    std::vector<std::vector<uint32_t>>& maxInputDims)
 {
     if (m_inputDims.empty()) {
         HDF_LOGE("Model has not been prepared yet.");
-        returnCode = NNRT_ReturnCode::NNRT_INVALID_MODEL;
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_MODEL;
     }
 
     minInputDims.clear();
@@ -166,8 +153,7 @@ int32_t PreparedModelService::GetInputDimRanges(std::vector<std::vector<uint32_t
             if (dim != DYNAMIC_SHAPE_FLAG) { // Min and max are same if the dimension is fixed.
                 if (dim <= 0) {
                     HDF_LOGE("Dimesion value is invalid.");
-                    returnCode = NNRT_ReturnCode::NNRT_INVALID_SHAPE;
-                    return HDF_ERR_INVALID_PARAM; 
+                    return NNRT_ReturnCode::NNRT_INVALID_SHAPE;
                 }
                 minInputShape.push_back(static_cast<uint32_t>(dim));
                 maxInputShape.push_back(static_cast<uint32_t>(dim));
@@ -180,8 +166,7 @@ int32_t PreparedModelService::GetInputDimRanges(std::vector<std::vector<uint32_t
         maxInputDims.push_back(std::move(maxInputShape));
     }
 
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 NNRT_ReturnCode PreparedModelService::UpdateOutput(const std::vector<IOTensor>& outputs,
@@ -445,7 +430,7 @@ NNRT_ReturnCode PreparedModelService::CompareTensor(const IOTensor& tensor, cons
                 HDF_LOGE("Dimension %{public}zu of tensor dose not match that of model.", i);
                 return NNRT_ReturnCode::NNRT_INVALID_SHAPE;
             }
-        } else if (tensorDim < MIN_DIM || tensorDim > MAX_DIM) {
+        } else if (tensorDim < static_cast<int>(MIN_DIM) || tensorDim > static_cast<int>(MAX_DIM)) {
                 HDF_LOGE("Dimension %{public}zu of tensor is out of dynamic range.", i);
                 return NNRT_ReturnCode::NNRT_OUT_OF_DIMENTION_RANGES;
         }

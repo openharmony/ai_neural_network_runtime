@@ -24,7 +24,6 @@
 #include "prepared_model_service.h"
 #include "shared_buffer_parser.h"
 #include "validation.h"
-#include "utils.h"
 
 namespace OHOS {
 namespace HDI {
@@ -43,36 +42,31 @@ NnrtDeviceService::~NnrtDeviceService()
     }
 }
 
-int32_t NnrtDeviceService::GetDeviceName(std::string& name, NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::GetDeviceName(std::string& name)
 {
     name = "RK3568-CPU";
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::GetVendorName(std::string& name, NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::GetVendorName(std::string& name)
 {
     name = "Rockchip";
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::GetDeviceType(DeviceType& deviceType, NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::GetDeviceType(DeviceType& deviceType)
 {
     deviceType = DeviceType::CPU;
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::GetDeviceStatus(DeviceStatus& status, NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::GetDeviceStatus(DeviceStatus& status)
 {
     status = DeviceStatus::AVAILABLE;
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::GetSupportedOperation(const Model& model, std::vector<bool>& ops,
-    NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::GetSupportedOperation(const Model& model, std::vector<bool>& ops)
 {
     size_t nodeSize = model.nodes.size();
     auto nodes = model.nodes;
@@ -82,179 +76,157 @@ int32_t NnrtDeviceService::GetSupportedOperation(const Model& model, std::vector
         ops[i] = regInstance.IsNodeTypeExist(nodes[i].nodeType);
     }
 
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::IsFloat16PrecisionSupported(bool& isSupported, NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::IsFloat16PrecisionSupported(bool& isSupported)
 {
     isSupported = true;
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::IsPerformanceModeSupported(bool& isSupported, NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::IsPerformanceModeSupported(bool& isSupported)
 {
     isSupported = true;
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::IsPrioritySupported(bool& isSupported, NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::IsPrioritySupported(bool& isSupported)
 {
     isSupported = false;
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::IsDynamicInputSupported(bool& isSupported, NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::IsDynamicInputSupported(bool& isSupported)
 {
     isSupported = true;
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::PrepareModel(const Model& model, const ModelConfig& config,
-    sptr<IPreparedModel>& preparedModel, NNRT_ReturnCode& returnCode)
+    sptr<IPreparedModel>& preparedModel)
 {
     auto ret = ValidateModel(model);
     if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("Model is invalid.");
-        returnCode = ret;
-        return GetHDFReturnCode(returnCode);
+        return ret;
     }
 
-    auto graph = TransModelToGraph(model, returnCode);
+    auto graph = TransModelToGraph(model, ret);
     if (graph == nullptr) {
         HDF_LOGE("Transfrom model to graph failed.");
-        return HDF_ERR_INVALID_PARAM;
+        return ret;
     }
 
     ret = ValidateModelConfig(config);
     if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("ModelConfig is invalid.");
-        returnCode = ret;
-        return GetHDFReturnCode(returnCode);
+        return ret;
     }
 
     ret = ShowCustomAttributes(config.extensions);
     if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("Showing custom attributes failed.");
-        returnCode = ret;
-        return GetHDFReturnCode(returnCode);
+        return ret;
     }
 
     auto context = TransModelConfig(config);
     sptr<PreparedModelService> service = new (std::nothrow) PreparedModelService(context);
     if (service == nullptr) {
         HDF_LOGE("Create new PreparedModelService instance failed.");
-        returnCode = NNRT_ReturnCode::NNRT_OUT_OF_MEMORY;
-        return HDF_ERR_MALLOC_FAIL;
+        return NNRT_ReturnCode::NNRT_OUT_OF_MEMORY;
     }
 
     ret = service->Compile(graph);
     if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("Prepared model failed.");
-        returnCode = ret;
-        return GetHDFReturnCode(returnCode);
+        return ret;
     }
 
     preparedModel = service;
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::PrepareOfflineModel(const std::vector<SharedBuffer>& offlineModels,
-    const ModelConfig& config, sptr<IPreparedModel>& preparedModel, NNRT_ReturnCode& returnCode)
+    const ModelConfig& config, sptr<IPreparedModel>& preparedModel)
 {
-    auto ret = PrepareModelFromModelCache(offlineModels, config, preparedModel, returnCode);
+    auto ret = PrepareModelFromModelCache(offlineModels, config, preparedModel);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("Prepare offline model failed.");
-        if (returnCode == NNRT_ReturnCode::NNRT_INVALID_MODEL_CACHE) {
-            returnCode = NNRT_ReturnCode::NNRT_INVALID_MODEL;
+        if (ret == NNRT_ReturnCode::NNRT_INVALID_MODEL_CACHE) {
+            return NNRT_ReturnCode::NNRT_INVALID_MODEL;
         }
         return ret;
     }
 
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::IsModelCacheSupported(bool& isSupported, NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::IsModelCacheSupported(bool& isSupported)
 {
     isSupported = true;
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::PrepareModelFromModelCache(const std::vector<SharedBuffer>& modelCache,
-    const ModelConfig& config, sptr<IPreparedModel>& preparedModel, NNRT_ReturnCode& returnCode)
+    const ModelConfig& config, sptr<IPreparedModel>& preparedModel)
 {
     HDF_LOGD("Using cache to prepare model.");
 
     // modelCache must be 1, because PreparedModel only export one cache file.
     if (modelCache.size() != 1) {
         HDF_LOGE("The size of modelCache vector is not valid, it should be one elememt in that vector.");
-        returnCode = NNRT_ReturnCode::NNRT_INVALID_MODEL_CACHE;
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_MODEL_CACHE;
     }
 
     SharedBufferParser parser;
     auto result = parser.Init(modelCache[0]);
     if (result != HDF_SUCCESS) {
         HDF_LOGE("Parse model buffer failed.");
-        returnCode = NNRT_ReturnCode::NNRT_INVALID_BUFFER;
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_BUFFER;
     }
 
     auto ret = ValidateModelConfig(config);
     if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("ModelConfig is invalid.");
-        returnCode = ret;
-        return GetHDFReturnCode(returnCode);
+        return ret;
     }
 
     ret = ShowCustomAttributes(config.extensions);
     if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("Showing custom attributes failed.");
-        returnCode = ret;
-        return GetHDFReturnCode(returnCode);
+        return ret;
     }
 
     auto context = TransModelConfig(config);
     sptr<PreparedModelService> service = new (std::nothrow) PreparedModelService(context);
     if (service == nullptr) {
         HDF_LOGE("Create new instance PreparedModelService failed.");
-        returnCode = NNRT_ReturnCode::NNRT_OUT_OF_MEMORY;
-        return HDF_ERR_MALLOC_FAIL;
+        return NNRT_ReturnCode::NNRT_OUT_OF_MEMORY;
     }
 
     void* modelBuffer = parser.GetBufferPtr();
     ret = service->Compile(modelBuffer, modelCache[0].dataSize);
     if (result != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("Prepared model failed.");
-        returnCode = ret;
-        return GetHDFReturnCode(returnCode);
+        return ret;
     }
 
     preparedModel = service;
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::AllocateBuffer(uint32_t length, SharedBuffer& buffer, NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::AllocateBuffer(uint32_t length, SharedBuffer& buffer)
 {
     sptr<Ashmem> ashptr = Ashmem::CreateAshmem("allocateBuffer", length);
     if (ashptr == nullptr) {
         HDF_LOGE("Create shared memory failed.");
-        returnCode = NNRT_ReturnCode::NNRT_OUT_OF_MEMORY;
-        return HDF_ERR_MALLOC_FAIL;
+        return NNRT_ReturnCode::NNRT_OUT_OF_MEMORY;
     }
 
     if (!ashptr->MapReadAndWriteAshmem()) {
         HDF_LOGE("Map allocate buffer failed.");
-        returnCode = NNRT_ReturnCode::NNRT_MEMORY_ERROR;
-        return HDF_FAILURE;
+        return NNRT_ReturnCode::NNRT_MEMORY_ERROR;
     }
 
     buffer.fd = ashptr->GetAshmemFd();
@@ -263,19 +235,17 @@ int32_t NnrtDeviceService::AllocateBuffer(uint32_t length, SharedBuffer& buffer,
     buffer.dataSize = length;
 
     m_ashmems[buffer.fd] = ashptr;
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::ReleaseBuffer(const SharedBuffer& buffer, NNRT_ReturnCode& returnCode)
+int32_t NnrtDeviceService::ReleaseBuffer(const SharedBuffer& buffer)
 {
     // parser will close current fd.
     SharedBufferParser parser;
     auto ret = parser.Init(buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("Parse buffer failed.");
-        returnCode = NNRT_ReturnCode::NNRT_INVALID_BUFFER;
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_BUFFER;
     }
 
     for (auto& ash : m_ashmems) {
@@ -283,9 +253,8 @@ int32_t NnrtDeviceService::ReleaseBuffer(const SharedBuffer& buffer, NNRT_Return
         ash.second->CloseAshmem();
     }
     m_ashmems.clear();
-    
-    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
-    return HDF_SUCCESS;
+
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 NNRT_ReturnCode NnrtDeviceService::ValidateModelConfig(const ModelConfig& config) const

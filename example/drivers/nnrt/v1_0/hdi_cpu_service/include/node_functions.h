@@ -19,8 +19,8 @@
 #include <functional>
 
 #include "hdf_base.h"
-#include "utils/hdf_log.h"
-
+#include "hdf_log.h"
+#include <hdf_sbuf_ipc.h>
 #include "node_registry.h"
 
 namespace OHOS {

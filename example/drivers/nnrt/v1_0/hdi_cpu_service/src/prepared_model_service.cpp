@@ -17,7 +17,7 @@
 
 #include <hdf_base.h>
 #include "securec.h"
-#include "utils/hdf_log.h"
+#include "hdf_log.h"
 
 #include "shared_buffer_parser.h"
 

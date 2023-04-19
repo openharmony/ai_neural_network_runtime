@@ -15,7 +15,7 @@
 
 #include "node_registry.h"
 
-#include "utils/hdf_log.h"
+#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
