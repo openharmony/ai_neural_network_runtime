@@ -19,12 +19,12 @@ config("nnrt_config") {
 
 nnrt_sources = [
   "native/compilation.cpp",
+  "native/device_discover_v1_0.cpp",
+  "native/device_discover_v2_0.cpp",
   "native/device_manager.cpp",
   "native/device_registrar.cpp",
   "native/execution_plan.cpp",
   "native/executor.cpp",
-  "native/device_discover_v1_0.cpp",
-  "native/device_discover_v2_0.cpp",
   "native/hdi_device_v1_0.cpp",
   "native/hdi_device_v2_0.cpp",
   "native/hdi_prepared_model_v1_0.cpp",
