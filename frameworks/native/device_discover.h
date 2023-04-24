@@ -16,16 +16,12 @@
 #ifndef NEURAL_NETWORK_RUNTIME_DEVICE_DISCOVER_H
 #define NEURAL_NETWORK_RUNTIME_DEVICE_DISCOVER_H
 
-#include <unordered_map>
-#include <memory>
-
 #include "device.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 std::shared_ptr<Device> DiscoverHDIDevicesV1_0(std::string& deviceName, std::string& vendorName, std::string& version);
 std::shared_ptr<Device> DiscoverHDIDevicesV2_0(std::string& deviceName, std::string& vendorName, std::string& version);
-
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
 #endif // NEURAL_NETWORK_RUNTIME_DEVICE_DISCOVER_H

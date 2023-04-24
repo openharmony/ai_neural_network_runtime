@@ -20,7 +20,7 @@
 #include "securec.h"
 
 #include "hdi_prepared_model_v2_0.h"
-#include "hdi_returncode_transform.h"
+#include "hdi_returncode_utils.h"
 #include "memory_manager.h"
 #include "transform.h"
 #include "common/log.h"
@@ -89,36 +89,32 @@ V2_0::Priority TransPriority(const OH_NN_Priority& priority)
 }
 
 HDIDeviceV2_0::HDIDeviceV2_0(OHOS::sptr<V2_0::INnrtDevice> device) : m_iDevice(device)
-{
-    device->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
-}
+{}
 
 OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceName(std::string& name)
 {
-    V2_0::NNRT_ReturnCode returnCode;
-    auto ret = m_iDevice->GetDeviceName(name, returnCode);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Get HDI device name failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            ret, ConverterRetToString(returnCode).c_str());
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    auto ret = m_iDevice->GetDeviceName(name);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI device name failed");
     }
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::GetVendorName(std::string& name)
 {
-    V2_0::NNRT_ReturnCode returnCode;
-    auto ret = m_iDevice->GetVendorName(name, returnCode);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Get HDI device vendor name failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            ret, ConverterRetToString(returnCode).c_str());
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    auto ret = m_iDevice->GetVendorName(name);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI vendor name failed");
     }
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::GetVersion(std::string& version)
 {
+    auto ret = m_iDevice->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI version failed");
+    }
     version = 'v' + std::to_string(m_hdiVersion.first) + '_' + std::to_string(m_hdiVersion.second);
     return OH_NN_SUCCESS;
 }
@@ -126,12 +122,9 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetVersion(std::string& version)
 OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceType(OH_NN_DeviceType& deviceType)
 {
     V2_0::DeviceType iDeviceType;
-    V2_0::NNRT_ReturnCode returnCode;
-    auto ret = m_iDevice->GetDeviceType(iDeviceType, returnCode);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Get HDI device type failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            ret, ConverterRetToString(returnCode).c_str());
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    auto ret = m_iDevice->GetDeviceType(iDeviceType);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI device type failed");
     }
 
     deviceType = TransHDIDeviceV2_0Type(iDeviceType);
@@ -141,12 +134,9 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceType(OH_NN_DeviceType& deviceType)
 OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceStatus(DeviceStatus& status)
 {
     V2_0::DeviceStatus iDeviceStatus;
-    V2_0::NNRT_ReturnCode returnCode;
-    auto ret = m_iDevice->GetDeviceStatus(iDeviceStatus, returnCode);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Get HDI device status failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            ret, ConverterRetToString(returnCode).c_str());
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    auto ret = m_iDevice->GetDeviceStatus(iDeviceStatus);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI device status failed");
     }
     status = TransHDIDeviceV2_0Status(iDeviceStatus);
     return OH_NN_SUCCESS;
@@ -162,14 +152,11 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetSupportedOperation(std::shared_ptr<const mind
 
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
     size_t tensorSize = mindspore::lite::MindIR_LiteGraph_GetConstTensorSize(model.get());
-    int32_t hdiRet {0};
+    int32_t ret {0};
     if (tensorSize > 0) {
-        V2_0::NNRT_ReturnCode returnCode;
-        hdiRet = m_iDevice->AllocateBuffer(tensorSize, tensorBuffer, returnCode);
-        if (hdiRet != HDF_SUCCESS || tensorBuffer.fd == INVALID_FD) {
-            LOGE("Allocate tensor buffer error when get supported operation. ErrorCode: %{public}d, \
-                innerHDIRet=%{public}s", hdiRet, ConverterRetToString(returnCode).c_str());
-            return OH_NN_FAILED;
+        ret = m_iDevice->AllocateBuffer(tensorSize, tensorBuffer);
+        if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS || tensorBuffer.fd == INVALID_FD) {
+            return CheckReturnCode(ret, OH_NN_FAILED, "Allocate tensor buffer error when get supported operation");
         }
     }
 
@@ -180,79 +167,61 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetSupportedOperation(std::shared_ptr<const mind
         return OH_NN_FAILED;
     }
 
-    V2_0::NNRT_ReturnCode returnCode;
-    hdiRet = m_iDevice->GetSupportedOperation(*iModel, ops, returnCode);
+    ret = m_iDevice->GetSupportedOperation(*iModel, ops);
 
     mindspore::lite::MindIR_Model_Destroy(&iModel);
-    auto ret = ReleaseSharedBuffer(tensorBuffer);
-    if (ret != OH_NN_SUCCESS) {
+    auto innerRet = ReleaseSharedBuffer(tensorBuffer);
+    if (innerRet != OH_NN_SUCCESS) {
         LOGE("Release tensorBuffer failed.");
         return OH_NN_FAILED;
     }
-    if (hdiRet != HDF_SUCCESS) {
-        LOGE("Get supported operation failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            hdiRet, ConverterRetToString(returnCode).c_str());
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get supported operation failed");
     }
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::IsFloat16PrecisionSupported(bool& isSupported)
 {
-    V2_0::NNRT_ReturnCode returnCode;
-    auto ret = m_iDevice->IsFloat16PrecisionSupported(isSupported, returnCode);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Query fp16 precision supported failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            ret, ConverterRetToString(returnCode).c_str());
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    auto ret = m_iDevice->IsFloat16PrecisionSupported(isSupported);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query fp16 precision supported failed");
     }
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::IsPerformanceModeSupported(bool& isSupported)
 {
-    V2_0::NNRT_ReturnCode returnCode;
-    auto ret = m_iDevice->IsPerformanceModeSupported(isSupported, returnCode);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Query performance mode supported failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            ret, ConverterRetToString(returnCode).c_str());
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    auto ret = m_iDevice->IsPerformanceModeSupported(isSupported);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query performance mode supported failed");
     }
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::IsPrioritySupported(bool& isSupported)
 {
-    V2_0::NNRT_ReturnCode returnCode;
-    auto ret = m_iDevice->IsPrioritySupported(isSupported, returnCode);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Query priority supported failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            ret, ConverterRetToString(returnCode).c_str());
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    auto ret = m_iDevice->IsPrioritySupported(isSupported);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query priority supported failed");
     }
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::IsDynamicInputSupported(bool& isSupported)
 {
-    V2_0::NNRT_ReturnCode returnCode;
-    auto ret = m_iDevice->IsDynamicInputSupported(isSupported, returnCode);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Query dynamic input supported failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            ret, ConverterRetToString(returnCode).c_str());
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    auto ret = m_iDevice->IsDynamicInputSupported(isSupported);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query dynamic input supported failed");
     }
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::IsModelCacheSupported(bool& isSupported)
 {
-    V2_0::NNRT_ReturnCode returnCode;
-    auto ret = m_iDevice->IsModelCacheSupported(isSupported, returnCode);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Query cache model supported failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            ret, ConverterRetToString(returnCode).c_str());
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    auto ret = m_iDevice->IsModelCacheSupported(isSupported);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query cache model supported failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -268,14 +237,11 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::li
 
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
     size_t tensorSize = mindspore::lite::MindIR_LiteGraph_GetConstTensorSize(model.get());
-    int32_t hdiRet {0};
+    int32_t ret {0};
     if (tensorSize > 0) {
-        V2_0::NNRT_ReturnCode returnCode;
-        hdiRet = m_iDevice->AllocateBuffer(tensorSize, tensorBuffer, returnCode);
-        if (hdiRet != HDF_SUCCESS || tensorBuffer.fd == INVALID_FD) {
-            LOGE("Allocate tensor buffer error when prepare model. ErrorCode: %{public}d, innerHDIRet=%{public}s",
-                hdiRet, ConverterRetToString(returnCode).c_str());
-            return OH_NN_FAILED;
+        ret = m_iDevice->AllocateBuffer(tensorSize, tensorBuffer);
+        if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS || tensorBuffer.fd == INVALID_FD) {
+            return CheckReturnCode(ret, OH_NN_FAILED, "Allocate tensor buffer error when prepare model");
         }
     }
 
@@ -292,19 +258,16 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::li
     iModelConfig.priority = TransPriority(config.priority);
     OHOS::sptr<V2_0::IPreparedModel> iPreparedModel;
 
-    V2_0::NNRT_ReturnCode returnCode;
-    auto preparedRet = m_iDevice->PrepareModel(*iModel, iModelConfig, iPreparedModel, returnCode);
+    ret = m_iDevice->PrepareModel(*iModel, iModelConfig, iPreparedModel);
 
     mindspore::lite::MindIR_Model_Destroy(&iModel);
-    auto ret = ReleaseSharedBuffer(tensorBuffer);
-    if (ret != OH_NN_SUCCESS) {
+    auto innerRet = ReleaseSharedBuffer(tensorBuffer);
+    if (innerRet != OH_NN_SUCCESS) {
         LOGE("Release tensorBuffer failed.");
         return OH_NN_FAILED;
     }
-    if (preparedRet != HDF_SUCCESS || iPreparedModel == nullptr) {
-        LOGE("Prepare model failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            preparedRet, ConverterRetToString(returnCode).c_str());
-        return OH_NN_FAILED;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS || iPreparedModel == nullptr) {
+        return CheckReturnCode(ret, OH_NN_FAILED, "Prepare model failed");
     }
 
     preparedModel = CreateSharedPtr<HDIPreparedModelV2_0>(iPreparedModel);
@@ -340,12 +303,9 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<Mod
     iModelConfig.priority = TransPriority(config.priority);
 
     OHOS::sptr<V2_0::IPreparedModel> iPreparedModel;
-    V2_0::NNRT_ReturnCode returnCode;
-    auto hdiRet = m_iDevice->PrepareModelFromModelCache(iBuffers, iModelConfig, iPreparedModel, returnCode);
-    if (hdiRet != HDF_SUCCESS) {
-        LOGE("Prepare model from cache failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            hdiRet, ConverterRetToString(returnCode).c_str());
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    auto nnrtRet = m_iDevice->PrepareModelFromModelCache(iBuffers, iModelConfig, iPreparedModel);
+    if (nnrtRet != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(nnrtRet, OH_NN_FAILED, "Prepare model from cache failed");
     }
 
     preparedModel = CreateSharedPtr<HDIPreparedModelV2_0>(iPreparedModel);
@@ -364,12 +324,9 @@ void* HDIDeviceV2_0::AllocateBuffer(size_t length)
     }
 
     V2_0::SharedBuffer buffer;
-    V2_0::NNRT_ReturnCode returnCode;
-    auto ret = m_iDevice->AllocateBuffer(length, buffer, returnCode);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Allocate buffer error. ErrorCode: %{public}d, innerHDIRet=%{public}s",
-            ret, ConverterRetToString(returnCode).c_str());
-        return nullptr;
+    auto ret = m_iDevice->AllocateBuffer(length, buffer);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, nullptr, "Allocate buffer error");
     }
 
     auto memManager = MemoryManager::GetInstance();
@@ -396,12 +353,9 @@ OH_NN_ReturnCode HDIDeviceV2_0::ReleaseBuffer(const void* buffer)
     }
 
     V2_0::SharedBuffer hdiBuffer {memory.fd, memory.length, 0, memory.length};
-    V2_0::NNRT_ReturnCode returnCode;
-    auto deviceResult = m_iDevice->ReleaseBuffer(hdiBuffer, returnCode);
-    if (deviceResult != HDF_SUCCESS) {
-        LOGE("Device release buffer error. ErrorCode: %{public}d, innerHDIRet=%{public}s",
-            deviceResult, ConverterRetToString(returnCode).c_str());
-        return OH_NN_FAILED;
+    auto deviceResult = m_iDevice->ReleaseBuffer(hdiBuffer);
+    if (deviceResult != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(deviceResult, OH_NN_FAILED, "Device release buffer error");
     }
 
     ret = memManager->UnMapMemory(buffer);
@@ -420,12 +374,9 @@ OH_NN_ReturnCode HDIDeviceV2_0::ReleaseSharedBuffer(const V2_0::SharedBuffer& bu
         return OH_NN_SUCCESS;
     }
 
-    V2_0::NNRT_ReturnCode returnCode;
-    auto ret = m_iDevice->ReleaseBuffer(buffer, returnCode);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Device release buffer error. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-            ret, ConverterRetToString(returnCode).c_str());
-        return OH_NN_FAILED;
+    auto ret = m_iDevice->ReleaseBuffer(buffer);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_FAILED, "Device release buffer error");
     }
     return OH_NN_SUCCESS;
 }
@@ -507,7 +458,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::CopyOfflineModelToDevice(const std::vector<std::
     void* deviceBuffer {nullptr};
     size_t deviceBufferSize {0};
 
-    for (size_t i = 0; i < offlineModels.size(); i++) {
+    size_t offlineModelsSize = offlineModels.size();
+    for (size_t i = 0; i < offlineModelsSize; i++) {
         offlineModel = offlineModels[i].data();
         offlineModelSize = offlineModels[i].size();
         deviceBuffer = deviceBuffers[i].buffer;
@@ -548,8 +500,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::vector<ModelBuffer>& de
         iBuffers.emplace_back(V2_0::SharedBuffer {memory.fd, memory.length, 0, memory.length});
     }
 
-    V2_0::NNRT_ReturnCode HDIReturnCode {V2_0::NNRT_ReturnCode::NNRT_SUCCESS};
-    auto preparedRet = m_iDevice->PrepareOfflineModel(iBuffers, iModelConfig, iPreparedModel, HDIReturnCode);
+    auto preparedRet = m_iDevice->PrepareOfflineModel(iBuffers, iModelConfig, iPreparedModel);
 
     // Release allocated model buffer after prepare model.
     OH_NN_ReturnCode status {OH_NN_SUCCESS};
@@ -562,10 +513,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::vector<ModelBuffer>& de
     }
     deviceBuffers.clear();
 
-    if (preparedRet != HDF_SUCCESS || iPreparedModel == nullptr) {
-        LOGE("Prepare model failed. ErrorCode=%{public}d, innerHDIRet=%{public}s",
-             preparedRet, ConverterRetToString(HDIReturnCode).c_str());
-        return OH_NN_FAILED;
+    if (preparedRet != V2_0::NNRT_ReturnCode::NNRT_SUCCESS || iPreparedModel == nullptr) {
+        return CheckReturnCode(preparedRet, OH_NN_FAILED, "Prepare offline model failed");
     }
 
     preparedModel = CreateSharedPtr<HDIPreparedModelV2_0>(iPreparedModel);
