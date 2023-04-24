@@ -86,7 +86,40 @@ V2_0::Priority TransPriority(const OH_NN_Priority& priority)
             return V2_0::Priority::PRIORITY_NONE;
     }
 }
+
+OH_NN_ReturnCode IsOfflineModel(std::shared_ptr<const mindspore::lite::LiteGraph> liteGraph, bool& isOfflineModel)
+{
+    isOfflineModel = false; // Initialize the returned value
+    if (liteGraph == nullptr) {
+        LOGE("LiteGraph is empty when identifying the offline model.");
+        return OH_NN_NULL_PTR;
+    }
+
+    if (liteGraph->all_nodes_.size() == 0) {
+        LOGE("Find empty node in the model.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    // If the model consists of more than 1 node, it will not be considered as offline model.
+    if (liteGraph->all_nodes_.size() > 1) {
+        isOfflineModel = false;
+        return OH_NN_SUCCESS;
+    }
+
+    const mindspore::lite::LiteGraph::Node* pNode = liteGraph->all_nodes_[0];
+    if (pNode == nullptr) {
+        LOGE("Find invalid node in the model.");
+        return OH_NN_NULL_PTR;
+    }
+
+    const mindspore::lite::NodeType& nodeType = mindspore::lite::MindIR_Primitive_GetType(pNode->primitive_);
+    if (nodeType == mindspore::lite::NodeType::NODE_TYPE_CUSTOM) {
+        isOfflineModel = true;
+    }
+
+    return OH_NN_SUCCESS;
 }
+}  // unamed namespace
 
 HDIDeviceV2_0::HDIDeviceV2_0(OHOS::sptr<V2_0::INnrtDevice> device) : m_iDevice(device)
 {}
@@ -143,11 +176,25 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceStatus(DeviceStatus& status)
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::GetSupportedOperation(std::shared_ptr<const mindspore::lite::LiteGraph> model,
-                                                  std::vector<bool>& ops)
+                                                      std::vector<bool>& ops)
 {
     if (model == nullptr) {
         LOGE("Model is nullptr, cannot query supported operation.");
         return OH_NN_NULL_PTR;
+    }
+
+    bool isOfflineModel {false};
+    OH_NN_ReturnCode innerRet = IsOfflineModel(model, isOfflineModel);
+    if (innerRet != OH_NN_SUCCESS) {
+        LOGE("Check offline model failed.");
+        return innerRet;
+    }
+
+    // Permanently return a [true] array for offline model.
+    if (isOfflineModel) {
+        ops.clear();
+        ops.emplace_back(true);
+        return OH_NN_SUCCESS;
     }
 
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
@@ -170,7 +217,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetSupportedOperation(std::shared_ptr<const mind
     ret = m_iDevice->GetSupportedOperation(*iModel, ops);
 
     mindspore::lite::MindIR_Model_Destroy(&iModel);
-    auto innerRet = ReleaseSharedBuffer(tensorBuffer);
+    innerRet = ReleaseSharedBuffer(tensorBuffer);
     if (innerRet != OH_NN_SUCCESS) {
         LOGE("Release tensorBuffer failed.");
         return OH_NN_FAILED;
@@ -387,25 +434,21 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetOfflineModelFromLiteGraph(std::shared_ptr<con
     // graph has been checked in PrepareOfflineModel, no need to check twice.
     offlineModels.clear();
 
-    const size_t inputNum = graph->input_indices_.size();
+    const size_t inputNum = graph->all_nodes_[0]->input_indices_.size();
     if (inputNum < (size_t)2) {
         LOGE("LiteGraph with offline model should have at least two input tensors, only get %zu.", inputNum);
         return OH_NN_INVALID_PARAMETER;
     }
 
-    // The offline model is integrated into input tensors with index larger than 0.
-    mindspore::lite::TensorPtr pTensor;
-    std::vector<uint8_t> offlineModel;
-    for (size_t i = 1; i < inputNum; i++) {
-        pTensor = graph->all_tensors_[i];
-        offlineModel = mindspore::lite::MindIR_Tensor_GetData(pTensor);
-        if (offlineModel.size() == (size_t)0) {
-            LOGE("Offline model has size of 0, please check the ms model.");
-            return OH_NN_INVALID_PARAMETER;
-        }
-
-        offlineModels.emplace_back(std::move(offlineModel));
+    // The offline model is integrated into the last input tensor.
+    uint32_t index = graph->all_nodes_[0]->input_indices_[inputNum - 1];
+    mindspore::lite::TensorPtr pTensor = graph->all_tensors_[index];
+    std::vector<uint8_t> offlineModel = mindspore::lite::MindIR_Tensor_GetData(pTensor);
+    if (offlineModel.size() == (size_t) 0) {
+        LOGE("Offline model has size of 0, please check the ms model.");
+        return OH_NN_INVALID_PARAMETER;
     }
+    offlineModels.emplace_back(std::move(offlineModel));
 
     return OH_NN_SUCCESS;
 }
@@ -478,12 +521,14 @@ OH_NN_ReturnCode HDIDeviceV2_0::CopyOfflineModelToDevice(const std::vector<std::
 
 OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::vector<ModelBuffer>& deviceBuffers,
                                                     const ModelConfig& config,
+                                                    const std::map<std::string, std::vector<int8_t>> extensions,
                                                     std::shared_ptr<PreparedModel>& preparedModel)
 {
     V2_0::ModelConfig iModelConfig;
     iModelConfig.enableFloat16 = config.enableFloat16;
     iModelConfig.mode = TransPerformanceMode(config.mode);
     iModelConfig.priority = TransPriority(config.priority);
+    iModelConfig.extensions = extensions;
     OHOS::sptr<V2_0::IPreparedModel> iPreparedModel;
 
     std::vector<V2_0::SharedBuffer> iBuffers;
@@ -566,7 +611,21 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::shared_ptr<const mindsp
         return status;
     }
 
-    status = PrepareOfflineModel(deviceBuffers, config, preparedModel);
+    // Retrieve offline model configs from Custom primitive and insert to extensions.
+    std::string key;
+    std::vector<uint8_t> valueFromCustomPrimitive;
+    std::vector<int8_t> value;
+    std::map<std::string, std::vector<int8_t>> extensions;
+    std::vector<const mindspore::schema::Attribute*> attributes =\
+        mindspore::lite::MindIR_Custom_GetAttr(model->all_nodes_[0]->primitive_);
+    for (const auto& attribute : attributes) {
+        key = mindspore::lite::MindIR_Attribute_GetName(*attribute);
+        valueFromCustomPrimitive = mindspore::lite::MindIR_Attribute_GetData(*attribute);
+        value.assign(valueFromCustomPrimitive.begin(), valueFromCustomPrimitive.end());
+        extensions.insert(std::pair<std::string, std::vector<int8_t>>(key, value));
+    }
+
+    status = PrepareOfflineModel(deviceBuffers, config, extensions, preparedModel);
     if (status != OH_NN_SUCCESS) {
         LOGE("PrepareOfflineModel failed.");
         return status;
