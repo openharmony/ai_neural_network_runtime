@@ -67,6 +67,7 @@ private:
                                               std::vector<ModelBuffer>& deviceBuffers);
     OH_NN_ReturnCode PrepareOfflineModel(std::vector<ModelBuffer>& deviceBuffers,
                                          const ModelConfig& config,
+                                         const std::map<std::string, std::vector<int8_t>> extensions,
                                          std::shared_ptr<PreparedModel>& preparedModel);
 
 private:
