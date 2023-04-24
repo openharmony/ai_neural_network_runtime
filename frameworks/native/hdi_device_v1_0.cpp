@@ -87,9 +87,7 @@ V1_0::Priority TransPriority(const OH_NN_Priority& priority)
 }
 
 HDIDeviceV1_0::HDIDeviceV1_0(OHOS::sptr<V1_0::INnrtDevice> device) : m_iDevice(device)
-{
-    device->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
-}
+{}
 
 OH_NN_ReturnCode HDIDeviceV1_0::GetDeviceName(std::string& name)
 {
@@ -113,6 +111,11 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetVendorName(std::string& name)
 
 OH_NN_ReturnCode HDIDeviceV1_0::GetVersion(std::string& version)
 {
+    auto ret = m_iDevice->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
+    if (ret != HDF_SUCCESS) {
+        LOGE("Get HDI version failed. ErrorCode=%d", ret);
+        return OH_NN_UNAVALIDABLE_DEVICE;
+    }
     version = 'v' + std::to_string(m_hdiVersion.first) + '_' + std::to_string(m_hdiVersion.second);
     return OH_NN_SUCCESS;
 }
@@ -143,7 +146,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetDeviceStatus(DeviceStatus& status)
 }
 
 OH_NN_ReturnCode HDIDeviceV1_0::GetSupportedOperation(std::shared_ptr<const mindspore::lite::LiteGraph> model,
-                                                  std::vector<bool>& ops)
+    std::vector<bool>& ops)
 {
     if (model == nullptr) {
         LOGE("Model is nullptr, cannot query supported operation.");
@@ -234,8 +237,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::IsModelCacheSupported(bool& isSupported)
 }
 
 OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
-                                         const ModelConfig& config,
-                                         std::shared_ptr<PreparedModel>& preparedModel)
+    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     if (model == nullptr) {
         LOGE("Model is nullptr, cannot prepare model.");
@@ -289,8 +291,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(std::shared_ptr<const mindspore::li
 }
 
 OH_NN_ReturnCode HDIDeviceV1_0::PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
-                                                       const ModelConfig& config,
-                                                       std::shared_ptr<PreparedModel>& preparedModel)
+    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     std::vector<V1_0::SharedBuffer> iBuffers;
     auto memManager = MemoryManager::GetInstance();

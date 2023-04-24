@@ -114,7 +114,8 @@ OH_NN_ReturnCode HDIPreparedModelV1_0::ExportModelCache(std::vector<ModelBuffer>
     }
 
     auto memManager = MemoryManager::GetInstance();
-    for (size_t i = 0; i < iBuffers.size(); i++) {
+    size_t iBuffersSize = iBuffers.size();
+    for (size_t i = 0; i < iBuffersSize; i++) {
         auto addr = memManager->MapMemory(iBuffers[i].fd, iBuffers[i].bufferSize);
         if (addr == nullptr) {
             LOGE("Export the %zuth model cache failed, cannot not map fd to address.", i + 1);

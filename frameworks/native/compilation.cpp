@@ -371,6 +371,7 @@ OH_NN_ReturnCode Compilation::GetCacheFileLength(std::ifstream& ifs, int& fsize)
 
 OH_NN_ReturnCode Compilation::ReadCacheModelFile(const std::string& file, ModelBuffer& modelBuffer) const
 {
+    // file is validated outside.
     std::ifstream ifs(file.c_str(), std::ios::in | std::ios::binary);
     if (!ifs) {
         LOGE("[Compilation] Fail to open cache file.");
@@ -410,15 +411,16 @@ OH_NN_ReturnCode Compilation::ReadCacheModelFile(const std::string& file, ModelB
 
     ifs.close();
     modelBuffer.buffer = ptr;
-    modelBuffer.length = fsize;
+    modelBuffer.length = static_cast<size_t>(fsize); // fsize should be non-negative, safe to cast.
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode Compilation::CheckCacheInfo(ModelCacheInfo& modelCacheInfo, const std::string& cacheInfoPath) const
 {
+    // cacheInfoPath is validated outside.
     std::ifstream infoCacheFile(cacheInfoPath.c_str(), std::ios::in | std::ios::binary);
     if (!infoCacheFile) {
-        LOGE("[Compilation] Openning cache info file failed.");
+        LOGE("[Compilation] Opening cache info file failed.");
         return OH_NN_INVALID_FILE;
     }
 
@@ -577,7 +579,8 @@ OH_NN_ReturnCode Compilation::LoadCacheBuild(std::shared_ptr<PreparedModel>& pre
     OH_NN_ReturnCode ret = CheckCacheModel(cacheInfo, modelBuffers);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[Compilation] Checking cache model failed.");
-        for (size_t i = 0; i < modelBuffers.size(); ++i) {
+        size_t modelBuffersSize = modelBuffers.size();
+        for (size_t i = 0; i < modelBuffersSize; ++i) {
             m_device->ReleaseBuffer(modelBuffers[i].buffer);
             modelBuffers[i].buffer = nullptr;
             modelBuffers[i].length = 0;
@@ -723,7 +726,8 @@ bool Compilation::IsBuild() const
 
 bool Compilation::IsDynamicShape() const
 {
-    for (size_t i = 0; i < m_inputTensors.size(); ++i) {
+    size_t inputTensorsSize = m_inputTensors.size();
+    for (size_t i = 0; i < inputTensorsSize; ++i) {
         if (m_inputTensors[i]->IsDynamicShape()) {
             return true;
         }

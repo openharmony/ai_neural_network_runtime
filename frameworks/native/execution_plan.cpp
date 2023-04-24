@@ -62,19 +62,6 @@ OH_NN_ReturnCode ExecutionPlan::Run(const std::vector<std::shared_ptr<NNTensor>>
         return ret;
     }
 
-    // Check if the output buffer is sufficient
-    bool bufferFailed {false};
-    for (size_t i = 0; i < outputSize; ++i) {
-        if (!isSufficientDataBuffer[i]) {
-            // Print all output indices with insufficient buffer, don't return until traversing all outputs.
-            LOGE("Run failed, Output %zu does not have enough buffer to store the data.", i);
-            bufferFailed = true;
-        }
-    }
-    if (bufferFailed) {
-        return OH_NN_FAILED;
-    }
-
     // Set the output NNTensor's dimensions from output IOTensor if it is dynamic.
     // NNTensor::SetDimensions will check if the tensor buffer is enough for the new dimensions.
     for (size_t i = 0; i < outputSize; ++i) {

@@ -19,13 +19,13 @@
 
 #include <vector>
 
-#include <v2_0/nnrt_types.h>
 #include <v2_0/innrt_device.h>
 #include <v2_0/iprepared_model.h>
+#include <v2_0/nnrt_types.h>
 
-#include "refbase.h"
-#include "prepared_model.h"
 #include "cpp_type.h"
+#include "prepared_model.h"
+#include "refbase.h"
 
 namespace V2_0 = OHOS::HDI::Nnrt::V2_0;
 
