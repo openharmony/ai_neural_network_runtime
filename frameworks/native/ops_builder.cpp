@@ -70,15 +70,16 @@ OH_NN_ReturnCode OpsBuilder::CheckIOIndex(const std::vector<uint32_t>& inputsInd
         return OH_NN_INVALID_PARAMETER;
     }
 
+    size_t allTensorsSize = allTensors.size();
     for (auto index : inputsIndex) {
-        if (index >= allTensors.size()) {
+        if (index >= allTensorsSize) {
             LOGE("The index of inputs is out of range.");
             return OH_NN_INVALID_PARAMETER;
         }
     }
 
     for (auto index : outputsIndex) {
-        if (index >= allTensors.size()) {
+        if (index >= allTensorsSize) {
             LOGE("The index of outputs is out of range.");
             return OH_NN_INVALID_PARAMETER;
         }

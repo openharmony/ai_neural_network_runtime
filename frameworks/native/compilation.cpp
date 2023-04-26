@@ -579,7 +579,8 @@ OH_NN_ReturnCode Compilation::LoadCacheBuild(std::shared_ptr<PreparedModel>& pre
     OH_NN_ReturnCode ret = CheckCacheModel(cacheInfo, modelBuffers);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[Compilation] Checking cache model failed.");
-        for (size_t i = 0; i < modelBuffers.size(); ++i) {
+        size_t modelBuffersSize = modelBuffers.size();
+        for (size_t i = 0; i < modelBuffersSize; ++i) {
             m_device->ReleaseBuffer(modelBuffers[i].buffer);
             modelBuffers[i].buffer = nullptr;
             modelBuffers[i].length = 0;
@@ -705,7 +706,8 @@ bool Compilation::IsBuild() const
 
 bool Compilation::IsDynamicShape() const
 {
-    for (size_t i = 0; i < m_inputTensors.size(); ++i) {
+    size_t inputTensorsSize = m_inputTensors.size();
+    for (size_t i = 0; i < inputTensorsSize; ++i) {
         if (m_inputTensors[i]->IsDynamicShape()) {
             return true;
         }
