@@ -49,6 +49,7 @@ private:
                                                      const void* buffer, size_t dataLength, size_t curBufferLength);
     void SetInputTensorWithNewBuffer(uint32_t index, std::shared_ptr<NNTensor> inputTensor,
                                      const void* inputBuffer, size_t length, bool isInnerMem);
+    OH_NN_ReturnCode CheckInputDimRanges(uint32_t index, const OH_NN_Tensor& nnTensor) const;
 
 private:
     struct ExeTensor {

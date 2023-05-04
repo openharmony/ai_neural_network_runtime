@@ -49,8 +49,11 @@ private:
     DeviceManager(const DeviceManager&) = delete;
     DeviceManager& operator=(const DeviceManager&) = delete;
 
+    void AddDevice(const std::string& deviceName, const std::string& vendorName,
+        const std::string& version, std::shared_ptr<Device> device);
     void DiscoverHDIDevices();
-    std::string GenUniqueName(const std::string& deviceName, const std::string& vendorName) const;
+    std::string GenUniqueName(
+        const std::string& deviceName, const std::string& vendorName, const std::string& version) const;
     bool IsValidDevice(std::shared_ptr<Device> device) const;
 
 private:

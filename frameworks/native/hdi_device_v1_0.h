@@ -13,22 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef NEURAL_NETWORK_RUNTIME_HDI_DEVICE_H
-#define NEURAL_NETWORK_RUNTIME_HDI_DEVICE_H
+#ifndef NEURAL_NETWORK_RUNTIME_HDI_DEVICE_V1_0_H
+#define NEURAL_NETWORK_RUNTIME_HDI_DEVICE_V1_0_H
 
+#include <v1_0/nnrt_types.h>
+#include <v1_0/innrt_device.h>
+#include <v1_0/iprepared_model.h>
 #include "refbase.h"
-#include "hdi_interfaces.h"
 
 #include "device.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-class HDIDevice : public Device {
+namespace V1_0 = OHOS::HDI::Nnrt::V1_0;
+class HDIDeviceV1_0 : public Device {
 public:
-    explicit HDIDevice(OHOS::sptr<V1_0::INnrtDevice> device);
+    explicit HDIDeviceV1_0(OHOS::sptr<V1_0::INnrtDevice> device);
 
     OH_NN_ReturnCode GetDeviceName(std::string& name) override;
     OH_NN_ReturnCode GetVendorName(std::string& name) override;
+    OH_NN_ReturnCode GetVersion(std::string& version) override;
     OH_NN_ReturnCode GetDeviceType(OH_NN_DeviceType& deviceType) override;
     OH_NN_ReturnCode GetDeviceStatus(DeviceStatus& status) override;
     OH_NN_ReturnCode GetSupportedOperation(std::shared_ptr<const mindspore::lite::LiteGraph> model,
@@ -60,4 +64,4 @@ private:
 };
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
-#endif // NEURAL_NETWORK_RUNTIME_HDI_DEVICE_H
+#endif // NEURAL_NETWORK_RUNTIME_HDI_DEVICE_V1_0_H
