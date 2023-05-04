@@ -14,21 +14,25 @@
  */
 
 
-#ifndef NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_H
-#define NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_H
+#ifndef NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_V1_0_H
+#define NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_V1_0_H
 
 #include <vector>
 
+#include <v1_0/nnrt_types.h>
+#include <v1_0/innrt_device.h>
+#include <v1_0/iprepared_model.h>
 #include "refbase.h"
-#include "hdi_interfaces.h"
 #include "prepared_model.h"
 #include "cpp_type.h"
 
+namespace V1_0 = OHOS::HDI::Nnrt::V1_0;
+
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-class HDIPreparedModel : public PreparedModel {
+class HDIPreparedModelV1_0 : public PreparedModel {
 public:
-    explicit HDIPreparedModel(OHOS::sptr<V1_0::IPreparedModel> hdiPreparedModel);
+    explicit HDIPreparedModelV1_0(OHOS::sptr<V1_0::IPreparedModel> hdiPreparedModel);
 
     OH_NN_ReturnCode ExportModelCache(std::vector<ModelBuffer>& modelCache) override;
 
@@ -44,4 +48,4 @@ private:
 };
 } // namespace NeuralNetworkRuntime
 } // OHOS
-#endif // NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_H
+#endif // NEURAL_NETWORK_RUNTIME_HDI_PREPARED_MODEL_V1_0_H

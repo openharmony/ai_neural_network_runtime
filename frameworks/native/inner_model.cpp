@@ -24,7 +24,6 @@
 #include "common/utils.h"
 #include "common/scoped_trace.h"
 #include "device_manager.h"
-#include "hdi_device.h"
 #include "validation.h"
 #include "ops_builder.h"
 #include "ops_registry.h"
@@ -289,8 +288,9 @@ OH_NN_ReturnCode InnerModel::ValidateTensorArray(const OH_NN_UInt32Array& indice
         return ret;
     }
 
+    size_t allTensorsSize = m_allTensors.size();
     for (uint32_t i = 0; i < indices.size; i++) {
-        if (indices.data[i] >= m_allTensors.size()) {
+        if (indices.data[i] >= allTensorsSize) {
             LOGE("ValidateTensors failed, index %u is out of the number of added tensors.", indices.data[i]);
             return OH_NN_INVALID_PARAMETER;
         }

@@ -14,9 +14,8 @@
  */
 
 #include "device_manager.h"
+#include "device_discover.h"
 
-#include "hdi_interfaces.h"
-#include "hdi_device.h"
 #include "common/log.h"
 #include "common/utils.h"
 
@@ -70,13 +69,21 @@ const std::string& DeviceManager::GetDeviceName(size_t deviceId)
         return m_tmpDeviceName;
     }
 
-    m_tmpDeviceName = GenUniqueName(deviceName, vendorName);
+    std::string version;
+    ret = iter->second->GetVersion(version);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("Get version failed.");
+        return m_tmpDeviceName;
+    }
+
+    m_tmpDeviceName = GenUniqueName(deviceName, vendorName, version);
     return m_tmpDeviceName;
 }
 
-std::string DeviceManager::GenUniqueName(const std::string& deviceName, const std::string& vendorName) const
+std::string DeviceManager::GenUniqueName(
+    const std::string& deviceName, const std::string& vendorName, const std::string& version) const
 {
-    return deviceName + "_" + vendorName;
+    return deviceName + "_" + vendorName + "_" + version;
 }
 
 OH_NN_ReturnCode DeviceManager::RegisterDevice(std::function<std::shared_ptr<Device>()> creator)
@@ -106,8 +113,15 @@ OH_NN_ReturnCode DeviceManager::RegisterDevice(std::function<std::shared_ptr<Dev
         return ret;
     }
 
+    std::string version;
+    ret = regDevice->GetVersion(version);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("Get version failed.");
+        return ret;
+    }
+
     const std::lock_guard<std::mutex> lock(m_mtx);
-    std::string uniqueName = GenUniqueName(deviceName, vendorName);
+    std::string uniqueName = GenUniqueName(deviceName, vendorName, version);
     auto setResult = m_uniqueName.emplace(uniqueName);
     if (!setResult.second) {
         LOGE("Device already exists, cannot register again. deviceName=%s, vendorName=%s",
@@ -119,29 +133,10 @@ OH_NN_ReturnCode DeviceManager::RegisterDevice(std::function<std::shared_ptr<Dev
     return OH_NN_SUCCESS;
 }
 
-void DeviceManager::DiscoverHDIDevices()
+void DeviceManager::AddDevice(const std::string& deviceName, const std::string& vendorName,
+    const std::string& version, std::shared_ptr<Device> device)
 {
-    // only one device from HDI now.
-    OHOS::sptr<V1_0::INnrtDevice> iDevice = V1_0::INnrtDevice::Get();
-    if (iDevice == nullptr) {
-        LOGW("Get HDI device failed.");
-        return;
-    }
-
-    std::string deviceName;
-    std::string vendorName;
-    auto hdiRet = iDevice->GetDeviceName(deviceName);
-    if (hdiRet != HDF_SUCCESS) {
-        LOGW("Get device name failed. ErrorCode=%d", hdiRet);
-        return;
-    }
-    hdiRet = iDevice->GetVendorName(vendorName);
-    if (hdiRet != HDF_SUCCESS) {
-        LOGW("Get vendor name failed. ErrorCode=%d", hdiRet);
-        return;
-    }
-
-    std::string uniqueName = GenUniqueName(deviceName, vendorName);
+    std::string uniqueName = GenUniqueName(deviceName, vendorName, version);
     const std::lock_guard<std::mutex> lock(m_mtx);
     auto setResult = m_uniqueName.emplace(uniqueName);
     if (!setResult.second) {
@@ -150,12 +145,23 @@ void DeviceManager::DiscoverHDIDevices()
         return;
     }
 
-    std::shared_ptr<Device> device = CreateSharedPtr<HDIDevice>(iDevice);
-    if (device == nullptr) {
-        LOGW("Failed to register device, because fail to create device instance.");
-        return;
-    }
     m_devices.emplace(std::hash<std::string>{}(uniqueName), device);
+}
+
+void DeviceManager::DiscoverHDIDevices()
+{
+    std::string deviceName;
+    std::string vendorName;
+    std::string version;
+    std::shared_ptr<Device> deviceV1_0 = DiscoverHDIDevicesV1_0(deviceName, vendorName, version);
+    if (deviceV1_0 != nullptr) {
+        AddDevice(deviceName, vendorName, version, deviceV1_0);
+    }
+
+    std::shared_ptr<Device> deviceV2_0 = DiscoverHDIDevicesV2_0(deviceName, vendorName, version);
+    if (deviceV2_0 != nullptr) {
+        AddDevice(deviceName, vendorName, version, deviceV2_0);
+    }
 }
 
 bool DeviceManager::IsValidDevice(std::shared_ptr<Device> device) const

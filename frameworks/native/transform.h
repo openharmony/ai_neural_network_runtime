@@ -16,7 +16,6 @@
 #ifndef NEURAL_NETWORK_RUNTIME_TRANSFORM_H
 #define NEURAL_NETWORK_RUNTIME_TRANSFORM_H
 
-#include "hdi_interfaces.h"
 #include "interfaces/kits/c/neural_network_runtime_type.h"
 #include "cpp_type.h"
 #include "mindir.h"
@@ -37,19 +36,6 @@ std::vector<T> ConstructVectorFromArray(const T* data, size_t size)
 
 uint32_t GetTypeSize(OH_NN_DataType type);
 
-
-namespace HDIToNN {
-OH_NN_DeviceType TransHDIDeviceType(const V1_0::DeviceType& iDeviceType);
-DeviceStatus TransHDIDeviceStatus(const V1_0::DeviceStatus& iDeviceStatus);
-} // namespace HDIToNN
-
-namespace NNToHDI {
-V1_0::PerformanceMode TransPerformanceMode(const OH_NN_PerformanceMode& mode);
-V1_0::Priority TransPriority(const OH_NN_Priority& priority);
-V1_0::DataType TransDataType(const OH_NN_DataType& dataType);
-V1_0::Format TransFormat(const OH_NN_Format& format);
-V1_0::IOTensor TransIOTensor(const IOTensor& tensor);
-} // namespace NNToHDI
 
 namespace NNToMS {
 mindspore::lite::DataType TransformDataType(OH_NN_DataType type);

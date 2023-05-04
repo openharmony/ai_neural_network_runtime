@@ -34,6 +34,12 @@ public:
                                  const std::vector<IOTensor>& outputs,
                                  std::vector<std::vector<int32_t>>& outputsDims,
                                  std::vector<bool>& isOutputBufferEnough) = 0;
+
+    virtual OH_NN_ReturnCode GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
+                                               std::vector<std::vector<uint32_t>>& maxInputDims)
+    {
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
 };
 } // OHOS
 } // namespace NeuralNetworkRuntime

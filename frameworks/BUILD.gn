@@ -19,12 +19,16 @@ config("nnrt_config") {
 
 nnrt_sources = [
   "native/compilation.cpp",
+  "native/device_discover_v1_0.cpp",
+  "native/device_discover_v2_0.cpp",
   "native/device_manager.cpp",
   "native/device_registrar.cpp",
   "native/execution_plan.cpp",
   "native/executor.cpp",
-  "native/hdi_device.cpp",
-  "native/hdi_prepared_model.cpp",
+  "native/hdi_device_v1_0.cpp",
+  "native/hdi_device_v2_0.cpp",
+  "native/hdi_prepared_model_v1_0.cpp",
+  "native/hdi_prepared_model_v2_0.cpp",
   "native/inner_model.cpp",
   "native/memory_manager.cpp",
   "native/neural_network_runtime.cpp",
@@ -122,6 +126,7 @@ ohos_shared_library("libneural_network_runtime") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "drivers_interface_nnrt:libnnrt_proxy_2.0",
     "hdf_core:libhdf_utils",
     "hilog_native:libhilog",
     "hitrace_native:libhitracechain",
