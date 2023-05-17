@@ -176,7 +176,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceStatus(DeviceStatus& status)
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::GetSupportedOperation(std::shared_ptr<const mindspore::lite::LiteGraph> model,
-                                                      std::vector<bool>& ops)
+    std::vector<bool>& ops)
 {
     if (model == nullptr) {
         LOGE("Model is nullptr, cannot query supported operation.");
@@ -274,8 +274,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::IsModelCacheSupported(bool& isSupported)
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
-                                         const ModelConfig& config,
-                                         std::shared_ptr<PreparedModel>& preparedModel)
+    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     if (model == nullptr) {
         LOGE("Model is nullptr, cannot prepare model.");
@@ -327,8 +326,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::li
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
-                                                           const ModelConfig& config,
-                                                           std::shared_ptr<PreparedModel>& preparedModel)
+    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     std::vector<V2_0::SharedBuffer> iBuffers;
     auto memManager = MemoryManager::GetInstance();

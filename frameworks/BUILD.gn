@@ -15,6 +15,10 @@ import("//build/ohos.gni")
 
 config("nnrt_config") {
   cflags_cc = [ "-fexceptions" ]
+  include_dirs = [
+    "..",
+    "../interfaces/innerkits/c",
+  ]
 }
 
 nnrt_sources = [
@@ -103,10 +107,7 @@ ohos_shared_library("libneural_network_runtime") {
   sources = nnrt_sources
   sources += ops_sources
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//foundation/ai/neural_network_runtime",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//third_party/googletest/googletest/include/gtest",
+    "..",
     "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
   ]
 
@@ -116,11 +117,13 @@ ohos_shared_library("libneural_network_runtime") {
   ]
 
   public_configs = [ ":nnrt_config" ]
+  all_dependent_configs = [ ":nnrt_config" ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "drivers_interface_nnrt:libnnrt_proxy_2.0",
+    "hdf_core:libhdf_utils",
     "hilog_native:libhilog",
     "hitrace_native:libhitracechain",
     "mindspore:mindir",
