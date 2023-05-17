@@ -31,15 +31,14 @@
             "sub_component": [
                  "//foundation/ai/neural_network_runtime:nnrt_target"
              ],
-            "inner_kits": [
-                {"type": "so",
-                 "name": "//foundation/ai/neural_network_runtime:nnrt_target",
-                 "header": {
-                     "header_files": [
-                         "neural_network_runtime_inner.h"
-                     ],
-                     "header_base":"//foundation/ai/neural_network_runtime/interfaces/innerkits/c"
-                }
+            "inner_api": [
+                {
+                    "type": "so",
+                    "name": "//foundation/ai/neural_network_runtime:nnrt_target",
+                    "header": {
+                        "header_files": [],
+                        "header_base":"//foundation/ai/neural_network_runtime/interfaces/innerkits/c"
+                    }
                 }
             ]
         }

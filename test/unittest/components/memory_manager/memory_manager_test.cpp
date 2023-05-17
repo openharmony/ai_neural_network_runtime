@@ -119,7 +119,7 @@ HWTEST_F(MemoryManagerTest, memorymanagertest_unmapmemory_001, TestSize.Level0)
 {
     const auto& memoryManager = MemoryManager::GetInstance();
     void* memory = nullptr;
-    memoryManager->UnMapMemory(memory);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, memoryManager->UnMapMemory(memory));
 }
 
 /**
@@ -131,7 +131,7 @@ HWTEST_F(MemoryManagerTest, memorymanagertest_unmapmemory_002, TestSize.Level0)
 {
     const auto& memoryManager = MemoryManager::GetInstance();
     void* memory = malloc(10);
-    memoryManager->UnMapMemory(memory);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, memoryManager->UnMapMemory(memory));
     free(memory);
 }
 
