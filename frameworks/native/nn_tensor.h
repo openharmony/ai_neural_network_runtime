@@ -47,6 +47,7 @@ public:
 
     void SetName(const std::string& name);
     void SetBuffer(const void* buffer, size_t length);
+    void SetFormat(OH_NN_Format format);
     OH_NN_ReturnCode SetDimensions(const std::vector<int32_t>& dimensions);
 
     std::string GetName() const;

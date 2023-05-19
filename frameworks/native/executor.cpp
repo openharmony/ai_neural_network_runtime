@@ -50,6 +50,7 @@ OH_NN_ReturnCode Executor::BuildInputTensor(uint32_t index, const OH_NN_Tensor& 
         return OH_NN_INVALID_PARAMETER;
     }
 
+    inputTensor->SetFormat(m_modelInputs[index]->GetFormat());
     if (!m_modelInputs[index]->CompareAttribute(*inputTensor)) {
         LOGE("BuildInputTensor failed, input has different attributes from the one in the constructed model.");
         return OH_NN_INVALID_PARAMETER;
