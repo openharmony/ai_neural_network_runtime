@@ -248,6 +248,11 @@ void NNTensor::SetBuffer(const void* buffer, size_t length)
     m_bufferLength = length;
 }
 
+void NNTensor::SetFormat(OH_NN_Format format)
+{
+    m_format = format;
+}
+
 OH_NN_ReturnCode NNTensor::SetDimensions(const std::vector<int32_t>& dimensions)
 {
     size_t expectedDimensionCount = m_dimensions.size();
