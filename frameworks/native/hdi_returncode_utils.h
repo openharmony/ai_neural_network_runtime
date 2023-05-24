@@ -26,7 +26,7 @@ namespace OHOS {
 namespace NeuralNetworkRuntime {
 inline std::string ConverterRetToString(OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode returnCode)
 {
-    static std::unordered_map<OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode, std::string> nnrtRet2StringMap{
+    static std::unordered_map<OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode, std::string> nnrtRet2StringMap {
         {V2_0::NNRT_ReturnCode::NNRT_SUCCESS, "NNRT_SUCCESS"},
         {V2_0::NNRT_ReturnCode::NNRT_FAILED, "NNRT_FAILED"},
         {V2_0::NNRT_ReturnCode::NNRT_NULL_PTR, "NNRT_NULL_PTR"},
@@ -64,7 +64,7 @@ inline std::string ConverterRetToString(OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode r
     };
 
     if (nnrtRet2StringMap.find(returnCode) == nnrtRet2StringMap.end()) {
-        return "";
+        return "ConverterRetToString failed, returnCode is invalid.";
     }
 
     return nnrtRet2StringMap.at(returnCode);
@@ -73,9 +73,9 @@ inline std::string ConverterRetToString(OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode r
 template<typename T>
 T CheckReturnCode(int32_t ret, T funcRet, const std::string& errorInfo)
 {
-    if (ret < 0) {
+    if (ret < V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
         LOGE("%{public}s. An error occurred in HDI, errorcode is %{public}d.", errorInfo.c_str(), ret);
-    } else if (ret > 0) {
+    } else if (ret > V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
         OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode nnrtRet = static_cast<OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode>(ret);
         LOGE("%{public}s. Errorcode is %{public}s.", errorInfo.c_str(), ConverterRetToString(nnrtRet).c_str());
     }

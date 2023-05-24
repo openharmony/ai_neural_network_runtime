@@ -153,8 +153,12 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::Run(const std::vector<IOTensor>& inputs, 
     }
 
     auto ret = m_hdiPreparedModel->Run(iInputTensors, iOutputTensors, outputsDims);
-    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS || outputsDims.empty()) {
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
         return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Run model failed");
+    }
+    if (outputsDims.empty()) {
+        LOGE("Run failed, outputsDims is empty.");
+        return OH_NN_UNAVALIDABLE_DEVICE;
     }
 
     return OH_NN_SUCCESS;

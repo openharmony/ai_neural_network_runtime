@@ -606,41 +606,9 @@ OH_NN_ReturnCode Compilation::LoadCacheBuild(std::shared_ptr<PreparedModel>& pre
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Compilation::InnerBuild()
+OH_NN_ReturnCode Compilation::BuildCacheModel(std::shared_ptr<PreparedModel>& preparedModel)
 {
     OH_NN_ReturnCode ret;
-    std::shared_ptr<PreparedModel> preparedModel;
-
-    // Prepare from offline model.
-    bool isOfflineModel{false};
-    ret = IsOfflineModel(isOfflineModel);
-    if (ret != OH_NN_SUCCESS) {
-        LOGE("[Compilation] Failed when identifying the offline model.");
-        return ret;
-    }
-
-    if (isOfflineModel) {
-        ret = BuildOfflineModel(preparedModel);
-        if (ret != OH_NN_SUCCESS) {
-            LOGE("[Compilation] Failed to build offline model.");
-            return ret;
-        }
-
-        m_isBuild = true;
-        return OH_NN_SUCCESS;
-    }
-
-    if (m_cachePath.empty()) {
-        ret = NormalBuild(preparedModel);
-        if (ret != OH_NN_SUCCESS) {
-            LOGE("Fail to normally build.");
-            return ret;
-        }
-
-        m_isBuild = true;
-        return OH_NN_SUCCESS;
-    }
-
     std::string cacheInfoPath = m_cachePath + "cache_info.nncache";
     if (access(cacheInfoPath.c_str(), 0) != 0) {
         ret = GenCacheBuild(preparedModel);
@@ -680,6 +648,51 @@ OH_NN_ReturnCode Compilation::InnerBuild()
     }
 
     m_isBuild = true;
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode Compilation::InnerBuild()
+{
+    OH_NN_ReturnCode ret;
+    std::shared_ptr<PreparedModel> preparedModel;
+
+    // Prepare from offline model.
+    bool isOfflineModel {false};
+    ret = IsOfflineModel(isOfflineModel);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Compilation] Failed when identifying the offline model.");
+        return ret;
+    }
+
+    if (isOfflineModel) {
+        ret = BuildOfflineModel(preparedModel);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[Compilation] Failed to build offline model.");
+            return ret;
+        }
+
+        m_isBuild = true;
+        return OH_NN_SUCCESS;
+    }
+
+    if (m_cachePath.empty()) {
+        ret = NormalBuild(preparedModel);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("Fail to normally build.");
+            return ret;
+        }
+
+        m_isBuild = true;
+        return OH_NN_SUCCESS;
+    }
+
+    ret = BuildCacheModel(preparedModel);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("Fail to build cache model.");
+        return ret;
+    }
+
     return OH_NN_SUCCESS;
 }
 

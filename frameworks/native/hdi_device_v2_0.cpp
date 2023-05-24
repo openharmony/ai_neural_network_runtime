@@ -28,6 +28,8 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
+const size_t OFFLINE_MODEL_MINIMUM_INPUT_SIZE = 2;
+
 namespace {
 OH_NN_DeviceType TransHDIDeviceV2_0Type(const V2_0::DeviceType& iDeviceType)
 {
@@ -433,7 +435,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetOfflineModelFromLiteGraph(std::shared_ptr<con
     offlineModels.clear();
 
     const size_t inputNum = graph->all_nodes_[0]->input_indices_.size();
-    if (inputNum < (size_t)2) {
+    if (inputNum < OFFLINE_MODEL_MINIMUM_INPUT_SIZE) {
         LOGE("LiteGraph with offline model should have at least two input tensors, only get %zu.", inputNum);
         return OH_NN_INVALID_PARAMETER;
     }
@@ -614,7 +616,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::shared_ptr<const mindsp
     std::vector<uint8_t> valueFromCustomPrimitive;
     std::vector<int8_t> value;
     std::map<std::string, std::vector<int8_t>> extensions;
-    std::vector<const mindspore::schema::Attribute*> attributes =\
+    std::vector<const mindspore::schema::Attribute*> attributes =
         mindspore::lite::MindIR_Custom_GetAttr(model->all_nodes_[0]->primitive_);
     for (const auto& attribute : attributes) {
         key = mindspore::lite::MindIR_Attribute_GetName(*attribute);

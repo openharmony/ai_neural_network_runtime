@@ -74,6 +74,7 @@ private:
     OH_NN_ReturnCode CheckCacheModel(const ModelCacheInfo& modelCacheInfo,
         std::vector<ModelBuffer>& modelBuffers) const;
     OH_NN_ReturnCode NormalBuild(std::shared_ptr<PreparedModel>& preparedModel);
+    OH_NN_ReturnCode BuildCacheModel(std::shared_ptr<PreparedModel>& preparedModel);
     OH_NN_ReturnCode GenCacheBuild(std::shared_ptr<PreparedModel>& preparedModel);
     OH_NN_ReturnCode ReGenCacheBuild(uint32_t fileNumber, std::shared_ptr<PreparedModel>& preparedModel);
     OH_NN_ReturnCode LoadCacheBuild(std::shared_ptr<PreparedModel>& preparedModel, const ModelCacheInfo& cacheInfo);
