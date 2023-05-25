@@ -16,9 +16,6 @@
 #ifndef NEURAL_NETWORK_RUNTIME_DEVICE_DISCOVER_H
 #define NEURAL_NETWORK_RUNTIME_DEVICE_DISCOVER_H
 
-#include <unordered_map>
-#include <memory>
-
 #include "device.h"
 
 namespace OHOS {

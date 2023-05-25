@@ -16,6 +16,7 @@
 #include "hdi_prepared_model_v2_0.h"
 
 #include "common/log.h"
+#include "hdi_returncode_utils.h"
 #include "memory_manager.h"
 
 namespace OHOS {
@@ -102,15 +103,14 @@ HDIPreparedModelV2_0::HDIPreparedModelV2_0(OHOS::sptr<V2_0::IPreparedModel> hdiP
 OH_NN_ReturnCode HDIPreparedModelV2_0::ExportModelCache(std::vector<ModelBuffer>& modelCache)
 {
     if (!modelCache.empty()) {
-        LOGE("The vector of modelCache should be empty. size=%zu", modelCache.size());
+        LOGE("The vector of modelCache should be empty. size=%{public}zu", modelCache.size());
         return OH_NN_INVALID_PARAMETER;
     }
 
     std::vector<V2_0::SharedBuffer> iBuffers;
     auto ret = m_hdiPreparedModel->ExportModelCache(iBuffers);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Export model cache failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Export model cache failed");
     }
 
     auto memManager = MemoryManager::GetInstance();
@@ -118,7 +118,7 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::ExportModelCache(std::vector<ModelBuffer>
     for (size_t i = 0; i < iBuffersSize; i++) {
         auto addr = memManager->MapMemory(iBuffers[i].fd, iBuffers[i].bufferSize);
         if (addr == nullptr) {
-            LOGE("Export the %zuth model cache failed, cannot not map fd to address.", i + 1);
+            LOGE("Export the %{public}zuth model cache failed, cannot not map fd to address.", i + 1);
             return OH_NN_MEMORY_ERROR;
         }
         ModelBuffer modelbuffer {addr, iBuffers[i].bufferSize};
@@ -152,9 +152,12 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::Run(const std::vector<IOTensor>& inputs, 
         iOutputTensors.emplace_back(iTensor);
     }
 
-    auto ret = m_hdiPreparedModel->Run(iInputTensors, iOutputTensors, outputsDims, isOutputBufferEnough);
-    if (ret != HDF_SUCCESS || outputsDims.empty()) {
-        LOGE("Run model failed. ErrorCode=%d", ret);
+    auto ret = m_hdiPreparedModel->Run(iInputTensors, iOutputTensors, outputsDims);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Run model failed");
+    }
+    if (outputsDims.empty()) {
+        LOGE("Run failed, outputsDims is empty.");
         return OH_NN_UNAVALIDABLE_DEVICE;
     }
 
@@ -165,9 +168,8 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::GetInputDimRanges(std::vector<std::vector
                                                          std::vector<std::vector<uint32_t>>& maxInputDims)
 {
     auto ret = m_hdiPreparedModel->GetInputDimRanges(minInputDims, maxInputDims);
-    if (ret != HDF_SUCCESS) {
-        LOGE("GetInputDimRanges failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get input dim ranges failed");
     }
 
     return OH_NN_SUCCESS;

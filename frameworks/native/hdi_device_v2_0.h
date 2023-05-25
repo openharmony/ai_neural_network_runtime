@@ -50,12 +50,25 @@ public:
     OH_NN_ReturnCode PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
                                                 const ModelConfig& config,
                                                 std::shared_ptr<PreparedModel>& preparedModel) override;
+    OH_NN_ReturnCode PrepareOfflineModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
+                                         const ModelConfig& config,
+                                         std::shared_ptr<PreparedModel>& preparedModel) override;
 
     void* AllocateBuffer(size_t length) override;
     OH_NN_ReturnCode ReleaseBuffer(const void* buffer) override;
 
 private:
     OH_NN_ReturnCode ReleaseSharedBuffer(const V2_0::SharedBuffer& buffer);
+    OH_NN_ReturnCode GetOfflineModelFromLiteGraph(std::shared_ptr<const mindspore::lite::LiteGraph> graph,
+                                                  std::vector<std::vector<uint8_t>>& offlineModels);
+    OH_NN_ReturnCode AllocateDeviceBufferForOfflineModel(const std::vector<std::vector<uint8_t>>& offlineModels,
+                                                         std::vector<ModelBuffer>& deviceBuffers);
+    OH_NN_ReturnCode CopyOfflineModelToDevice(const std::vector<std::vector<uint8_t>>& offlineModels,
+                                              std::vector<ModelBuffer>& deviceBuffers);
+    OH_NN_ReturnCode PrepareOfflineModel(std::vector<ModelBuffer>& deviceBuffers,
+                                         const ModelConfig& config,
+                                         const std::map<std::string, std::vector<int8_t>> extensions,
+                                         std::shared_ptr<PreparedModel>& preparedModel);
 
 private:
     // first: major version, second: minor version
