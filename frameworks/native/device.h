@@ -52,6 +52,9 @@ public:
     virtual OH_NN_ReturnCode PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
                                                         const ModelConfig& config,
                                                         std::shared_ptr<PreparedModel>& preparedModel) = 0;
+    virtual OH_NN_ReturnCode PrepareOfflineModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
+                                                 const ModelConfig& config,
+                                                 std::shared_ptr<PreparedModel>& preparedModel) = 0;
 
     virtual void* AllocateBuffer(size_t length) = 0;
     virtual OH_NN_ReturnCode ReleaseBuffer(const void* buffer) = 0;

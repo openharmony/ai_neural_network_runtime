@@ -87,9 +87,7 @@ V1_0::Priority TransPriority(const OH_NN_Priority& priority)
 }
 
 HDIDeviceV1_0::HDIDeviceV1_0(OHOS::sptr<V1_0::INnrtDevice> device) : m_iDevice(device)
-{
-    device->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
-}
+{}
 
 OH_NN_ReturnCode HDIDeviceV1_0::GetDeviceName(std::string& name)
 {
@@ -113,6 +111,11 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetVendorName(std::string& name)
 
 OH_NN_ReturnCode HDIDeviceV1_0::GetVersion(std::string& version)
 {
+    auto ret = m_iDevice->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
+    if (ret != HDF_SUCCESS) {
+        LOGE("Get HDI version failed. ErrorCode=%d", ret);
+        return OH_NN_UNAVALIDABLE_DEVICE;
+    }
     version = 'v' + std::to_string(m_hdiVersion.first) + '_' + std::to_string(m_hdiVersion.second);
     return OH_NN_SUCCESS;
 }
@@ -150,7 +153,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetSupportedOperation(std::shared_ptr<const mind
         return OH_NN_NULL_PTR;
     }
 
-    V1_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
     size_t tensorSize = mindspore::lite::MindIR_LiteGraph_GetConstTensorSize(model.get());
     int32_t hdiRet {0};
     if (tensorSize > 0) {
@@ -241,7 +244,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(std::shared_ptr<const mindspore::li
         return OH_NN_INVALID_PARAMETER;
     }
 
-    V1_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
     size_t tensorSize = mindspore::lite::MindIR_LiteGraph_GetConstTensorSize(model.get());
     int32_t hdiRet {0};
     if (tensorSize > 0) {
@@ -390,6 +393,14 @@ OH_NN_ReturnCode HDIDeviceV1_0::ReleaseSharedBuffer(const V1_0::SharedBuffer& bu
         return OH_NN_FAILED;
     }
     return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode HDIDeviceV1_0::PrepareOfflineModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
+                                                    const ModelConfig& config,
+                                                    std::shared_ptr<PreparedModel>& preparedModel)
+{
+    LOGE("HDIDeviceV1.0 not support PrepareOfflineModel.");
+    return OH_NN_OPERATION_FORBIDDEN;
 }
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS

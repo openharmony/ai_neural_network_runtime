@@ -17,8 +17,10 @@
 
 #include "hdf_base.h"
 #include "mindir.h"
+#include "securec.h"
 
 #include "hdi_prepared_model_v2_0.h"
+#include "hdi_returncode_utils.h"
 #include "memory_manager.h"
 #include "transform.h"
 #include "common/log.h"
@@ -26,6 +28,8 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
+const size_t OFFLINE_MODEL_MINIMUM_INPUT_SIZE = 2;
+
 namespace {
 OH_NN_DeviceType TransHDIDeviceV2_0Type(const V2_0::DeviceType& iDeviceType)
 {
@@ -84,19 +88,49 @@ V2_0::Priority TransPriority(const OH_NN_Priority& priority)
             return V2_0::Priority::PRIORITY_NONE;
     }
 }
+
+OH_NN_ReturnCode IsOfflineModel(std::shared_ptr<const mindspore::lite::LiteGraph> liteGraph, bool& isOfflineModel)
+{
+    isOfflineModel = false; // Initialize the returned value
+    if (liteGraph == nullptr) {
+        LOGE("LiteGraph is empty when identifying the offline model.");
+        return OH_NN_NULL_PTR;
+    }
+
+    if (liteGraph->all_nodes_.size() == 0) {
+        LOGE("Find empty node in the model.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    // If the model consists of more than 1 node, it will not be considered as offline model.
+    if (liteGraph->all_nodes_.size() > 1) {
+        isOfflineModel = false;
+        return OH_NN_SUCCESS;
+    }
+
+    const mindspore::lite::LiteGraph::Node* pNode = liteGraph->all_nodes_[0];
+    if (pNode == nullptr) {
+        LOGE("Find invalid node in the model.");
+        return OH_NN_NULL_PTR;
+    }
+
+    const mindspore::lite::NodeType& nodeType = mindspore::lite::MindIR_Primitive_GetType(pNode->primitive_);
+    if (nodeType == mindspore::lite::NodeType::NODE_TYPE_CUSTOM) {
+        isOfflineModel = true;
+    }
+
+    return OH_NN_SUCCESS;
 }
+}  // unamed namespace
 
 HDIDeviceV2_0::HDIDeviceV2_0(OHOS::sptr<V2_0::INnrtDevice> device) : m_iDevice(device)
-{
-    device->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
-}
+{}
 
 OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceName(std::string& name)
 {
     auto ret = m_iDevice->GetDeviceName(name);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Get HDI device name failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI device name failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -104,15 +138,18 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceName(std::string& name)
 OH_NN_ReturnCode HDIDeviceV2_0::GetVendorName(std::string& name)
 {
     auto ret = m_iDevice->GetVendorName(name);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Get HDI device vendor name failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI vendor name failed");
     }
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::GetVersion(std::string& version)
 {
+    auto ret = m_iDevice->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI version failed");
+    }
     version = 'v' + std::to_string(m_hdiVersion.first) + '_' + std::to_string(m_hdiVersion.second);
     return OH_NN_SUCCESS;
 }
@@ -121,9 +158,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceType(OH_NN_DeviceType& deviceType)
 {
     V2_0::DeviceType iDeviceType;
     auto ret = m_iDevice->GetDeviceType(iDeviceType);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Get HDI device type failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI device type failed");
     }
 
     deviceType = TransHDIDeviceV2_0Type(iDeviceType);
@@ -134,9 +170,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceStatus(DeviceStatus& status)
 {
     V2_0::DeviceStatus iDeviceStatus;
     auto ret = m_iDevice->GetDeviceStatus(iDeviceStatus);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Get HDI device status failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI device status failed");
     }
     status = TransHDIDeviceV2_0Status(iDeviceStatus);
     return OH_NN_SUCCESS;
@@ -150,14 +185,27 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetSupportedOperation(std::shared_ptr<const mind
         return OH_NN_NULL_PTR;
     }
 
-    V2_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
+    bool isOfflineModel {false};
+    OH_NN_ReturnCode innerRet = IsOfflineModel(model, isOfflineModel);
+    if (innerRet != OH_NN_SUCCESS) {
+        LOGE("Check offline model failed.");
+        return innerRet;
+    }
+
+    // Permanently return a [true] array for offline model.
+    if (isOfflineModel) {
+        ops.clear();
+        ops.emplace_back(true);
+        return OH_NN_SUCCESS;
+    }
+
+    OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
     size_t tensorSize = mindspore::lite::MindIR_LiteGraph_GetConstTensorSize(model.get());
-    int32_t hdiRet {0};
+    int32_t ret {0};
     if (tensorSize > 0) {
-        hdiRet = m_iDevice->AllocateBuffer(tensorSize, tensorBuffer);
-        if (hdiRet != HDF_SUCCESS || tensorBuffer.fd == INVALID_FD) {
-            LOGE("Allocate tensor buffer error when get supported operation. ErrorCode: %d", hdiRet);
-            return OH_NN_FAILED;
+        ret = m_iDevice->AllocateBuffer(tensorSize, tensorBuffer);
+        if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS || tensorBuffer.fd == INVALID_FD) {
+            return CheckReturnCode(ret, OH_NN_FAILED, "Allocate tensor buffer error when get supported operation");
         }
     }
 
@@ -168,17 +216,16 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetSupportedOperation(std::shared_ptr<const mind
         return OH_NN_FAILED;
     }
 
-    hdiRet = m_iDevice->GetSupportedOperation(*iModel, ops);
+    ret = m_iDevice->GetSupportedOperation(*iModel, ops);
 
     mindspore::lite::MindIR_Model_Destroy(&iModel);
-    auto ret = ReleaseSharedBuffer(tensorBuffer);
-    if (ret != OH_NN_SUCCESS) {
+    innerRet = ReleaseSharedBuffer(tensorBuffer);
+    if (innerRet != OH_NN_SUCCESS) {
         LOGE("Release tensorBuffer failed.");
         return OH_NN_FAILED;
     }
-    if (hdiRet != HDF_SUCCESS) {
-        LOGE("Get supported operation failed. ErrorCode=%d", hdiRet);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get supported operation failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -186,9 +233,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetSupportedOperation(std::shared_ptr<const mind
 OH_NN_ReturnCode HDIDeviceV2_0::IsFloat16PrecisionSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsFloat16PrecisionSupported(isSupported);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Query fp16 precision supported failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query fp16 precision supported failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -196,9 +242,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::IsFloat16PrecisionSupported(bool& isSupported)
 OH_NN_ReturnCode HDIDeviceV2_0::IsPerformanceModeSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsPerformanceModeSupported(isSupported);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Query performance mode supported failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query performance mode supported failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -206,9 +251,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::IsPerformanceModeSupported(bool& isSupported)
 OH_NN_ReturnCode HDIDeviceV2_0::IsPrioritySupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsPrioritySupported(isSupported);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Query priority supported failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query priority supported failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -216,9 +260,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::IsPrioritySupported(bool& isSupported)
 OH_NN_ReturnCode HDIDeviceV2_0::IsDynamicInputSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsDynamicInputSupported(isSupported);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Query dynamic input supported failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query dynamic input supported failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -226,9 +269,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::IsDynamicInputSupported(bool& isSupported)
 OH_NN_ReturnCode HDIDeviceV2_0::IsModelCacheSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsModelCacheSupported(isSupported);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Query cache model supported failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query cache model supported failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -241,14 +283,13 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::li
         return OH_NN_INVALID_PARAMETER;
     }
 
-    V2_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
+    OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {INVALID_FD, 0, 0, 0};
     size_t tensorSize = mindspore::lite::MindIR_LiteGraph_GetConstTensorSize(model.get());
-    int32_t hdiRet {0};
+    int32_t ret {0};
     if (tensorSize > 0) {
-        hdiRet = m_iDevice->AllocateBuffer(tensorSize, tensorBuffer);
-        if (hdiRet != HDF_SUCCESS || tensorBuffer.fd == INVALID_FD) {
-            LOGE("Allocate tensor buffer error when prepare model. ErrorCode: %d", hdiRet);
-            return OH_NN_FAILED;
+        ret = m_iDevice->AllocateBuffer(tensorSize, tensorBuffer);
+        if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS || tensorBuffer.fd == INVALID_FD) {
+            return CheckReturnCode(ret, OH_NN_FAILED, "Allocate tensor buffer error when prepare model");
         }
     }
 
@@ -265,17 +306,16 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::li
     iModelConfig.priority = TransPriority(config.priority);
     OHOS::sptr<V2_0::IPreparedModel> iPreparedModel;
 
-    auto preparedRet = m_iDevice->PrepareModel(*iModel, iModelConfig, iPreparedModel);
+    ret = m_iDevice->PrepareModel(*iModel, iModelConfig, iPreparedModel);
 
     mindspore::lite::MindIR_Model_Destroy(&iModel);
-    auto ret = ReleaseSharedBuffer(tensorBuffer);
-    if (ret != OH_NN_SUCCESS) {
+    auto innerRet = ReleaseSharedBuffer(tensorBuffer);
+    if (innerRet != OH_NN_SUCCESS) {
         LOGE("Release tensorBuffer failed.");
         return OH_NN_FAILED;
     }
-    if (preparedRet != HDF_SUCCESS || iPreparedModel == nullptr) {
-        LOGE("Prepare model failed. ErrorCode=%d", preparedRet);
-        return OH_NN_FAILED;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS || iPreparedModel == nullptr) {
+        return CheckReturnCode(ret, OH_NN_FAILED, "Prepare model failed");
     }
 
     preparedModel = CreateSharedPtr<HDIPreparedModelV2_0>(iPreparedModel);
@@ -298,7 +338,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<Mod
     for (size_t i = 0; i < modelCacheSize; i++) {
         ret = memManager->GetMemory(modelCache[i].buffer, memory);
         if (ret != OH_NN_SUCCESS) {
-            LOGE("The %zuth model cache is invalid. Please put valid model cache.", i + 1);
+            LOGE("The %{public}zuth model cache is invalid. Please put valid model cache.", i + 1);
             return ret;
         }
         iBuffers.emplace_back(V2_0::SharedBuffer {memory.fd, memory.length, 0, memory.length});
@@ -310,10 +350,9 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<Mod
     iModelConfig.priority = TransPriority(config.priority);
 
     OHOS::sptr<V2_0::IPreparedModel> iPreparedModel;
-    auto hdiRet = m_iDevice->PrepareModelFromModelCache(iBuffers, iModelConfig, iPreparedModel);
-    if (hdiRet != HDF_SUCCESS) {
-        LOGE("Prepare model from cache failed. ErrorCode=%d", hdiRet);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+    auto nnrtRet = m_iDevice->PrepareModelFromModelCache(iBuffers, iModelConfig, iPreparedModel);
+    if (nnrtRet != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(nnrtRet, OH_NN_FAILED, "Prepare model from cache failed");
     }
 
     preparedModel = CreateSharedPtr<HDIPreparedModelV2_0>(iPreparedModel);
@@ -333,9 +372,8 @@ void* HDIDeviceV2_0::AllocateBuffer(size_t length)
 
     V2_0::SharedBuffer buffer;
     auto ret = m_iDevice->AllocateBuffer(length, buffer);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Allocate buffer error. ErrorCode: %d", ret);
-        return nullptr;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, nullptr, "Allocate buffer error");
     }
 
     auto memManager = MemoryManager::GetInstance();
@@ -363,9 +401,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::ReleaseBuffer(const void* buffer)
 
     V2_0::SharedBuffer hdiBuffer {memory.fd, memory.length, 0, memory.length};
     auto deviceResult = m_iDevice->ReleaseBuffer(hdiBuffer);
-    if (deviceResult != HDF_SUCCESS) {
-        LOGE("Device release buffer error. ErrorCode: %d", deviceResult);
-        return OH_NN_FAILED;
+    if (deviceResult != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(deviceResult, OH_NN_FAILED, "Device release buffer error");
     }
 
     ret = memManager->UnMapMemory(buffer);
@@ -380,15 +417,220 @@ OH_NN_ReturnCode HDIDeviceV2_0::ReleaseBuffer(const void* buffer)
 OH_NN_ReturnCode HDIDeviceV2_0::ReleaseSharedBuffer(const V2_0::SharedBuffer& buffer)
 {
     if (buffer.fd == INVALID_FD) {
-        LOGI("No need to release. fd=%d", INVALID_FD);
+        LOGI("No need to release. fd=%{public}d", INVALID_FD);
         return OH_NN_SUCCESS;
     }
 
     auto ret = m_iDevice->ReleaseBuffer(buffer);
-    if (ret != HDF_SUCCESS) {
-        LOGE("Device release buffer error. ErrorCode=%d", ret);
-        return OH_NN_FAILED;
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_FAILED, "Device release buffer error");
     }
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode HDIDeviceV2_0::GetOfflineModelFromLiteGraph(std::shared_ptr<const mindspore::lite::LiteGraph> graph,
+                                                             std::vector<std::vector<uint8_t>>& offlineModels)
+{
+    // graph has been checked in PrepareOfflineModel, no need to check twice.
+    offlineModels.clear();
+
+    const size_t inputNum = graph->all_nodes_[0]->input_indices_.size();
+    if (inputNum < OFFLINE_MODEL_MINIMUM_INPUT_SIZE) {
+        LOGE("LiteGraph with offline model should have at least two input tensors, only get %zu.", inputNum);
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    // The offline model is integrated into the last input tensor.
+    uint32_t index = graph->all_nodes_[0]->input_indices_[inputNum - 1];
+    mindspore::lite::TensorPtr pTensor = graph->all_tensors_[index];
+    std::vector<uint8_t> offlineModel = mindspore::lite::MindIR_Tensor_GetData(pTensor);
+    if (offlineModel.size() == (size_t) 0) {
+        LOGE("Offline model has size of 0, please check the ms model.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    offlineModels.emplace_back(std::move(offlineModel));
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode HDIDeviceV2_0::AllocateDeviceBufferForOfflineModel(
+    const std::vector<std::vector<uint8_t>>& offlineModels, std::vector<ModelBuffer>& deviceBuffers)
+{
+    // offlineModels is guaranteed to have at least one element in GetOfflineModelFromLiteGraph, no need to check size.
+    deviceBuffers.clear();
+
+    for (const std::vector<uint8_t>& offlineModel : offlineModels) {
+        const size_t offlineModelSize = offlineModel.size();
+
+        void* newModelBuffer = AllocateBuffer(offlineModelSize);
+        if (newModelBuffer == nullptr) {
+            // Release allocated model buffer if error happens.
+            OH_NN_ReturnCode status {OH_NN_SUCCESS};
+            for (const ModelBuffer& deviceBuffer : deviceBuffers) {
+                status = ReleaseBuffer(deviceBuffer.buffer);
+                if (status != OH_NN_SUCCESS) {
+                    LOGE("Release shared buffer of offline model failed.");
+                    return status;
+                }
+            }
+
+            deviceBuffers.clear();
+            LOGE("Error happens when allocating shared buffer for offline model.");
+            return OH_NN_MEMORY_ERROR;
+        }
+
+        ModelBuffer modelBuffer {nullptr, 0};
+        modelBuffer.buffer = newModelBuffer;
+        modelBuffer.length = offlineModelSize;
+        deviceBuffers.emplace_back(modelBuffer);
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode HDIDeviceV2_0::CopyOfflineModelToDevice(const std::vector<std::vector<uint8_t>>& offlineModels,
+                                                         std::vector<ModelBuffer>& deviceBuffers)
+{
+    if (offlineModels.size() != deviceBuffers.size()) {
+        LOGE("CopyOfflineModelToDevice failed, number of offlineModels not equal to allocated buffers.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    const void* offlineModel {nullptr};
+    size_t offlineModelSize {0};
+    void* deviceBuffer {nullptr};
+    size_t deviceBufferSize {0};
+
+    size_t offlineModelsSize = offlineModels.size();
+    for (size_t i = 0; i < offlineModelsSize; i++) {
+        offlineModel = offlineModels[i].data();
+        offlineModelSize = offlineModels[i].size();
+        deviceBuffer = deviceBuffers[i].buffer;
+        deviceBufferSize = deviceBuffers[i].length;
+
+        // Copy offline model to shared buffer of device.
+        errno_t errorCode = memcpy_s(deviceBuffer, deviceBufferSize, offlineModel, offlineModelSize);
+        if (errorCode != EOK) {
+            LOGE("Error happened when copy offline model to device buffer. Error code: %d.", errorCode);
+            return OH_NN_MEMORY_ERROR;
+        }
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::vector<ModelBuffer>& deviceBuffers,
+                                                    const ModelConfig& config,
+                                                    const std::map<std::string, std::vector<int8_t>> extensions,
+                                                    std::shared_ptr<PreparedModel>& preparedModel)
+{
+    V2_0::ModelConfig iModelConfig;
+    iModelConfig.enableFloat16 = config.enableFloat16;
+    iModelConfig.mode = TransPerformanceMode(config.mode);
+    iModelConfig.priority = TransPriority(config.priority);
+    iModelConfig.extensions = extensions;
+    OHOS::sptr<V2_0::IPreparedModel> iPreparedModel;
+
+    std::vector<V2_0::SharedBuffer> iBuffers;
+    auto memManager = MemoryManager::GetInstance();
+    Memory memory;
+    OH_NN_ReturnCode ret;
+    size_t numOfflineModel = deviceBuffers.size();
+    for (size_t i = 0; i < numOfflineModel; i++) {
+        ret = memManager->GetMemory(deviceBuffers[i].buffer, memory);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("Retrieve the memory of %zuth device buffer failed.", i);
+            return ret;
+        }
+        iBuffers.emplace_back(V2_0::SharedBuffer {memory.fd, memory.length, 0, memory.length});
+    }
+
+    auto preparedRet = m_iDevice->PrepareOfflineModel(iBuffers, iModelConfig, iPreparedModel);
+
+    // Release allocated model buffer after prepare model.
+    OH_NN_ReturnCode status {OH_NN_SUCCESS};
+    for (const ModelBuffer& deviceBuffer : deviceBuffers) {
+        status = ReleaseBuffer(deviceBuffer.buffer);
+        if (status != OH_NN_SUCCESS) {
+            LOGE("Release shared buffer of offline model failed.");
+            return status;
+        }
+    }
+    deviceBuffers.clear();
+
+    if (preparedRet != V2_0::NNRT_ReturnCode::NNRT_SUCCESS || iPreparedModel == nullptr) {
+        return CheckReturnCode(preparedRet, OH_NN_FAILED, "Prepare offline model failed");
+    }
+
+    preparedModel = CreateSharedPtr<HDIPreparedModelV2_0>(iPreparedModel);
+    if (preparedModel == nullptr) {
+        LOGE("Prepare model failed, because fail to create preparedModel instance.");
+        return OH_NN_MEMORY_ERROR;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
+                                                    const ModelConfig& config,
+                                                    std::shared_ptr<PreparedModel>& preparedModel)
+{
+    if (model == nullptr) {
+        LOGE("LiteGraph is empty when identifying the offline model.");
+        return OH_NN_NULL_PTR;
+    }
+
+    std::vector<std::vector<uint8_t>> offlineModels;
+    OH_NN_ReturnCode status = GetOfflineModelFromLiteGraph(model, offlineModels);
+    if (status != OH_NN_SUCCESS) {
+        LOGE("Error happens when getting offline models from lite graph.");
+        return status;
+    }
+
+    std::vector<ModelBuffer> deviceBuffers;
+    status = AllocateDeviceBufferForOfflineModel(offlineModels, deviceBuffers);
+    if (status != OH_NN_SUCCESS) {
+        LOGE("Error happens when allocating device buffers for offline model.");
+        return status;
+    }
+
+    status = CopyOfflineModelToDevice(offlineModels, deviceBuffers);
+    if (status != OH_NN_SUCCESS) {
+        LOGE("Error happened when copying offline models to device buffers.");
+
+        OH_NN_ReturnCode ret {OH_NN_SUCCESS};
+        // Release allocated model buffer if error happens.
+        for (const ModelBuffer& deviceBuffer : deviceBuffers) {
+            ret = ReleaseBuffer(deviceBuffer.buffer);
+            if (ret != OH_NN_SUCCESS) {
+                LOGE("Releasing device buffer failed after copying offline models to device buffers failed.");
+                return ret;
+            }
+        }
+
+        return status;
+    }
+
+    // Retrieve offline model configs from Custom primitive and insert to extensions.
+    std::string key;
+    std::vector<uint8_t> valueFromCustomPrimitive;
+    std::vector<int8_t> value;
+    std::map<std::string, std::vector<int8_t>> extensions;
+    std::vector<const mindspore::schema::Attribute*> attributes =
+        mindspore::lite::MindIR_Custom_GetAttr(model->all_nodes_[0]->primitive_);
+    for (const auto& attribute : attributes) {
+        key = mindspore::lite::MindIR_Attribute_GetName(*attribute);
+        valueFromCustomPrimitive = mindspore::lite::MindIR_Attribute_GetData(*attribute);
+        value.assign(valueFromCustomPrimitive.begin(), valueFromCustomPrimitive.end());
+        extensions.insert(std::pair<std::string, std::vector<int8_t>>(key, value));
+    }
+
+    status = PrepareOfflineModel(deviceBuffers, config, extensions, preparedModel);
+    if (status != OH_NN_SUCCESS) {
+        LOGE("PrepareOfflineModel failed.");
+        return status;
+    }
+
     return OH_NN_SUCCESS;
 }
 } // namespace NeuralNetworkRuntime
