@@ -15,9 +15,9 @@
 
 #include "node_functions.h"
 
-#include "node_registry.h"
 #include <message_parcel.h>
 #include <v2_0/node_attr_types.h>
+#include "node_registry.h"
 
 namespace OHOS {
 namespace HDI {

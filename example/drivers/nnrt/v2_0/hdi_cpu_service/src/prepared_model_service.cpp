@@ -59,7 +59,7 @@ int32_t PreparedModelService::ExportModelCache(std::vector<SharedBuffer>& modelC
         auto size = m_cacheBuffer->GetAshmemSize();
 
         // SharedBuffer: fd, bufferSize, offset, dataSize
-        modelCache.emplace_back(SharedBuffer{fd, size, 0, size});
+        modelCache.emplace_back(SharedBuffer {fd, size, 0, size});
         return HDF_SUCCESS;
     }
 
@@ -118,7 +118,7 @@ int32_t PreparedModelService::Run(const std::vector<IOTensor>& inputs, const std
         return NNRT_ReturnCode::NNRT_FAILED;
     }
 
-    bool isOutputBufferEnough{false};
+    bool isOutputBufferEnough {false};
     ret = UpdateOutput(outputs, outputsDims, isOutputBufferEnough);
     if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("Update output dimension or data failed.");
@@ -229,7 +229,7 @@ NNRT_ReturnCode PreparedModelService::Compile(std::shared_ptr<mindspore::schema:
         return NNRT_ReturnCode::NNRT_INVALID_MODEL;
     }
     for (auto i : graph->inputIndex) {
-        auto inputShape = graph->allTensors[i]->dims; 
+        auto inputShape = graph->allTensors[i]->dims;
         auto iter = std::find(inputShape.begin(), inputShape.end(), DYNAMIC_SHAPE_FLAG);
         if (iter != inputShape.end()) {
             m_isDynamicShape = true;
