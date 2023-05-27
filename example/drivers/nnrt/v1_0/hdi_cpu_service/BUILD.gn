@@ -15,40 +15,35 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_prebuilt_shared_library("mindspore_demo") {
-  source = "//drivers/peripheral/nnrt/v1_0/mindspore/mindspore/libmindspore-lite.huawei.so"
-
-  install_images = [chipset_base_dir]
+  source = "../mindspore/mindspore/libmindspore-lite.huawei.so"
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_nnrt"
 }
 
 ohos_shared_library("libnnrt_device_service_1.0") {
   include_dirs = [
-    "//drivers/peripheral/nnrt/v1_0/hdi_cpu_service/include",
-    "//drivers/peripheral/nnrt/v1_0/mindspore",
+    "include",
+    "../mindspore",
     "//third_party/flatbuffers/include",
-    "//commonlibrary/c_utils/base/include"
   ]
   sources = [
     "src/nnrt_device_service.cpp",
-    "src/prepared_model_service.cpp",
-    "src/node_registry.cpp",
     "src/node_functions.cpp",
+    "src/node_registry.cpp",
+    "src/prepared_model_service.cpp",
     "src/shared_buffer_parser.cpp",
-    "src/validation.cpp"
+    "src/validation.cpp",
   ]
 
-  deps = [
-    "//drivers/interface/nnrt/v1_0:nnrt_idl_headers",
-    "//drivers/interface/nnrt/v1_0:libnnrt_stub_1.0",
-    ":mindspore_demo"
-  ]
+  deps = [ ":mindspore_demo" ]
 
   external_deps = [
+    "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_stub_1.0",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_single",
-    "c_utils:utils"
+    "hilog_native:libhilog",
+    "ipc:ipc_core",
   ]
 
   install_images = [ chipset_base_dir ]
@@ -58,22 +53,18 @@ ohos_shared_library("libnnrt_device_service_1.0") {
 
 ohos_shared_library("libnnrt_driver") {
   include_dirs = []
-  sources = [
-    "src/nnrt_device_driver.cpp"
-  ]
-  deps = [
-    "//drivers/peripheral/nnrt/v1_0/hdi_cpu_service:libnnrt_device_service_1.0",
-    "//drivers/interface/nnrt/v1_0:libnnrt_stub_1.0"
-  ]
+  sources = [ "src/nnrt_device_driver.cpp" ]
+  deps = [ ":libnnrt_device_service_1.0" ]
 
   external_deps = [
+    "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_stub_1.0",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_single",
-    "c_utils:utils",
-    "hdf_core:libhdi"
+    "hdf_core:libhdi",
+    "hilog_native:libhilog",
+    "ipc:ipc_core",
   ]
 
   install_images = [ chipset_base_dir ]
@@ -83,8 +74,8 @@ ohos_shared_library("libnnrt_driver") {
 
 group("hdf_nnrt_service") {
   deps = [
-    ":mindspore_demo",
-    ":libnnrt_driver",
     ":libnnrt_device_service_1.0",
+    ":libnnrt_driver",
+    ":mindspore_demo",
   ]
 }

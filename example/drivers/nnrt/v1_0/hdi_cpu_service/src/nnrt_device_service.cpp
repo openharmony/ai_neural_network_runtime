@@ -288,7 +288,7 @@ std::shared_ptr<mindspore::schema::MetaGraphT> NnrtDeviceService::TransModelToGr
     metaGraph->name = model.name;
     metaGraph->version = mindspore::Version();
 
-    std::unique_ptr<mindspore::schema::TensorT> transTensor{nullptr};
+    std::unique_ptr<mindspore::schema::TensorT> transTensor {nullptr};
     for (auto tensor : model.allTensors) {
         transTensor = TransTensor(tensor);
         if (transTensor == nullptr) {

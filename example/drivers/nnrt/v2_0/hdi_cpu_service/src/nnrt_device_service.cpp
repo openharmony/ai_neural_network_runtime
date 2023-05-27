@@ -324,7 +324,7 @@ std::shared_ptr<mindspore::schema::MetaGraphT> NnrtDeviceService::TransModelToGr
     metaGraph->name = model.name;
     metaGraph->version = mindspore::Version();
 
-    std::unique_ptr<mindspore::schema::TensorT> transTensor{nullptr};
+    std::unique_ptr<mindspore::schema::TensorT> transTensor {nullptr};
     for (auto tensor : model.allTensors) {
         transTensor = TransTensor(tensor, returnCode);
         if (transTensor == nullptr) {
@@ -482,7 +482,7 @@ std::shared_ptr<mindspore::Context> NnrtDeviceService::TransModelConfig(const Mo
 NNRT_ReturnCode NnrtDeviceService::ShowCustomAttributes(const std::map<std::string,
     std::vector<int8_t>>& extensions) const
 {
-    float attr1{0.0};
+    float attr1 {0.0};
     std::string attr2;
 
     auto ret = ParseCustomAttributes(extensions, attr1, attr2);

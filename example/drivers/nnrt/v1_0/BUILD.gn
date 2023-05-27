@@ -13,12 +13,10 @@
 
 if (defined(ohos_lite)) {
   group("nnrt_entry") {
-    deps = [ ]
+    deps = []
   }
 } else {
   group("nnrt_entry") {
-    deps = [
-      "./hdi_cpu_service:hdf_nnrt_service",
-    ]
+    deps = [ "./hdi_cpu_service:hdf_nnrt_service" ]
   }
 }

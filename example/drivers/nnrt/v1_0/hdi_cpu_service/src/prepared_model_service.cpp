@@ -57,7 +57,7 @@ int32_t PreparedModelService::ExportModelCache(std::vector<SharedBuffer>& modelC
         auto size = m_cacheBuffer->GetAshmemSize();
 
         // SharedBuffer: fd, bufferSize, offset, dataSize
-        modelCache.emplace_back(SharedBuffer{fd, size, 0, size});
+        modelCache.emplace_back(SharedBuffer {fd, size, 0, size});
         return HDF_SUCCESS;
     }
 
