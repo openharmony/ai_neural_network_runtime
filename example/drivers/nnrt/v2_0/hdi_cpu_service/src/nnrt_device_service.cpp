@@ -16,7 +16,7 @@
 #include "nnrt_device_service.h"
 
 #include <hdf_base.h>
-#include "utils/hdf_log.h"
+#include "hdf_log.h"
 #include "ashmem.h"
 #include "securec.h"
 
@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Nnrt {
-namespace V1_0 {
+namespace V2_0 {
 extern "C" INnrtDevice *NnrtDeviceImplGetInstance(void)
 {
     return new (std::nothrow) NnrtDeviceService();
@@ -45,25 +45,25 @@ NnrtDeviceService::~NnrtDeviceService()
 int32_t NnrtDeviceService::GetDeviceName(std::string& name)
 {
     name = "RK3568-CPU";
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::GetVendorName(std::string& name)
 {
     name = "Rockchip";
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::GetDeviceType(DeviceType& deviceType)
 {
     deviceType = DeviceType::CPU;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::GetDeviceStatus(DeviceStatus& status)
 {
     status = DeviceStatus::AVAILABLE;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::GetSupportedOperation(const Model& model, std::vector<bool>& ops)
@@ -75,51 +75,58 @@ int32_t NnrtDeviceService::GetSupportedOperation(const Model& model, std::vector
     for (size_t i = 0; i < nodeSize; i++) {
         ops[i] = regInstance.IsNodeTypeExist(nodes[i].nodeType);
     }
-    return HDF_SUCCESS;
+
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::IsFloat16PrecisionSupported(bool& isSupported)
 {
     isSupported = true;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::IsPerformanceModeSupported(bool& isSupported)
 {
     isSupported = true;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::IsPrioritySupported(bool& isSupported)
 {
     isSupported = false;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::IsDynamicInputSupported(bool& isSupported)
 {
     isSupported = true;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::PrepareModel(const Model& model, const ModelConfig& config,
     sptr<IPreparedModel>& preparedModel)
 {
     auto ret = ValidateModel(model);
-    if (ret != HDF_SUCCESS) {
+    if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("Model is invalid.");
         return ret;
     }
 
-    auto graph = TransModelToGraph(model);
+    auto graph = TransModelToGraph(model, ret);
     if (graph == nullptr) {
         HDF_LOGE("Transfrom model to graph failed.");
-        return HDF_ERR_INVALID_PARAM;
+        return ret;
     }
 
     ret = ValidateModelConfig(config);
-    if (ret != HDF_SUCCESS) {
+    if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("ModelConfig is invalid.");
+        return ret;
+    }
+
+    ret = ShowCustomAttributes(config.extensions);
+    if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
+        HDF_LOGE("Showing custom attributes failed.");
         return ret;
     }
 
@@ -127,23 +134,38 @@ int32_t NnrtDeviceService::PrepareModel(const Model& model, const ModelConfig& c
     sptr<PreparedModelService> service = new (std::nothrow) PreparedModelService(context);
     if (service == nullptr) {
         HDF_LOGE("Create new PreparedModelService instance failed.");
-        return HDF_ERR_MALLOC_FAIL;
+        return NNRT_ReturnCode::NNRT_OUT_OF_MEMORY;
     }
 
     ret = service->Compile(graph);
-    if (ret != HDF_SUCCESS) {
+    if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("Prepared model failed.");
         return ret;
     }
 
     preparedModel = service;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
+}
+
+int32_t NnrtDeviceService::PrepareOfflineModel(const std::vector<SharedBuffer>& offlineModels,
+    const ModelConfig& config, sptr<IPreparedModel>& preparedModel)
+{
+    auto ret = PrepareModelFromModelCache(offlineModels, config, preparedModel);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("Prepare offline model failed.");
+        if (ret == NNRT_ReturnCode::NNRT_INVALID_MODEL_CACHE) {
+            return NNRT_ReturnCode::NNRT_INVALID_MODEL;
+        }
+        return ret;
+    }
+
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::IsModelCacheSupported(bool& isSupported)
 {
     isSupported = true;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::PrepareModelFromModelCache(const std::vector<SharedBuffer>& modelCache,
@@ -154,32 +176,44 @@ int32_t NnrtDeviceService::PrepareModelFromModelCache(const std::vector<SharedBu
     // modelCache must be 1, because PreparedModel only export one cache file.
     if (modelCache.size() != 1) {
         HDF_LOGE("The size of modelCache vector is not valid, it should be one elememt in that vector.");
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_MODEL_CACHE;
     }
 
     SharedBufferParser parser;
-    auto ret = parser.Init(modelCache[0]);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("Parse modle buffer failed.");
-        return HDF_ERR_INVALID_PARAM;
+    auto result = parser.Init(modelCache[0]);
+    if (result != HDF_SUCCESS) {
+        HDF_LOGE("Parse model buffer failed.");
+        return NNRT_ReturnCode::NNRT_INVALID_BUFFER;
     }
 
-    void* modelBuffer = parser.GetBufferPtr();
+    auto ret = ValidateModelConfig(config);
+    if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
+        HDF_LOGE("ModelConfig is invalid.");
+        return ret;
+    }
+
+    ret = ShowCustomAttributes(config.extensions);
+    if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
+        HDF_LOGE("Showing custom attributes failed.");
+        return ret;
+    }
+
     auto context = TransModelConfig(config);
     sptr<PreparedModelService> service = new (std::nothrow) PreparedModelService(context);
     if (service == nullptr) {
         HDF_LOGE("Create new instance PreparedModelService failed.");
-        return HDF_ERR_MALLOC_FAIL;
+        return NNRT_ReturnCode::NNRT_OUT_OF_MEMORY;
     }
 
+    void* modelBuffer = parser.GetBufferPtr();
     ret = service->Compile(modelBuffer, modelCache[0].dataSize);
-    if (ret != HDF_SUCCESS) {
+    if (result != NNRT_ReturnCode::NNRT_SUCCESS) {
         HDF_LOGE("Prepared model failed.");
         return ret;
     }
 
     preparedModel = service;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::AllocateBuffer(uint32_t length, SharedBuffer& buffer)
@@ -187,12 +221,12 @@ int32_t NnrtDeviceService::AllocateBuffer(uint32_t length, SharedBuffer& buffer)
     sptr<Ashmem> ashptr = Ashmem::CreateAshmem("allocateBuffer", length);
     if (ashptr == nullptr) {
         HDF_LOGE("Create shared memory failed.");
-        return HDF_FAILURE;
+        return NNRT_ReturnCode::NNRT_OUT_OF_MEMORY;
     }
 
     if (!ashptr->MapReadAndWriteAshmem()) {
         HDF_LOGE("Map allocate buffer failed.");
-        return HDF_FAILURE;
+        return NNRT_ReturnCode::NNRT_MEMORY_ERROR;
     }
 
     buffer.fd = ashptr->GetAshmemFd();
@@ -201,7 +235,7 @@ int32_t NnrtDeviceService::AllocateBuffer(uint32_t length, SharedBuffer& buffer)
     buffer.dataSize = length;
 
     m_ashmems[buffer.fd] = ashptr;
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
 int32_t NnrtDeviceService::ReleaseBuffer(const SharedBuffer& buffer)
@@ -211,7 +245,7 @@ int32_t NnrtDeviceService::ReleaseBuffer(const SharedBuffer& buffer)
     auto ret = parser.Init(buffer);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("Parse buffer failed.");
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_BUFFER;
     }
 
     for (auto& ash : m_ashmems) {
@@ -219,78 +253,80 @@ int32_t NnrtDeviceService::ReleaseBuffer(const SharedBuffer& buffer)
         ash.second->CloseAshmem();
     }
     m_ashmems.clear();
-    return HDF_SUCCESS;
+
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::ValidateModelConfig(const ModelConfig& config) const
+NNRT_ReturnCode NnrtDeviceService::ValidateModelConfig(const ModelConfig& config) const
 {
     if (!ValidatePerformanceMode(config.mode)) {
         HDF_LOGE("PerformanceMode is invalid. mode=%d", config.mode);
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_PERFORMANCE_MODE;
     }
 
     if (!ValidatePriority(config.priority)) {
         HDF_LOGE("Priority is invalid. priority=%d", config.priority);
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_PRIORITY;
     }
 
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-int32_t NnrtDeviceService::ValidateModel(const Model& model) const
+NNRT_ReturnCode NnrtDeviceService::ValidateModel(const Model& model) const
 {
     if (model.allTensors.empty()) {
         HDF_LOGE("Model has no tensors.");
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_TENSOR;
     }
 
     if (model.subGraph.empty()) {
         HDF_LOGE("Model has no subGraphs.");
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_MODEL;
     }
 
     if (model.nodes.empty()) {
         HDF_LOGE("Model has no nodes.");
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_NODE;
     }
 
     if (model.inputIndex.empty()) {
         HDF_LOGE("Model has no input.");
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_INPUT;
     }
 
     if (model.outputIndex.empty()) {
         HDF_LOGE("Model has no output.");
-        return HDF_ERR_INVALID_PARAM;
+        return NNRT_ReturnCode::NNRT_INVALID_OUTPUT;
     }
 
     size_t tensorSize = model.allTensors.size();
     for (auto index : model.inputIndex) {
         if (index > tensorSize) {
             HDF_LOGE("Input index is invalid, index=%u", index);
-            return HDF_ERR_INVALID_PARAM;
+            return NNRT_ReturnCode::NNRT_INVALID_INPUT;
         }
     }
 
     for (auto index : model.outputIndex) {
         if (index > tensorSize) {
             HDF_LOGE("Output index is invalid, index=%u", index);
-            return HDF_ERR_INVALID_PARAM;
+            return NNRT_ReturnCode::NNRT_INVALID_OUTPUT;
         }
     }
 
-    return HDF_SUCCESS;
+    return NNRT_ReturnCode::NNRT_SUCCESS;
 }
 
-std::shared_ptr<mindspore::schema::MetaGraphT> NnrtDeviceService::TransModelToGraph(const Model& model) const
+std::shared_ptr<mindspore::schema::MetaGraphT> NnrtDeviceService::TransModelToGraph(const Model& model,
+    NNRT_ReturnCode& returnCode) const
 {
     auto metaGraph = std::make_shared<mindspore::schema::MetaGraphT>();
     metaGraph->name = model.name;
     metaGraph->version = mindspore::Version();
 
-    std::unique_ptr<mindspore::schema::TensorT> transTensor{nullptr};
+    std::unique_ptr<mindspore::schema::TensorT> transTensor {nullptr};
     for (auto tensor : model.allTensors) {
-        transTensor = TransTensor(tensor);
+        transTensor = TransTensor(tensor, returnCode);
         if (transTensor == nullptr) {
             HDF_LOGE("Transform tensor failed.");
             return nullptr;
@@ -303,7 +339,7 @@ std::shared_ptr<mindspore::schema::MetaGraphT> NnrtDeviceService::TransModelToGr
     // Transform node
     std::unique_ptr<mindspore::schema::CNodeT> transNode {nullptr};
     for (auto& node : model.nodes) {
-        transNode = TransNode(node);
+        transNode = TransNode(node, returnCode);
         if (transNode == nullptr) {
             HDF_LOGE("Transform node failed, node name=%{public}s", node.name.c_str());
             return nullptr;
@@ -316,18 +352,23 @@ std::shared_ptr<mindspore::schema::MetaGraphT> NnrtDeviceService::TransModelToGr
     for (auto graph : model.subGraph) {
         metaGraph->subGraph.emplace_back(TransSubGraph(graph, numTensor));
     }
+
+    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
     return metaGraph;
 }
 
-std::unique_ptr<mindspore::schema::TensorT> NnrtDeviceService::TransTensor(const Tensor& tensor) const
+std::unique_ptr<mindspore::schema::TensorT> NnrtDeviceService::TransTensor(const Tensor& tensor,
+    NNRT_ReturnCode& returnCode) const
 {
     if (!ValidateDataType(tensor.dataType)) {
         HDF_LOGE("DataType of tensor is invalid. dataType=%d", tensor.dataType);
+        returnCode = NNRT_ReturnCode::NNRT_INVALID_DATATYPE;
         return nullptr;
     }
 
     if (!ValidateFormat(tensor.format)) {
         HDF_LOGE("Format of tensor is invalid. format=%d", tensor.format);
+        returnCode = NNRT_ReturnCode::NNRT_INVALID_FORMAT;
         return nullptr;
     }
 
@@ -350,6 +391,7 @@ std::unique_ptr<mindspore::schema::TensorT> NnrtDeviceService::TransTensor(const
         auto ret = parser.Init(tensor.data);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("Parse tensor data failed.");
+            returnCode = NNRT_ReturnCode::NNRT_MEMORY_ERROR;
             return nullptr;
         }
 
@@ -359,13 +401,17 @@ std::unique_ptr<mindspore::schema::TensorT> NnrtDeviceService::TransTensor(const
                                tensor.data.dataSize, data, tensor.data.dataSize);
         if (memRet != EOK) {
             HDF_LOGW("Copy tensor data failed.");
+            returnCode = NNRT_ReturnCode::NNRT_INVALID_BUFFER;
             return nullptr;
         }
     }
+
+    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
     return schemaTensor;
 }
 
-std::unique_ptr<mindspore::schema::CNodeT> NnrtDeviceService::TransNode(const Node& node) const
+std::unique_ptr<mindspore::schema::CNodeT> NnrtDeviceService::TransNode(const Node& node,
+    NNRT_ReturnCode& returnCode) const
 {
     auto cnode = std::make_unique<mindspore::schema::CNodeT>();
     cnode->name = node.name;
@@ -378,10 +424,12 @@ std::unique_ptr<mindspore::schema::CNodeT> NnrtDeviceService::TransNode(const No
     auto primitive = parseFunc(node.nodeAttr);
     if (primitive == nullptr) {
         HDF_LOGE("Parse primitve data failed. node name=%{public}s", node.name.c_str());
+        returnCode = NNRT_ReturnCode::NNRT_INVALID_NODE;
         return nullptr;
     }
 
     cnode->primitive = std::move(primitive);
+    returnCode = NNRT_ReturnCode::NNRT_SUCCESS;
     return cnode;
 }
 
@@ -394,7 +442,7 @@ std::unique_ptr<mindspore::schema::SubGraphT> NnrtDeviceService::TransSubGraph(c
     subGraph->outputIndices = graph.outputIndices;
     subGraph->nodeIndices = graph.nodeIndices;
     subGraph->tensorIndices.reserve(numTensor);
-    for (auto i = 0; i < numTensor; i++) {
+    for (size_t i = 0; i < numTensor; i++) {
         subGraph->tensorIndices.emplace_back(static_cast<uint32_t>(i));
     }
     return subGraph;
@@ -430,7 +478,83 @@ std::shared_ptr<mindspore::Context> NnrtDeviceService::TransModelConfig(const Mo
     deviceInfos.emplace_back(cpuInfo);
     return context;
 }
-} // V1_0
+
+NNRT_ReturnCode NnrtDeviceService::ShowCustomAttributes(const std::map<std::string,
+    std::vector<int8_t>>& extensions) const
+{
+    float attr1 {0.0};
+    std::string attr2;
+
+    auto ret = ParseCustomAttributes(extensions, attr1, attr2);
+    if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
+        HDF_LOGE("Parsing custom attributes failed.");
+        return ret;
+    }
+
+    if (attr1 != 0.0f) {
+        HDF_LOGI("Set attr1: %f", attr1);
+    }
+
+    if (!attr2.empty()) {
+        HDF_LOGI("Set attr2: %s", attr2.c_str());
+    }
+
+    return NNRT_ReturnCode::NNRT_SUCCESS;
+}
+
+NNRT_ReturnCode NnrtDeviceService::ConvertVecToFloat(std::vector<int8_t> vecFloat, float& result) const
+{
+    if (vecFloat.size() != sizeof(float)) {
+        HDF_LOGE("Size of the int8_t vector dose not match a float value.");
+        return NNRT_ReturnCode::NNRT_INVALID_PARAMETER;
+    }
+
+    result = *(reinterpret_cast<float*>(vecFloat.data()));
+    return NNRT_ReturnCode::NNRT_SUCCESS;
+}
+
+NNRT_ReturnCode NnrtDeviceService::ConvertVecToString(std::vector<int8_t> vecFloat, std::string& result) const
+{
+    if (vecFloat.empty()) {
+        HDF_LOGE("int8_t vector is empty.");
+        return NNRT_ReturnCode::NNRT_INVALID_PARAMETER;
+    }
+
+    result = reinterpret_cast<char*>(vecFloat.data());
+    return NNRT_ReturnCode::NNRT_SUCCESS;
+}
+
+NNRT_ReturnCode NnrtDeviceService::ParseCustomAttributes(const std::map<std::string, std::vector<int8_t>>& extensions,
+    float& attr1, std::string& attr2) const
+{
+    NNRT_ReturnCode ret;
+    for (auto extension : extensions) {
+        if (extension.first == "attr1") {
+            ret = ConvertVecToFloat(extension.second, attr1);
+            if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
+                HDF_LOGE("ConvertVecToFloat failed.");
+                return ret;
+            }
+            if (attr1 <= 0.0f || attr1 > 1.0f) {
+                HDF_LOGE("attr1 is out of range (0,1].");
+                return NNRT_ReturnCode::NNRT_INVALID_PARAMETER;
+            }
+        } else if (extension.first == "attr2") {
+            ret = ConvertVecToString(extension.second, attr2);
+            if (ret != NNRT_ReturnCode::NNRT_SUCCESS) {
+                HDF_LOGE("ConvertVecToString failed.");
+                return ret;
+            }
+            if (attr2 != "LOW" || attr2 != "HIGH") {
+                HDF_LOGE("attr2 is neither LOW nor HIGH.");
+                return NNRT_ReturnCode::NNRT_INVALID_PARAMETER;
+            }
+        }
+    }
+
+    return NNRT_ReturnCode::NNRT_SUCCESS;
+}
+} // V2_0
 } // Nnrt
 } // HDI
 } // OHOS
