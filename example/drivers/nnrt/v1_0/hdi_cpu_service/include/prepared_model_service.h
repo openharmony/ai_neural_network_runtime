@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_NNR_V1_0_PREPAREDMODELSERVICE_H
-#define OHOS_HDI_NNR_V1_0_PREPAREDMODELSERVICE_H
+#ifndef OHOS_HDI_NNRT_V1_0_PREPAREDMODELSERVICE_H
+#define OHOS_HDI_NNRT_V1_0_PREPAREDMODELSERVICE_H
 
 #include "v1_0/iprepared_model.h"
 #include "include/api/data_type.h"

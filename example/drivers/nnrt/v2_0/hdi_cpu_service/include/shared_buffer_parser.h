@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_NNR_V1_0_SHARED_BUFFER_PARSER_H
-#define OHOS_HDI_NNR_V1_0_SHARED_BUFFER_PARSER_H
+#ifndef OHOS_HDI_NNRT_V2_0_SHARED_BUFFER_PARSER_H
+#define OHOS_HDI_NNRT_V2_0_SHARED_BUFFER_PARSER_H
 
 #include "ashmem.h"
-#include "v1_0/nnrt_types.h"
+#include "v2_0/nnrt_types.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Nnrt {
-namespace V1_0 {
+namespace V2_0 {
 namespace {
 const int INVALID_FD = -1;
 }
@@ -42,8 +42,8 @@ private:
     sptr<Ashmem> m_ashptr {nullptr};
     void* m_bufferAddr {nullptr};
 };
-} // V1_0
+} // V2_0
 } // Nnrt
 } // HDI
 } // OHOS
-#endif // OHOS_HDI_NNR_V1_0_SHARED_BUFFER_PARSER_H
+#endif // OHOS_HDI_NNR_V2_0_SHARED_BUFFER_PARSER_H

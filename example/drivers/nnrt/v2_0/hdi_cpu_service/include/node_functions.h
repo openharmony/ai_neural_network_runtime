@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_NNR_NODE_FUNCTIONS_H
-#define OHOS_HDI_NNR_NODE_FUNCTIONS_H
+#ifndef OHOS_HDI_NNRT_V2_0_NODE_FUNCTIONS_H
+#define OHOS_HDI_NNRT_V2_0_NODE_FUNCTIONS_H
 
 #include <functional>
 
+#include <hdf_sbuf_ipc.h>
 #include "hdf_base.h"
-#include "utils/hdf_log.h"
-
+#include "hdf_log.h"
 #include "node_registry.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Nnrt {
-namespace V1_0 {
+namespace V2_0 {
 template<typename T>
 int32_t ParsePrimitive(const std::vector<int8_t>& primitive, T& attr,
     std::function<bool(OHOS::MessageParcel&, T&)> parseFunc)
@@ -64,7 +64,7 @@ PrimUniquePtr GetScaleFusionPrimitive(const std::vector<int8_t>& primitive);
 PrimUniquePtr GetActivationPrimitive(const std::vector<int8_t>& primitive);
 PrimUniquePtr GetQuantDTypeCastPrimitive(const std::vector<int8_t>& primitive);
 PrimUniquePtr GetMulFusionPrimitive(const std::vector<int8_t>& primitive);
-} // namespace V1_0
+} // namespace V2_0
 } // namespace Nnrt
 } // namespace HDI
 } // namespace OHOS

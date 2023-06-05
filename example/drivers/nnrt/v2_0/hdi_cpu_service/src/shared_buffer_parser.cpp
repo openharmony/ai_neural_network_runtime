@@ -13,20 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_NNR_V1_0_UTILS_H
-#define OHOS_HDI_NNR_V1_0_UTILS_H
+#ifndef OHOS_HDI_NNR_V2_0_UTILS_H
+#define OHOS_HDI_NNR_V2_0_UTILS_H
 
 #include "shared_buffer_parser.h"
 
 #include <hdf_base.h>
 #include "ashmem.h"
-#include "v1_0/nnrt_types.h"
-#include "utils/hdf_log.h"
+#include "v2_0/nnrt_types.h"
+#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Nnrt {
-namespace V1_0 {
+namespace V2_0 {
 SharedBufferParser::~SharedBufferParser()
 {
     if (m_ashptr != nullptr) {
@@ -97,8 +97,8 @@ SharedBuffer SharedBufferParser::GetBuffer()
 {
     return m_buffer;
 }
-} // V1_0
+} // V2_0
 } // Nnrt
 } // HDI
 } // OHOS
-#endif // OHOS_HDI_NNR_V1_0_UTILS_H
+#endif // OHOS_HDI_NNR_V2_0_UTILS_H
