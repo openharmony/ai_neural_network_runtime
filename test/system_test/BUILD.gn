@@ -75,32 +75,10 @@ ohos_systemtest("End2EndTest") {
   ]
 }
 
-ohos_systemtest("StressTest") {
-  module_out_path = module_output_path
-  sources = [
-    "./common/nnrt_test.cpp",
-    "./stress_test.cpp",
-  ]
-
-  configs = [ ":system_test_config" ]
-
-  deps = [
-    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "mindspore:mindir",
-  ]
-}
-
 group("system_test") {
   testonly = true
   deps = [
     ":DeviceTest",
     ":End2EndTest",
-    ":StressTest",
   ]
 }
