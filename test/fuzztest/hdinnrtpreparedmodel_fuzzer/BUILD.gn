@@ -42,7 +42,7 @@ ohos_fuzztest("HdiNnrtPreparedModelFuzzTest") {
     "drivers_interface_nnrt:libnnrt_proxy_2.0",
     "drivers_interface_nnrt:libnnrt_stub_2.0",
     "hdf_core:libhdi",
-    "hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "mindspore:mindir",
     "neural_network_runtime:nnrt_target",

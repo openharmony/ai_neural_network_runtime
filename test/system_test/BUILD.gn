@@ -45,8 +45,8 @@ ohos_systemtest("DeviceTest") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
+    "hilog:libhilog",
     "hitrace:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
   ]
 }
 
@@ -68,9 +68,9 @@ ohos_systemtest("End2EndTest") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
+    "hilog:libhilog",
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
-    "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
 }

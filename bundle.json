@@ -26,7 +26,7 @@
                 "c_utils",
                 "drivers_interface_nnrt",
                 "hdf_core",
-                "hilog_native",
+                "hilog",
                 "hitrace",
                 "mindspore"
             ],
