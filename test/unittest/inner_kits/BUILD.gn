@@ -50,7 +50,7 @@ ohos_unittest("NeuralNetworkRuntimeInnerTest") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
