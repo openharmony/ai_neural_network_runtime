@@ -124,7 +124,7 @@ ohos_shared_library("libneural_network_runtime") {
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "drivers_interface_nnrt:libnnrt_proxy_2.0",
     "hdf_core:libhdf_utils",
-    "hilog_native:libhilog",
+    "hilog:libhilog",
     "hitrace:libhitracechain",
     "mindspore:mindir",
   ]

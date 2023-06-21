@@ -37,7 +37,7 @@ ohos_fuzztest("HdiNnrtDeviceFuzzTest") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_stub_2.0",
     "hdf_core:libhdi",
-    "hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 }
