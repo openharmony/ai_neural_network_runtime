@@ -42,7 +42,7 @@ ohos_shared_library("libnnrt_device_service_1.0") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_stub_1.0",
     "hdf_core:libhdf_utils",
-    "hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 
@@ -63,7 +63,7 @@ ohos_shared_library("libnnrt_driver") {
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
-    "hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
   ]
 
