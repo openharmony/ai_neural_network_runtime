@@ -43,7 +43,7 @@ ohos_unittest("CompilationTest") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -66,7 +66,7 @@ ohos_unittest("ExecutorTest") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -88,7 +88,7 @@ ohos_unittest("DeviceManagerTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -110,7 +110,7 @@ ohos_unittest("DeviceRegistrarTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -133,7 +133,7 @@ ohos_unittest("HDIDeviceTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -156,7 +156,7 @@ ohos_unittest("HDIPreparedModelTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -177,7 +177,7 @@ ohos_unittest("MemoryManagerTest") {
 
   external_deps = [
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -197,7 +197,7 @@ ohos_unittest("TransformTest") {
 
   external_deps = [
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -220,7 +220,7 @@ ohos_unittest("InnerModelTest") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -242,7 +242,7 @@ ohos_unittest("NnTensorTest") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -264,7 +264,7 @@ ohos_unittest("NnValidationTest") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -286,7 +286,7 @@ ohos_unittest("OpsRegistryTest") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
@@ -310,7 +310,7 @@ ohos_unittest("NeuralNetworkRuntimeTest") {
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hitrace_native:libhitracechain",
+    "hitrace:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]

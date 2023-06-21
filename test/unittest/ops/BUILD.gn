@@ -105,7 +105,7 @@ ohos_unittest("OpsUnittest") {
 
   external_deps = [
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "hitrace_native:hitrace_meter",
+    "hitrace:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "mindspore:mindir",
   ]
