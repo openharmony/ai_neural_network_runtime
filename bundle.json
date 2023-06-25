@@ -45,6 +45,9 @@
                         "header_base":"//foundation/ai/neural_network_runtime/interfaces/innerkits/c"
                     }
                 }
+            ],
+            "test": [
+                "//foundation/ai/neural_network_runtime:nnrt_fuzztest"
             ]
         }
     }
