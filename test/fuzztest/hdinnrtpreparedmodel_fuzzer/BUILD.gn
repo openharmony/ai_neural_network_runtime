@@ -15,7 +15,7 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "drivers_interface_nnrt/drivers_interface_nnrt"
+module_output_path = "drivers_interface_nnrt/nnrt"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("HdiNnrtPreparedModelFuzzTest") {
