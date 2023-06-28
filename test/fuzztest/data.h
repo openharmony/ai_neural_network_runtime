@@ -29,6 +29,7 @@ public:
         dataFuzz = data;
         dataSize = size;
     }
+
     template<class T> T GetData()
     {
         T object {};
@@ -44,18 +45,20 @@ public:
         dataPos = dataPos + objectSize;
         return object;
     }
-    const uint8_t* getNowData()
+
+    const uint8_t* GetNowData()
     {
         return dataFuzz + dataPos;
     }
-    size_t getNowDataSize()
+
+    size_t GetNowDataSize()
     {
         return dataSize - dataPos;
     }
 private:
-    const uint8_t* dataFuzz = nullptr;
-    size_t dataSize = 0;
-    size_t dataPos = 0;
+    const uint8_t* dataFuzz {nullptr};
+    size_t dataSize {0};
+    size_t dataPos {0};
 };
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS

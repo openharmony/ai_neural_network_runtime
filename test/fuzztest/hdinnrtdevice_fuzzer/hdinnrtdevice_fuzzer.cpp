@@ -39,7 +39,7 @@ bool HdiNnrtDeviceFuzzTest(const uint8_t* data, size_t size)
         % (V2_0::CMD_NNRT_DEVICE_RELEASE_BUFFER - V2_0::CMD_NNRT_DEVICE_GET_VERSION + 1);
     MessageParcel datas;
     datas.WriteInterfaceToken(V2_0::INnrtDevice::GetDescriptor());
-    datas.WriteBuffer(dataFuzz.getNowData(), dataFuzz.getNowDataSize());
+    datas.WriteBuffer(dataFuzz.GetNowData(), dataFuzz.GetNowDataSize());
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
