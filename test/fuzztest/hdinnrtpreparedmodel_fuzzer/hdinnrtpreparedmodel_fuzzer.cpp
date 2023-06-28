@@ -207,7 +207,7 @@ bool HdiNnrtPreparedModelFuzzTest(const uint8_t* data, size_t size)
         % (V2_0::CMD_PREPARED_MODEL_RUN - V2_0::CMD_PREPARED_MODEL_GET_VERSION + 1);
     MessageParcel datas;
     datas.WriteInterfaceToken(V2_0::IPreparedModel::GetDescriptor());
-    datas.WriteBuffer(dataFuzz.getNowData(), dataFuzz.getNowDataSize());
+    datas.WriteBuffer(dataFuzz.GetNowData(), dataFuzz.GetNowDataSize());
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
