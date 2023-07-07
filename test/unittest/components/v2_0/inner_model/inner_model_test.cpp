@@ -142,7 +142,6 @@ HWTEST_F(InnerModelTest, inner_model_construct_nntensor_from_litegraph_003, Test
 
     SetLiteGraph(liteGraph);
     EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph));
-    mindspore::lite::MindIR_LiteGraph_Destroy(&liteGraph);
 }
 
 /**
@@ -200,7 +199,6 @@ HWTEST_F(InnerModelTest, inner_model_build_from_lite_graph_002, TestSize.Level1)
     SetLiteGraph(liteGraph);
     EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph));
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.BuildFromLiteGraph(liteGraph));
-    mindspore::lite::MindIR_LiteGraph_Destroy(&liteGraph);
 }
 
 /**
@@ -252,7 +250,6 @@ HWTEST_F(InnerModelTest, inner_model_add_tensor_002, TestSize.Level1)
     const int32_t dimInput[2] = {2, 2};
     const OH_NN_Tensor& tensor = {OH_NN_INT8, 2, dimInput, nullptr, OH_NN_TENSOR};
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.AddTensor(tensor));
-    mindspore::lite::MindIR_LiteGraph_Destroy(&liteGraph);
 }
 
 /**
@@ -345,8 +342,6 @@ HWTEST_F(InnerModelTest, inner_model_set_tensor_value_005, TestSize.Level1)
 
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.SetTensorValue(index,
        static_cast<const void *>(&activation), sizeof(int8_t)));
-
-    mindspore::lite::MindIR_LiteGraph_Destroy(&liteGraph);
 }
 
 /**
@@ -427,7 +422,6 @@ HWTEST_F(InnerModelTest, inner_model_add_operation_002, TestSize.Level1)
 
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.AddOperation(m_opType, m_params, m_inputs,
         m_outputs));
-    mindspore::lite::MindIR_LiteGraph_Destroy(&liteGraph);
 }
 
 /**
@@ -620,7 +614,6 @@ HWTEST_F(InnerModelTest, inner_model_specify_inputs_and_outputs_002, TestSize.Le
     EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph));
 
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.SpecifyInputsAndOutputs(inputs, outputs));
-    mindspore::lite::MindIR_LiteGraph_Destroy(&liteGraph);
 }
 
 /**
@@ -785,7 +778,6 @@ HWTEST_F(InnerModelTest, inner_model_get_supported_operation_002, TestSize.Level
     EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph));
 
     EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, m_innerModelTest.GetSupportedOperations(deviceID, &isSupported, opCount));
-    mindspore::lite::MindIR_LiteGraph_Destroy(&liteGraph);
 }
 
 /**
