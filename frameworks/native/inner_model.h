@@ -59,6 +59,7 @@ private:
     OH_NN_ReturnCode ValidateInputAndOutput(
         const OH_NN_UInt32Array& inputIndices, const OH_NN_UInt32Array& outputIndices) const;
     OH_NN_ReturnCode ValidateTensorArray(const OH_NN_UInt32Array& indices) const;
+    OH_NN_ReturnCode CheckParameters() const;
 
 private:
     std::vector<char> m_supportedOperations; // std::vector<bool> not support data(), use std::vector<char> instead.

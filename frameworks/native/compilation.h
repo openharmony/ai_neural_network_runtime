@@ -61,7 +61,7 @@ private:
     std::shared_ptr<ExecutionPlan> m_executionPlan {nullptr};
     std::vector<std::shared_ptr<NNTensor>> m_inputTensors;
     std::vector<std::shared_ptr<NNTensor>> m_outputTensors;
-    void* m_metaGraph{nullptr};
+    void* m_metaGraph {nullptr};
     Buffer m_quantBuffer;
     std::string m_modelName;
 
