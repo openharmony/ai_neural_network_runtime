@@ -61,18 +61,21 @@ private:
     std::shared_ptr<ExecutionPlan> m_executionPlan {nullptr};
     std::vector<std::shared_ptr<NNTensor>> m_inputTensors;
     std::vector<std::shared_ptr<NNTensor>> m_outputTensors;
+    void* m_metaGraph{nullptr};
+    Buffer m_quantBuffer;
+    std::string m_modelName;
 
 private:
-    OH_NN_ReturnCode GenerateCacheFiles(const std::vector<ModelBuffer>& modelBuffer) const;
+    OH_NN_ReturnCode GenerateCacheFiles(const std::vector<Buffer>& modelBuffer) const;
     OH_NN_ReturnCode GenerateCacheModel(size_t cacheNumber, std::unique_ptr<uint64_t[]>& cacheInfo,
-        std::vector<ModelBuffer> modelBuffer) const;
+        std::vector<Buffer> modelBuffer) const;
     OH_NN_ReturnCode GenerateCacheInfo(uint32_t cacheSize, std::unique_ptr<uint64_t[]>& cacheInfo) const;
     OH_NN_ReturnCode CheckCacheInfo(ModelCacheInfo& modelCacheInfo, const std::string& cacheInfoPath) const;
-    OH_NN_ReturnCode ReadCacheModelFile(const std::string& file, ModelBuffer& modelBuffer) const;
+    OH_NN_ReturnCode ReadCacheModelFile(const std::string& file, Buffer& modelBuffer) const;
     OH_NN_ReturnCode RemoveCacheFiles(uint32_t fileNumber) const;
     unsigned short GetCrc16(const unsigned char* buffer, size_t length) const;
     OH_NN_ReturnCode CheckCacheModel(const ModelCacheInfo& modelCacheInfo,
-        std::vector<ModelBuffer>& modelBuffers) const;
+        std::vector<Buffer>& modelBuffers) const;
     OH_NN_ReturnCode NormalBuild(std::shared_ptr<PreparedModel>& preparedModel);
     OH_NN_ReturnCode BuildCacheModel(std::shared_ptr<PreparedModel>& preparedModel);
     OH_NN_ReturnCode GenCacheBuild(std::shared_ptr<PreparedModel>& preparedModel);

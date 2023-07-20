@@ -130,6 +130,6 @@ ohos_shared_library("libneural_network_runtime") {
   ]
 
   subsystem_name = "ai"
-  innerapi_tags = [ "platformsdk_indirect" ]
+  innerapi_tags = [ "ndk" ]
   part_name = "neural_network_runtime"
 }

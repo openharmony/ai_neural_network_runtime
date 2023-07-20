@@ -93,7 +93,7 @@ OH_NN_ReturnCode MemoryManager::GetMemory(const void* buffer, Memory& memory) co
     }
 
     memory.fd = iter->second.fd;
-    memory.data = buffer;
+    memory.data = iter->second.data;
     memory.length = iter->second.length;
 
     return OH_NN_SUCCESS;
