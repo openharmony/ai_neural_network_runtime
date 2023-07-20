@@ -23,6 +23,32 @@ extern "C" {
 #endif
 
 /**
+ * @brief 定义Tensor信息结构体。包含名字，数据类型，维度信息，格式信息。
+ *
+ * @since 10
+ * @version 1.1
+ */
+typedef struct OH_NN_TensorInfo {
+    char name[128];
+    OH_NN_DataType dataType;
+    uint32_t dimensionCount;
+    const int32_t *dimensions;
+    OH_NN_Format format;
+} OH_NN_TensorInfo;
+
+/**
+ * @brief 定义扩展字段结构体。
+ *
+ * @since 10
+ * @version 1.1
+ */
+typedef struct OH_NN_Extension {
+    char name[128];
+    char *value;
+    size_t valueSize;
+} OH_NN_Extension;
+
+/**
  * @brief 直接加载LiteGraph，完成模型搭建。
  *
  * 调用{@link OH_NNModel_Construct}创建模型实例后，直接调用本方法加载LiteGraph。加载LiteGraph后，只能调用
@@ -33,7 +59,7 @@ extern "C" {
  * 等构图接口混用，否则返回{@link OH_NN_OPERATION_FORBIDDEN}错误。\n
  *
  * 如果本方法调用成功，返回{@link OH_NN_SUCCESS}，liteGraph将由NNRt管理，调用者无需释放，避免造成二次释放;
- * 如果方法返回其他错误码，则NNRt不会持有liteGraph，此时需要调用者主动释放内存。
+ * 如果方法返回其他错误码，则NNRt不会持有liteGraph，此时需要调用者主动释放内存。\n
  *
  *
  * 本接口不作为Neural Network Runtime接口对外开放。\n
@@ -47,6 +73,59 @@ extern "C" {
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const void *liteGraph);
+
+/**
+ * @brief 设置MetaGraph的输入输出信息。
+ *
+ * 调用{@link OH_NNModel_Construct}创建模型实例后，直接调用本方法设置MetaGraph的输入输出信息。然后调用{@link OH_NNModel_BuildFromMetaGraph}
+ * 加载MetaGraph，完成模型搭建。\n
+ *
+ * 不允许本方法与{@link OH_NNModel_AddTensor}、和{@link OH_NNModel_SpecifyInputsAndOutputs}
+ * 等构图接口混用，否则返回{@link OH_NN_OPERATION_FORBIDDEN}错误。\n
+ *
+ * 如果本方法调用成功，返回{@link OH_NN_SUCCESS}。\n
+ *
+ *
+ * 本接口不作为Neural Network Runtime接口对外开放。\n
+ *
+ * @param model 指向{@link OH_NNModel}实例的指针。
+ * @param inputsInfo 指向{@link OH_NN_TensorInfo}数组的指针，代表传入的输入Tensor信息。
+ * @param inputSize 代表inputsInfo数组大小。
+ * @param outputsInfo 指向{@link OH_NN_TensorInfo}数组的指针，代表传入的输出Tensor信息。
+ * @param outputSize 代表outputsInfo数组大小。
+ * @return 函数执行的结果状态，执行成功返回OH_NN_SUCCESS，失败返回具体错误码，参考{@link OH_NN_ReturnCode}。
+ * @since 10
+ * @version 1.1
+ */
+OH_NN_ReturnCode OH_NNModel_SetInputsAndOutputsInfo(OH_NNModel *model, const OH_NN_TensorInfo *inputsInfo,
+    size_t inputSize, const OH_NN_TensorInfo *outputsInfo, size_t outputSize);
+
+/**
+ * @brief 直接加载MetaGraph，完成模型搭建。
+ *
+ * 调用{@link OH_NNModel_SetInputsAndOutputsInfo}设置好MetaGraph输入输出信息后，直接调用本方法加载MetaGraph。加载MetaGraph后，只能调用
+ * {@link OH_NNCompilation_Construct}创建模型编译器，或者调用{@link OH_NNModel_Destroy}销毁模型实例。\n
+ *
+ * 不允许本方法与{@link OH_NNModel_AddTensor}、{@link OH_NNModel_AddOperation}、
+ * {@link OH_NNModel_SetTensorData}、{@link OH_NNModel_SpecifyInputsAndOutputs}和{@link OH_NNModel_Finish}
+ * 等构图接口混用，否则返回{@link OH_NN_OPERATION_FORBIDDEN}错误。\n
+ *
+ * 如果本方法调用成功，返回{@link OH_NN_SUCCESS}。\n
+ *
+ *
+ * 本接口不作为Neural Network Runtime接口对外开放。\n
+ *
+ * @param model 指向{@link OH_NNModel}实例的指针。
+ * @param metaGraph 指向MetaGraph的指针。
+ * @param extensions 指向{@ OH_NN_Extension}数组的指针，代表传入的扩展字段。
+ *                   例如，传递量化信息时，指定Extension.name为"QuantBuffer"，将量化Buffer赋给value和valueSize。
+ * @param extensionSize 代表extensions数组大小。
+ * @return 函数执行的结果状态，执行成功返回OH_NN_SUCCESS，失败返回具体错误码，参考{@link OH_NN_ReturnCode}。
+ * @since 10
+ * @version 1.1
+ */
+OH_NN_ReturnCode OH_NNModel_BuildFromMetaGraph(OH_NNModel *model, const void *metaGraph,
+    const OH_NN_Extension *extensions, size_t extensionSize);
 
 #ifdef __cplusplus
 }

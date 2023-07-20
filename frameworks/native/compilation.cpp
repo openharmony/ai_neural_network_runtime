@@ -74,7 +74,10 @@ static const unsigned short CRC16_TAB[256] = {
 Compilation::Compilation(const InnerModel* innerModel)
     : m_liteGraph(innerModel->GetLiteGraphs()),
     m_inputTensors(innerModel->GetInputTensors()),
-    m_outputTensors(innerModel->GetOutputTensors()) {}
+    m_outputTensors(innerModel->GetOutputTensors()),
+    m_metaGraph(innerModel->GetMetaGraph()),
+    m_quantBuffer(innerModel->GetQuantBuffer()),
+    m_modelName(innerModel->GetModelName()) {}
 
 OH_NN_ReturnCode Compilation::SetDevice(size_t deviceId)
 {
@@ -275,7 +278,7 @@ unsigned short Compilation::GetCrc16(const unsigned char* buffer, size_t length)
 
 OH_NN_ReturnCode Compilation::GenerateCacheInfo(uint32_t cacheSize, std::unique_ptr<uint64_t[]>& cacheInfo) const
 {
-    std::string cacheInfoPath = m_cachePath + "cache_info.nncache";
+    std::string cacheInfoPath = m_cachePath + m_modelName + "cache_info.nncache";
     std::ofstream cacheInfoStream(cacheInfoPath, std::ios::binary | std::ios::out | std::ios::trunc);
     if (cacheInfoStream.fail()) {
         LOGE("[Compilation] Model cache info file is invalid.");
@@ -293,24 +296,24 @@ OH_NN_ReturnCode Compilation::GenerateCacheInfo(uint32_t cacheSize, std::unique_
 }
 
 OH_NN_ReturnCode Compilation::GenerateCacheModel(size_t cacheNumber, std::unique_ptr<uint64_t[]>& cacheInfo,
-    std::vector<ModelBuffer> modelBuffer) const
+    std::vector<Buffer> modelBuffer) const
 {
     auto cacheInfoPtr = cacheInfo.get();
     *cacheInfoPtr++ = static_cast<uint64_t>(cacheNumber);
     *cacheInfoPtr++ = static_cast<uint64_t>(m_version);
     *cacheInfoPtr++ = static_cast<uint64_t>(m_deviceId);
     for (uint32_t i = 0; i < cacheNumber; ++i) {
-        std::string cacheModelFile = m_cachePath + std::to_string(i) + ".nncache";
+        std::string cacheModelFile = m_cachePath + m_modelName + std::to_string(i) + ".nncache";
         std::ofstream cacheModelStream(cacheModelFile, std::ios::binary | std::ios::out | std::ios::trunc);
         if (cacheModelStream.fail()) {
             LOGE("[Compilation] Model cache file is invalid.");
             return OH_NN_INVALID_FILE;
         }
 
-        uint64_t checkSum = static_cast<uint64_t>(GetCrc16(static_cast<const unsigned char*>(modelBuffer[i].buffer),
+        uint64_t checkSum = static_cast<uint64_t>(GetCrc16(static_cast<const unsigned char*>(modelBuffer[i].data),
             modelBuffer[i].length));
         *cacheInfoPtr++ = checkSum;
-        if (!cacheModelStream.write(static_cast<const char*>(modelBuffer[i].buffer), modelBuffer[i].length)) {
+        if (!cacheModelStream.write(static_cast<const char*>(modelBuffer[i].data), modelBuffer[i].length)) {
             LOGE("[Compilation] Fail to write cache model.");
             cacheModelStream.close();
             return OH_NN_FAILED;
@@ -322,7 +325,7 @@ OH_NN_ReturnCode Compilation::GenerateCacheModel(size_t cacheNumber, std::unique
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Compilation::GenerateCacheFiles(const std::vector<ModelBuffer>& modelBuffer) const
+OH_NN_ReturnCode Compilation::GenerateCacheFiles(const std::vector<Buffer>& modelBuffer) const
 {
     const size_t cacheNumber = modelBuffer.size();
     uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber;
@@ -369,7 +372,7 @@ OH_NN_ReturnCode Compilation::GetCacheFileLength(std::ifstream& ifs, int& fsize)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Compilation::ReadCacheModelFile(const std::string& file, ModelBuffer& modelBuffer) const
+OH_NN_ReturnCode Compilation::ReadCacheModelFile(const std::string& file, Buffer& modelBuffer) const
 {
     // file is validated outside.
     std::ifstream ifs(file.c_str(), std::ios::in | std::ios::binary);
@@ -410,7 +413,7 @@ OH_NN_ReturnCode Compilation::ReadCacheModelFile(const std::string& file, ModelB
     }
 
     ifs.close();
-    modelBuffer.buffer = ptr;
+    modelBuffer.data = ptr;
     modelBuffer.length = static_cast<size_t>(fsize); // fsize should be non-negative, safe to cast.
     return OH_NN_SUCCESS;
 }
@@ -459,7 +462,7 @@ OH_NN_ReturnCode Compilation::CheckCacheInfo(ModelCacheInfo& modelCacheInfo, con
 
 OH_NN_ReturnCode Compilation::RemoveCacheFiles(uint32_t fileNumber) const
 {
-    std::string cacheInfoPath = m_cachePath + "cache_info.nncache";
+    std::string cacheInfoPath = m_cachePath + m_modelName + "cache_info.nncache";
     if (remove(cacheInfoPath.c_str()) == -1) {
         LOGE("[Compilation] Fail to remove the file %s, please delete the file manually.", cacheInfoPath.c_str());
         return OH_NN_FAILED;
@@ -467,7 +470,7 @@ OH_NN_ReturnCode Compilation::RemoveCacheFiles(uint32_t fileNumber) const
     LOGI("[Compilation] Succeed to remove the file cache_info.nncach.");
 
     for (uint32_t i = 0; i < fileNumber; ++i) {
-        std::string fileName = std::to_string(i) + ".nncache";
+        std::string fileName = m_modelName + std::to_string(i) + ".nncache";
         std::string cacheModelPath = m_cachePath + fileName;
         if (access(cacheModelPath.c_str(), 0) != 0) {
             LOGW("[Compilation] The file %s does not exist, no need to delete the file.", cacheModelPath.c_str());
@@ -484,23 +487,23 @@ OH_NN_ReturnCode Compilation::RemoveCacheFiles(uint32_t fileNumber) const
 }
 
 OH_NN_ReturnCode Compilation::CheckCacheModel(const ModelCacheInfo& modelCacheInfo,
-    std::vector<ModelBuffer>& modelBuffers) const
+    std::vector<Buffer>& modelBuffers) const
 {
     for (uint32_t i = 0; i < modelCacheInfo.fileNumber; ++i) {
-        std::string cacheModelPath = m_cachePath + std::to_string(i) + ".nncache";
+        std::string cacheModelPath = m_cachePath + m_modelName + std::to_string(i) + ".nncache";
         if (access(cacheModelPath.c_str(), 0) != 0) {
             LOGE("[Compilation] The cache model file %s does not exist.", cacheModelPath.c_str());
             return OH_NN_INVALID_FILE;
         }
 
-        ModelBuffer modelBuffer;
+        Buffer modelBuffer;
         OH_NN_ReturnCode ret = ReadCacheModelFile(cacheModelPath, modelBuffer);
         if (ret != OH_NN_SUCCESS) {
             LOGE("[Compilation] Read cache model file failed.");
             return ret;
         }
 
-        if (GetCrc16(static_cast<const unsigned char*>(modelBuffer.buffer),
+        if (GetCrc16(static_cast<const unsigned char*>(modelBuffer.data),
             modelBuffer.length) != modelCacheInfo.modelCheckSum[i]) {
             LOGE("[Compilation] The cache model file %s has been changed.", cacheModelPath.c_str());
             return OH_NN_INVALID_FILE;
@@ -515,7 +518,23 @@ OH_NN_ReturnCode Compilation::CheckCacheModel(const ModelCacheInfo& modelCacheIn
 OH_NN_ReturnCode Compilation::NormalBuild(std::shared_ptr<PreparedModel>& preparedModel)
 {
     ModelConfig config {m_enableFp16, m_performance, m_priority};
-    OH_NN_ReturnCode ret = m_device->PrepareModel(m_liteGraph, config, preparedModel);
+    if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
+        LOGE("[Compilation] Both m_liteGraph and m_metaGraph are nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if ((m_liteGraph != nullptr) && (m_metaGraph != nullptr)) {
+        LOGE("[Compilation] Neither m_liteGraph nor m_metaGraph are nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    OH_NN_ReturnCode ret {OH_NN_FAILED};
+    if (m_liteGraph != nullptr) {
+        ret = m_device->PrepareModel(m_liteGraph, config, preparedModel);
+    }
+    if (m_metaGraph != nullptr) {
+        ret = m_device->PrepareModel(m_metaGraph, m_quantBuffer, config, preparedModel);
+    }
     if (ret != OH_NN_SUCCESS) {
         LOGE("[Compilation] Preparing model failed when normally building.");
         return ret;
@@ -523,7 +542,7 @@ OH_NN_ReturnCode Compilation::NormalBuild(std::shared_ptr<PreparedModel>& prepar
 
     m_executionPlan = CreateSharedPtr<ExecutionPlan>(preparedModel, m_device);
     if (m_executionPlan == nullptr) {
-        LOGE("Fail to create ExecutionPlan instance.");
+        LOGE("[Compilation] Fail to create ExecutionPlan instance.");
         return OH_NN_MEMORY_ERROR;
     }
 
@@ -538,7 +557,7 @@ OH_NN_ReturnCode Compilation::GenCacheBuild(std::shared_ptr<PreparedModel>& prep
         return ret;
     }
 
-    std::vector<ModelBuffer> modelBuffers;
+    std::vector<Buffer> modelBuffers;
     ret = preparedModel->ExportModelCache(modelBuffers);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[Compilation] Export model cache failed.");
@@ -575,14 +594,14 @@ OH_NN_ReturnCode Compilation::ReGenCacheBuild(uint32_t fileNumber, std::shared_p
 OH_NN_ReturnCode Compilation::LoadCacheBuild(std::shared_ptr<PreparedModel>& preparedModel,
     const ModelCacheInfo& cacheInfo)
 {
-    std::vector<ModelBuffer> modelBuffers;
+    std::vector<Buffer> modelBuffers;
     OH_NN_ReturnCode ret = CheckCacheModel(cacheInfo, modelBuffers);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[Compilation] Checking cache model failed.");
         size_t modelBuffersSize = modelBuffers.size();
         for (size_t i = 0; i < modelBuffersSize; ++i) {
-            m_device->ReleaseBuffer(modelBuffers[i].buffer);
-            modelBuffers[i].buffer = nullptr;
+            m_device->ReleaseBuffer(modelBuffers[i].data);
+            modelBuffers[i].data = nullptr;
             modelBuffers[i].length = 0;
         }
         return ret;
@@ -597,6 +616,15 @@ OH_NN_ReturnCode Compilation::LoadCacheBuild(std::shared_ptr<PreparedModel>& pre
 
     LOGI("[Compilation] Load cache successfully.");
 
+    for (auto& modelBuffer : modelBuffers) {
+        ret = m_device->ReleaseBuffer(modelBuffer.data);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[Compilation] Release cache model buffer failed.");
+            return ret;
+        }
+    }
+    modelBuffers.clear();
+
     m_executionPlan = CreateSharedPtr<ExecutionPlan>(preparedModel, m_device);
     if (m_executionPlan == nullptr) {
         LOGE("Fail to create ExecutionPlan instance.");
@@ -609,7 +637,7 @@ OH_NN_ReturnCode Compilation::LoadCacheBuild(std::shared_ptr<PreparedModel>& pre
 OH_NN_ReturnCode Compilation::BuildCacheModel(std::shared_ptr<PreparedModel>& preparedModel)
 {
     OH_NN_ReturnCode ret;
-    std::string cacheInfoPath = m_cachePath + "cache_info.nncache";
+    std::string cacheInfoPath = m_cachePath + m_modelName + "cache_info.nncache";
     if (access(cacheInfoPath.c_str(), 0) != 0) {
         ret = GenCacheBuild(preparedModel);
         if (ret != OH_NN_SUCCESS) {
@@ -644,7 +672,12 @@ OH_NN_ReturnCode Compilation::BuildCacheModel(std::shared_ptr<PreparedModel>& pr
 
     ret = LoadCacheBuild(preparedModel, cacheInfo);
     if (ret != OH_NN_SUCCESS) {
-        return ret;
+        // recompile the model online and update the cache when failing to build cache model
+        ret = ReGenCacheBuild(cacheInfo.fileNumber, preparedModel);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[Compilation] Failed to re-generate and build cache model.");
+            return ret;
+        }
     }
 
     m_isBuild = true;
@@ -751,9 +784,19 @@ bool Compilation::IsDynamicShape() const
 OH_NN_ReturnCode Compilation::IsOfflineModel(bool& isOfflineModel) const
 {
     isOfflineModel = false; // Initialize the returned value
-    if (m_liteGraph == nullptr) {
-        LOGE("[Compilation] LiteGraph is empty when identifying the offline model.");
+    if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
+        LOGE("[Compilation] LiteGraph and metaGraph are empty when identifying the offline model.");
         return OH_NN_NULL_PTR;
+    }
+
+    if ((m_liteGraph != nullptr) && (m_metaGraph != nullptr)) {
+        LOGE("[Compilation] LiteGraph and metaGraph are not empty when identifying the offline model.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (m_metaGraph != nullptr) {
+        isOfflineModel = false;
+        return OH_NN_SUCCESS;
     }
 
     if (m_liteGraph->all_nodes_.size() == 0) {

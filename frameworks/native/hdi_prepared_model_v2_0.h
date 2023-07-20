@@ -35,7 +35,7 @@ class HDIPreparedModelV2_0 : public PreparedModel {
 public:
     explicit HDIPreparedModelV2_0(OHOS::sptr<V2_0::IPreparedModel> hdiPreparedModel);
 
-    OH_NN_ReturnCode ExportModelCache(std::vector<ModelBuffer>& modelCache) override;
+    OH_NN_ReturnCode ExportModelCache(std::vector<Buffer>& modelCache) override;
 
     OH_NN_ReturnCode Run(const std::vector<IOTensor>& inputs,
                          const std::vector<IOTensor>& outputs,

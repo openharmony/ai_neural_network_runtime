@@ -21,6 +21,7 @@
 
 #include "cpp_type.h"
 #include "interfaces/kits/c/neural_network_runtime.h"
+#include "interfaces/innerkits/c/neural_network_runtime_inner.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -39,6 +40,7 @@ public:
     NNTensor& operator=(const NNTensor& tensor) = delete;
 
     OH_NN_ReturnCode BuildFromOHNNTensor(const OH_NN_Tensor& nnTensor);
+    OH_NN_ReturnCode BuildFromOHNNTensorInfo(const OH_NN_TensorInfo& nnTensorInfo);
     OH_NN_ReturnCode Build(OH_NN_DataType dataType,
                            const std::vector<int32_t>& dimensions,
                            const std::vector<QuantParam>& quantParam,
@@ -47,7 +49,7 @@ public:
 
     void SetName(const std::string& name);
     void SetBuffer(const void* buffer, size_t length);
-    void SetFormat(OH_NN_Format format);
+    void SetFormat(const OH_NN_Format& format);
     OH_NN_ReturnCode SetDimensions(const std::vector<int32_t>& dimensions);
 
     std::string GetName() const;
@@ -74,7 +76,7 @@ public:
 private:
     // Used in BuildFromOHNNTensor()
     OH_NN_ReturnCode ParseQuantParams(const OH_NN_QuantParam* quantParams);
-    OH_NN_ReturnCode ParseDimensions(const OH_NN_Tensor& nnTensor);
+    OH_NN_ReturnCode ParseDimensions(const int32_t* dimensions, uint32_t dimensionCount);
     // Used in Build()
     OH_NN_ReturnCode ParseQuantParams(const std::vector<QuantParam>& quantParams);
     OH_NN_ReturnCode ParseDimensions(const std::vector<int32_t>& dimensions);

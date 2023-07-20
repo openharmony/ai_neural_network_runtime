@@ -52,6 +52,7 @@ std::shared_ptr<NNTensor> ConstructNNTensorFromLiteGraphTensor(const MSLITE::Ten
     std::vector<int32_t> msDims = MSLITE::MindIR_Tensor_GetDims(msTensor);
     std::vector<MSLITE::QuantParam> msQuantParams = MSLITE::MindIR_Tensor_GetQuantParams(msTensor);
     std::vector<QuantParam> nnQuantParams = MSToNN::TransformQuantParams(msQuantParams);
+    OH_NN_Format nnFormat = MSToNN::TransformFormat(MSLITE::MindIR_Tensor_GetFormat(msTensor));
 
     std::shared_ptr<NNTensor> nnTensor = CreateSharedPtr<NNTensor>();
     if (nnTensor == nullptr) {
@@ -64,6 +65,8 @@ std::shared_ptr<NNTensor> ConstructNNTensorFromLiteGraphTensor(const MSLITE::Ten
         LOGE("ConstructNNTensorFromLiteGraphTensor failed, error happened when building NNTensor with attributes.");
         return nullptr;
     }
+
+    nnTensor->SetFormat(nnFormat);
 
     return nnTensor;
 }
@@ -102,7 +105,7 @@ InnerModel::InnerModel() {}
 
 bool InnerModel::IsBuild() const
 {
-    return (m_liteGraph != nullptr);
+    return ((m_liteGraph != nullptr) || (m_metaGraph != nullptr));
 }
 
 OH_NN_ReturnCode InnerModel::BuildFromLiteGraph(const MSLITE::LiteGraph* liteGraph)
@@ -113,8 +116,8 @@ OH_NN_ReturnCode InnerModel::BuildFromLiteGraph(const MSLITE::LiteGraph* liteGra
         return OH_NN_INVALID_PARAMETER;
     }
 
-    if (m_liteGraph != nullptr) {
-        LOGE("BuildFromLiteGraph failed, liteGraph has been built or loaded before.");
+    if (IsBuild()) {
+        LOGE("BuildFromLiteGraph failed, inner model has been built or loaded before.");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
@@ -143,10 +146,36 @@ OH_NN_ReturnCode InnerModel::BuildFromLiteGraph(const MSLITE::LiteGraph* liteGra
     return OH_NN_SUCCESS;
 }
 
+OH_NN_ReturnCode InnerModel::BuildFromMetaGraph(
+    const void* metaGraph, const Buffer& quantBuffer, const std::string& modelName)
+{
+    NNRT_TRACE_NAME("Build model from meta graph");
+    if (metaGraph == nullptr) {
+        LOGE("BuildFromMetaGraph failed, passed empty metaGraph.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (IsBuild()) {
+        LOGE("BuildFromMetaGraph failed, inner model has been built or loaded before.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    if (m_allTensors.empty()) {
+        LOGE("BuildFromMetaGraph failed, SetInputsAndOutputsInfo should be called before building metaGraph.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    m_metaGraph = const_cast<void*>(metaGraph);
+    m_quantBuffer = quantBuffer;
+    m_modelName = modelName;
+
+    return OH_NN_SUCCESS;
+}
+
 OH_NN_ReturnCode InnerModel::AddTensor(const OH_NN_Tensor& nnTensor)
 {
-    if (m_liteGraph != nullptr) {
-        LOGE("AddTensor failed, AddTensor is forbidden after Finish() or LoadLiteGraph() has been called.");
+    if (IsBuild()) {
+        LOGE("AddTensor failed, AddTensor is forbidden after model has been built.");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
@@ -172,8 +201,8 @@ OH_NN_ReturnCode InnerModel::AddTensor(const OH_NN_Tensor& nnTensor)
 // DOTO: 圈复杂度待优化
 OH_NN_ReturnCode InnerModel::SetTensorValue(uint32_t index, const void* buffer, size_t length)
 {
-    if (m_liteGraph != nullptr) {
-        LOGE("SetTensorValue failed, SetTensorValue is forbidden after Finish() or LoadLiteGraph() has been called.");
+    if (IsBuild()) {
+        LOGE("SetTensorValue failed, SetTensorValue is forbidden after model has been built.");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
@@ -302,8 +331,8 @@ OH_NN_ReturnCode InnerModel::ValidateTensorArray(const OH_NN_UInt32Array& indice
 OH_NN_ReturnCode InnerModel::AddOperation(OH_NN_OperationType opType, const OH_NN_UInt32Array& paramIndices,
                                           const OH_NN_UInt32Array& inputIndices, const OH_NN_UInt32Array& outputIndices)
 {
-    if (m_liteGraph != nullptr) {
-        LOGE("AddOperation failed, AddOperation is forbidden after after Finish() or LoadLiteGraph() has been called.");
+    if (IsBuild()) {
+        LOGE("AddOperation failed, AddOperation is forbidden after model has been built.");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
@@ -342,9 +371,8 @@ OH_NN_ReturnCode InnerModel::AddOperation(OH_NN_OperationType opType, const OH_N
 OH_NN_ReturnCode InnerModel::SpecifyInputsAndOutputs(
     const OH_NN_UInt32Array& inputIndices, const OH_NN_UInt32Array& outputIndices)
 {
-    if (m_liteGraph != nullptr) {
-        LOGE("SpecifyInputsAndOutputs failed, "
-             "SpecifyInputsAndOutputs is forbidden after Finish() or LoadLiteGraph() has been called.");
+    if (IsBuild()) {
+        LOGE("SpecifyInputsAndOutputs failed, SpecifyInputsAndOutputs is forbidden after model has been built.");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
@@ -373,12 +401,90 @@ OH_NN_ReturnCode InnerModel::SpecifyInputsAndOutputs(
     return OH_NN_SUCCESS;
 }
 
+OH_NN_ReturnCode InnerModel::CheckParameters() const
+{
+    if (m_liteGraph != nullptr) {
+        LOGE("CheckParameters failed, liteGraph is not nullptr.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    if (m_metaGraph != nullptr) {
+        LOGE("CheckParameters failed, metaGraph is not nullptr.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    if (!m_allTensors.empty()) {
+        LOGE("CheckParameters failed, m_allTensors is not empty.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    if (!(m_inputTensors.empty() && (m_inputIndices.empty()))) {
+        LOGE("CheckParameters failed, m_inputTensors is not empty.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    if (!(m_outputTensors.empty() && (m_outputIndices.empty()))) {
+        LOGE("CheckParameters failed, m_outputTensors is not empty.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode InnerModel::SetInputsAndOutputsInfo(const OH_NN_TensorInfo* inputsInfo, size_t inputSize,
+    const OH_NN_TensorInfo* outputsInfo, size_t outputSize)
+{
+    OH_NN_ReturnCode ret = CheckParameters();
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("SetInputsAndOutputsInfo failed, error happened when checking parameters.");
+        return ret;
+    }
+
+    // 根据inputsInfo设置输入NNTensor
+    for (size_t i = 0; i < inputSize; ++i) {
+        std::shared_ptr<NNTensor> tensor = CreateSharedPtr<NNTensor>();
+        if (tensor == nullptr) {
+            LOGE("SetInputsAndOutputsInfo failed, error happened when creating input NNTensor.");
+            return OH_NN_MEMORY_ERROR;
+        }
+
+        ret = tensor->BuildFromOHNNTensorInfo(inputsInfo[i]);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("SetInputsAndOutputsInfo failed, error happened when building input NNTensor from info.");
+            return ret;
+        }
+        m_inputIndices.emplace_back(i);
+        m_allTensors.emplace_back(tensor);
+        m_inputTensors.emplace_back(tensor);
+    }
+
+    // 根据outputsInfo设置输入NNTensor
+    for (size_t i = 0; i < outputSize; ++i) {
+        std::shared_ptr<NNTensor> tensor = CreateSharedPtr<NNTensor>();
+        if (tensor == nullptr) {
+            LOGE("SetInputsAndOutputsInfo failed, error happened when creating output NNTensor.");
+            return OH_NN_MEMORY_ERROR;
+        }
+
+        ret = tensor->BuildFromOHNNTensorInfo(outputsInfo[i]);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("SetInputsAndOutputsInfo failed, error happened when building output NNTensor from info.");
+            return ret;
+        }
+        m_outputIndices.emplace_back(i + inputSize);
+        m_allTensors.emplace_back(tensor);
+        m_outputTensors.emplace_back(tensor);
+    }
+
+    return OH_NN_SUCCESS;
+}
+
 OH_NN_ReturnCode InnerModel::Build()
 {
     NNRT_TRACE_NAME("Build model");
-    if (m_liteGraph != nullptr) {
-        LOGE("Build failed,"
-             " OH_NNModel is not allowed to build again after Build() or BuildFromLiteGraph() has been called.");
+    if (IsBuild()) {
+        LOGE("Build failed, OH_NNModel_Finish() shouldn't be called after OH_NNModel_Finish() or "
+             "OH_NNModel_BuildFromMetaGraph() or OH_NNModel_BuildFromLiteGraph().");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
@@ -541,6 +647,21 @@ std::vector<std::shared_ptr<NNTensor>> InnerModel::GetInputTensors() const
 std::vector<std::shared_ptr<NNTensor>> InnerModel::GetOutputTensors() const
 {
     return m_outputTensors;
+}
+
+void* InnerModel::GetMetaGraph() const
+{
+    return m_metaGraph;
+}
+
+Buffer InnerModel::GetQuantBuffer() const
+{
+    return m_quantBuffer;
+}
+
+std::string InnerModel::GetModelName() const
+{
+    return m_modelName;
 }
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS

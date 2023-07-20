@@ -167,5 +167,16 @@ std::vector<QuantParam> MSToNN::TransformQuantParams(std::vector<mindspore::lite
     }
     return nnQuantParam;
 }
+
+OH_NN_Format MSToNN::TransformFormat(mindspore::lite::Format msFormat)
+{
+    if (msFormat == mindspore::lite::FORMAT_NHWC) {
+        return OH_NN_Format::OH_NN_FORMAT_NHWC;
+    } else if (msFormat == mindspore::lite::FORMAT_NCHW) {
+        return OH_NN_Format::OH_NN_FORMAT_NCHW;
+    }
+
+    return OH_NN_Format::OH_NN_FORMAT_NONE;
+}
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS

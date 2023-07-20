@@ -327,7 +327,15 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::li
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
+OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(const void* metaGraph,
+                                             const Buffer& quantBuffer,
+                                             const ModelConfig& config,
+                                             std::shared_ptr<PreparedModel>& preparedModel)
+{
+    return OH_NN_OPERATION_FORBIDDEN;
+}
+
+OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<Buffer>& modelCache,
     const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     std::vector<V2_0::SharedBuffer> iBuffers;
@@ -336,7 +344,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<Mod
     OH_NN_ReturnCode ret;
     size_t modelCacheSize = modelCache.size();
     for (size_t i = 0; i < modelCacheSize; i++) {
-        ret = memManager->GetMemory(modelCache[i].buffer, memory);
+        ret = memManager->GetMemory(modelCache[i].data, memory);
         if (ret != OH_NN_SUCCESS) {
             LOGE("The %{public}zuth model cache is invalid. Please put valid model cache.", i + 1);
             return ret;
@@ -382,6 +390,11 @@ void* HDIDeviceV2_0::AllocateBuffer(size_t length)
         LOGE("Map fd to address failed.");
     }
     return addr;
+}
+
+void* HDIDeviceV2_0::AllocateTensorBuffer(size_t length, std::shared_ptr<NNTensor> tensor)
+{
+    return AllocateBuffer(length);
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::ReleaseBuffer(const void* buffer)
@@ -454,7 +467,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetOfflineModelFromLiteGraph(std::shared_ptr<con
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::AllocateDeviceBufferForOfflineModel(
-    const std::vector<std::vector<uint8_t>>& offlineModels, std::vector<ModelBuffer>& deviceBuffers)
+    const std::vector<std::vector<uint8_t>>& offlineModels, std::vector<Buffer>& deviceBuffers)
 {
     // offlineModels is guaranteed to have at least one element in GetOfflineModelFromLiteGraph, no need to check size.
     deviceBuffers.clear();
@@ -466,8 +479,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::AllocateDeviceBufferForOfflineModel(
         if (newModelBuffer == nullptr) {
             // Release allocated model buffer if error happens.
             OH_NN_ReturnCode status {OH_NN_SUCCESS};
-            for (const ModelBuffer& deviceBuffer : deviceBuffers) {
-                status = ReleaseBuffer(deviceBuffer.buffer);
+            for (const Buffer& deviceBuffer : deviceBuffers) {
+                status = ReleaseBuffer(deviceBuffer.data);
                 if (status != OH_NN_SUCCESS) {
                     LOGE("Release shared buffer of offline model failed.");
                     return status;
@@ -479,8 +492,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::AllocateDeviceBufferForOfflineModel(
             return OH_NN_MEMORY_ERROR;
         }
 
-        ModelBuffer modelBuffer {nullptr, 0};
-        modelBuffer.buffer = newModelBuffer;
+        Buffer modelBuffer {nullptr, 0};
+        modelBuffer.data = newModelBuffer;
         modelBuffer.length = offlineModelSize;
         deviceBuffers.emplace_back(modelBuffer);
     }
@@ -489,7 +502,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::AllocateDeviceBufferForOfflineModel(
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::CopyOfflineModelToDevice(const std::vector<std::vector<uint8_t>>& offlineModels,
-                                                         std::vector<ModelBuffer>& deviceBuffers)
+                                                         std::vector<Buffer>& deviceBuffers)
 {
     if (offlineModels.size() != deviceBuffers.size()) {
         LOGE("CopyOfflineModelToDevice failed, number of offlineModels not equal to allocated buffers.");
@@ -505,7 +518,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::CopyOfflineModelToDevice(const std::vector<std::
     for (size_t i = 0; i < offlineModelsSize; i++) {
         offlineModel = offlineModels[i].data();
         offlineModelSize = offlineModels[i].size();
-        deviceBuffer = deviceBuffers[i].buffer;
+        deviceBuffer = deviceBuffers[i].data;
         deviceBufferSize = deviceBuffers[i].length;
 
         // Copy offline model to shared buffer of device.
@@ -519,7 +532,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::CopyOfflineModelToDevice(const std::vector<std::
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::vector<ModelBuffer>& deviceBuffers,
+OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::vector<Buffer>& deviceBuffers,
                                                     const ModelConfig& config,
                                                     const std::map<std::string, std::vector<int8_t>> extensions,
                                                     std::shared_ptr<PreparedModel>& preparedModel)
@@ -537,7 +550,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::vector<ModelBuffer>& de
     OH_NN_ReturnCode ret;
     size_t numOfflineModel = deviceBuffers.size();
     for (size_t i = 0; i < numOfflineModel; i++) {
-        ret = memManager->GetMemory(deviceBuffers[i].buffer, memory);
+        ret = memManager->GetMemory(deviceBuffers[i].data, memory);
         if (ret != OH_NN_SUCCESS) {
             LOGE("Retrieve the memory of %zuth device buffer failed.", i);
             return ret;
@@ -549,8 +562,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::vector<ModelBuffer>& de
 
     // Release allocated model buffer after prepare model.
     OH_NN_ReturnCode status {OH_NN_SUCCESS};
-    for (const ModelBuffer& deviceBuffer : deviceBuffers) {
-        status = ReleaseBuffer(deviceBuffer.buffer);
+    for (const Buffer& deviceBuffer : deviceBuffers) {
+        status = ReleaseBuffer(deviceBuffer.data);
         if (status != OH_NN_SUCCESS) {
             LOGE("Release shared buffer of offline model failed.");
             return status;
@@ -587,7 +600,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::shared_ptr<const mindsp
         return status;
     }
 
-    std::vector<ModelBuffer> deviceBuffers;
+    std::vector<Buffer> deviceBuffers;
     status = AllocateDeviceBufferForOfflineModel(offlineModels, deviceBuffers);
     if (status != OH_NN_SUCCESS) {
         LOGE("Error happens when allocating device buffers for offline model.");
@@ -600,8 +613,8 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::shared_ptr<const mindsp
 
         OH_NN_ReturnCode ret {OH_NN_SUCCESS};
         // Release allocated model buffer if error happens.
-        for (const ModelBuffer& deviceBuffer : deviceBuffers) {
-            ret = ReleaseBuffer(deviceBuffer.buffer);
+        for (const Buffer& deviceBuffer : deviceBuffers) {
+            ret = ReleaseBuffer(deviceBuffer.data);
             if (ret != OH_NN_SUCCESS) {
                 LOGE("Releasing device buffer failed after copying offline models to device buffers failed.");
                 return ret;
