@@ -401,36 +401,45 @@ OH_NN_ReturnCode InnerModel::SpecifyInputsAndOutputs(
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode InnerModel::SetInputsAndOutputsInfo(const OH_NN_TensorInfo* inputsInfo, size_t inputSize,
-    const OH_NN_TensorInfo* outputsInfo, size_t outputSize)
+OH_NN_ReturnCode InnerModel::CheckParameters() const
 {
     if (m_liteGraph != nullptr) {
-        LOGE("SetInputsAndOutputsInfo failed, SetInputsAndOutputsInfo is forbidden when using liteGraph.");
+        LOGE("CheckParameters failed, liteGraph is not nullptr.");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
     if (m_metaGraph != nullptr) {
-        LOGE("SetInputsAndOutputsInfo failed, SetInputsAndOutputsInfo should be called before "
-             "calling OH_NNModel_BuildFromMetaGraph.");
+        LOGE("CheckParameters failed, metaGraph is not nullptr.");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
     if (!m_allTensors.empty()) {
-        LOGE("SetInputsAndOutputsInfo failed, m_allTensors is not empty.");
+        LOGE("CheckParameters failed, m_allTensors is not empty.");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
     if (!(m_inputTensors.empty() && (m_inputIndices.empty()))) {
-        LOGE("SetInputsAndOutputsInfo failed, m_inputTensors is not empty.");
+        LOGE("CheckParameters failed, m_inputTensors is not empty.");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
     if (!(m_outputTensors.empty() && (m_outputIndices.empty()))) {
-        LOGE("SetInputsAndOutputsInfo failed, m_outputTensors is not empty.");
+        LOGE("CheckParameters failed, m_outputTensors is not empty.");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
-    OH_NN_ReturnCode ret {OH_NN_FAILED};
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode InnerModel::SetInputsAndOutputsInfo(const OH_NN_TensorInfo* inputsInfo, size_t inputSize,
+    const OH_NN_TensorInfo* outputsInfo, size_t outputSize)
+{
+    OH_NN_ReturnCode ret = CheckParameters();
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("SetInputsAndOutputsInfo failed, error happened when checking parameters.");
+        return ret;
+    }
+
     // 根据inputsInfo设置输入NNTensor
     for (size_t i = 0; i < inputSize; ++i) {
         std::shared_ptr<NNTensor> tensor = CreateSharedPtr<NNTensor>();

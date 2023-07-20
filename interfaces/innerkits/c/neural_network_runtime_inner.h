@@ -24,7 +24,7 @@ extern "C" {
 
 /**
  * @brief 定义Tensor信息结构体。包含名字，数据类型，维度信息，格式信息。
- * 
+ *
  * @since 10
  * @version 1.1
  */
@@ -38,7 +38,7 @@ typedef struct OH_NN_TensorInfo {
 
 /**
  * @brief 定义扩展字段结构体。
- * 
+ *
  * @since 10
  * @version 1.1
  */
