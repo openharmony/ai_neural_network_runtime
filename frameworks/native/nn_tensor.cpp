@@ -115,7 +115,7 @@ OH_NN_ReturnCode NNTensor::BuildFromOHNNTensor(const OH_NN_Tensor& nnTensor)
         return OH_NN_INVALID_PARAMETER;
     }
 
-    OH_NN_ReturnCode ret = ParseDimensions(nnTensor);
+    OH_NN_ReturnCode ret = ParseDimensions(nnTensor.dimensions, nnTensor.dimensionCount);
     if (ret != OH_NN_SUCCESS) {
         LOGE("BuildFromOHNNTensor failed, passed invalid nnTensor dimensions.");
         return ret;
@@ -124,6 +124,30 @@ OH_NN_ReturnCode NNTensor::BuildFromOHNNTensor(const OH_NN_Tensor& nnTensor)
     ret = ParseQuantParams(nnTensor.quantParam);
     if (ret != OH_NN_SUCCESS) {
         LOGE("BuildFromOHNNTensor failed, please check quantParam in nnTensor.");
+        return ret;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNTensor::BuildFromOHNNTensorInfo(const OH_NN_TensorInfo& nnTensorInfo)
+{
+    if (!Validation::ValidateTensorDataType(nnTensorInfo.dataType)) {
+        LOGE("BuildFromOHNNTensorInfo failed, passed invalid data type: %d.", nnTensorInfo.dataType);
+        return OH_NN_INVALID_PARAMETER;
+    }
+    m_dataType = nnTensorInfo.dataType;
+
+    if (!Validation::ValidateTensorFormat(nnTensorInfo.format)) {
+        LOGE("BuildFromOHNNTensorInfo failed, passed invalid nnTensorInfo format: %d.", nnTensorInfo.format);
+        return OH_NN_INVALID_PARAMETER;
+    }
+    m_format = nnTensorInfo.format;
+    m_name = nnTensorInfo.name;
+
+    OH_NN_ReturnCode ret = ParseDimensions(nnTensorInfo.dimensions, nnTensorInfo.dimensionCount);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("BuildFromOHNNTensorInfo failed, passed invalid nnTensorInfo dimensions.");
         return ret;
     }
 
@@ -167,16 +191,16 @@ OH_NN_ReturnCode NNTensor::ParseDimensions(const std::vector<int32_t>& dimension
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode NNTensor::ParseDimensions(const OH_NN_Tensor& nnTensor)
+OH_NN_ReturnCode NNTensor::ParseDimensions(const int32_t* dimensions, uint32_t dimensionCount)
 {
-    OH_NN_ReturnCode ret = Validation::ValidateArray(nnTensor.dimensions, nnTensor.dimensionCount);
+    OH_NN_ReturnCode ret = Validation::ValidateArray(dimensions, dimensionCount);
     if (ret != OH_NN_SUCCESS) {
         LOGE("BuildFromOHNNTensor failed, please check dimension and dimensionCount in NNTensor.");
         return ret;
     }
-    std::vector<int32_t> dimensions = ConstructVectorFromArray(nnTensor.dimensions, nnTensor.dimensionCount);
+    std::vector<int32_t> dimensionsVec = ConstructVectorFromArray(dimensions, dimensionCount);
 
-    ret = ParseDimensions(dimensions);
+    ret = ParseDimensions(dimensionsVec);
     if (ret != OH_NN_SUCCESS) {
         LOGE("BuildFromOHNNTensor failed, passed invalid dimension info.");
         return ret;
@@ -248,7 +272,7 @@ void NNTensor::SetBuffer(const void* buffer, size_t length)
     m_bufferLength = length;
 }
 
-void NNTensor::SetFormat(OH_NN_Format format)
+void NNTensor::SetFormat(const OH_NN_Format& format)
 {
     m_format = format;
 }

@@ -39,8 +39,8 @@ struct ModelConfig {
     OH_NN_Priority priority;
 };
 
-struct ModelBuffer {
-    void* buffer;
+struct Buffer {
+    void* data;
     size_t length;
 };
 

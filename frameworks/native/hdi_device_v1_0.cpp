@@ -290,7 +290,15 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(std::shared_ptr<const mindspore::li
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDeviceV1_0::PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
+OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(const void* metaGraph,
+                                             const Buffer& quantBuffer,
+                                             const ModelConfig& config,
+                                             std::shared_ptr<PreparedModel>& preparedModel)
+{
+    return OH_NN_OPERATION_FORBIDDEN;
+}
+
+OH_NN_ReturnCode HDIDeviceV1_0::PrepareModelFromModelCache(const std::vector<Buffer>& modelCache,
     const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     std::vector<V1_0::SharedBuffer> iBuffers;
@@ -299,7 +307,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModelFromModelCache(const std::vector<Mod
     OH_NN_ReturnCode ret;
     size_t modelCacheSize = modelCache.size();
     for (size_t i = 0; i < modelCacheSize; i++) {
-        ret = memManager->GetMemory(modelCache[i].buffer, memory);
+        ret = memManager->GetMemory(modelCache[i].data, memory);
         if (ret != OH_NN_SUCCESS) {
             LOGE("The %zuth model cache is invalid. Please put valid model cache.", i + 1);
             return ret;
@@ -347,6 +355,11 @@ void* HDIDeviceV1_0::AllocateBuffer(size_t length)
         LOGE("Map fd to address failed.");
     }
     return addr;
+}
+
+void* HDIDeviceV1_0::AllocateTensorBuffer(size_t length, std::shared_ptr<NNTensor> tensor)
+{
+    return AllocateBuffer(length);
 }
 
 OH_NN_ReturnCode HDIDeviceV1_0::ReleaseBuffer(const void* buffer)

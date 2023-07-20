@@ -47,7 +47,11 @@ public:
     OH_NN_ReturnCode PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
                                   const ModelConfig& config,
                                   std::shared_ptr<PreparedModel>& preparedModel) override;
-    OH_NN_ReturnCode PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
+    OH_NN_ReturnCode PrepareModel(const void* metaGraph,
+                                  const Buffer& quantBuffer,
+                                  const ModelConfig& config,
+                                  std::shared_ptr<PreparedModel>& preparedModel) override;
+    OH_NN_ReturnCode PrepareModelFromModelCache(const std::vector<Buffer>& modelCache,
                                                 const ModelConfig& config,
                                                 std::shared_ptr<PreparedModel>& preparedModel) override;
     OH_NN_ReturnCode PrepareOfflineModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
@@ -55,6 +59,7 @@ public:
                                          std::shared_ptr<PreparedModel>& preparedModel) override;
 
     void* AllocateBuffer(size_t length) override;
+    void* AllocateTensorBuffer(size_t length, std::shared_ptr<NNTensor> tensor) override;
     OH_NN_ReturnCode ReleaseBuffer(const void* buffer) override;
 
 private:

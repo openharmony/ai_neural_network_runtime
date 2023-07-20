@@ -28,7 +28,7 @@ public:
     PreparedModel() = default;
     virtual ~PreparedModel() = default;
 
-    virtual OH_NN_ReturnCode ExportModelCache(std::vector<ModelBuffer>& modelCache) = 0;
+    virtual OH_NN_ReturnCode ExportModelCache(std::vector<Buffer>& modelCache) = 0;
 
     virtual OH_NN_ReturnCode Run(const std::vector<IOTensor>& inputs,
                                  const std::vector<IOTensor>& outputs,

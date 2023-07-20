@@ -35,6 +35,7 @@ OH_NN_ReturnCode ValidateArray(const T* data, size_t size)
 
 bool ValidateTensorType(OH_NN_TensorType nnTensorType);
 bool ValidateTensorDataType(OH_NN_DataType dataType);
+bool ValidateTensorFormat(OH_NN_Format format);
 bool ValidatePerformanceMode(OH_NN_PerformanceMode performanceMode);
 bool ValidatePriority(OH_NN_Priority priority);
 bool ValidateFuseType(OH_NN_FuseType fuseType);

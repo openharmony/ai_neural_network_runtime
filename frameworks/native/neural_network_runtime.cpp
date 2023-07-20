@@ -164,6 +164,57 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
     return innerModel->BuildFromLiteGraph(pLiteGraph);
 }
 
+NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromMetaGraph(OH_NNModel *model, const void *metaGraph,
+    const OH_NN_Extension *extensions, size_t extensionSize)
+{
+    if (model == nullptr) {
+        LOGE("OH_NNModel_BuildFromMetaGraph failed, passed nullptr to model.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (metaGraph == nullptr) {
+        LOGE("OH_NNModel_BuildFromMetaGraph failed, passed nullptr to metaGraph.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    Buffer buffer;
+    std::string modelName;
+    for (size_t i = 0; i < extensionSize; ++i) {
+        std::string name = extensions[i].name;
+        if (name == "QuantBuffer") {
+            buffer.data = extensions[i].value;
+            buffer.length = extensions[i].valueSize;
+        } else if (name == "ModelName") {
+            modelName.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
+        }
+    }
+
+    InnerModel *innerModel = reinterpret_cast<InnerModel*>(model);
+    return innerModel->BuildFromMetaGraph(metaGraph, buffer, modelName);
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNModel_SetInputsAndOutputsInfo(OH_NNModel *model, const OH_NN_TensorInfo *inputsInfo,
+    size_t inputSize, const OH_NN_TensorInfo *outputsInfo, size_t outputSize)
+{
+    if (model == nullptr) {
+        LOGE("OH_NNModel_SetInputsAndOutputsInfo failed, passed nullptr to model.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if ((inputsInfo == nullptr) || (inputSize == 0)) {
+        LOGE("OH_NNModel_SetInputsAndOutputsInfo failed, inputsInfo is empty.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if ((outputsInfo == nullptr) || (outputSize == 0)) {
+        LOGE("OH_NNModel_SetInputsAndOutputsInfo failed, outputsInfo is empty.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    InnerModel *innerModel = reinterpret_cast<InnerModel*>(model);
+    return innerModel->SetInputsAndOutputsInfo(inputsInfo, inputSize, outputsInfo, outputSize);
+}
+
 NNRT_API void OH_NNModel_Destroy(OH_NNModel **model)
 {
     if (model == nullptr) {
