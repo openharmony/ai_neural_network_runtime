@@ -28,6 +28,14 @@ bool ValidateTensorDataType(OH_NN_DataType dataType)
     return false;
 }
 
+bool ValidateTensorFormat(OH_NN_Format format)
+{
+    if ((format >= OH_NN_FORMAT_NONE) && (format <= OH_NN_FORMAT_NHWC)) {
+        return true;
+    }
+    return false;
+}
+
 bool ValidatePerformanceMode(OH_NN_PerformanceMode performanceMode)
 {
     if ((performanceMode >= OH_NN_PERFORMANCE_NONE) && (performanceMode <= OH_NN_PERFORMANCE_EXTREME)) {

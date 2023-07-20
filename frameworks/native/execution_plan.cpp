@@ -64,6 +64,10 @@ OH_NN_ReturnCode ExecutionPlan::Run(const std::vector<std::shared_ptr<NNTensor>>
 
     // Set the output NNTensor's dimensions from output IOTensor if it is dynamic.
     // NNTensor::SetDimensions will check if the tensor buffer is enough for the new dimensions.
+    if (outputsDims.size() != outputSize) {
+        LOGE("ExecutionPlan run failed, size of outputsDims is not equal to outputTensors.");
+        return OH_NN_INVALID_PARAMETER;
+    }
     for (size_t i = 0; i < outputSize; ++i) {
         ret = outputTensors[i]->SetDimensions(outputsDims[i]);
         if (ret != OH_NN_SUCCESS) {

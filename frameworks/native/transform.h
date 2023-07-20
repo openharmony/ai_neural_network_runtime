@@ -48,6 +48,7 @@ mindspore::lite::PadMode TransformPadModeValue(int8_t padMode);
 namespace MSToNN {
 OH_NN_DataType TransformDataType(mindspore::lite::DataType type);
 std::vector<QuantParam> TransformQuantParams(std::vector<mindspore::lite::QuantParam> msQuantParams);
+OH_NN_Format TransformFormat(mindspore::lite::Format msFormat);
 } // namespace MSToNN
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS

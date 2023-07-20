@@ -218,7 +218,7 @@ OH_NN_ReturnCode Executor::SetInput(uint32_t index, const OH_NN_Tensor& nnTensor
      * - The buffer held in m_inputTensors is allocated and set by CreateInputMemory() and SetInputFromMemory().
      */
     std::shared_ptr<Device> inputDevice = m_executionPlan->GetInputDevice();
-    void* inputBuffer = inputDevice->AllocateBuffer(length);
+    void* inputBuffer = inputDevice->AllocateTensorBuffer(length, inputTensor);
     if (inputBuffer == nullptr) {
         LOGE("SetInput failed, error happened when allocating input device buffer.");
         return OH_NN_MEMORY_ERROR;
@@ -314,7 +314,7 @@ OH_NN_ReturnCode Executor::SetOutput(uint32_t index, void* buffer, size_t length
         m_outputTensors[index].tensor = m_modelOutputs[index];
     }
 
-    void* deviceOutputBuffer = outputDevice->AllocateBuffer(length);
+    void* deviceOutputBuffer = outputDevice->AllocateTensorBuffer(length, m_outputTensors[index].tensor);
     if (deviceOutputBuffer == nullptr) {
         LOGE("SetOutput failed, allocating output device buffer failed.");
         return OH_NN_MEMORY_ERROR;
@@ -400,7 +400,7 @@ OH_NN_ReturnCode Executor::CreateInputMemory(uint32_t index, size_t length, OH_N
 
     // Allocate device buffer
     std::shared_ptr<Device> inputDevice = m_executionPlan->GetInputDevice();
-    void* deviceInputBuffer = inputDevice->AllocateBuffer(length);
+    void* deviceInputBuffer = inputDevice->AllocateTensorBuffer(length, m_modelInputs[index]);
     if (deviceInputBuffer == nullptr) {
         LOGE("CreateInputMemory failed, allocating intput device buffer failed.");
         return OH_NN_MEMORY_ERROR;
@@ -463,7 +463,7 @@ OH_NN_ReturnCode Executor::CreateOutputMemory(uint32_t index, size_t length, OH_
 
     // Allocate device buffer
     std::shared_ptr<Device> outputDevice = m_executionPlan->GetOutputDevice();
-    void* deviceOutputBuffer = outputDevice->AllocateBuffer(length);
+    void* deviceOutputBuffer = outputDevice->AllocateTensorBuffer(length, m_modelOutputs[index]);
     if (deviceOutputBuffer == nullptr) {
         LOGE("CreateOutputMemory failed, allocating output device buffer failed.");
         return OH_NN_MEMORY_ERROR;

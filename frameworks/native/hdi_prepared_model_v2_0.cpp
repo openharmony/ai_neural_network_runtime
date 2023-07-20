@@ -100,7 +100,7 @@ HDIPreparedModelV2_0::HDIPreparedModelV2_0(OHOS::sptr<V2_0::IPreparedModel> hdiP
     hdiPreparedModel->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
 }
 
-OH_NN_ReturnCode HDIPreparedModelV2_0::ExportModelCache(std::vector<ModelBuffer>& modelCache)
+OH_NN_ReturnCode HDIPreparedModelV2_0::ExportModelCache(std::vector<Buffer>& modelCache)
 {
     if (!modelCache.empty()) {
         LOGE("The vector of modelCache should be empty. size=%{public}zu", modelCache.size());
@@ -121,7 +121,7 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::ExportModelCache(std::vector<ModelBuffer>
             LOGE("Export the %{public}zuth model cache failed, cannot not map fd to address.", i + 1);
             return OH_NN_MEMORY_ERROR;
         }
-        ModelBuffer modelbuffer {addr, iBuffers[i].bufferSize};
+        Buffer modelbuffer {addr, iBuffers[i].bufferSize};
         modelCache.emplace_back(modelbuffer);
     }
 

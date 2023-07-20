@@ -21,6 +21,7 @@
 
 #include "mindir.h"
 #include "ops_builder.h"
+#include "interfaces/innerkits/c/neural_network_runtime_inner.h"
 #include "interfaces/kits/c/neural_network_runtime.h"
 
 namespace OHOS {
@@ -31,6 +32,8 @@ public:
 
     bool IsBuild() const;
     OH_NN_ReturnCode BuildFromLiteGraph(const mindspore::lite::LiteGraph* liteGraph);
+    OH_NN_ReturnCode BuildFromMetaGraph(const void* metaGraph, const Buffer& quantBuffer,
+                                        const std::string& modelName);
     OH_NN_ReturnCode AddTensor(const OH_NN_Tensor& nnTensor);
     OH_NN_ReturnCode SetTensorValue(uint32_t index, const void* buffer, size_t length);
     OH_NN_ReturnCode AddOperation(OH_NN_OperationType opType,
@@ -40,10 +43,15 @@ public:
     OH_NN_ReturnCode GetSupportedOperations(size_t deviceID, const bool** isSupported, uint32_t& opCount);
     OH_NN_ReturnCode SpecifyInputsAndOutputs(
         const OH_NN_UInt32Array& inputIndices, const OH_NN_UInt32Array& outputIndices);
+    OH_NN_ReturnCode SetInputsAndOutputsInfo(const OH_NN_TensorInfo* inputsInfo, size_t inputSize,
+        const OH_NN_TensorInfo* outputsInfo, size_t outputSize);
     OH_NN_ReturnCode Build();
     std::vector<std::shared_ptr<NNTensor>> GetInputTensors() const;
     std::vector<std::shared_ptr<NNTensor>> GetOutputTensors() const;
     std::shared_ptr<mindspore::lite::LiteGraph> GetLiteGraphs() const;
+    void* GetMetaGraph() const;
+    Buffer GetQuantBuffer() const;
+    std::string GetModelName() const;
 
 private:
     void AddTensorsToLiteGraph(std::unordered_map<uint32_t, uint32_t>& modelIDToGraphID);
@@ -61,6 +69,9 @@ private:
     std::vector<std::shared_ptr<NNTensor>> m_inputTensors; // Used to pass input tensors to compilation.
     std::vector<std::shared_ptr<NNTensor>> m_outputTensors; // Used to pass output tensors to compilation.
     std::shared_ptr<mindspore::lite::LiteGraph> m_liteGraph {nullptr};
+    void* m_metaGraph {nullptr};
+    Buffer m_quantBuffer;
+    std::string m_modelName;
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS

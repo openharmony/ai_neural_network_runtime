@@ -22,6 +22,7 @@
 
 #include "interfaces/kits/c/neural_network_runtime_type.h"
 #include "cpp_type.h"
+#include "nn_tensor.h"
 #include "prepared_model.h"
 #include "mindir.h"
 
@@ -49,7 +50,11 @@ public:
     virtual OH_NN_ReturnCode PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
                                           const ModelConfig& config,
                                           std::shared_ptr<PreparedModel>& preparedModel) = 0;
-    virtual OH_NN_ReturnCode PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
+    virtual OH_NN_ReturnCode PrepareModel(const void* metaGraph,
+                                          const Buffer& quantBuffer,
+                                          const ModelConfig& config,
+                                          std::shared_ptr<PreparedModel>& preparedModel) = 0;
+    virtual OH_NN_ReturnCode PrepareModelFromModelCache(const std::vector<Buffer>& modelCache,
                                                         const ModelConfig& config,
                                                         std::shared_ptr<PreparedModel>& preparedModel) = 0;
     virtual OH_NN_ReturnCode PrepareOfflineModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
@@ -57,6 +62,7 @@ public:
                                                  std::shared_ptr<PreparedModel>& preparedModel) = 0;
 
     virtual void* AllocateBuffer(size_t length) = 0;
+    virtual void* AllocateTensorBuffer(size_t length, std::shared_ptr<NNTensor> tensor) = 0;
     virtual OH_NN_ReturnCode ReleaseBuffer(const void* buffer) = 0;
 };
 } // namespace NeuralNetworkRuntime
