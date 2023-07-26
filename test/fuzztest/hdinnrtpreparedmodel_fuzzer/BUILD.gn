@@ -22,11 +22,7 @@ ohos_fuzztest("HdiNnrtPreparedModelFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file = "../hdinnrtpreparedmodel_fuzzer"
 
-  include_dirs = [
-    "../../../",
-    "//third_party/bounds_checking_function/include",
-    "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
-  ]
+  include_dirs = [ "//third_party/bounds_checking_function/include" ]
 
   cflags = [
     "-g",
@@ -39,12 +35,9 @@ ohos_fuzztest("HdiNnrtPreparedModelFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_nnrt:libnnrt_proxy_2.0",
     "drivers_interface_nnrt:libnnrt_stub_2.0",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "mindspore:mindir",
-    "neural_network_runtime:nnrt_target",
   ]
 }

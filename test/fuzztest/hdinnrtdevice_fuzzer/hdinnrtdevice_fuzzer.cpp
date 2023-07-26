@@ -14,6 +14,7 @@
  */
 #include "hdinnrtdevice_fuzzer.h"
 #include "../data.h"
+#include "../nnrt_device_impl.h"
 #include "../../../common/log.h"
 
 #include <v2_0/nnrt_device_stub.h>
@@ -28,9 +29,9 @@ namespace NeuralNetworkRuntime {
 constexpr size_t U32_AT_SIZE = 4;
 bool HdiNnrtDeviceFuzzTest(const uint8_t* data, size_t size)
 {
-    OHOS::sptr<V2_0::INnrtDevice> device = V2_0::INnrtDevice::Get();
+    OHOS::sptr<V2_0::INnrtDevice> device = new V2_0::NnrtDeviceImpl();
     if (device == nullptr) {
-        LOGE("[HdiNnrtDeviceFuzzTest]Nnrt device get failed.");
+        LOGE("[HdiNnrtDeviceFuzzTest]Nnrt device make failed.");
         return false;
     }
 
@@ -44,6 +45,10 @@ bool HdiNnrtDeviceFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     std::shared_ptr<V2_0::NnrtDeviceStub> nnrtDeviceStub = std::make_shared<V2_0::NnrtDeviceStub>(device);
+    if (nnrtDeviceStub == nullptr) {
+        LOGE("[HdiNnrtDeviceFuzzTest]Nnrt device stub make failed.");
+        return false;
+    }
     nnrtDeviceStub->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
