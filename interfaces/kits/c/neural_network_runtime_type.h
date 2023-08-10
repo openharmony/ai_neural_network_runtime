@@ -28,7 +28,8 @@
  * @file neural_network_runtime_type.h
  *
  * @brief Defines the structure and enumeration for Neural Network Runtime.
- *
+ * 
+ * @library libneural_network_runtime.so
  * @since 9
  * @version 1.0
  */
