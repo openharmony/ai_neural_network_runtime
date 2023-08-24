@@ -44,7 +44,7 @@ bool HdiNnrtDeviceFuzzTest(const uint8_t* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    std::shared_ptr<V2_0::NnrtDeviceStub> nnrtDeviceStub = std::make_shared<V2_0::NnrtDeviceStub>(device);
+    OHOS::sptr<V2_0::NnrtDeviceStub> nnrtDeviceStub = new V2_0::NnrtDeviceStub(device);
     if (nnrtDeviceStub == nullptr) {
         LOGE("[HdiNnrtDeviceFuzzTest]Nnrt device stub make failed.");
         return false;
