@@ -31,8 +31,9 @@ std::shared_ptr<Device> DiscoverHDIDevicesV2_0(std::string& deviceName, std::str
     }
 
     auto ret = iDevice->GetDeviceName(deviceName);
-    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        if (ret < V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+    int32_t nnrtSuccess = static_cast<int32_t>(V2_0::NNRT_ReturnCode::NNRT_SUCCESS);
+    if (ret != nnrtSuccess) {
+        if (ret < nnrtSuccess) {
             LOGW("Get device name failed. An error occurred in HDI, errorcode is %{public}d.", ret);
         } else {
             OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode nnrtRet = static_cast<OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode>(ret);
@@ -42,8 +43,8 @@ std::shared_ptr<Device> DiscoverHDIDevicesV2_0(std::string& deviceName, std::str
     }
 
     ret = iDevice->GetVendorName(vendorName);
-    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        if (ret < V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+    if (ret != nnrtSuccess) {
+        if (ret < nnrtSuccess) {
             LOGW("Get vendor name failed. An error occurred in HDI, errorcode is %{public}d.", ret);
         } else {
             OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode nnrtRet = static_cast<OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode>(ret);
@@ -54,8 +55,8 @@ std::shared_ptr<Device> DiscoverHDIDevicesV2_0(std::string& deviceName, std::str
 
     std::pair<uint32_t, uint32_t> hdiVersion;
     ret = iDevice->GetVersion(hdiVersion.first, hdiVersion.second);
-    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        if (ret < V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+    if (ret != nnrtSuccess) {
+        if (ret < nnrtSuccess) {
             LOGW("Get version failed. An error occurred in HDI, errorcode is %{public}d.", ret);
         } else {
             OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode nnrtRet = static_cast<OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode>(ret);

@@ -46,12 +46,12 @@ public:
         return object;
     }
 
-    const uint8_t* GetNowData()
+    const uint8_t* GetNowData() const
     {
         return dataFuzz + dataPos;
     }
 
-    size_t GetNowDataSize()
+    size_t GetNowDataSize() const
     {
         return dataSize - dataPos;
     }

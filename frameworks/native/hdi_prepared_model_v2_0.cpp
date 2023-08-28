@@ -133,7 +133,7 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::Run(const std::vector<IOTensor>& inputs, 
 {
     V2_0::IOTensor iTensor;
     std::vector<V2_0::IOTensor> iInputTensors;
-    for (auto& input: inputs) {
+    for (const auto& input: inputs) {
         iTensor = TransIOTensor(input);
         if (iTensor.data.fd == INVALID_FD) {
             LOGE("Transform inputs tensor failed, cannot find data file descriptor.");
@@ -143,7 +143,7 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::Run(const std::vector<IOTensor>& inputs, 
     }
 
     std::vector<V2_0::IOTensor> iOutputTensors;
-    for (auto& output: outputs) {
+    for (const auto& output: outputs) {
         iTensor = TransIOTensor(output);
         if (iTensor.data.fd == INVALID_FD) {
             LOGE("Transform outputs tensor failed, cannot find data file descriptor.");

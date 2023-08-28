@@ -71,7 +71,7 @@ private:
     std::vector<std::shared_ptr<NNTensor>> m_outputTensors; // Used to pass output tensors to compilation.
     std::shared_ptr<mindspore::lite::LiteGraph> m_liteGraph {nullptr};
     void* m_metaGraph {nullptr};
-    Buffer m_quantBuffer;
+    Buffer m_quantBuffer = {nullptr, 0};
     std::string m_modelName;
 };
 }  // namespace NeuralNetworkRuntime

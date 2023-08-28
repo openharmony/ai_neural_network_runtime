@@ -300,18 +300,20 @@ NNRT_ReturnCode NnrtDeviceService::ValidateModel(const Model& model) const
     }
 
     size_t tensorSize = model.allTensors.size();
-    for (auto index : model.inputIndex) {
-        if (index > tensorSize) {
-            HDF_LOGE("Input index is invalid, index=%u", index);
-            return NNRT_ReturnCode::NNRT_INVALID_INPUT;
-        }
+    auto inputIt = std::find_if(model.inputIndex.begin(), model.inputIndex.end(), [tensorSize](size_t inputIndex) {
+        return inputIndex > tensorSize;
+    })
+    if (inputIt != model.inputIndex.end()) {
+        HDF_LOGE("Input index is invalid, index=%u", *inputIt);
+        return NNRT_ReturnCode::NNRT_INVALID_INPUT;
     }
 
-    for (auto index : model.outputIndex) {
-        if (index > tensorSize) {
-            HDF_LOGE("Output index is invalid, index=%u", index);
-            return NNRT_ReturnCode::NNRT_INVALID_OUTPUT;
-        }
+    auto outputIt = std::find_if(model.outputIndex.begin(), model.outputIndex.end(), [tensorSize](size_t outputIndex) {
+        return outputIndex > tensorSize;
+    })
+    if (outputIt != model.outputIndex.end()) {
+        HDF_LOGE("Output index is invalid, index=%u", *outputIt);
+        return NNRT_ReturnCode::NNRT_INVALID_OUTPUT;
     }
 
     return NNRT_ReturnCode::NNRT_SUCCESS;
