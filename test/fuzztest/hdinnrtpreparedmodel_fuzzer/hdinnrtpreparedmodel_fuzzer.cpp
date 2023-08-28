@@ -44,8 +44,7 @@ bool HdiNnrtPreparedModelFuzzTest(const uint8_t* data, size_t size)
     datas.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
-    std::shared_ptr<V2_0::PreparedModelStub> preparedModelStub =
-        std::make_shared<V2_0::PreparedModelStub>(preparedModel);
+    OHOS::sptr<V2_0::PreparedModelStub> preparedModelStub = new V2_0::PreparedModelStub(preparedModel);
     if (preparedModelStub == nullptr) {
         LOGE("[HdiNnrtPreparedModelFuzzTest]Nnrt preparemodel stub make failed.");
         return false;

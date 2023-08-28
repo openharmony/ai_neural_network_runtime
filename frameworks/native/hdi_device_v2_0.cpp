@@ -534,7 +534,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::CopyOfflineModelToDevice(const std::vector<std::
 
 OH_NN_ReturnCode HDIDeviceV2_0::PrepareOfflineModel(std::vector<Buffer>& deviceBuffers,
                                                     const ModelConfig& config,
-                                                    const std::map<std::string, std::vector<int8_t>> extensions,
+                                                    const std::map<std::string, std::vector<int8_t>>& extensions,
                                                     std::shared_ptr<PreparedModel>& preparedModel)
 {
     V2_0::ModelConfig iModelConfig;
