@@ -14,21 +14,21 @@
 import("//build/ohos.gni")
 
 ohos_ndk_library("libneural_network_runtime_ndk") {
-    output_name = "neural_network_runtime.z"
-    output_extension = "so"
-    ndk_description_file = "libneural_network_runtime.ndk.json"
-    min_compact_version = "9"
-    system_capability = "SystemCapability.AI.NeuralNetworkRuntime"
-    system_capability_headers = [
-        "neural_network_runtime.h",
-        "neural_network_runtime_type.h",
-    ]
+  output_name = "neural_network_runtime"
+  output_extension = "so"
+  ndk_description_file = "libneural_network_runtime.ndk.json"
+  min_compact_version = "9"
+  system_capability = "SystemCapability.AI.NeuralNetworkRuntime"
+  system_capability_headers = [
+    "neural_network_runtime.h",
+    "neural_network_runtime_type.h",
+  ]
 }
 
 ohos_ndk_headers("libneural_network_runtime_header") {
-    dest_dir = "$ndk_headers_out_dir/neural_network_runtime"
-    sources = [
-        "neural_network_runtime.h",
-        "neural_network_runtime_type.h",
-    ]
+  dest_dir = "$ndk_headers_out_dir/neural_network_runtime"
+  sources = [
+    "neural_network_runtime.h",
+    "neural_network_runtime_type.h",
+  ]
 }

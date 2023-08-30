@@ -106,6 +106,7 @@ ops_sources = [
 ohos_shared_library("libneural_network_runtime") {
   sources = nnrt_sources
   sources += ops_sources
+  output_extension = "so"
   include_dirs = [
     "..",
     "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
@@ -130,6 +131,6 @@ ohos_shared_library("libneural_network_runtime") {
   ]
 
   subsystem_name = "ai"
-  innerapi_tags = [ "platformsdk_indirect" ]
+  innerapi_tags = [ "ndk" ]
   part_name = "neural_network_runtime"
 }
