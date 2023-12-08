@@ -21,7 +21,9 @@
 #include "executor.h"
 #include "inner_model.h"
 #include "common/log.h"
+#include <dlfcn.h>
 
+void* g_libHandle = dlopen("libneural_network_runtime_ext.so", RTLD_NOW | RTLD_GLOBAL);
 
 using namespace OHOS::NeuralNetworkRuntime;
 
