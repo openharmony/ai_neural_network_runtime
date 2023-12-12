@@ -386,7 +386,7 @@ OH_NN_ReturnCode CreateCompiler(Compilation* compilation, Compiler** compiler)
 
     BackendManager& manager = BackendManager::GetInstance();
     std::shared_ptr<Backend> backend = manager.GetBackend(compilation->backendID);
-    if(backend == nullptr) {
+    if (backend == nullptr) {
         LOGE("CreateCompiler failed, fail to get backend %{public}zu.", compilation->backendID);
         return OH_NN_FAILED;
     }
@@ -526,7 +526,7 @@ NNRT_API void OH_NNCompilation_Destroy(OH_NNCompilation **compilation)
     if (compilationImpr->compiler != nullptr) {
         BackendManager& manager = BackendManager::GetInstance();
         std::shared_ptr<Backend> backend = manager.GetBackend(compilationImpr->backendID);
-        if(backend == nullptr) {
+        if (backend == nullptr) {
             LOGE("OH_NNCompilation_Destroy failed, fail to get backend %{public}zu.", compilationImpr->backendID);
             return;
         }

@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "nncompiler.h"
 
 #include <sys/stat.h>
@@ -13,6 +28,9 @@
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace {
+const int CACHE_INPUT_TENSORDESC_OFFSET = 2;
+const int CACHE_OUTPUT_TENSORDESC_OFFSET = 1;
+
 struct SerializedTensorDesc {
 public:
     SerializedTensorDesc() = default;
@@ -440,14 +458,14 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     }
 
     size_t cacheNum = caches.size();
-    ret = DeserializedTensorsFromBuffer(caches[cacheNum-2], m_inputTensorDescs);
+    ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_INPUT_TENSORDESC_OFFSET], m_inputTensorDescs);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when deserializing input tensor desc.");
         ReleaseBufferByDevice(caches);
         return ret;
     }
 
-    ret = DeserializedTensorsFromBuffer(caches[cacheNum-1], m_outputTensorDescs);
+    ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_OUTPUT_TENSORDESC_OFFSET], m_outputTensorDescs);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when deserializing output tensor desc.");
         ReleaseBufferByDevice(caches);
@@ -458,7 +476,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     config.enableFloat16 = m_enableFp16;
     config.mode = m_performance;
     config.priority = m_priority;
-    std::vector<Buffer> modelOnlyCaches(caches.begin(), caches.end()-2);
+    std::vector<Buffer> modelOnlyCaches(caches.begin(), caches.end() - CACHE_INPUT_TENSORDESC_OFFSET);
     ret = m_device->PrepareModelFromModelCache(modelOnlyCaches, config, m_preparedModel);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when preparing model from cache.");
