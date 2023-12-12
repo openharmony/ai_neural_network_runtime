@@ -100,10 +100,17 @@ NNCompiler::NNCompiler(std::shared_ptr<Device> device, size_t backendID)
     : m_device(device),
     m_backendID(backendID) {}
 
-NNCompiler::NNCompiler(const void* model, std::shared_ptr<Device> device, size_t backendID)
-    : m_model(const_cast<void*>(model)),
-    m_device(device),
-    m_backendID(backendID) {}
+NNCompiler::NNCompiler(const void* model, std::shared_ptr<Device> device, size_t backendID) {
+    m_device = device;
+    m_backendID = backendID;
+    const InnerModel* innerModel = reinterpret_cast<const InnerModel*>(model);
+    m_liteGraph = innerModel->GetLiteGraphs();
+    m_inputTensorDescs = innerModel->GetInputTensorDescs();
+    m_outputTensorDescs = innerModel->GetOutputTensorDescs();
+    m_metaGraph = innerModel->GetMetaGraph();
+    m_quantBuffer = innerModel->GetQuantBuffer();
+    m_modelName = innerModel->GetModelName();
+}
 
 NNCompiler::~NNCompiler()
 {
@@ -112,7 +119,6 @@ NNCompiler::~NNCompiler()
     }
     m_inputTensorDescs.clear();
     m_outputTensorDescs.clear();
-    m_model = nullptr;
 }
 
 size_t NNCompiler::GetBackendID() const
@@ -269,32 +275,22 @@ OH_NN_ReturnCode NNCompiler::Build()
         LOGI("[NNCompiler] Build success, restore from cache file.");
         m_isBuild = true;
         return OH_NN_SUCCESS;
-    } else if (m_model == nullptr) {
-        LOGI("[NNCompiler] Build failed, fail to restore from cache file.");
-        return ret;
     }
 
     // cache不存在，正常在线构图
-    const InnerModel* innerModel = reinterpret_cast<const InnerModel*>(m_model);
-    std::shared_ptr<mindspore::lite::LiteGraph> liteGraph = innerModel->GetLiteGraphs();
-    m_inputTensorDescs = innerModel->GetInputTensorDescs();
-    m_outputTensorDescs = innerModel->GetOutputTensorDescs();
-    void* metaGraph = innerModel->GetMetaGraph();
-    Buffer quantBuffer = innerModel->GetQuantBuffer();
-
-    if ((liteGraph == nullptr) && (metaGraph == nullptr)) {
+    if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
         LOGE("[NNCompiler] Build failed, both liteGraph and metaGraph are nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
-    if ((liteGraph != nullptr) && (metaGraph != nullptr)) {
+    if ((m_liteGraph != nullptr) && (m_metaGraph != nullptr)) {
         LOGE("[NNCompiler] Build failed, neither liteGraph nor metaGraph are nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
     // 判断是否支持模型
     bool isSupporttedModel = true;
-    ret = IsSupporttedModel(liteGraph, isSupporttedModel);
+    ret = IsSupporttedModel(m_liteGraph, isSupporttedModel);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] Build failed, error happend when judge if support the model.");
         return ret;
@@ -305,11 +301,11 @@ OH_NN_ReturnCode NNCompiler::Build()
 
     ModelConfig config {m_enableFp16, static_cast<OH_NN_PerformanceMode>(m_performance),
         static_cast<OH_NN_Priority>(m_priority)};
-    if (liteGraph != nullptr) {
-        ret = m_device->PrepareModel(liteGraph, config, m_preparedModel);
+    if (m_liteGraph != nullptr) {
+        ret = m_device->PrepareModel(m_liteGraph, config, m_preparedModel);
     }
-    if (metaGraph != nullptr) {
-        ret = m_device->PrepareModel(metaGraph, quantBuffer, config, m_preparedModel);
+    if (m_metaGraph != nullptr) {
+        ret = m_device->PrepareModel(m_metaGraph, m_quantBuffer, config, m_preparedModel);
     }
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] Build failed, fail to prepare model when normally building.");
@@ -398,6 +394,7 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
     caches.emplace_back(outputTensorDescBuffer);
     tensorBuffers.emplace_back(outputTensorDescBuffer);
 
+    compiledCache.SetModelName(m_modelName);
     ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] SaveToCacheFile failed, error happened when saving model cache.");
