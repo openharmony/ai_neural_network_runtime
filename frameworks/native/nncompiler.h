@@ -51,7 +51,6 @@ private:
         const Buffer& buffer, std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& tensorDescs);
 
 private:
-    void* m_model {nullptr};
     bool m_isBuild {false};
     bool m_enableFp16 {false};
     std::string m_cachePath;
@@ -61,6 +60,10 @@ private:
     OH_NN_Priority m_priority {OH_NN_PRIORITY_NONE};
     OH_NN_PerformanceMode m_performance {OH_NN_PERFORMANCE_NONE};
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
+    Buffer m_quantBuffer {nullptr, 0};
+    std::string m_modelName;
+    void* m_metaGraph {nullptr};
+    std::shared_ptr<mindspore::lite::LiteGraph> m_liteGraph {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
 };
