@@ -94,7 +94,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetDeviceName(std::string& name)
     auto ret = m_iDevice->GetDeviceName(name);
     if (ret != HDF_SUCCESS) {
         LOGE("Get HDI device name failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
     return OH_NN_SUCCESS;
 }
@@ -104,7 +104,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetVendorName(std::string& name)
     auto ret = m_iDevice->GetVendorName(name);
     if (ret != HDF_SUCCESS) {
         LOGE("Get HDI device vendor name failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
     return OH_NN_SUCCESS;
 }
@@ -114,7 +114,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetVersion(std::string& version)
     auto ret = m_iDevice->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
     if (ret != HDF_SUCCESS) {
         LOGE("Get HDI version failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
     version = 'v' + std::to_string(m_hdiVersion.first) + '_' + std::to_string(m_hdiVersion.second);
     return OH_NN_SUCCESS;
@@ -126,7 +126,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetDeviceType(OH_NN_DeviceType& deviceType)
     auto ret = m_iDevice->GetDeviceType(iDeviceType);
     if (ret != HDF_SUCCESS) {
         LOGE("Get HDI device type failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
 
     deviceType = TransHDIDeviceV1_0Type(iDeviceType);
@@ -139,7 +139,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetDeviceStatus(DeviceStatus& status)
     auto ret = m_iDevice->GetDeviceStatus(iDeviceStatus);
     if (ret != HDF_SUCCESS) {
         LOGE("Get HDI device status failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
     status = TransHDIDeviceV1_0Status(iDeviceStatus);
     return OH_NN_SUCCESS;
@@ -181,7 +181,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetSupportedOperation(std::shared_ptr<const mind
     }
     if (hdiRet != HDF_SUCCESS) {
         LOGE("Get supported operation failed. ErrorCode=%d", hdiRet);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
     return OH_NN_SUCCESS;
 }
@@ -191,7 +191,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::IsFloat16PrecisionSupported(bool& isSupported)
     auto ret = m_iDevice->IsFloat16PrecisionSupported(isSupported);
     if (ret != HDF_SUCCESS) {
         LOGE("Query fp16 precision supported failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
     return OH_NN_SUCCESS;
 }
@@ -201,7 +201,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::IsPerformanceModeSupported(bool& isSupported)
     auto ret = m_iDevice->IsPerformanceModeSupported(isSupported);
     if (ret != HDF_SUCCESS) {
         LOGE("Query performance mode supported failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
     return OH_NN_SUCCESS;
 }
@@ -211,7 +211,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::IsPrioritySupported(bool& isSupported)
     auto ret = m_iDevice->IsPrioritySupported(isSupported);
     if (ret != HDF_SUCCESS) {
         LOGE("Query priority supported failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
     return OH_NN_SUCCESS;
 }
@@ -221,7 +221,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::IsDynamicInputSupported(bool& isSupported)
     auto ret = m_iDevice->IsDynamicInputSupported(isSupported);
     if (ret != HDF_SUCCESS) {
         LOGE("Query dynamic input supported failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
     return OH_NN_SUCCESS;
 }
@@ -231,7 +231,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::IsModelCacheSupported(bool& isSupported)
     auto ret = m_iDevice->IsModelCacheSupported(isSupported);
     if (ret != HDF_SUCCESS) {
         LOGE("Query cache model supported failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
     return OH_NN_SUCCESS;
 }
@@ -324,7 +324,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModelFromModelCache(const std::vector<Buf
     auto hdiRet = m_iDevice->PrepareModelFromModelCache(iBuffers, iModelConfig, iPreparedModel);
     if (hdiRet != HDF_SUCCESS) {
         LOGE("Prepare model from cache failed. ErrorCode=%d", hdiRet);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
 
     preparedModel = CreateSharedPtr<HDIPreparedModelV1_0>(iPreparedModel);
@@ -355,6 +355,41 @@ void* HDIDeviceV1_0::AllocateBuffer(size_t length)
         LOGE("Map fd to address failed.");
     }
     return addr;
+}
+
+OH_NN_ReturnCode HDIDeviceV1_0::AllocateBuffer(size_t length, int& fd)
+{
+    if (length == 0) {
+        LOGE("The length param is invalid, length=0");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    V1_0::SharedBuffer buffer;
+    auto ret = m_iDevice->AllocateBuffer(length, buffer);
+    if (ret != HDF_SUCCESS) {
+        LOGE("Allocate buffer error. ErrorCode: %d", ret);
+        return OH_NN_MEMORY_ERROR;
+    }
+
+    fd = buffer.fd;
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode HDIDeviceV1_0::ReleaseBuffer(int fd, size_t length)
+{
+    V1_0::SharedBuffer hdiBuffer {fd, length, 0, length};
+    auto deviceResult = m_iDevice->ReleaseBuffer(hdiBuffer);
+    if (deviceResult != HDF_SUCCESS) {
+        LOGE("Device release buffer error. ErrorCode: %d", deviceResult);
+        return OH_NN_MEMORY_ERROR;
+    }
+    return OH_NN_SUCCESS;
+}
+
+
+void* HDIDeviceV1_0::AllocateTensorBuffer(size_t length, std::shared_ptr<TensorDesc> tensor)
+{
+    return AllocateBuffer(length);
 }
 
 void* HDIDeviceV1_0::AllocateTensorBuffer(size_t length, std::shared_ptr<NNTensor> tensor)

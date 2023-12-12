@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include "mindir_types.h"
-
 #include "validation.h"
 
 namespace OHOS {
@@ -30,7 +28,7 @@ bool ValidateTensorDataType(OH_NN_DataType dataType)
 
 bool ValidateTensorFormat(OH_NN_Format format)
 {
-    if ((format >= OH_NN_FORMAT_NONE) && (format <= OH_NN_FORMAT_NHWC)) {
+    if ((format >= OH_NN_FORMAT_NONE) && (format <= OH_NN_FORMAT_ND)) {
         return true;
     }
     return false;
@@ -55,14 +53,6 @@ bool ValidatePriority(OH_NN_Priority priority)
 bool ValidateFuseType(OH_NN_FuseType fuseType)
 {
     if ((fuseType >= OH_NN_FUSED_NONE) && (fuseType <= OH_NN_FUSED_RELU6)) {
-        return true;
-    }
-    return false;
-}
-
-bool ValidatePadMode(int8_t padMode)
-{
-    if ((padMode >= mindspore::lite::PAD_MODE_PAD) && (padMode <= mindspore::lite::PAD_MODE_VALID)) {
         return true;
     }
     return false;

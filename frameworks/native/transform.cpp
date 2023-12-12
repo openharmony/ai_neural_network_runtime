@@ -15,7 +15,6 @@
 
 #include "transform.h"
 
-#include "memory_manager.h"
 #include "common/log.h"
 
 namespace OHOS {

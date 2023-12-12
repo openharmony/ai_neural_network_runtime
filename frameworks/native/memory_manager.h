@@ -19,7 +19,7 @@
 #include <unordered_map>
 #include <mutex>
 
-#include "interfaces/kits/c/neural_network_runtime_type.h"
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

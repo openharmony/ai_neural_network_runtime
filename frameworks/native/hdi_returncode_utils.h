@@ -73,9 +73,10 @@ inline std::string ConverterRetToString(OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode r
 template<typename T>
 T CheckReturnCode(int32_t ret, T funcRet, const std::string& errorInfo)
 {
-    if (ret < V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+    int32_t success = static_cast<int32_t>(V2_0::NNRT_ReturnCode::NNRT_SUCCESS);
+    if (ret < success) {
         LOGE("%{public}s. An error occurred in HDI, errorcode is %{public}d.", errorInfo.c_str(), ret);
-    } else if (ret > V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+    } else if (ret > success) {
         OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode nnrtRet = static_cast<OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode>(ret);
         LOGE("%{public}s. Errorcode is %{public}s.", errorInfo.c_str(), ConverterRetToString(nnrtRet).c_str());
     }

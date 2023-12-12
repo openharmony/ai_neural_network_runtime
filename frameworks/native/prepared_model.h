@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "interfaces/kits/c/neural_network_runtime_type.h"
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
 #include "cpp_type.h"
 
 namespace OHOS {
@@ -32,6 +32,11 @@ public:
 
     virtual OH_NN_ReturnCode Run(const std::vector<IOTensor>& inputs,
                                  const std::vector<IOTensor>& outputs,
+                                 std::vector<std::vector<int32_t>>& outputsDims,
+                                 std::vector<bool>& isOutputBufferEnough) = 0;
+
+    virtual OH_NN_ReturnCode Run(const std::vector<NN_Tensor*>& inputs,
+                                 const std::vector<NN_Tensor*>& outputs,
                                  std::vector<std::vector<int32_t>>& outputsDims,
                                  std::vector<bool>& isOutputBufferEnough) = 0;
 

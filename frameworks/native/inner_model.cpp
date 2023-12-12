@@ -23,11 +23,12 @@
 
 #include "common/utils.h"
 #include "common/scoped_trace.h"
-#include "device_manager.h"
+#include "backend_manager.h"
 #include "validation.h"
 #include "ops_builder.h"
 #include "ops_registry.h"
 #include "transform.h"
+#include "nnbackend.h"
 
 namespace MSLITE = mindspore::lite;
 
@@ -198,6 +199,75 @@ OH_NN_ReturnCode InnerModel::AddTensor(const OH_NN_Tensor& nnTensor)
     return OH_NN_SUCCESS;
 }
 
+OH_NN_ReturnCode InnerModel::AddTensorDesc(const NN_TensorDesc* nnTensorDesc)
+{
+    if (nnTensorDesc == nullptr) {
+        LOGE("AddTensorDesc failed, passed nullptr to nnTensorDesc.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    std::shared_ptr<NNTensor> tensor = CreateSharedPtr<NNTensor>();
+    if (tensor == nullptr) {
+        LOGE("AddTensorDesc failed, error happened when creating NNTensor.");
+        return OH_NN_MEMORY_ERROR;
+    }
+
+    OH_NN_ReturnCode returnCode = tensor->BuildFromTensorDesc(nnTensorDesc);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("AddTensorDesc failed, error happened when build NNTensor from OH_NNCore_TensorDesc.");
+        return returnCode;
+    }
+
+    // The NNTensor is named as "Tensor: <tensor index>"".
+    tensor->SetName("Tensor: " + std::to_string(m_allTensors.size()));
+    m_allTensors.emplace_back(tensor);
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode InnerModel::SetTensorType(uint32_t index, OH_NN_TensorType tensorType)
+{
+    if (IsBuild()) {
+        LOGE("SetTensorType failed, SetTensorType is forbidden after model has been built.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    if (index >= m_allTensors.size()) {
+        LOGE("SetTensorType failed, passed index %u out of the number of added tensors.", index);
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    std::shared_ptr<NNTensor> tensor = m_allTensors[index];
+    OH_NN_ReturnCode returnCode = tensor->SetTensorType(tensorType);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("SetTensorType failed, error happened when setting tensor type.");
+    }
+
+    return returnCode;
+}
+
+OH_NN_ReturnCode InnerModel::SetTensorQuantParam(uint32_t index, const NN_QuantParam* quantParam)
+{
+    if (IsBuild()) {
+        LOGE("SetTensorQuantParam failed, SetTensorValue is forbidden after model has been built.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    if (index >= m_allTensors.size()) {
+        LOGE("SetTensorQuantParam failed, passed index %u out of the number of added tensors.", index);
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    std::shared_ptr<NNTensor> tensor = m_allTensors[index];
+    // quantParam is validated in outer function, no need to check it here.
+    OH_NN_ReturnCode returnCode = tensor->SetQuantParam(quantParam);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("SetTensorQuantParam failed, error happened when set quant param.");
+    }
+
+    return returnCode;
+}
+
 // DOTO: 圈复杂度待优化
 OH_NN_ReturnCode InnerModel::SetTensorValue(uint32_t index, const void* buffer, size_t length)
 {
@@ -320,7 +390,7 @@ OH_NN_ReturnCode InnerModel::ValidateTensorArray(const OH_NN_UInt32Array& indice
     size_t allTensorsSize = m_allTensors.size();
     for (uint32_t i = 0; i < indices.size; i++) {
         if (indices.data[i] >= allTensorsSize) {
-            LOGE("ValidateTensors failed, index %u is out of the number of added tensors.", indices.data[i]);
+            LOGE("ValidateTensors failed, index %{public}u is out of the number of added tensors.", indices.data[i]);
             return OH_NN_INVALID_PARAMETER;
         }
     }
@@ -610,18 +680,19 @@ OH_NN_ReturnCode InnerModel::GetSupportedOperations(size_t deviceID, const bool*
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
-    DeviceManager& deviceManager = DeviceManager::GetInstance();
+    BackendManager& backendManager = BackendManager::GetInstance();
 
-    std::shared_ptr<Device> device = deviceManager.GetDevice(deviceID);
-    if (device == nullptr) {
-        LOGE("GetSupportedOperations failed, retrieve device failed.");
+    std::shared_ptr<Backend> backend = backendManager.GetBackend(deviceID);
+    if (backend == nullptr) {
+        LOGE("GetSupportedOperations failed, retrieve backend failed.");
         return OH_NN_FAILED;
     }
 
     std::vector<bool> supportedOperations;
-    OH_NN_ReturnCode ret = device->GetSupportedOperation(m_liteGraph, supportedOperations);
+    std::shared_ptr<NNBackend> nnBackend = std::reinterpret_pointer_cast<NNBackend>(backend);
+    OH_NN_ReturnCode ret = nnBackend->GetSupportedOperation(m_liteGraph, supportedOperations);
     if (ret != OH_NN_SUCCESS) {
-        LOGE("GetSupportedOperations failed, error happened when get supported operations from devices.");
+        LOGE("GetSupportedOperations failed, error happened when get supported operations from backends.");
         return ret;
     }
 
@@ -647,6 +718,34 @@ std::vector<std::shared_ptr<NNTensor>> InnerModel::GetInputTensors() const
 std::vector<std::shared_ptr<NNTensor>> InnerModel::GetOutputTensors() const
 {
     return m_outputTensors;
+}
+
+std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> InnerModel::GetInputTensorDescs() const
+{
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> inputTensorDescs;
+    std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> tensorDescPair;
+    for (auto inputTensor : m_inputTensors) {
+        tensorDescPair.first = OHOS::NeuralNetworkRuntime::CreateSharedPtr<TensorDesc>();
+        inputTensor->ConvertToTensorDesc(*(tensorDescPair.first.get()));
+        tensorDescPair.second = inputTensor->GetType();
+        inputTensorDescs.emplace_back(tensorDescPair);
+    }
+
+    return inputTensorDescs;
+}
+
+std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> InnerModel::GetOutputTensorDescs() const
+{
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> outputTensorDescs;
+    std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> tensorDescPair;
+    for (auto outputTensor : m_outputTensors) {
+        tensorDescPair.first = OHOS::NeuralNetworkRuntime::CreateSharedPtr<TensorDesc>();
+        outputTensor->ConvertToTensorDesc(*(tensorDescPair.first.get()));
+        tensorDescPair.second = outputTensor->GetType();
+        outputTensorDescs.emplace_back(tensorDescPair);
+    }
+
+    return outputTensorDescs;
 }
 
 void* InnerModel::GetMetaGraph() const

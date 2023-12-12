@@ -20,8 +20,9 @@
 #include <vector>
 
 #include "cpp_type.h"
-#include "interfaces/kits/c/neural_network_runtime.h"
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
 #include "interfaces/innerkits/c/neural_network_runtime_inner.h"
+#include "tensor_desc.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -41,9 +42,11 @@ public:
 
     OH_NN_ReturnCode BuildFromOHNNTensor(const OH_NN_Tensor& nnTensor);
     OH_NN_ReturnCode BuildFromOHNNTensorInfo(const OH_NN_TensorInfo& nnTensorInfo);
+    OH_NN_ReturnCode BuildFromTensorDesc(const NN_TensorDesc* tensorDesc);
+
     OH_NN_ReturnCode Build(OH_NN_DataType dataType,
                            const std::vector<int32_t>& dimensions,
-                           const std::vector<QuantParam>& quantParam,
+                           const std::vector<QuantParam>& quantParams,
                            OH_NN_TensorType type);
     void IdentifyOpParameter();
 
@@ -51,6 +54,8 @@ public:
     void SetBuffer(const void* buffer, size_t length);
     void SetFormat(const OH_NN_Format& format);
     OH_NN_ReturnCode SetDimensions(const std::vector<int32_t>& dimensions);
+    OH_NN_ReturnCode SetQuantParam(const NN_QuantParam* quantParam);
+    OH_NN_ReturnCode SetTensorType(OH_NN_TensorType tensorType);
 
     std::string GetName() const;
     OH_NN_TensorType GetType() const;
@@ -66,6 +71,7 @@ public:
     std::vector<QuantParam> GetQuantParam() const;
     LiteGraphTensorPtr ConvertToLiteGraphTensor() const;
     void ConvertToIOTensor(IOTensor& tensor) const;
+    void ConvertToTensorDesc(TensorDesc& desc) const;
 
     bool IsDynamicShape() const;
     bool IsQuantTensor() const;
@@ -74,12 +80,10 @@ public:
     bool CompareAttribute(const NNTensor& tensor) const;
 
 private:
-    // Used in BuildFromOHNNTensor()
     OH_NN_ReturnCode ParseQuantParams(const OH_NN_QuantParam* quantParams);
     OH_NN_ReturnCode ParseDimensions(const int32_t* dimensions, uint32_t dimensionCount);
-    // Used in Build()
-    OH_NN_ReturnCode ParseQuantParams(const std::vector<QuantParam>& quantParams);
-    OH_NN_ReturnCode ParseDimensions(const std::vector<int32_t>& dimensions);
+    OH_NN_ReturnCode ValidateQuantParams(const std::vector<QuantParam>& quantParams);
+    OH_NN_ReturnCode ValidateDimensions(const std::vector<int32_t>& dimensions);
 
 private:
     OH_NN_TensorType m_type {OH_NN_TENSOR};

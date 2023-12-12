@@ -59,8 +59,12 @@ public:
                                          std::shared_ptr<PreparedModel>& preparedModel) override;
 
     void* AllocateBuffer(size_t length) override;
+    void* AllocateTensorBuffer(size_t length, std::shared_ptr<TensorDesc> tensor) override;
     void* AllocateTensorBuffer(size_t length, std::shared_ptr<NNTensor> tensor) override;
     OH_NN_ReturnCode ReleaseBuffer(const void* buffer) override;
+
+    OH_NN_ReturnCode AllocateBuffer(size_t length, int& fd) override;
+    OH_NN_ReturnCode ReleaseBuffer(int fd, size_t length) override;
 
 private:
     OH_NN_ReturnCode ReleaseSharedBuffer(const V2_0::SharedBuffer& buffer);
