@@ -73,7 +73,7 @@ std::shared_ptr<Device> DeviceManager::GetDevice(size_t deviceId) const
 OH_NN_ReturnCode HDIDeviceV1_0::GetDeviceType(OH_NN_DeviceType& deviceType)
 {
     if (deviceType == OH_NN_OTHERS) {
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
 
     return OH_NN_SUCCESS;
@@ -2254,7 +2254,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, device_get_type_003, testing::ext::TestSize.L
     OH_NN_DeviceType deviceType = OH_NN_OTHERS;
     OH_NN_DeviceType* pDeviceType = &deviceType;
     OH_NN_ReturnCode ret = OH_NNDevice_GetType(deviceID, pDeviceType);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, ret);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, ret);
 }
 
 /*

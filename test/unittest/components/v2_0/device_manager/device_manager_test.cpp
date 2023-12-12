@@ -165,7 +165,7 @@ HWTEST_F(DeviceManagerTest, devicemanager_registerdevice_003, TestSize.Level0)
         [&device]()->std::shared_ptr<HDIDeviceV2_0> {return std::make_shared<HDIDeviceV2_0>(device);};
     auto& deviceManager = DeviceManager::GetInstance();
     OH_NN_ReturnCode result = deviceManager.RegisterDevice(creator);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /**
@@ -187,7 +187,7 @@ HWTEST_F(DeviceManagerTest, devicemanager_registerdevice_004, TestSize.Level0)
         [&device]()->std::shared_ptr<HDIDeviceV2_0> {return std::make_shared<HDIDeviceV2_0>(device);};
     auto& deviceManager = DeviceManager::GetInstance();
     OH_NN_ReturnCode result = deviceManager.RegisterDevice(creator);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /**

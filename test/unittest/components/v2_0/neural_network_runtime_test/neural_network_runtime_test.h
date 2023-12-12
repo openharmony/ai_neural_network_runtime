@@ -18,7 +18,7 @@
 
 #include <gtest/gtest.h>
 
-#include "interfaces/kits/c/neural_network_runtime.h"
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime.h"
 #include "frameworks/native/inner_model.h"
 #include "frameworks/native/executor.h"
 

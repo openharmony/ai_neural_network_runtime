@@ -63,7 +63,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetSupportedOperation(std::shared_ptr<const mind
     supportedOperations = {true, true, true};
 
     if (model->name_ == "Loaded_NNR_Model") {
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
     } else {
         return OH_NN_SUCCESS;
     }

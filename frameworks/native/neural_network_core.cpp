@@ -27,6 +27,521 @@
 using namespace OHOS::NeuralNetworkRuntime;
 #define NNRT_API __attribute__((visibility("default")))
 
+NNRT_API OH_NN_ReturnCode OH_NNDevice_GetAllDevicesID(const size_t **allDevicesID, uint32_t *deviceCount)
+{
+    if (allDevicesID == nullptr) {
+        LOGE("OH_NNDevice_GetAllDevicesID failed, passed nullptr to allDevicesID.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if ((*allDevicesID) != nullptr) {
+        LOGE("OH_NNDevice_GetAllDevicesID failed, *allDevicesID should be nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (deviceCount == nullptr) {
+        LOGE("OH_NNDevice_GetAllDevicesID failed, passed nullptr to deviceCount.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    BackendManager& backendManager = BackendManager::GetInstance();
+    const std::vector<size_t>& allDevices = backendManager.GetAllBackendsID();
+
+    if (allDevices.empty()) {
+        LOGW("OH_NNDevice_GetAllDevicesID got no device.");
+        *allDevicesID = nullptr;
+        *deviceCount = 0;
+        return OH_NN_SUCCESS;
+    }
+
+    *allDevicesID = allDevices.data();
+    // allDevices.size() will not exceed UINT32_MAX, it is safe to cast to uint32_t.
+    *deviceCount = static_cast<uint32_t>(allDevices.size());
+
+    return OH_NN_SUCCESS;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNDevice_GetName(size_t deviceID, const char **name)
+{
+    if (name == nullptr) {
+        LOGE("OH_NNDevice_GetName failed, passed nullptr to name.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if ((*name) != nullptr) {
+        LOGE("OH_NNDevice_GetName failed, *name should be nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    BackendManager& backendManager = BackendManager::GetInstance();
+    const std::string& backendName = backendManager.GetBackendName(deviceID);
+    if (backendName.empty()) {
+        LOGE("OH_NNDevice_GetName failed, error happened when getting name of deviceID %{public}zu.", deviceID);
+        *name = nullptr;
+        return OH_NN_FAILED;
+    }
+
+    *name = backendName.data();
+    return OH_NN_SUCCESS;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNDevice_GetType(size_t deviceID, OH_NN_DeviceType* deviceType)
+{
+    BackendManager& backendManager = BackendManager::GetInstance();
+    std::shared_ptr<Backend> backend = backendManager.GetBackend(deviceID);
+    if (backend == nullptr) {
+        LOGE("OH_NNDevice_GetType failed, passed invalid deviceID.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (deviceType == nullptr) {
+        LOGE("OH_NNDevice_GetType failed, passed nullptr to deviceType.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    OH_NN_ReturnCode ret = backend->GetBackendType(*deviceType);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("OH_NNDevice_GetType failed, device id: %{public}zu.", deviceID);
+        return ret;
+    }
+    return OH_NN_SUCCESS;
+}
+
+NNRT_API OH_NNCompilation *OH_NNCompilation_Construct(const OH_NNModel *model)
+{
+    if (model == nullptr) {
+        LOGE("OH_NNCompilation_Construct failed, passed nullptr to model.");
+        return nullptr;
+    }
+
+    Compilation *compilation = new (std::nothrow) Compilation();
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_Construct failed, please check whether it has enough memory.");
+        return nullptr;
+    }
+
+    compilation->nnModel = const_cast<void*>(reinterpret_cast<const void*>(model));
+    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(compilation);
+
+    return nnCompilation;
+}
+
+NNRT_API OH_NNCompilation *OH_NNCompilation_ConstructWithOfflineModelFile(const char *modelPath)
+{
+    if (modelPath == nullptr) {
+        LOGE("OH_NNCompilation_ConstructWithOfflineModelFile failed, passed nullptr to modelPath.");
+        return nullptr;
+    }
+
+    Compilation *compilation = new (std::nothrow) Compilation();
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_ConstructWithOfflineModelFile failed, please check whether it has enough memory.");
+        return nullptr;
+    }
+
+    compilation->offlineModelPath = const_cast<char*>(modelPath);
+    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(compilation);
+
+    return nnCompilation;
+}
+
+NNRT_API OH_NNCompilation *OH_NNCompilation_ConstructWithOfflineModelBuffer(const void *modelBuffer, size_t modelSize)
+{
+    if (modelBuffer == nullptr) {
+        LOGE("OH_NNCompilation_ConstructWithOfflineModelBuffer failed, modelBuffer is nullptr.");
+        return nullptr;
+    }
+
+    if (modelSize == static_cast<size_t>(0)) {
+        LOGE("OH_NNCompilation_ConstructWithOfflineModelBuffer failed, modelSize is 0.");
+        return nullptr;
+    }
+
+    Compilation *compilation = new (std::nothrow) Compilation();
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_ConstructWithOfflineModelBuffer failed, please check whether it has enough memory.");
+        return nullptr;
+    }
+
+    compilation->offlineModelBuffer.first = const_cast<void*>(modelBuffer);
+    compilation->offlineModelBuffer.second = modelSize;
+    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(compilation);
+
+    return nnCompilation;
+}
+
+NNRT_API NNRT_API OH_NNCompilation *OH_NNCompilation_ConstructForCache()
+{
+    Compilation *compilation = new (std::nothrow) Compilation();
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_ConstructForCache failed, please check whether it has enough memory.");
+        return nullptr;
+    }
+
+    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(compilation);
+    return nnCompilation;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNCompilation_ExportCacheToBuffer(OH_NNCompilation *compilation,
+                                                               const void *buffer,
+                                                               size_t length,
+                                                               size_t *modelSize)
+{
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_ExportCacheToBuffer failed, compilation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (buffer == nullptr) {
+        LOGE("OH_NNCompilation_ExportCacheToBuffer failed, buffer is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (length == static_cast<size_t>(0)) {
+        LOGE("OH_NNCompilation_ExportCacheToBuffer failed, pass length equals to 0.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (modelSize == nullptr) {
+        LOGE("OH_NNCompilation_ExportCacheToBuffer failed, modelSize is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    Compilation* compilationImpr = reinterpret_cast<Compilation*>(compilation);
+    if (compilationImpr->compiler == nullptr) {
+        LOGE("OH_NNCompilation_ExportCacheToBuffer failed, should call OH_NNCompilation_Build before export cache.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    OH_NN_ReturnCode ret = compilationImpr->compiler->SaveToCacheBuffer(buffer, length, modelSize);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("OH_NNCompilation_ExportCacheToBuffer failed, fail to save cache to buffer.");
+    }
+
+    return ret;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNCompilation_ImportCacheFromBuffer(OH_NNCompilation *compilation,
+                                                                 const void *buffer,
+                                                                 size_t modelSize)
+{
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_ImportCacheFromBuffer failed, compilation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (buffer == nullptr) {
+        LOGE("OH_NNCompilation_ImportCacheFromBuffer failed, buffer is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (modelSize == static_cast<size_t>(0)) {
+        LOGE("OH_NNCompilation_ImportCacheFromBuffer failed, modelSize is 0.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    Compilation* compilationImpr = reinterpret_cast<Compilation*>(compilation);
+    compilationImpr->offlineModelBuffer.first = const_cast<void*>(buffer);
+    compilationImpr->offlineModelBuffer.second = modelSize;
+
+    return OH_NN_SUCCESS;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNCompilation_AddExtensionConfig(OH_NNCompilation *compilation,
+                                                              const char *configName,
+                                                              const void *configValue,
+                                                              const size_t configValueSize)
+{
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_AddExtensionConfig failed, compilation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (configName == nullptr) {
+        LOGE("OH_NNCompilation_AddExtensionConfig failed, configName is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (configValue == nullptr) {
+        LOGE("OH_NNCompilation_AddExtensionConfig failed, configValue is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (configValueSize == static_cast<size_t>(0)) {
+        LOGE("OH_NNCompilation_AddExtensionConfig failed, configValueSize is 0.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    Compilation* compilationImpr = reinterpret_cast<Compilation*>(compilation);
+
+    std::string configNameStr = configName;
+    if (configNameStr.empty()) {
+        LOGE("OH_NNCompilation_AddExtensionConfig failed, configName is empty.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    std::vector<char> configValueVec(configValueSize, '0');
+    void* configValueAddr = reinterpret_cast<void*>(configValueVec.data());
+    uint32_t ret = memcpy_s(configValueAddr, configValueVec.size(), configValue, configValueSize);
+    if (ret != EOK) {
+        LOGE("OH_NNCompilation_AddExtensionConfig failed, copy config value failed.");
+        return OH_NN_FAILED;
+    }
+
+    auto emplaceResult = compilationImpr->configs.emplace(configNameStr, configValueVec);
+    if (!emplaceResult.second) {
+        LOGE("OH_NNCompilation_AddExtensionConfig failed, configName %{public}s already exists,"
+             "don't set again.", configName);
+        return OH_NN_FAILED;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNCompilation_SetDevice(OH_NNCompilation *compilation, size_t deviceID)
+{
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_SetDevice failed, compilation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    Compilation* compilationImpr = reinterpret_cast<Compilation*>(compilation);
+    compilationImpr->backendID = deviceID;
+
+    return OH_NN_SUCCESS;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNCompilation_SetCache(OH_NNCompilation *compilation,
+                                                    const char *cachePath,
+                                                    uint32_t version)
+{
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_SetCache failed, compilation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (cachePath == nullptr) {
+        LOGE("OH_NNCompilation_SetCache failed, cachePath is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    Compilation* compilationImpr = reinterpret_cast<Compilation*>(compilation);
+    compilationImpr->cachePath = const_cast<char*>(cachePath);
+    compilationImpr->cacheVersion = version;
+
+    return OH_NN_SUCCESS;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNCompilation_SetPerformanceMode(OH_NNCompilation *compilation,
+                                                              OH_NN_PerformanceMode performanceMode)
+{
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_SetPerformanceMode failed, compilation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    Compilation* compilationImpr = reinterpret_cast<Compilation*>(compilation);
+    compilationImpr->performance = performanceMode;
+
+    return OH_NN_SUCCESS;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNCompilation_SetPriority(OH_NNCompilation *compilation, OH_NN_Priority priority)
+{
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_SetPriority failed, compilation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    Compilation* compilationImpr = reinterpret_cast<Compilation*>(compilation);
+    compilationImpr->priority = priority;
+
+    return OH_NN_SUCCESS;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNCompilation_EnableFloat16(OH_NNCompilation *compilation, bool enableFloat16)
+{
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_EnableFloat16 failed, compilation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    Compilation* compilationImpr = reinterpret_cast<Compilation*>(compilation);
+    compilationImpr->enableFp16 = enableFloat16;
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode CreateCompiler(Compilation* compilation, Compiler** compiler)
+{
+    if (compilation == nullptr) {
+        LOGE("CreateCompiler failed, compilation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (compiler == nullptr) {
+        LOGE("CreateCompiler failed, compiler is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    BackendManager& manager = BackendManager::GetInstance();
+    std::shared_ptr<Backend> backend = manager.GetBackend(compilation->backendID);
+    if(backend == nullptr) {
+        LOGE("CreateCompiler failed, fail to get backend %{public}zu.", compilation->backendID);
+        return OH_NN_FAILED;
+    }
+
+    *compiler = backend->CreateCompiler(compilation);
+    if (*compiler == nullptr) {
+        LOGE("CreateCompiler failed, fail to create compiler.");
+        return OH_NN_FAILED;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode SetCompilationOptions(Compilation* compilation)
+{
+    if (compilation == nullptr) {
+        LOGE("SetCompilationOptions failed, compilation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (compilation->compiler == nullptr) {
+        LOGE("SetCompilationOptions failed, compiler is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    OH_NN_ReturnCode ret = OH_NN_SUCCESS;
+    if (compilation->cachePath != nullptr) {
+        ret = compilation->compiler->SetCacheDir(compilation->cachePath, compilation->cacheVersion);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("SetCompilationOptions failed, fail to set cache dir.");
+            return ret;
+        }
+    }
+
+    ret = compilation->compiler->SetEnableFp16(compilation->enableFp16);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("SetCompilationOptions failed, fail to set enable fp16.");
+        return ret;
+    }
+
+    ret = compilation->compiler->SetPerformance(compilation->performance);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("SetCompilationOptions failed, fail to set performance.");
+        return ret;
+    }
+
+    ret = compilation->compiler->SetPriority(compilation->priority);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("SetCompilationOptions failed, fail to set priority.");
+        return ret;
+    }
+
+    ret = compilation->compiler->SetExtensionConfig(compilation->configs);
+    if ((ret != OH_NN_SUCCESS) && (ret != OH_NN_UNSUPPORTED)) {
+        LOGE("SetCompilationOptions failed, fail to set extenstion configs.");
+        return ret;
+    }
+
+    ret = compilation->compiler->SetOptions(compilation->options);
+    if ((ret != OH_NN_SUCCESS) && (ret != OH_NN_UNSUPPORTED)) {
+        LOGE("SetCompilationOptions failed, fail to set extenstion options.");
+        return ret;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation)
+{
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_Build failed, compilation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    Compilation* compilationImpr = reinterpret_cast<Compilation*>(compilation);
+
+    if (((compilationImpr->nnModel != nullptr) && (compilationImpr->offlineModelPath != nullptr)) ||
+        ((compilationImpr->nnModel != nullptr) &&
+         ((compilationImpr->offlineModelBuffer.first != nullptr) ||
+          (compilationImpr->offlineModelBuffer.second != static_cast<size_t>(0)))) ||
+        ((compilationImpr->offlineModelPath != nullptr) &&
+         ((compilationImpr->offlineModelBuffer.first != nullptr) ||
+          (compilationImpr->offlineModelBuffer.second != static_cast<size_t>(0))))) {
+        LOGE("OH_NNCompilation_Build failed, find multi model to build compilation.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    OH_NN_ReturnCode ret = OH_NN_SUCCESS;
+    if (compilationImpr->compiler != nullptr) {
+        LOGE("OH_NNCompilation_Build failed, the compiler in compilation is not nullptr, "
+             "please input a new compilation.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    Compiler* compiler = nullptr;
+    ret = CreateCompiler(compilationImpr, &compiler);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("OH_NNCompilation_Build failed, faile to create compiler.");
+        return ret;
+    }
+    compilationImpr->compiler = compiler;
+
+    ret = SetCompilationOptions(compilationImpr);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("OH_NNCompilation_Build failed, faile to create compiler.");
+        return ret;
+    }
+
+    bool isBuild = compilationImpr->compiler->IsBuild();
+    if (isBuild) {
+        LOGE("OH_NNCompilation_Build failed, compilation has been built, don't build again.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    ret = compilationImpr->compiler->Build();
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("OH_NNCompilation_Build failed, faile to build compilation.");
+        return ret;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+NNRT_API void OH_NNCompilation_Destroy(OH_NNCompilation **compilation)
+{
+    if (compilation == nullptr) {
+        LOGE("OH_NNCompilation_Destroy failed, compilation is nullptr.");
+        return;
+    }
+
+    if (*compilation == nullptr) {
+        LOGE("OH_NNCompilation_Destroy failed, compilation is nullptr.");
+        return;
+    }
+
+    Compilation* compilationImpr = reinterpret_cast<Compilation*>(*compilation);
+    if (compilationImpr->compiler != nullptr) {
+        BackendManager& manager = BackendManager::GetInstance();
+        std::shared_ptr<Backend> backend = manager.GetBackend(compilationImpr->backendID);
+        if(backend == nullptr) {
+            LOGE("OH_NNCompilation_Destroy failed, fail to get backend %{public}zu.", compilationImpr->backendID);
+            return;
+        }
+
+        OH_NN_ReturnCode ret = backend->DestroyCompiler(compilationImpr->compiler);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("OH_NNCompilation_Destroy failed, fail to destroy compiler.");
+            return;
+        }
+    }
+
+    delete compilationImpr;
+    *compilation = nullptr;
+}
+
 NNRT_API NN_TensorDesc *OH_NNTensorDesc_Create()
 {
     TensorDesc *tensorDescImpl = new (std::nothrow) TensorDesc();
