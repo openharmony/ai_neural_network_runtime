@@ -110,8 +110,8 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
     }
 
     if ((uint64_t)version > cacheInfo.version) {
-        LOGE("[NNCompiledCache] Restore failed, version is not match. The current version is %{public}u, but the cache files "
-             "version is %{public}zu.",
+        LOGE("[NNCompiledCache] Restore failed, version is not match. The current version is %{public}u, "
+             "but the cache files version is %{public}zu.",
              version,
              (size_t)cacheInfo.version);
         return OH_NN_INVALID_PARAMETER;
@@ -126,7 +126,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
     for (uint32_t i = 0; i < cacheInfo.fileNumber; ++i) {
         std::string cacheModelPath = cacheDir + "/" + m_modelName + std::to_string(i) + ".nncache";
         if (access(cacheModelPath.c_str(), 0) != 0) {
-            LOGE("[NNCompiledCache] Restore failed, %s is not exist.", cacheModelPath.c_str());
+            LOGE("[NNCompiledCache] Restore failed, %{public}s is not exist.", cacheModelPath.c_str());
             return OH_NN_INVALID_PARAMETER;
         }
 
@@ -139,7 +139,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
 
         if (GetCrc16(static_cast<const unsigned char*>(modelBuffer.data), modelBuffer.length) !=
             cacheInfo.modelCheckSum[i]) {
-            LOGE("[NNCompiledCache] Restore failed, the cache model file %s has been changed.",
+            LOGE("[NNCompiledCache] Restore failed, the cache model file %{public}s has been changed.",
                  cacheModelPath.c_str());
             return OH_NN_INVALID_FILE;
         }

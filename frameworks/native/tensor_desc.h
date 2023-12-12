@@ -16,9 +16,9 @@
 #ifndef NEURAL_NETWORK_RUNTIME_TENSOR_DESC_H
 #define NEURAL_NETWORK_RUNTIME_TENSOR_DESC_H
 
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
 #include <string>
 #include <vector>
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

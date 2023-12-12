@@ -32,30 +32,30 @@ public:
                const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& outputTensorDescs);
     virtual ~NNExecutor();
 
-    virtual OH_NN_ReturnCode GetInputDimRange(size_t inputIndex,
-                                              size_t** minInputDims,
-                                              size_t** maxInputDims,
-                                              size_t* shapeNum) const override;
-    virtual OH_NN_ReturnCode GetOutputShape(uint32_t outputIndex, int32_t** shape, uint32_t* shapeNum) const override;
+    OH_NN_ReturnCode GetInputDimRange(size_t inputIndex,
+                                      size_t** minInputDims,
+                                      size_t** maxInputDims,
+                                      size_t* shapeNum) const override;
+    OH_NN_ReturnCode GetOutputShape(uint32_t outputIndex, int32_t** shape, uint32_t* shapeNum) const override;
 
-    virtual size_t GetInputNum() const override;
-    virtual size_t GetOutputNum() const override;
-    virtual NN_TensorDesc* CreateInputTensorDesc(size_t index) const override;
-    virtual NN_TensorDesc* CreateOutputTensorDesc(size_t index) const override;
+    size_t GetInputNum() const override;
+    size_t GetOutputNum() const override;
+    NN_TensorDesc* CreateInputTensorDesc(size_t index) const override;
+    NN_TensorDesc* CreateOutputTensorDesc(size_t index) const override;
 
-    virtual OH_NN_ReturnCode SetOnRunDone(NN_OnRunDone onRunDone) override;
-    virtual OH_NN_ReturnCode SetOnServiceDied(NN_OnServiceDied onServiceDied) override;
-    virtual OH_NN_ReturnCode RunSync(NN_Tensor* inputTensors[],
-                                     size_t inputSize,
-                                     NN_Tensor* outputTensors[],
-                                     size_t outputSize) override;
-    virtual OH_NN_ReturnCode RunAsync(NN_Tensor* inputTensors[],
-                                      size_t inputSize,
-                                      NN_Tensor* outputTensors[],
-                                      size_t outputSize,
-                                      int32_t timeout,
-                                      void* userData) override;
-    virtual size_t GetBackendID() override;
+    OH_NN_ReturnCode SetOnRunDone(NN_OnRunDone onRunDone) override;
+    OH_NN_ReturnCode SetOnServiceDied(NN_OnServiceDied onServiceDied) override;
+    OH_NN_ReturnCode RunSync(NN_Tensor* inputTensors[],
+                             size_t inputSize,
+                             NN_Tensor* outputTensors[],
+                             size_t outputSize) override;
+    OH_NN_ReturnCode RunAsync(NN_Tensor* inputTensors[],
+                              size_t inputSize,
+                              NN_Tensor* outputTensors[],
+                              size_t outputSize,
+                              int32_t timeout,
+                              void* userData) override;
+    size_t GetBackendID() override;
 
     // The following APIs are compatible with older versions
     OH_NN_ReturnCode SetInput(uint32_t index, const OH_NN_Tensor& nnTensor, const void* buffer, size_t length);

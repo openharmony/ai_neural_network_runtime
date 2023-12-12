@@ -68,7 +68,9 @@ NNRT_API OH_NN_ReturnCode OH_NNQuantParam_SetScales(NN_QuantParam* quantParams, 
     return OH_NN_SUCCESS;
 }
 
-NNRT_API OH_NN_ReturnCode OH_NNQuantParam_SetZeroPoints(NN_QuantParam* quantParams, const int32_t* zeroPoints, size_t quantNum)
+NNRT_API OH_NN_ReturnCode OH_NNQuantParam_SetZeroPoints(NN_QuantParam* quantParams,
+                                                        const int32_t* zeroPoints,
+                                                        size_t quantNum)
 {
     if (quantParams == nullptr) {
         LOGE("OH_NNQuantParam_SetZeroPoints failed, passed nullptr to quantParams.");

@@ -81,7 +81,6 @@ OH_NNCompilation *OH_NNCompilation_Construct(const OH_NNModel *model);
  * 
  * You should perform the offline compilation during your development and deploy the offline model in your app package. \n
  * 
- *
  * @param modelPath Offline model file path.
  * @return Pointer to an {@link OH_NNCompilation} instance.
  * @since 11
@@ -95,7 +94,8 @@ OH_NNCompilation *OH_NNCompilation_ConstructWithOfflineModelFile(const char *mod
  * This method conflicts with the way of passing an online built model or an offline model file path, 
  * and you have to choose only one of the three construction methods. \n
  * 
- * After {@link OH_NNCompilation_Build} is called, the <b>modelBuffer<\b> can be released. \n
+ * Note that the returned {@link OH_NNCompilation} instance only saves the <b>modelBuffer<\b> pointer inside, instead of 
+ * copying its data. You should not release <b>modelBuffer<\b> before the {@link OH_NNCompilation} instance is destroied. \n
  *
  * @param modelBuffer Offline model file buffer.
  * @param modelSize Offfline model buffer size.
@@ -143,7 +143,8 @@ OH_NN_ReturnCode OH_NNCompilation_ExportCacheToBuffer(OH_NNCompilation *compilat
  *
  * {@link OH_NNCompilation_Build} should be called to complete the restoration after {@link OH_NNCompilation_ImportCacheFromBuffer} is called. \n
  * 
- * After {@link OH_NNCompilation_Build} is called, the <b>buffer<\b> can be released. \n
+ * Note that <b>compilation<\b> only saves the <b>buffer<\b> pointer inside, instead of copying its data. You should not 
+ * release <b>buffer<\b> before <b>compilation<\b> is destroied. \n
  *
  * @param compilation Pointer to the {@link OH_NNCompilation} instance.
  * @param buffer Pointer to the given buffer.
@@ -186,10 +187,11 @@ OH_NN_ReturnCode OH_NNCompilation_AddExtensionConfig(OH_NNCompilation *compilati
  *
  * In the compilation phase, you need to specify the device for model compilation and computing. Call {@link OH_NNDevice_GetAllDevicesID} 
  * to obtain available device IDs. Call {@link OH_NNDevice_GetType} and {@link OH_NNDevice_GetName} to obtain device information 
- * and pass target device IDs to this method for setting. \n
+ * and pass target device ID to this method for setting. \n
+ *
  *
  * @param compilation Pointer to the {@link OH_NNCompilation} instance.
- * @param deviceID Device ID.
+ * @param deviceID Device id. If it is 0, the 0th device in the current device list will be used.
  * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
  *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
  * @since 9
@@ -308,8 +310,9 @@ OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation);
 /**
  * @brief Releases the <b>Compilation</b> object.
  *
- * This method needs to be called to release the compilation instance created by calling {@link OH_NNCompilation_Construct}. 
- * Otherwise, the memory leak will occur. \n
+ * This method needs to be called to release the compilation instance created by {@link OH_NNCompilation_Construct}, 
+ * {@link OH_NNCompilation_ConstructWithOfflineModelFile}, {@link OH_NNCompilation_ConstructWithOfflineModelBuffer} and 
+ * {@link OH_NNCompilation_ConstructForCache}. Otherwise, the memory leak will occur. \n
  *
  * If <b>compilation</b> or <b>*compilation</b> is a null pointer, this method only prints warning logs and does not execute the release. \n
  *
@@ -431,7 +434,7 @@ OH_NN_ReturnCode OH_NNTensorDesc_GetDataType(const NN_TensorDesc *tensorDesc, OH
  *
  * After the {@link NN_TensorDesc} instance is created, call this method to set the tensor shape. \n
  * 
- * if <b>tensorDesc</b> or <b>shape</b> is a null pointer, or <b>shapeNum</b> is 0, this method will return error code. \n
+ * if <b>tensorDesc</b> or <b>shape</b> is a null pointer, or <b>shapeLength</b> is 0, this method will return error code. \n
  *
  * @param tensorDesc Pointer to the {@link NN_TensorDesc} instance.
  * @param shape The shape list of the tensor that needs to be set.
@@ -448,7 +451,7 @@ OH_NN_ReturnCode OH_NNTensorDesc_SetShape(NN_TensorDesc *tensorDesc, const int32
  *
  * Call this method to obtain the shape of the specified {@link NN_TensorDesc} instance. \n
  * 
- * if <b>tensorDesc</b>, <b>shape</b> or <b>shapeNum</b> is a null pointer, this method will return error code. 
+ * if <b>tensorDesc</b>, <b>shape</b> or <b>shapeLength</b> is a null pointer, this method will return error code. 
  * As an output parameter, <b>*shape</b> must be a null pointer, otherwise the method will return an error code. 
  * Fou example, you should define int32_t* tensorShape = NULL, and pass &tensorShape as the argument of <b>shape</b>. \n
  * 
@@ -546,13 +549,13 @@ OH_NN_ReturnCode OH_NNTensorDesc_GetByteSize(const NN_TensorDesc *tensorDesc, si
  * 
  * If the tensor shape is dynamic, this method will return error code. \n
  * 
- * <b>deviceID</b> indicates the selected device, which can be a null pointer. If it is a null pointer, the 0th device is used by default. \n
+ * <b>deviceID</b> indicates the selected device. If it is 0, the 0th device is used. \n
  * 
  * <b>tensorDesc</b> must be provided, and this method will return an error code if it is a null pointer. \n
  *
  * Call {@link OH_NNTensor_DestroyTensor} to release the {@link NN_Tensor} instance. \n
  *
- * @param deviceID The device id which can be a null pointer. If it is a null pointer, the 0th device in the current device list will be used by default.
+ * @param deviceID Device id. If it is 0, the 0th device in the current device list will be used.
  * @param tensorDesc Pointer to the {@link NN_TensorDesc} instance.
  * @return Pointer to a {@link NN_Tensor} instance.
  * @since 11
@@ -569,7 +572,7 @@ NN_Tensor* OH_NNTensor_Create(size_t deviceID, NN_TensorDesc *tensorDesc);
  * Note that this method will copy the <b>tensorDesc</b> into {@link NN_Tensor}. Therefore you should destroy <b>tensorDesc</b> 
  * by {@link OH_NNTensorDesc_Destroy} when it is no longer used. \n
  * 
- * <b>deviceName</b> indicates the selected device, which can be a null pointer. If it is a null pointer, the 0th device is used by default. \n
+ * <b>deviceID</b> indicates the selected device. If it is 0, the 0th device is used. \n
  * 
  * <b>tensorDesc</b> must be provided, if it is a null pointer, the method returns an error code. 
  * <b>size</b> must be no less than the byte size of tensorDesc. Otherwise, this method will return an error code. If the tensor 
@@ -577,7 +580,7 @@ NN_Tensor* OH_NNTensor_Create(size_t deviceID, NN_TensorDesc *tensorDesc);
  *
  * Call {@link OH_NNTensor_DestroyTensor} to release the {@link NN_Tensor} instance. \n
  *
- * @param deviceID The device id  which can be a null pointer. If it is a null pointer, the 0th device in the current device list will be used by default.
+ * @param deviceID Device id. If it is 0, the 0th device in the current device list will be used.
  * @param tensorDesc Pointer to the {@link NN_TensorDesc} instance.
  * @param size Size of tensor data that need to be allocated.
  * @return Pointer to a {@link NN_Tensor} instance.
@@ -599,12 +602,13 @@ NN_Tensor* OH_NNTensor_CreateWithSize(size_t deviceID, NN_TensorDesc *tensorDesc
  * instance you created must use a new <b>tensorDesc</b> that has not been used by another {@link NN_Tensor} instance. 
  * Otherwise, a <b>tensorDesc</b> will be released twice, which will bring a memory corruption of doulbe free. \n
  * 
- * <b>deviceName</b> indicates the selected device, which can be a null pointer. If it is a null pointer, the 0th device is used by default. 
+ * <b>deviceID</b> indicates the selected device. If it is 0, the 0th device is used. \n
+ * 
  * <b>tensorDesc</b> must be provided, if it is a null pointer, the method returns an error code. \n
  *
  * Call {@link OH_NNTensor_DestroyTensor} to release the {@link NN_Tensor} instance. \n
  *
- * @param deviceID The device id which can be a null pointer. If it is a null pointer, the 0th device in the current device list will be used by default.
+ * @param deviceID Device id. If it is 0, the 0th device in the current device list will be used.
  * @param tensorDesc Pointer to the {@link NN_TensorDesc} instance.
  * @param fd Fd of the shared memory to be resued.
  * @param size Size of the shared memory to be resued.
@@ -671,6 +675,23 @@ NN_TensorDesc* OH_NNTensor_GetTensorDesc(const NN_Tensor *tensor);
 void* OH_NNTensor_GetDataBuffer(const NN_Tensor *tensor);
 
 /**
+ * @brief Gets the data fd of a {@link NN_Tensor}.
+ *
+ * The <b>fd</b> corresponds to a shared memory on device driver, and can be resued by another {@link NN_Tensor} through 
+ * {@link OH_NNTensor_CreateWithFd}. \n
+ * 
+ * if <b>tensor</b> or <b>fd</b> is a null pointer, this method will return error code. \n
+ *
+ * @param tensor Pointer to the {@link NN_Tensor} instance.
+ * @param fd The returned fd of tensor data.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
+ *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
+ * @since 11
+ * @version 1.0
+ */
+OH_NN_ReturnCode OH_NNTensor_GetFd(const NN_Tensor *tensor, int *fd);
+
+/**
  * @brief Gets the data size of a {@link NN_Tensor}.
  *
  * The tensor data size is as same as the argument <b>size</b> of {@link OH_NNTensor_CreateWithSize} and {@link OH_NNTensor_CreateWithFd}. 
@@ -688,23 +709,6 @@ void* OH_NNTensor_GetDataBuffer(const NN_Tensor *tensor);
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNTensor_GetSize(const NN_Tensor *tensor, size_t *size);
-
-/**
- * @brief Gets the data fd of a {@link NN_Tensor}.
- *
- * The <b>fd</b> corresponds to a shared memory on device driver, and can be resued by another {@link NN_Tensor} through 
- * {@link OH_NNTensor_CreateWithFd}. \n
- * 
- * if <b>tensor</b> or <b>fd</b> is a null pointer, this method will return error code. \n
- *
- * @param tensor Pointer to the {@link NN_Tensor} instance.
- * @param fd The returned fd of tensor data.
- * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
- *         If the operation fails, an error code is returned. For details about the error codes, see {@link OH_NN_ReturnCode}.
- * @since 11
- * @version 1.0
- */
-OH_NN_ReturnCode OH_NNTensor_GetFd(const NN_Tensor *tensor, int *fd);
 
 /**
  * @brief Get the data offset of a tensor.

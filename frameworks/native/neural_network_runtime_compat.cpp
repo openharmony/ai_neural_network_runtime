@@ -84,7 +84,6 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_SetOutput(OH_NNExecutor *executor,
 
     NNExecutor *executorImpl = reinterpret_cast<NNExecutor *>(executor);
     return executorImpl->SetOutput(outputIndex, dataBuffer, length);
-
 }
 
 NNRT_API OH_NN_ReturnCode OH_NNExecutor_Run(OH_NNExecutor *executor)

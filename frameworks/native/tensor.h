@@ -16,8 +16,8 @@
 #ifndef NEURAL_NETWORK_RUNTIME_TENSOR_H
 #define NEURAL_NETWORK_RUNTIME_TENSOR_H
 
-#include "tensor_desc.h"
 #include <memory>
+#include "tensor_desc.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

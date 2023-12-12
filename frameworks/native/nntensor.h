@@ -16,15 +16,15 @@
 #ifndef NEURAL_NETWORK_RUNTIME_NNTENSOR_H
 #define NEURAL_NETWORK_RUNTIME_NNTENSOR_H
 
-#include "tensor.h"
 #include <memory>
+#include "tensor.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 class NNTensor2_0 : public Tensor {
 public:
-    NNTensor2_0(size_t backendID) : m_backendID(backendID) {}
-    virtual ~NNTensor2_0();
+    explicit NNTensor2_0(size_t backendID) : m_backendID(backendID) {}
+    ~NNTensor2_0() override;
 
     OH_NN_ReturnCode SetTensorDesc(const TensorDesc* tensorDesc) override;
     OH_NN_ReturnCode CreateData() override;
