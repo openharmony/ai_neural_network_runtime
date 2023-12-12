@@ -21,8 +21,9 @@
 
 #include "mindir.h"
 #include "ops_builder.h"
+#include "tensor_desc.h"
 #include "interfaces/innerkits/c/neural_network_runtime_inner.h"
-#include "interfaces/kits/c/neural_network_runtime.h"
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -35,6 +36,9 @@ public:
     OH_NN_ReturnCode BuildFromMetaGraph(const void* metaGraph, const Buffer& quantBuffer,
                                         const std::string& modelName);
     OH_NN_ReturnCode AddTensor(const OH_NN_Tensor& nnTensor);
+    OH_NN_ReturnCode AddTensorDesc(const NN_TensorDesc* nnTensorDesc);
+    OH_NN_ReturnCode SetTensorQuantParam(uint32_t index, const NN_QuantParam* quantParam);
+    OH_NN_ReturnCode SetTensorType(uint32_t index, OH_NN_TensorType tensorType);
     OH_NN_ReturnCode SetTensorValue(uint32_t index, const void* buffer, size_t length);
     OH_NN_ReturnCode AddOperation(OH_NN_OperationType opType,
                                   const OH_NN_UInt32Array& paramIndices,
@@ -48,6 +52,8 @@ public:
     OH_NN_ReturnCode Build();
     std::vector<std::shared_ptr<NNTensor>> GetInputTensors() const;
     std::vector<std::shared_ptr<NNTensor>> GetOutputTensors() const;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> GetInputTensorDescs() const;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> GetOutputTensorDescs() const;
     std::shared_ptr<mindspore::lite::LiteGraph> GetLiteGraphs() const;
     void* GetMetaGraph() const;
     Buffer GetQuantBuffer() const;

@@ -17,7 +17,7 @@
 #define NEURAL_NETWORK_RUNTIME_VALIDATION_H
 
 #include "common/log.h"
-#include "interfaces/kits/c/neural_network_runtime.h"
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -39,7 +39,6 @@ bool ValidateTensorFormat(OH_NN_Format format);
 bool ValidatePerformanceMode(OH_NN_PerformanceMode performanceMode);
 bool ValidatePriority(OH_NN_Priority priority);
 bool ValidateFuseType(OH_NN_FuseType fuseType);
-bool ValidatePadMode(int8_t padMode);
 } // namespace Validation
 } // NeuralNetworkRuntime
 } // namespace OHOS
