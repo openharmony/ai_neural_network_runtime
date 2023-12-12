@@ -649,7 +649,9 @@ NNRT_API OH_NN_ReturnCode OH_NNTensorDesc_SetShape(NN_TensorDesc *tensorDesc, co
     return tensorDescImpl->SetShape(shape, shapeLength);
 }
 
-NNRT_API OH_NN_ReturnCode OH_NNTensorDesc_GetShape(const NN_TensorDesc *tensorDesc, int32_t **shape, size_t *shapeLength)
+NNRT_API OH_NN_ReturnCode OH_NNTensorDesc_GetShape(const NN_TensorDesc *tensorDesc,
+                                                   int32_t **shape,
+                                                   size_t *shapeLength)
 {
     if (tensorDesc == nullptr) {
         LOGE("OH_NNTensorDesc_GetShape failed, tensorDesc is nullptr.");
@@ -792,8 +794,10 @@ NNRT_API NN_Tensor* OH_NNTensor_CreateWithSize(size_t deviceID, NN_TensorDesc *t
     return tensor;
 }
 
-NNRT_API NN_Tensor* OH_NNTensor_CreateWithFd(
-    size_t deviceID, NN_TensorDesc *tensorDesc, int fd, size_t size, size_t offset)
+NNRT_API NN_Tensor* OH_NNTensor_CreateWithFd(size_t deviceID,
+                                             NN_TensorDesc *tensorDesc,
+                                             int fd, size_t size,
+                                             size_t offset)
 {
     if (tensorDesc == nullptr) {
         LOGE("OH_NNTensor_CreateWithFd failed, tensorDesc is nullptr.");
@@ -1012,8 +1016,10 @@ NNRT_API void OH_NNExecutor_Destroy(OH_NNExecutor **executor)
     *executor = nullptr;
 }
 
-NNRT_API OH_NN_ReturnCode OH_NNExecutor_GetOutputShape(
-    OH_NNExecutor *executor, uint32_t outputIndex, int32_t **shape, uint32_t *shapeLength)
+NNRT_API OH_NN_ReturnCode OH_NNExecutor_GetOutputShape(OH_NNExecutor *executor,
+                                                       uint32_t outputIndex,
+                                                       int32_t **shape,
+                                                       uint32_t *shapeLength)
 {
     if (executor == nullptr) {
         LOGE("OH_NNExecutor_GetOutputShape failed, executor is nullptr.");
@@ -1091,7 +1097,10 @@ NNRT_API NN_TensorDesc* OH_NNExecutor_CreateOutputTensorDesc(const OH_NNExecutor
 }
 
 NNRT_API OH_NN_ReturnCode OH_NNExecutor_GetInputDimRange(const OH_NNExecutor *executor,
-    size_t index, size_t **minInputDims, size_t **maxInputDims, size_t *shapeLength)
+                                                         size_t index,
+                                                         size_t **minInputDims,
+                                                         size_t **maxInputDims,
+                                                         size_t *shapeLength)
 {
     if (executor == nullptr) {
         LOGE("OH_NNExecutor_GetInputDimRange failed, executor is nullptr.");
@@ -1145,7 +1154,10 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_SetOnServiceDied(OH_NNExecutor *executor
 }
 
 NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunSync(OH_NNExecutor *executor,
-    NN_Tensor *inputTensor[], size_t inputCount, NN_Tensor *outputTensor[], size_t outputCount)
+                                                NN_Tensor *inputTensor[],
+                                                size_t inputCount,
+                                                NN_Tensor *outputTensor[],
+                                                size_t outputCount)
 {
     if (executor == nullptr) {
         LOGE("OH_NNExecutor_RunSync failed, executor is nullptr.");
@@ -1172,8 +1184,13 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunSync(OH_NNExecutor *executor,
     return executorImpl->RunSync(inputTensor, inputCount, outputTensor, outputCount);
 }
 
-NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunAsync(OH_NNExecutor *executor, NN_Tensor* inputTensor[],
-    size_t inputCount, NN_Tensor* outputTensor[], size_t outputCount, int32_t timeout, void* userData)
+NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunAsync(OH_NNExecutor *executor,
+                                                 NN_Tensor* inputTensor[],
+                                                 size_t inputCount,
+                                                 NN_Tensor* outputTensor[],
+                                                 size_t outputCount,
+                                                 int32_t timeout,
+                                                 void* userData)
 {
     if (executor == nullptr) {
         LOGE("OH_NNExecutor_RunAsync failed, executor is nullptr.");
@@ -1195,7 +1212,7 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunAsync(OH_NNExecutor *executor, NN_Ten
         LOGE("OH_NNExecutor_RunAsync failed, outputCount is 0.");
         return OH_NN_INVALID_PARAMETER;
     }
-    if (userData == 0) {
+    if (userData == nullptr) {
         LOGE("OH_NNExecutor_RunAsync failed, userData is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }

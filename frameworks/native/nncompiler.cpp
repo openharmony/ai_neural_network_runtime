@@ -105,7 +105,7 @@ public:
     OH_NN_TensorType m_tensorType{OH_NN_TENSOR};
     size_t m_shapeNum{0};
     int32_t* m_shape{nullptr};
-    const char* m_name{nullptr};        // null-terminated
+    const char* m_name{nullptr}; // null-terminated
 };
 
 const size_t SIZE_OF_DATATYPE = sizeof(SerializedTensorDesc::m_dataType);
@@ -118,7 +118,8 @@ NNCompiler::NNCompiler(std::shared_ptr<Device> device, size_t backendID)
     : m_device(device),
     m_backendID(backendID) {}
 
-NNCompiler::NNCompiler(const void* model, std::shared_ptr<Device> device, size_t backendID) {
+NNCompiler::NNCompiler(const void* model, std::shared_ptr<Device> device, size_t backendID)
+{
     m_device = device;
     m_backendID = backendID;
     const InnerModel* innerModel = reinterpret_cast<const InnerModel*>(model);
@@ -450,6 +451,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     }
 
     std::vector<Buffer> caches;
+    compiledCache.SetModelName(m_modelName);
     ret = compiledCache.Restore(m_cachePath, m_cacheVersion, caches);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when restoring model cache.");
@@ -458,6 +460,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     }
 
     size_t cacheNum = caches.size();
+    m_inputTensorDescs.clear();
     ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_INPUT_TENSORDESC_OFFSET], m_inputTensorDescs);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when deserializing input tensor desc.");
@@ -465,6 +468,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
         return ret;
     }
 
+    m_outputTensorDescs.clear();
     ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_OUTPUT_TENSORDESC_OFFSET], m_outputTensorDescs);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when deserializing output tensor desc.");

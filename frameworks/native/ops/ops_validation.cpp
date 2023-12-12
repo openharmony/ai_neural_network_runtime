@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// #include "mindir_types.h" // todo
-
 #include "ops_validation.h"
 #include "mindir_types.h"
 

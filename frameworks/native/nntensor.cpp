@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
+#include <sys/mman.h>
+#include <unistd.h>
+
+#include "common/log.h"
 #include "backend_manager.h"
 #include "nnbackend.h"
 #include "nntensor.h"
-#include "common/log.h"
-#include <sys/mman.h>
-#include <unistd.h>
 #include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
 
 namespace OHOS {
