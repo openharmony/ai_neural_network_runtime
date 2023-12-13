@@ -153,33 +153,33 @@ typedef enum {
      * @deprecated since 11
      * @useinstead {@link OH_NN_UNAVAILABLE_DEVICE}
      */
-    OH_NN_UNAVALIABLE_DEVICE = 7,
+    OH_NN_UNAVALIDABLE_DEVICE = 7,
     /** Invalid path. */
     OH_NN_INVALID_PATH = 8,
-    /** A hardware error occurs, for example, HDL service crash. 
-     * @since 11
-     */
-    OH_NN_UNAVAILABLE_DEVICE = 9,
     /** Timeout. 
      * @since 11
      */
-    OH_NN_TIMEOUT = 10,
+    OH_NN_TIMEOUT = 9,
     /** Unsupported. 
      * @since 11
      */
-    OH_NN_UNSUPPORTED = 11,
+    OH_NN_UNSUPPORTED = 10,
     /** Connection Exception. 
      * @since 11
      */
-    OH_NN_CONNECTION_EXCEPTION = 12,
+    OH_NN_CONNECTION_EXCEPTION = 11,
     /** Save cache exception.
      * @since 11
      */
-    OH_NN_SAVE_CACHE_EXCEPTION = 13,
+    OH_NN_SAVE_CACHE_EXCEPTION = 12,
     /** Dynamic shape.
      * @since 11
      */
-    OH_NN_DYNAMIC_SHAPE = 14
+    OH_NN_DYNAMIC_SHAPE = 13,
+    /** A hardware error occurs, for example, HDL service crash. 
+     * @since 11
+     */
+    OH_NN_UNAVAILABLE_DEVICE = 14
 } OH_NN_ReturnCode;
 
 

@@ -53,8 +53,8 @@ public:
     OH_NN_ReturnCode SetOptions(const std::vector<std::shared_ptr<void>>& options) override;
 
     NNExecutor* CreateExecutor();
-    OH_NN_ReturnCode IsSupporttedModel(const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph,
-                                       bool& isSupporttedModel) const;
+    OH_NN_ReturnCode IsSupportedModel(const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph,
+                                       bool& isSupportedModel) const;
 
 private:
     void ReleaseBuffer(std::vector<Buffer>& buffers) const;
