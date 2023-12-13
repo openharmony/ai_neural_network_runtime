@@ -189,7 +189,7 @@ OH_NN_ReturnCode OH_NNCompilation_AddExtensionConfig(OH_NNCompilation *compilati
  * to obtain available device IDs. Call {@link OH_NNDevice_GetType} and {@link OH_NNDevice_GetName} to obtain device information 
  * and pass target device ID to this method for setting. \n
  *
- *
+ * 
  * @param compilation Pointer to the {@link OH_NNCompilation} instance.
  * @param deviceID Device id. If it is 0, the 0th device in the current device list will be used.
  * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
@@ -602,7 +602,7 @@ NN_Tensor* OH_NNTensor_CreateWithSize(size_t deviceID, NN_TensorDesc *tensorDesc
  * instance you created must use a new <b>tensorDesc</b> that has not been used by another {@link NN_Tensor} instance. 
  * Otherwise, a <b>tensorDesc</b> will be released twice, which will bring a memory corruption of doulbe free. \n
  * 
- * <b>deviceID</b> indicates the selected device. If it is 0, the 0th device is used. \n
+ * <b>deviceID</b> indicates the selected device. If it is 0, the 0th device is used. \n 
  * 
  * <b>tensorDesc</b> must be provided, if it is a null pointer, the method returns an error code. \n
  *

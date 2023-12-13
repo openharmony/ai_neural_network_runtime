@@ -254,8 +254,8 @@ bool NNCompiler::IsBuild() const
     return m_isBuild;
 }
 
-OH_NN_ReturnCode NNCompiler::IsSupporttedModel(const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph,
-                                               bool& isSupporttedModel) const
+OH_NN_ReturnCode NNCompiler::IsSupportedModel(const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph,
+                                               bool& isSupportedModel) const
 {
     std::vector<bool> supportedList;
     OH_NN_ReturnCode ret = m_device->GetSupportedOperation(liteGraph, supportedList);
@@ -268,12 +268,12 @@ OH_NN_ReturnCode NNCompiler::IsSupporttedModel(const std::shared_ptr<mindspore::
         if (!isSupport) {
             LOGE("[NNCompiler] Build failed, current device not support the model, device id: %{public}zu.",
                 m_backendID);
-            isSupporttedModel = false;
+            isSupportedModel = false;
             return OH_NN_FAILED;
         }
     }
 
-    isSupporttedModel = true;
+    isSupportedModel = true;
     return OH_NN_SUCCESS;
 }
 
@@ -308,12 +308,12 @@ OH_NN_ReturnCode NNCompiler::Build()
     }
 
     // 判断是否支持模型
-    bool isSupporttedModel = true;
-    ret = IsSupporttedModel(m_liteGraph, isSupporttedModel);
+    bool isSupportedModel = true;
+    ret = IsSupportedModel(m_liteGraph, isSupportedModel);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] Build failed, error happend when judge if support the model.");
         return ret;
-    } else if (!isSupporttedModel) {
+    } else if (!isSupportedModel) {
         LOGE("[NNCompiler] Build failed, current device not support the model.");
         return OH_NN_FAILED;
     }

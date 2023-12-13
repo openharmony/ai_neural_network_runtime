@@ -245,7 +245,7 @@ OH_NN_ReturnCode NNBackend::GetSupportedOperation(std::shared_ptr<const mindspor
 
     OH_NN_ReturnCode ret = m_device->GetSupportedOperation(model, ops);
     if (ret != OH_NN_SUCCESS) {
-        LOGE("[NNBackend] GetSupportedOperation failed, fail to get supportted ops from device.");
+        LOGE("[NNBackend] GetSupportedOperation failed, fail to get supported ops from device.");
         return OH_NN_FAILED;
     }
 
