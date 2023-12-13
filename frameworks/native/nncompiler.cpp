@@ -460,16 +460,16 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     }
 
     size_t cacheNum = caches.size();
-    m_inputTensorDescs.clear();
-    ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_INPUT_TENSORDESC_OFFSET], m_inputTensorDescs);
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> inputTensorDescs;
+    ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_INPUT_TENSORDESC_OFFSET], inputTensorDescs);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when deserializing input tensor desc.");
         ReleaseBufferByDevice(caches);
         return ret;
     }
 
-    m_outputTensorDescs.clear();
-    ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_OUTPUT_TENSORDESC_OFFSET], m_outputTensorDescs);
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> outputTensorDescs;
+    ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_OUTPUT_TENSORDESC_OFFSET], outputTensorDescs);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when deserializing output tensor desc.");
         ReleaseBufferByDevice(caches);
@@ -489,6 +489,8 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     }
     ReleaseBufferByDevice(caches);
 
+    m_inputTensorDescs = inputTensorDescs;
+    m_outputTensorDescs = outputTensorDescs;
     LOGI("[NNCompiler] Restore model cache successfully.");
     return OH_NN_SUCCESS;
 }
