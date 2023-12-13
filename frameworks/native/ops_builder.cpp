@@ -62,11 +62,11 @@ OH_NN_ReturnCode OpsBuilder::CheckIOIndex(const std::vector<uint32_t>& inputsInd
     size_t inputsIndexSize = inputsIndex.size();
     size_t outputIndexSize = outputsIndex.size();
     if (inputsIndexSize != inputNum) {
-        LOGE("The number of index of inputs is %zu don't equal to %zu.", inputsIndexSize, inputNum);
+        LOGE("The number of index of inputs is %{public}zu don't equal to %{public}zu.", inputsIndexSize, inputNum);
         return OH_NN_INVALID_PARAMETER;
     }
     if (outputIndexSize != outputNum) {
-        LOGE("The number of index of outputs is %zu don't equal to %zu.", outputIndexSize, outputNum);
+        LOGE("The number of index of outputs is %{public}zu don't equal to %zu.", outputIndexSize, outputNum);
         return OH_NN_INVALID_PARAMETER;
     }
 

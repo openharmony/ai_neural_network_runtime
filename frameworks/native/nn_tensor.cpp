@@ -23,6 +23,7 @@
 #include "common/log.h"
 #include "mindir.h"
 #include "mindir_types.h"
+#include "quant_param.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -74,7 +75,7 @@ NNTensor& NNTensor::operator=(NNTensor&& tensor) noexcept
 
 OH_NN_ReturnCode NNTensor::Build(OH_NN_DataType dataType,
                                  const std::vector<int32_t>& dimensions,
-                                 const std::vector<QuantParam>& quantParam,
+                                 const std::vector<QuantParam>& quantParams,
                                  OH_NN_TensorType type)
 {
     m_type = type;
@@ -85,17 +86,19 @@ OH_NN_ReturnCode NNTensor::Build(OH_NN_DataType dataType,
     }
     m_dataType = dataType;
 
-    OH_NN_ReturnCode ret = ParseDimensions(dimensions);
-    if (ret != OH_NN_SUCCESS) {
-        LOGE("Build failed, passed invalid dimensions.");
-        return ret;
+    OH_NN_ReturnCode returnCode = ValidateDimensions(dimensions);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("Build failed, error happened when validating dimensions.");
+        return returnCode;
     }
+    m_dimensions = dimensions;
 
-    ret = ParseQuantParams(quantParam);
-    if (ret != OH_NN_SUCCESS) {
-        LOGE("Build failed, please check quantParam.");
-        return ret;
+    returnCode = ValidateQuantParams(quantParams);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("Build failed, error happened when validating quantParams.");
+        return returnCode;
     }
+    m_quantParams = quantParams;
 
     return OH_NN_SUCCESS;
 }
@@ -115,16 +118,16 @@ OH_NN_ReturnCode NNTensor::BuildFromOHNNTensor(const OH_NN_Tensor& nnTensor)
         return OH_NN_INVALID_PARAMETER;
     }
 
-    OH_NN_ReturnCode ret = ParseDimensions(nnTensor.dimensions, nnTensor.dimensionCount);
-    if (ret != OH_NN_SUCCESS) {
+    OH_NN_ReturnCode returnCode = ParseDimensions(nnTensor.dimensions, nnTensor.dimensionCount);
+    if (returnCode != OH_NN_SUCCESS) {
         LOGE("BuildFromOHNNTensor failed, passed invalid nnTensor dimensions.");
-        return ret;
+        return returnCode;
     }
 
-    ret = ParseQuantParams(nnTensor.quantParam);
-    if (ret != OH_NN_SUCCESS) {
+    returnCode = ParseQuantParams(nnTensor.quantParam);
+    if (returnCode != OH_NN_SUCCESS) {
         LOGE("BuildFromOHNNTensor failed, please check quantParam in nnTensor.");
-        return ret;
+        return returnCode;
     }
 
     return OH_NN_SUCCESS;
@@ -145,16 +148,86 @@ OH_NN_ReturnCode NNTensor::BuildFromOHNNTensorInfo(const OH_NN_TensorInfo& nnTen
     m_format = nnTensorInfo.format;
     m_name = nnTensorInfo.name;
 
-    OH_NN_ReturnCode ret = ParseDimensions(nnTensorInfo.dimensions, nnTensorInfo.dimensionCount);
-    if (ret != OH_NN_SUCCESS) {
+    OH_NN_ReturnCode returnCode = ParseDimensions(nnTensorInfo.dimensions, nnTensorInfo.dimensionCount);
+    if (returnCode != OH_NN_SUCCESS) {
         LOGE("BuildFromOHNNTensorInfo failed, passed invalid nnTensorInfo dimensions.");
-        return ret;
+        return returnCode;
     }
 
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode NNTensor::ParseDimensions(const std::vector<int32_t>& dimensions)
+OH_NN_ReturnCode NNTensor::BuildFromTensorDesc(const NN_TensorDesc* tensorDesc)
+{
+    if (tensorDesc == nullptr) {
+        LOGE("BuildFromTensorDesc failed, passed nullptr to tensorDesc.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    const auto* tensorDescImpl = reinterpret_cast<const OHOS::NeuralNetworkRuntime::TensorDesc*>(tensorDesc);
+
+    // Get datatype from TensorDesc
+    OH_NN_DataType dataType;
+    OH_NN_ReturnCode returnCode = tensorDescImpl->GetDataType(&dataType);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("BuildFromTensorDesc failed, error happened when get dataType.");
+        return returnCode;
+    }
+    if (!OHOS::NeuralNetworkRuntime::Validation::ValidateTensorDataType(dataType)) {
+        LOGE("BuildFromTensorDesc failed, passed invalid dataType.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    // Get Dimensions from TensorDesc and transform to std::vector
+    int32_t* shape {nullptr};
+    size_t shapeNum {0};
+    returnCode = tensorDescImpl->GetShape(&shape, &shapeNum);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("BuildFromTensorDesc failed, error happened when get shape.");
+        return returnCode;
+    }
+    std::vector<int32_t> dimensions(shape, shape + shapeNum);
+
+    // OH_NNCore_TensorDesc does not include quant parameters and tensor type, should be set using indenpendent interface.
+    returnCode = Build(dataType, dimensions, {}, OH_NN_TENSOR);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("BuildFromTensorDesc failed, error happened when building NNTensor.");
+    }
+
+    return returnCode;
+}
+
+OH_NN_ReturnCode NNTensor::SetQuantParam(const NN_QuantParam* quantParam)
+{
+    if (quantParam == nullptr) {
+        LOGE("SetQuantParam failed, quantParam is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    const auto* quantParamImpl = reinterpret_cast<const OHOS::NeuralNetworkRuntime::QuantParams*>(quantParam);
+    m_quantParams.clear();
+    OH_NN_ReturnCode returnCode = quantParamImpl->CopyToCompat(m_quantParams);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("SetQuantParam failed, error happened when converting quantization parameters.");
+        return returnCode;
+    }
+
+    returnCode = ValidateQuantParams(m_quantParams);
+    if (returnCode != OH_NN_SUCCESS) {
+        m_quantParams.clear();
+        LOGE("SetQuantParam failed, error happened when parsing quantization parameters.");
+    }
+
+    return returnCode;
+}
+
+OH_NN_ReturnCode NNTensor::SetTensorType(OH_NN_TensorType tensorType)
+{
+    m_type = tensorType;
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNTensor::ValidateDimensions(const std::vector<int32_t>& dimensions)
 {
     // Temporary variable to check overflow.
     uint64_t absoluteDim {0};
@@ -187,24 +260,24 @@ OH_NN_ReturnCode NNTensor::ParseDimensions(const std::vector<int32_t>& dimension
         m_dataLength = static_cast<size_t>(dataLength);
     }
 
-    m_dimensions = std::move(dimensions);
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode NNTensor::ParseDimensions(const int32_t* dimensions, uint32_t dimensionCount)
 {
-    OH_NN_ReturnCode ret = Validation::ValidateArray(dimensions, dimensionCount);
-    if (ret != OH_NN_SUCCESS) {
+    OH_NN_ReturnCode returnCode = Validation::ValidateArray(dimensions, dimensionCount);
+    if (returnCode != OH_NN_SUCCESS) {
         LOGE("BuildFromOHNNTensor failed, please check dimension and dimensionCount in NNTensor.");
-        return ret;
+        return returnCode;
     }
     std::vector<int32_t> dimensionsVec = ConstructVectorFromArray(dimensions, dimensionCount);
 
-    ret = ParseDimensions(dimensionsVec);
-    if (ret != OH_NN_SUCCESS) {
+    returnCode = ValidateDimensions(dimensionsVec);
+    if (returnCode != OH_NN_SUCCESS) {
         LOGE("BuildFromOHNNTensor failed, passed invalid dimension info.");
-        return ret;
+        return returnCode;
     }
+    m_dimensions = std::move(dimensionsVec);
 
     return OH_NN_SUCCESS;
 }
@@ -231,26 +304,26 @@ OH_NN_ReturnCode NNTensor::ParseQuantParams(const OH_NN_QuantParam* quantParam)
         tmpQuantParam.emplace_back((QuantParam){numBits, scale, zeroPoint});
     }
 
-    OH_NN_ReturnCode ret = ParseQuantParams(tmpQuantParam);
-    if (ret != OH_NN_SUCCESS) {
-        LOGE("ParseQuantParams failed, please numBits in NNTensor.");
-        return ret;
+    OH_NN_ReturnCode returnCode = ValidateQuantParams(tmpQuantParam);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("ParseQuantParams failed, error happened when validating quantization parameters.");
+        return returnCode;
     }
+    m_quantParams = std::move(tmpQuantParam);
 
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode NNTensor::ParseQuantParams(const std::vector<QuantParam>& quantParams)
+OH_NN_ReturnCode NNTensor::ValidateQuantParams(const std::vector<QuantParam>& quantParams)
 {
     for (const QuantParam& param : quantParams) {
         // Only support 8-bit quantization in NNR version 1.0
         if ((param.numBits != SUPPORT_NUM_BIT) || (param.numBits == INVALID_NUM_BIT)) {
-            LOGE("ParseQuantParams failed, get invalid numBits %d.", param.numBits);
+            LOGE("ValidateQuantParams failed, get invalid numBits %d.", param.numBits);
             return OH_NN_INVALID_PARAMETER;
         }
     }
 
-    m_quantParams = quantParams;
     return OH_NN_SUCCESS;
 }
 
@@ -287,10 +360,10 @@ OH_NN_ReturnCode NNTensor::SetDimensions(const std::vector<int32_t>& dimensions)
         return OH_NN_INVALID_PARAMETER;
     }
 
-    auto ret = ParseDimensions(dimensions);
-    if (ret != OH_NN_SUCCESS) {
-        LOGE("SetDimemsions failed, passed invalid dimension info.");
-        return ret;
+    auto returnCode = ValidateDimensions(dimensions);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("SetDimemsions failed, error happened when validating dimensions.");
+        return returnCode;
     }
 
     m_dimensions = dimensions;
@@ -379,6 +452,14 @@ void NNTensor::ConvertToIOTensor(IOTensor& tensor) const
     tensor.dimensions = m_dimensions;
     tensor.data = const_cast<void*>(m_buffer);
     tensor.length = m_bufferLength;
+}
+
+void NNTensor::ConvertToTensorDesc(TensorDesc& desc) const
+{
+    desc.SetDataType(m_dataType);
+    desc.SetFormat(m_format);
+    desc.SetName(m_name.c_str());
+    desc.SetShape(m_dimensions.data(), m_dimensions.size());
 }
 
 bool NNTensor::IsDynamicShape() const

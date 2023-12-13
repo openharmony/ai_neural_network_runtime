@@ -20,7 +20,7 @@
 #include <cstdio>
 #include <vector>
 
-#include "interfaces/kits/c/neural_network_runtime.h"
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime.h"
 #include "test/system_test/common/nnrt_test.h"
 
 namespace OHOS {

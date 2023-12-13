@@ -20,11 +20,12 @@
 #include <vector>
 #include <memory>
 
-#include "interfaces/kits/c/neural_network_runtime_type.h"
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
 #include "cpp_type.h"
-#include "nn_tensor.h"
+#include "tensor_desc.h"
 #include "prepared_model.h"
 #include "mindir.h"
+#include "nn_tensor.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -62,8 +63,12 @@ public:
                                                  std::shared_ptr<PreparedModel>& preparedModel) = 0;
 
     virtual void* AllocateBuffer(size_t length) = 0;
+    virtual void* AllocateTensorBuffer(size_t length, std::shared_ptr<TensorDesc> tensor) = 0;
     virtual void* AllocateTensorBuffer(size_t length, std::shared_ptr<NNTensor> tensor) = 0;
     virtual OH_NN_ReturnCode ReleaseBuffer(const void* buffer) = 0;
+
+    virtual OH_NN_ReturnCode AllocateBuffer(size_t length, int& fd) = 0;
+    virtual OH_NN_ReturnCode ReleaseBuffer(int fd, size_t length) = 0;
 };
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS

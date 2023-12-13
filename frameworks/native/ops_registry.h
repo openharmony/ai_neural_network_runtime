@@ -21,7 +21,7 @@
 #include <unordered_map>
 
 #include "ops_builder.h"
-#include "interfaces/kits/c/neural_network_runtime.h"
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

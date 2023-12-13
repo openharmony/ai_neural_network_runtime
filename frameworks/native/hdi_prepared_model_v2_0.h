@@ -42,6 +42,11 @@ public:
                          std::vector<std::vector<int32_t>>& outputsDims,
                          std::vector<bool>& isOutputBufferEnough) override;
 
+    OH_NN_ReturnCode Run(const std::vector<NN_Tensor*>& inputs,
+                         const std::vector<NN_Tensor*>& outputs,
+                         std::vector<std::vector<int32_t>>& outputsDims,
+                         std::vector<bool>& isOutputBufferEnough) override;
+
     OH_NN_ReturnCode GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
                                        std::vector<std::vector<uint32_t>>& maxInputDims) override;
 

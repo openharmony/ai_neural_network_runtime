@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef NEURAL_NETWORK_RUNTIME_DEVICE_DISCOVER_H
-#define NEURAL_NETWORK_RUNTIME_DEVICE_DISCOVER_H
-
-#include "device.h"
+#include "common/utils.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-std::shared_ptr<Device> DiscoverHDIDevicesV1_0(std::string& deviceName, std::string& vendorName, std::string& version);
-std::shared_ptr<Device> DiscoverHDIDevicesV2_0(std::string& deviceName, std::string& vendorName, std::string& version);
+std::string GenUniqueName(
+    const std::string& deviceName, const std::string& vendorName, const std::string& version)
+{
+    return deviceName + "_" + vendorName + "_" + version;
+}
+
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
-#endif // NEURAL_NETWORK_RUNTIME_DEVICE_DISCOVER_H

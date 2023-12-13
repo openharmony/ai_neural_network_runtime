@@ -194,7 +194,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_getdevicename_002, TestSize.Level0)
     EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), GetDeviceName(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(deviceName), ::testing::Return(HDF_FAILURE)));
     OH_NN_ReturnCode result = hdiDevice->GetDeviceName(deviceName);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /* *
@@ -232,7 +232,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_getvendorname_002, TestSize.Level0)
     EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), GetVendorName(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(vendorName), ::testing::Return(HDF_FAILURE)));
     OH_NN_ReturnCode result = hdiDevice->GetVendorName(vendorName);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /* *
@@ -272,7 +272,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_getdevicetype_002, TestSize.Level0)
     EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), GetDeviceType(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(iDeviceType), ::testing::Return(HDF_FAILURE)));
     OH_NN_ReturnCode result = hdiDevice->GetDeviceType(deviceType);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /* *
@@ -312,7 +312,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_getdevicestatus_002, TestSize.Level0)
     EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), GetDeviceStatus(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(iDeviceStatus), ::testing::Return(HDF_FAILURE)));
     OH_NN_ReturnCode result = hdiDevice->GetDeviceStatus(deviceStatus);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /* *
@@ -414,7 +414,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_getsupportedoperation_004, TestSize.Level0)
 
     std::vector<bool> newOps {true};
     OH_NN_ReturnCode result = hdiDevice->GetSupportedOperation(model, newOps);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /* *
@@ -450,7 +450,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_isfloat16precisionsupported_002, TestSize.Leve
     EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), IsFloat16PrecisionSupported(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(isSupported), ::testing::Return(HDF_FAILURE)));
     OH_NN_ReturnCode result = hdiDevice->IsFloat16PrecisionSupported(isSupported);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /* *
@@ -490,7 +490,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_isperformancemodesupported_002, TestSize.Level
     EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), IsPerformanceModeSupported(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(isSupported), ::testing::Return(HDF_FAILURE)));
     OH_NN_ReturnCode result = hdiDevice->IsPerformanceModeSupported(isSupported);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /* *
@@ -530,7 +530,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_isprioritysupported_002, TestSize.Level0)
     EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), IsPrioritySupported(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(isSupported), ::testing::Return(HDF_FAILURE)));
     OH_NN_ReturnCode result = hdiDevice->IsPrioritySupported(isSupported);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /* *
@@ -570,7 +570,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_isdynamicinputsupported_002, TestSize.Level0)
     EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), IsDynamicInputSupported(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(isSupported), ::testing::Return(HDF_FAILURE)));
     OH_NN_ReturnCode result = hdiDevice->IsDynamicInputSupported(isSupported);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /* *
@@ -610,7 +610,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_ismodelcachesupported_002, TestSize.Level0)
     EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), IsModelCacheSupported(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(isSupported), ::testing::Return(HDF_FAILURE)));
     OH_NN_ReturnCode result = hdiDevice->IsModelCacheSupported(isSupported);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /* *

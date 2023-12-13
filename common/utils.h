@@ -16,6 +16,7 @@
 #ifndef NEURAL_NETWORK_RUNTIME_UTILS_H
 #define NEURAL_NETWORK_RUNTIME_UTILS_H
 
+#include <string>
 #include <memory>
 
 #include "log.h"
@@ -33,7 +34,9 @@ std::shared_ptr<T> CreateSharedPtr(Args&&... args)
         return nullptr;
     }
     return tPtr;
-}
+};
+
+std::string GenUniqueName(const std::string&, const std::string&, const std::string&);
 
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
