@@ -28,8 +28,8 @@ nnrt_sources = [
   "native/hdi_prepared_model_v2_0.cpp",
   "native/inner_model.cpp",
   "native/memory_manager.cpp",
-  "native/neural_network_runtime_compat.cpp",
   "native/neural_network_runtime.cpp",
+  "native/neural_network_runtime_compat.cpp",
   "native/nn_tensor.cpp",
   "native/nnbackend.cpp",
   "native/nncompiled_cache.cpp",
@@ -133,9 +133,7 @@ ohos_shared_library("libneural_network_runtime") {
     "mindspore:mindir",
   ]
 
-  deps = [
-    ":libneural_network_core"
-  ]
+  deps = [ ":libneural_network_core" ]
 
   subsystem_name = "ai"
   innerapi_tags = [ "ndk" ]
@@ -156,7 +154,6 @@ ohos_shared_library("libneural_network_core") {
   output_extension = "so"
   include_dirs = [
     "..",
-    "../../third_party/bounds_checking_function/include",
     "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
   ]
 
@@ -178,4 +175,3 @@ ohos_shared_library("libneural_network_core") {
   innerapi_tags = [ "ndk" ]
   part_name = "neural_network_runtime"
 }
-
