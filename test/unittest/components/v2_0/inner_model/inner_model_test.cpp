@@ -777,7 +777,7 @@ HWTEST_F(InnerModelTest, inner_model_get_supported_operation_002, TestSize.Level
     SetLiteGraph(liteGraph);
     EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph));
 
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, m_innerModelTest.GetSupportedOperations(deviceID, &isSupported, opCount));
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, m_innerModelTest.GetSupportedOperations(deviceID, &isSupported, opCount));
 }
 
 /**

@@ -17,6 +17,7 @@
 
 #include "common/log.h"
 #include "memory_manager.h"
+#include "nntensor.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -91,6 +92,71 @@ V1_0::IOTensor TransIOTensor(const IOTensor& tensor)
 
     return iTensor;
 }
+
+OH_NN_ReturnCode TransIOTensor(const NN_Tensor* tensor, V1_0::IOTensor& ioTensor)
+{
+    if (tensor == nullptr) {
+        LOGE("TransIOTensor failed, failed to transform to v1_0 IOTensor.");
+        return OH_NN_NULL_PTR;
+    }
+
+    const NNTensor2_0* nnTensor = reinterpret_cast<const NNTensor2_0*>(tensor);
+    TensorDesc* nnTensorDesc = nnTensor->GetTensorDesc();
+    if (nnTensorDesc == nullptr) {
+        LOGE("TransIOTensor failed, failed to get desc from tensor.");
+        return OH_NN_NULL_PTR;
+    }
+
+    // convert name
+    const char* tensorName = nullptr;
+    OH_NN_ReturnCode ret = nnTensorDesc->GetName(&tensorName);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("TransIOTensor failed, failed to get name from desc.");
+        return ret;
+    }
+    ioTensor.name = tensorName;
+    
+    // convert data type
+    OH_NN_DataType dataType;
+    ret = nnTensorDesc->GetDataType(&dataType);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("TransIOTensor failed, failed to get data type from desc.");
+        return ret;
+    }
+    ioTensor.dataType = TransDataType(dataType);
+
+    // convert format
+    OH_NN_Format format;
+    ret = nnTensorDesc->GetFormat(&format);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("TransIOTensor failed, failed to get format from desc.");
+        return ret;
+    }
+    ioTensor.format = TransFormat(format);
+
+    // convert shape
+    int32_t* shape = nullptr;
+    size_t shapeNum = 0;
+    ret = nnTensorDesc->GetShape(&shape, &shapeNum);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("TransIOTensor failed, failed to get shape from desc.");
+        return ret;
+    }
+    ioTensor.dimensions.clear();
+    for (size_t i = 0; i < shapeNum; ++i) {
+        ioTensor.dimensions.emplace_back(shape[i]);
+    }
+
+    // convert data
+    if (!nnTensor->CheckTensorData()) {
+        LOGE("TransIOTensor failed, failed to check tensor data.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    V1_0::SharedBuffer iBuffer {nnTensor->GetFd(), nnTensor->GetSize(), nnTensor->GetOffset(), nnTensor->GetSize()};
+    ioTensor.data = iBuffer;
+
+    return OH_NN_SUCCESS;
+}
 } // unamed namespace
 
 HDIPreparedModelV1_0::HDIPreparedModelV1_0(OHOS::sptr<V1_0::IPreparedModel> hdiPreparedModel)
@@ -110,7 +176,7 @@ OH_NN_ReturnCode HDIPreparedModelV1_0::ExportModelCache(std::vector<Buffer>& mod
     auto ret = m_hdiPreparedModel->ExportModelCache(iBuffers);
     if (ret != HDF_SUCCESS) {
         LOGE("Export model cache failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_SAVE_CACHE_EXCEPTION;
     }
 
     auto memManager = MemoryManager::GetInstance();
@@ -155,7 +221,49 @@ OH_NN_ReturnCode HDIPreparedModelV1_0::Run(const std::vector<IOTensor>& inputs, 
     auto ret = m_hdiPreparedModel->Run(iInputTensors, iOutputTensors, outputsDims, isOutputBufferEnough);
     if (ret != HDF_SUCCESS || outputsDims.empty()) {
         LOGE("Run model failed. ErrorCode=%d", ret);
-        return OH_NN_UNAVALIDABLE_DEVICE;
+        return OH_NN_UNAVAILABLE_DEVICE;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode HDIPreparedModelV1_0::Run(const std::vector<NN_Tensor*>& inputs,
+    const std::vector<NN_Tensor*>& outputs, std::vector<std::vector<int32_t>>& outputsDims,
+    std::vector<bool>& isOutputBufferEnough)
+{
+    V1_0::IOTensor iTensor;
+    std::vector<V1_0::IOTensor> iInputTensors;
+    for (const auto& input: inputs) {
+        auto returnCode = TransIOTensor(input, iTensor);
+        if (returnCode != OH_NN_SUCCESS) {
+            LOGE("Run failed, failed to transform to ioTensor.");
+            return OH_NN_FAILED;
+        }
+        if (iTensor.data.fd == INVALID_FD) {
+            LOGE("Transform inputs tensor failed, cannot find data file descriptor.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+        iInputTensors.emplace_back(iTensor);
+    }
+
+    std::vector<V1_0::IOTensor> iOutputTensors;
+    for (const auto& output: outputs) {
+        auto returnCode = TransIOTensor(output, iTensor);
+        if (returnCode != OH_NN_SUCCESS) {
+            LOGE("Run failed, failed to transform to ioTensor.");
+            return OH_NN_FAILED;
+        }
+        if (iTensor.data.fd == INVALID_FD) {
+            LOGE("Transform outputs tensor failed, cannot find data file descriptor.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+        iOutputTensors.emplace_back(iTensor);
+    }
+
+    auto ret = m_hdiPreparedModel->Run(iInputTensors, iOutputTensors, outputsDims, isOutputBufferEnough);
+    if (ret != HDF_SUCCESS || outputsDims.empty()) {
+        LOGE("Run model failed. ErrorCode=%d", ret);
+        return OH_NN_UNAVAILABLE_DEVICE;
     }
 
     return OH_NN_SUCCESS;

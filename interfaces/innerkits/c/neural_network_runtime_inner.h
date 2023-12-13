@@ -16,7 +16,7 @@
 #ifndef NEURAL_NETWORK_RUNTIME_INNER_H
 #define NEURAL_NETWORK_RUNTIME_INNER_H
 
-#include "interfaces/kits/c/neural_network_runtime_type.h"
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
 
 #ifdef __cplusplus
 extern "C" {

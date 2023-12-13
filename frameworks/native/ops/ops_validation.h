@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,20 +13,17 @@
  * limitations under the License.
  */
 
-#include "device_registrar.h"
+#ifndef NEURAL_NETWORK_RUNTIME_OPS_VALIDATION_H
+#define NEURAL_NETWORK_RUNTIME_OPS_VALIDATION_H
 
-#include "device_manager.h"
-#include "common/log.h"
+#include <cstdint>
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-DeviceRegistrar::DeviceRegistrar(const CreateDevice creator)
-{
-    auto& deviceManager = DeviceManager::GetInstance();
-    auto ret = deviceManager.RegisterDevice(creator);
-    if (ret != OH_NN_SUCCESS) {
-        LOGW("Register device failed. ErrorCode=%d", ret);
-    }
-}
+namespace Validation {
+bool ValidatePadMode(int8_t padMode);
+} // namespace Validation
 } // NeuralNetworkRuntime
-} // OHOS
+} // namespace OHOS
+
+#endif // NEURAL_NETWORK_RUNTIME_OPS_VALIDATION_H

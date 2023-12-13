@@ -21,17 +21,17 @@
  *
  * @Syscap SystemCapability.Ai.NeuralNetworkRuntime
  * @since 9
- * @version 1.0
+ * @version 2.0
  */
 
 /**
  * @file neural_network_runtime_type.h
  *
- * @brief Defines the structure and enumeration for Neural Network Runtime.
+ * @brief Defines the structure and enumeration.
  * 
  * @library libneural_network_runtime.so
  * @since 9
- * @version 1.0
+ * @version 2.0
  */
 
 #ifndef NEURAL_NETWORK_RUNTIME_TYPE_H
@@ -45,7 +45,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Defines the handles of models for Neural Network Runtime.
+ * @brief Defines the handles of models.
  *
  * @since 9
  * @version 1.0
@@ -53,7 +53,7 @@ extern "C" {
 typedef struct OH_NNModel OH_NNModel;
 
 /**
- * @brief Defines the compiler handle for Neural Network Runtime.
+ * @brief Defines the compiler handle.
  *
  * @since 9
  * @version 1.0
@@ -61,12 +61,36 @@ typedef struct OH_NNModel OH_NNModel;
 typedef struct OH_NNCompilation OH_NNCompilation;
 
 /**
- * @brief Defines the executor handle for Neural Network Runtime.
+ * @brief Defines the executor handle.
  *
  * @since 9
  * @version 1.0
  */
 typedef struct OH_NNExecutor OH_NNExecutor;
+
+/**
+ * @brief Defines the quantization parameter handle.
+ *
+ * @since 11
+ * @version 1.0
+ */
+typedef struct NN_QuantParam NN_QuantParam;
+
+/**
+ * @brief Defines the tensor descriptor handle.
+ *
+ * @since 11
+ * @version 1.0
+ */
+typedef struct NN_TensorDesc NN_TensorDesc;
+
+/**
+ * @brief Defines the tensor handle.
+ *
+ * @since 11
+ * @version 1.0
+ */
+typedef struct NN_Tensor NN_Tensor;
 
 /**
  * @brief Defines the hardware performance mode.
@@ -105,10 +129,10 @@ typedef enum {
 } OH_NN_Priority;
 
 /**
- * @brief Defines error codes for Neural Network Runtime.
+ * @brief Defines error codes.
  *
  * @since 9
- * @version 1.0
+ * @version 2.0
  */
 typedef enum {
     /** The operation is successful. */
@@ -125,14 +149,69 @@ typedef enum {
     OH_NN_NULL_PTR = 5,
     /** Invalid file. */
     OH_NN_INVALID_FILE = 6,
-    /** A hardware error occurs, for example, HDL service crash. */
+    /** A hardware error occurs, for example, HDL service crash. 
+     * @deprecated since 11
+     * @useinstead {@link OH_NN_UNAVAILABLE_DEVICE}
+     */
     OH_NN_UNAVALIDABLE_DEVICE = 7,
     /** Invalid path. */
-    OH_NN_INVALID_PATH = 8
+    OH_NN_INVALID_PATH = 8,
+    /** Timeout. 
+     * @since 11
+     */
+    OH_NN_TIMEOUT = 9,
+    /** Unsupported. 
+     * @since 11
+     */
+    OH_NN_UNSUPPORTED = 10,
+    /** Connection Exception. 
+     * @since 11
+     */
+    OH_NN_CONNECTION_EXCEPTION = 11,
+    /** Save cache exception.
+     * @since 11
+     */
+    OH_NN_SAVE_CACHE_EXCEPTION = 12,
+    /** Dynamic shape.
+     * @since 11
+     */
+    OH_NN_DYNAMIC_SHAPE = 13,
+    /** A hardware error occurs, for example, HDL service crash. 
+     * @since 11
+     */
+    OH_NN_UNAVAILABLE_DEVICE = 14
 } OH_NN_ReturnCode;
 
+
 /**
- * @brief Defines activation function types in the fusion operator for Neural Network Runtime.
+ * @brief Defines the callback function handle for the post-process when the asynchronous execution has been done.
+ * 
+ * Use the first argument <b>userData<\b> to identify the asynchronous execution you want to get. 
+ * It is the argument <b>userData<\b> passed to {@link OH_NNExecutor_RunAsync}. \n
+ * Use the second argument <b>errCode<\b> of type {@link OH_NN_ReturnCode} to get the error code returned by the asynchronous execution. \n
+ * 
+ * @param userData Asynchronous execution identifier, which is the argument <b>userData<\b> passed to {@link OH_NNExecutor_RunAsync}.
+ * @param errCode Error code {@link OH_NN_ReturnCode} returned by the asynchronous execution.
+ * @param output Output tensors {@link NN_Tensor} of the model, which are same as argument <b>outputTensor<\b> passed to {@link OH_NNExecutor_RunAsync}
+ * @param outputCount Output tensor count, which are same as argument <b>outputCount<\b> passed to {@link OH_NNExecutor_RunAsync}
+ * @since 11
+ * @version 1.0
+ */
+typedef void (*NN_OnRunDone)(void*, OH_NN_ReturnCode, void* [], int32_t);
+
+/**
+ * @brief Defines the callback function handle for the post-process when the device driver service is dead during asynchronous execution.
+ * 
+ * You should recompile the model if this callback function is called. \n
+ * 
+ * @param userData Asynchronous execution identifier, which is the argument <b>userData<\b> passed to {@link OH_NNExecutor_RunAsync}.
+ * @since 11
+ * @version 1.0
+ */
+typedef void (*NN_OnServiceDied)(void*);
+
+/**
+ * @brief Defines activation function types in the fusion operator.
  *
  * @since 9
  * @version 1.0
@@ -150,7 +229,7 @@ typedef enum : int8_t {
  * @brief Defines the layout type of tensor data.
  *
  * @since 9
- * @version 1.0
+ * @version 2.0
  */
 typedef enum {
     /** The tensor does not have a specific layout type (such as scalar or vector). */
@@ -158,11 +237,15 @@ typedef enum {
     /** The tensor arranges data in NCHW format.*/
     OH_NN_FORMAT_NCHW = 1,
     /** The tensor arranges data in NHWC format.*/
-    OH_NN_FORMAT_NHWC = 2
+    OH_NN_FORMAT_NHWC = 2,
+    /** The tensor arranges data in ND format.
+     * @since 11
+     */
+    OH_NN_FORMAT_ND = 3
 } OH_NN_Format;
 
 /**
- * @brief Defines device types supported by Neural Network Runtime.
+ * @brief Defines device types.
  *
  * @since 9
  * @version 1.0
@@ -179,7 +262,7 @@ typedef enum {
 } OH_NN_DeviceType;
 
 /**
- * @brief Defines tensor data types supported by Neural Network Runtime.
+ * @brief Defines tensor data types.
  *
  * @since 9
  * @version 1.0
@@ -215,7 +298,7 @@ typedef enum {
 
 
 /**
- * @brief Defines operator types supported by Neural Network Runtime.
+ * @brief Defines operator types.
  *
  * @since 9
  * @version 1.0
@@ -1720,6 +1803,8 @@ typedef struct OH_NN_UInt32Array {
    \end{cases}
  \f]
  * 
+ * @deprecated since 11
+ * @useinstead {@link NN_QuantParam}
  * @since 9
  * @version 1.0
  */
@@ -1744,6 +1829,8 @@ typedef struct OH_NN_QuantParam {
  * It is usually used to construct data nodes and operator parameters in a model graph. When constructing a tensor,
  * you need to specify the data type, number of dimensions, dimension information, and quantization information.
  *
+ * @deprecated since 11
+ * @useinstead {@link NN_TensorDesc}
  * @since 9
  * @version 1.0
  */
@@ -1766,6 +1853,8 @@ typedef struct OH_NN_Tensor {
 /**
  * @brief Defines the memory structure.
  *
+ * @deprecated since 11
+ * @useinstead {@link NN_Tensor}
  * @since 9
  * @version 1.0
  */

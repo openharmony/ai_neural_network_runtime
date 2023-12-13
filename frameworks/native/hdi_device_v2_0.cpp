@@ -130,7 +130,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceName(std::string& name)
 {
     auto ret = m_iDevice->GetDeviceName(name);
     if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI device name failed");
+        return CheckReturnCode(ret, OH_NN_UNAVAILABLE_DEVICE, "Get HDI device name failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -139,7 +139,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetVendorName(std::string& name)
 {
     auto ret = m_iDevice->GetVendorName(name);
     if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI vendor name failed");
+        return CheckReturnCode(ret, OH_NN_UNAVAILABLE_DEVICE, "Get HDI vendor name failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -148,7 +148,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetVersion(std::string& version)
 {
     auto ret = m_iDevice->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
     if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI version failed");
+        return CheckReturnCode(ret, OH_NN_UNAVAILABLE_DEVICE, "Get HDI version failed");
     }
     version = 'v' + std::to_string(m_hdiVersion.first) + '_' + std::to_string(m_hdiVersion.second);
     return OH_NN_SUCCESS;
@@ -159,7 +159,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceType(OH_NN_DeviceType& deviceType)
     V2_0::DeviceType iDeviceType;
     auto ret = m_iDevice->GetDeviceType(iDeviceType);
     if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI device type failed");
+        return CheckReturnCode(ret, OH_NN_UNAVAILABLE_DEVICE, "Get HDI device type failed");
     }
 
     deviceType = TransHDIDeviceV2_0Type(iDeviceType);
@@ -171,7 +171,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceStatus(DeviceStatus& status)
     V2_0::DeviceStatus iDeviceStatus;
     auto ret = m_iDevice->GetDeviceStatus(iDeviceStatus);
     if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get HDI device status failed");
+        return CheckReturnCode(ret, OH_NN_UNAVAILABLE_DEVICE, "Get HDI device status failed");
     }
     status = TransHDIDeviceV2_0Status(iDeviceStatus);
     return OH_NN_SUCCESS;
@@ -225,7 +225,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetSupportedOperation(std::shared_ptr<const mind
         return OH_NN_FAILED;
     }
     if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Get supported operation failed");
+        return CheckReturnCode(ret, OH_NN_UNAVAILABLE_DEVICE, "Get supported operation failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -234,7 +234,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::IsFloat16PrecisionSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsFloat16PrecisionSupported(isSupported);
     if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query fp16 precision supported failed");
+        return CheckReturnCode(ret, OH_NN_UNAVAILABLE_DEVICE, "Query fp16 precision supported failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -243,7 +243,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::IsPerformanceModeSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsPerformanceModeSupported(isSupported);
     if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query performance mode supported failed");
+        return CheckReturnCode(ret, OH_NN_UNAVAILABLE_DEVICE, "Query performance mode supported failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -252,7 +252,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::IsPrioritySupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsPrioritySupported(isSupported);
     if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query priority supported failed");
+        return CheckReturnCode(ret, OH_NN_UNAVAILABLE_DEVICE, "Query priority supported failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -261,7 +261,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::IsDynamicInputSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsDynamicInputSupported(isSupported);
     if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query dynamic input supported failed");
+        return CheckReturnCode(ret, OH_NN_UNAVAILABLE_DEVICE, "Query dynamic input supported failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -270,7 +270,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::IsModelCacheSupported(bool& isSupported)
 {
     auto ret = m_iDevice->IsModelCacheSupported(isSupported);
     if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
-        return CheckReturnCode(ret, OH_NN_UNAVALIDABLE_DEVICE, "Query cache model supported failed");
+        return CheckReturnCode(ret, OH_NN_UNAVAILABLE_DEVICE, "Query cache model supported failed");
     }
     return OH_NN_SUCCESS;
 }
@@ -390,6 +390,38 @@ void* HDIDeviceV2_0::AllocateBuffer(size_t length)
         LOGE("Map fd to address failed.");
     }
     return addr;
+}
+
+OH_NN_ReturnCode HDIDeviceV2_0::AllocateBuffer(size_t length, int& fd)
+{
+    if (length == 0) {
+        LOGE("The length param is invalid, length=0");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    V2_0::SharedBuffer buffer;
+    auto ret = m_iDevice->AllocateBuffer(length, buffer);
+    if (ret != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(ret, OH_NN_MEMORY_ERROR, "Allocate buffer error");
+    }
+
+    fd = buffer.fd;
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode HDIDeviceV2_0::ReleaseBuffer(int fd, size_t length)
+{
+    V2_0::SharedBuffer hdiBuffer {fd, length, 0, length};
+    auto deviceResult = m_iDevice->ReleaseBuffer(hdiBuffer);
+    if (deviceResult != V2_0::NNRT_ReturnCode::NNRT_SUCCESS) {
+        return CheckReturnCode(deviceResult, OH_NN_FAILED, "Device release buffer error");
+    }
+    return OH_NN_SUCCESS;
+}
+
+void* HDIDeviceV2_0::AllocateTensorBuffer(size_t length, std::shared_ptr<TensorDesc> tensor)
+{
+    return AllocateBuffer(length);
 }
 
 void* HDIDeviceV2_0::AllocateTensorBuffer(size_t length, std::shared_ptr<NNTensor> tensor)

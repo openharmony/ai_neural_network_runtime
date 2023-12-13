@@ -41,6 +41,11 @@ public:
                          std::vector<std::vector<int32_t>>& outputsDims,
                          std::vector<bool>& isOutputBufferEnough) override;
 
+    OH_NN_ReturnCode Run(const std::vector<NN_Tensor*>& inputs,
+                         const std::vector<NN_Tensor*>& outputs,
+                         std::vector<std::vector<int32_t>>& outputsDims,
+                         std::vector<bool>& isOutputBufferEnough) override;
+
 private:
     // first: major version, second: minor version
     std::pair<uint32_t, uint32_t> m_hdiVersion;

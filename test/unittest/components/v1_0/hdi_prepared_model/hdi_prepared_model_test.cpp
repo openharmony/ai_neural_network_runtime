@@ -201,7 +201,7 @@ HWTEST_F(HDIPreparedModelTest, hidpreparedmodel_exportmodelcache_004, TestSize.L
         );
 
     OH_NN_ReturnCode result = preparedModel->ExportModelCache(modelCache);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
 /**
@@ -291,7 +291,7 @@ HWTEST_F(HDIPreparedModelTest, hidpreparedmodel_run_003, TestSize.Level0)
         );
 
     OH_NN_ReturnCode result = preparedModel->Run(inputs, outputs, outputsDims, isOutputBufferEnough);
-    EXPECT_EQ(OH_NN_UNAVALIDABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
     const auto& memoryManager = MemoryManager::GetInstance();
     memoryManager->UnMapMemory(buffer);
 }
