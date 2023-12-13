@@ -31,18 +31,18 @@ nnrt_sources = [
   "native/neural_network_runtime_compat.cpp",
   "native/neural_network_runtime.cpp",
   "native/nn_tensor.cpp",
+  "native/nnbackend.cpp",
+  "native/nncompiled_cache.cpp",
+  "native/nncompiler.cpp",
   "native/nnexecutor.cpp",
   "native/nntensor.cpp",
   "native/ops_builder.cpp",
   "native/ops_registry.cpp",
-  "native/transform.cpp",
-  "native/validation.cpp",
   "native/quant_param.cpp",
-  "native/nnbackend.cpp",
-  "native/nncompiler.cpp",
-  "native/nncompiled_cache.cpp",
   "native/register_hdi_device_v1_0.cpp",
   "native/register_hdi_device_v2_0.cpp",
+  "native/transform.cpp",
+  "native/validation.cpp",
 ]
 
 ops_sources = [
@@ -143,12 +143,12 @@ ohos_shared_library("libneural_network_runtime") {
 }
 
 nnrt_core_sources = [
+  "native/backend_manager.cpp",
+  "native/backend_registrar.cpp",
   "native/neural_network_core.cpp",
   "native/tensor_desc.cpp",
-  "native/validation.cpp",
-  "native/backend_registrar.cpp",
-  "native/backend_manager.cpp",
   "native/utils.cpp",
+  "native/validation.cpp",
 ]
 
 ohos_shared_library("libneural_network_core") {
@@ -156,8 +156,8 @@ ohos_shared_library("libneural_network_core") {
   output_extension = "so"
   include_dirs = [
     "..",
-    "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
     "../../third_party/bounds_checking_function/include",
+    "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
   ]
 
   install_images = [
