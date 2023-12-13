@@ -170,7 +170,7 @@ NNRT_API OH_NNCompilation *OH_NNCompilation_ConstructWithOfflineModelBuffer(cons
     return nnCompilation;
 }
 
-NNRT_API NNRT_API OH_NNCompilation *OH_NNCompilation_ConstructForCache()
+NNRT_API OH_NNCompilation *OH_NNCompilation_ConstructForCache()
 {
     Compilation *compilation = new (std::nothrow) Compilation();
     if (compilation == nullptr) {
