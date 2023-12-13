@@ -30,7 +30,7 @@ public:
                std::shared_ptr<PreparedModel> preparedModel,
                const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& inputTensorDescs,
                const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& outputTensorDescs);
-    virtual ~NNExecutor();
+    ~NNExecutor() override;
 
     OH_NN_ReturnCode GetInputDimRange(size_t inputIndex,
                                       size_t** minInputDims,
