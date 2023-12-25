@@ -19,7 +19,6 @@
  *
  * @brief Provides APIs for accelerating the Neural Network Runtime model inference.
  *
- * @Syscap SystemCapability.Ai.NeuralNetworkRuntime
  * @since 9
  * @version 2.0
  */
@@ -29,7 +28,10 @@
  *
  * @brief Defines the structure and enumeration.
  * 
+ * include "neural_network_runtime/neural_network_runtime_type.h"
  * @library libneural_network_runtime.so
+ * @kit Neural Network Runtime Kit
+ * @Syscap SystemCapability.Ai.NeuralNetworkRuntime
  * @since 9
  * @version 2.0
  */
@@ -53,7 +55,7 @@ extern "C" {
 typedef struct OH_NNModel OH_NNModel;
 
 /**
- * @brief Defines the compiler handle.
+ * @brief Defines the compilation handle.
  *
  * @since 9
  * @version 1.0
@@ -186,29 +188,41 @@ typedef enum {
 /**
  * @brief Defines the callback function handle for the post-process when the asynchronous execution has been done.
  * 
- * Use the first argument <b>userData<\b> to identify the asynchronous execution you want to get. 
- * It is the argument <b>userData<\b> passed to {@link OH_NNExecutor_RunAsync}. \n
- * Use the second argument <b>errCode<\b> of type {@link OH_NN_ReturnCode} to get the error code returned by the asynchronous execution. \n
+ * Use <b>userData</b> to identify the asynchronous execution you want to get.
+ * It is the argument <b>userData</b> passed to {@link OH_NNExecutor_RunAsync}.\n
  * 
- * @param userData Asynchronous execution identifier, which is the argument <b>userData<\b> passed to {@link OH_NNExecutor_RunAsync}.
+ * Use <b>errCode</b> of type {@link OH_NN_ReturnCode} to get the error code returned by the asynchronous execution.\n
+ * 
+ * The <b>outputTensor</b> and <b>outputCount</b> are the inference results, which is the same as ones passed to
+ * {@link OH_NNExecutor_RunAsync}.\n
+ * 
+ * @param userData Asynchronous execution identifier, which is the argument <b>userData</b> passed to
+ *                 {@link OH_NNExecutor_RunAsync}.
  * @param errCode Error code {@link OH_NN_ReturnCode} returned by the asynchronous execution.
- * @param output Output tensors {@link NN_Tensor} of the model, which are same as argument <b>outputTensor<\b> passed to {@link OH_NNExecutor_RunAsync}
- * @param outputCount Output tensor count, which are same as argument <b>outputCount<\b> passed to {@link OH_NNExecutor_RunAsync}
+ * @param outputTensor An array of output tensors {@link NN_Tensor} of the model, which is the same as the argument
+ *                     <b>outputTensor</b> passed to {@link OH_NNExecutor_RunAsync}.
+ * @param outputCount Output tensor count, which is the same as the argument <b>outputCount</b> passed to
+ *                    {@link OH_NNExecutor_RunAsync}.
  * @since 11
  * @version 1.0
  */
-typedef void (*NN_OnRunDone)(void*, OH_NN_ReturnCode, void* [], int32_t);
+typedef void (*NN_OnRunDone)(void *userData, OH_NN_ReturnCode errCode, void *outputTensor[], int32_t outputCount);
 
 /**
- * @brief Defines the callback function handle for the post-process when the device driver service is dead during asynchronous execution.
+ * @brief Defines the callback function handle for the post-process when the device driver service is dead during
+ *        asynchronous execution.
  * 
- * You should recompile the model if this callback function is called. \n
+ * You should recompile the model if this callback function is called.\n
  * 
- * @param userData Asynchronous execution identifier, which is the argument <b>userData<\b> passed to {@link OH_NNExecutor_RunAsync}.
+ * Use <b>userData</b> to identify the asynchronous execution you want to get.
+ * It is the argument <b>userData</b> passed to {@link OH_NNExecutor_RunAsync}.\n
+ * 
+ * @param userData Asynchronous execution identifier, which is the argument <b>userData</b> passed to
+ *                 {@link OH_NNExecutor_RunAsync}.
  * @since 11
  * @version 1.0
  */
-typedef void (*NN_OnServiceDied)(void*);
+typedef void (*NN_OnServiceDied)(void *userData);
 
 /**
  * @brief Defines activation function types in the fusion operator.
