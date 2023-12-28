@@ -44,7 +44,18 @@ const std::vector<size_t>& BackendManager::GetAllBackendsID()
 
 std::shared_ptr<Backend> BackendManager::GetBackend(size_t backendID) const
 {
-    auto iter = m_backends.find(backendID);
+    if (m_backends.empty()) {
+        LOGE("[BackendManager] GetBackend failed, there is no registered backend can be used.");
+        return nullptr;
+    }
+
+    auto iter = m_backends.begin();
+    if (backendID == static_cast<size_t>(0)) {
+        LOGI("[BackendManager] the backendID is 0, default return 1st backend.");
+        return iter->second;
+    }
+
+    iter = m_backends.find(backendID);
     if (iter == m_backends.end()) {
         LOGE("[BackendManager] GetBackend failed, not find backendId=%{public}zu", backendID);
         return nullptr;
@@ -56,7 +67,18 @@ std::shared_ptr<Backend> BackendManager::GetBackend(size_t backendID) const
 const std::string& BackendManager::GetBackendName(size_t backendID)
 {
     m_tmpBackendName.clear();
-    auto iter = m_backends.find(backendID);
+    if (m_backends.empty()) {
+        LOGE("[BackendManager] GetBackendName failed, there is no registered backend can be used.");
+        return m_tmpBackendName;
+    }
+
+    auto iter = m_backends.begin();
+    if (backendID == static_cast<size_t>(0)) {
+        LOGI("[BackendManager] the backendID is 0, default return 1st backend.");
+    } else {
+        iter = m_backends.find(backendID);
+    }
+
     if (iter == m_backends.end()) {
         LOGE("[BackendManager] GetBackendName failed, backendID %{public}zu is not registered.", backendID);
         return m_tmpBackendName;
