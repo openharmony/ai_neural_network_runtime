@@ -53,8 +53,6 @@ public:
     OH_NN_ReturnCode SetOptions(const std::vector<std::shared_ptr<void>>& options) override;
 
     NNExecutor* CreateExecutor();
-    OH_NN_ReturnCode IsSupportedModel(const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph,
-                                       bool& isSupportedModel) const;
 
 private:
     void ReleaseBuffer(std::vector<Buffer>& buffers) const;
@@ -64,6 +62,12 @@ private:
         Buffer& buffer) const;
     OH_NN_ReturnCode DeserializedTensorsFromBuffer(
         const Buffer& buffer, std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& tensorDescs);
+
+    OH_NN_ReturnCode NormalBuild();
+    OH_NN_ReturnCode BuildOfflineModel();
+    OH_NN_ReturnCode IsOfflineModel(bool& isOfflineModel) const;
+    OH_NN_ReturnCode IsSupportedModel(const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph,
+                                      bool& isSupportedModel) const;
 
 private:
     bool m_isBuild {false};
