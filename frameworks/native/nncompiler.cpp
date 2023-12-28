@@ -277,26 +277,63 @@ OH_NN_ReturnCode NNCompiler::IsSupportedModel(const std::shared_ptr<mindspore::l
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode NNCompiler::Build()
+OH_NN_ReturnCode NNCompiler::IsOfflineModel(bool& isOfflineModel) const
 {
-    if (m_isBuild) {
-        LOGE("[NNCompiler] Build failed, cannot build again.");
-        return OH_NN_OPERATION_FORBIDDEN;
+    isOfflineModel = false; // Initialize the returned value
+    if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
+        LOGE("[Compilation] LiteGraph and metaGraph are empty when identifying the offline model.");
+        return OH_NN_NULL_PTR;
     }
 
-    // cache存在，从cache直接复原prepareModel、input/output TensorDesc
-    OH_NN_ReturnCode ret = RestoreFromCacheFile();
-    if (ret == OH_NN_OPERATION_FORBIDDEN) {
-        LOGE("[NNCompiler] Build failed, operation is forbidden.");
-        return ret;
+    if ((m_liteGraph != nullptr) && (m_metaGraph != nullptr)) {
+        LOGE("[Compilation] LiteGraph and metaGraph are not empty when identifying the offline model.");
+        return OH_NN_INVALID_PARAMETER;
     }
-    if (ret == OH_NN_SUCCESS) {
-        LOGI("[NNCompiler] Build success, restore from cache file.");
-        m_isBuild = true;
+
+    if (m_metaGraph != nullptr) {
+        isOfflineModel = false;
         return OH_NN_SUCCESS;
     }
 
-    // cache不存在，正常在线构图
+    if (m_liteGraph->all_nodes_.size() == 0) {
+        LOGE("[Compilation] Find empty node in the model.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    // If the model consists of more than 1 node, it will not be considered as offline model.
+    if (m_liteGraph->all_nodes_.size() > 1) {
+        isOfflineModel = false;
+        return OH_NN_SUCCESS;
+    }
+
+    const mindspore::lite::LiteGraph::Node* pNode = m_liteGraph->all_nodes_[0];
+    if (pNode == nullptr) {
+        LOGE("[Compilation] Find invalid node in the model.");
+        return OH_NN_NULL_PTR;
+    }
+
+    const mindspore::lite::NodeType& nodeType = mindspore::lite::MindIR_Primitive_GetType(pNode->primitive_);
+    if (nodeType == mindspore::lite::NodeType::NODE_TYPE_CUSTOM) {
+        isOfflineModel = true;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNCompiler::BuildOfflineModel()
+{
+    ModelConfig config {m_enableFp16, m_performance, m_priority};
+    OH_NN_ReturnCode ret = m_device->PrepareOfflineModel(m_liteGraph, config, m_preparedModel);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Compilation] Preparing model failed when building from offline model.");
+        return ret;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNCompiler::NormalBuild()
+{
     if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
         LOGE("[NNCompiler] Build failed, both liteGraph and metaGraph are nullptr.");
         return OH_NN_INVALID_PARAMETER;
@@ -309,7 +346,7 @@ OH_NN_ReturnCode NNCompiler::Build()
 
     // 判断是否支持模型
     bool isSupportedModel = true;
-    ret = IsSupportedModel(m_liteGraph, isSupportedModel);
+    OH_NN_ReturnCode ret = IsSupportedModel(m_liteGraph, isSupportedModel);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] Build failed, error happend when judge if support the model.");
         return ret;
@@ -339,6 +376,59 @@ OH_NN_ReturnCode NNCompiler::Build()
             LOGE("[NNCompiler] Build success, but fail to save cache to file.");
             return ret;
         }
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNCompiler::Build()
+{
+    if (m_isBuild) {
+        LOGE("[NNCompiler] Build failed, cannot build again.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    if (m_device == nullptr) {
+        LOGE("[NNCompiler] Build failed, the m_device is nullptr.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+
+    // Prepare from offline model.
+    bool isOfflineModel {false};
+    OH_NN_ReturnCode ret = IsOfflineModel(isOfflineModel);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNCompiler] Build failed, fail to identify the offline model.");
+        return ret;
+    }
+
+    if (isOfflineModel) {
+        ret = BuildOfflineModel();
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[NNCompiler] Build failed, Failed to build offline model.");
+            return ret;
+        }
+
+        m_isBuild = true;
+        return OH_NN_SUCCESS;
+    }
+
+    // cache存在，从cache直接复原prepareModel、input/output TensorDesc
+    ret = RestoreFromCacheFile();
+    if (ret == OH_NN_OPERATION_FORBIDDEN) {
+        LOGE("[NNCompiler] Build failed, operation is forbidden.");
+        return ret;
+    }
+    if (ret == OH_NN_SUCCESS) {
+        LOGI("[NNCompiler] Build success, restore from cache file.");
+        m_isBuild = true;
+        return OH_NN_SUCCESS;
+    }
+
+    // cache不存在或cache restore失败，走在线构图
+    ret = NormalBuild();
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNCompiler] Build failed, fail to build model online.");
+        return ret;
     }
 
     return OH_NN_SUCCESS;
