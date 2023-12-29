@@ -282,7 +282,7 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_AddExtensionConfig(OH_NNCompilation *
 
     std::vector<char> configValueVec(configValueSize, '0');
     void* configValueAddr = reinterpret_cast<void*>(configValueVec.data());
-    uint32_t ret = memcpy_s(configValueAddr, configValueVec.size(), configValue, configValueSize);
+    errno_t ret = memcpy_s(configValueAddr, configValueVec.size(), configValue, configValueSize);
     if (ret != EOK) {
         LOGE("OH_NNCompilation_AddExtensionConfig failed, copy config value failed.");
         return OH_NN_FAILED;

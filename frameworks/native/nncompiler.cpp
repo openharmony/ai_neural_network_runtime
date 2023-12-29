@@ -669,7 +669,7 @@ OH_NN_ReturnCode NNCompiler::SerializeTensorsToBuffer(
     }
 
     // Allocate memory for the serialized data
-    char* serializedData = new char[totalSize];
+    char* serializedData = new (std::nothrow) char[totalSize];
     if (serializedData == nullptr) {
         LOGE("[NNCompiler] SerializeInputsToBuffer failed, failed to create serialized data.");
         return OH_NN_NULL_PTR;
@@ -783,7 +783,7 @@ OH_NN_ReturnCode NNCompiler::DeserializedTensorsFromBuffer(
         }
         ptr += sizeof(desc.m_shapeNum);
 
-        desc.m_shape = new int32_t[desc.m_shapeNum];
+        desc.m_shape = new (std::nothrow) int32_t[desc.m_shapeNum];
         if (desc.m_shape == nullptr) {
             LOGE("[NNCompiler] DeserializedTensorsFromBuffer failed, failed to create shape buffer.");
             ReleaseDescShape(immediateTensorDescs);
