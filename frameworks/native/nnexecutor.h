@@ -97,10 +97,10 @@ private:
 
     // The following parameters are provided for compatibility with older versions
     struct ExeTensor {
-        std::shared_ptr<NNTensor> tensor;
-        void* userBuffer;
-        size_t userBufferLength;
-        bool isInnerMem;
+        std::shared_ptr<NNTensor> tensor {nullptr};
+        void* userBuffer {nullptr};
+        size_t userBufferLength {0};
+        bool isInnerMem {false};
     };
     bool m_isRun {false};
     std::unordered_map<int, ExeTensor> m_inputTensors;

@@ -23,12 +23,6 @@
 #include "quant_param.h"
 #include "validation.h"
 
-#include <dlfcn.h>
-
-namespace {
-void* g_libHandle = dlopen("libneural_network_runtime_ext.so", RTLD_NOW | RTLD_GLOBAL);
-}
-
 using namespace OHOS::NeuralNetworkRuntime;
 
 #define NNRT_API __attribute__((visibility("default")))
