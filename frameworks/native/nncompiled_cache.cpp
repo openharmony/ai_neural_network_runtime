@@ -97,8 +97,8 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
     }
 
     std::string cacheInfoPath = cacheDir + "/" + m_modelName + "cache_info.nncache";
-    char* realPathCache = realpath(cacheInfoPath.c_str(), NULL);
-    if (realPathCache == NULL) {
+    char path[PATH_MAX];
+    if (realpath(cacheInfoPath.c_str(), path) == nullptr) {
         LOGE("[NNCompiledCache] Restore failed, fail to get the real path of cacheInfoPath.");
         return OH_NN_INVALID_PARAMETER;
     }
