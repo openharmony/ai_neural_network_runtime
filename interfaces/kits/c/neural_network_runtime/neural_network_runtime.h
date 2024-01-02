@@ -191,7 +191,7 @@ OH_NN_ReturnCode OH_NNModel_AddTensorToModel(OH_NNModel *model, const NN_TensorD
  * @param index Index of a tensor.
  * @param dataBuffer Pointer to real data.
  * @param length Length of the data buffer.
- * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned. 
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned.
  *         If the operation fails, an error code is returned. For details about the error codes,
  *         see {@link OH_NN_ReturnCode}.
  * @since 9
