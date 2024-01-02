@@ -435,7 +435,7 @@ typedef enum {
      *       The value is an array [height_block, width_block].
      * * <b>crops</b>: elements truncated from the spatial dimension of the output. The value is a 2D array
      *       [[crop0_start, crop0_end], [crop1_start, crop1_end]] with the shape of (2, 2).
-     *      
+     *
      *
      * Outputs:
      *
@@ -539,10 +539,10 @@ typedef enum {
      * * <b>input</b>: input tensor.
      * * <b>weight</b>: convolution weight in [outChannel, kernelHeight, kernelWidth, inChannel/group] format.
      *       The value of <b>inChannel</b> must be exactly divided by the value of <b>group</b>.
-     *      
-     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>. 
-     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters. 
-     *       The quantization version requires data input of the <b>OH_NN_INT32</b> type. 
+     *
+     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>.
+     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters.
+     *       The quantization version requires data input of the <b>OH_NN_INT32</b> type.
      *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.
      *
      * Parameters:
@@ -652,11 +652,11 @@ typedef enum {
      * Inputs:
      *
      * * <b>input</b>: input tensor.
-     * * <b>weight</b>: convolution weight in [outChannel, kernelHeight, kernelWidth, 1] format. 
+     * * <b>weight</b>: convolution weight in [outChannel, kernelHeight, kernelWidth, 1] format.
      *       <b>outChannel</b> is equal to <b>channelMultiplier</b> multiplied by <b>inChannel</b>.
-     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>. 
-     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters. 
-     *       The quantization version requires data input of the <b>OH_NN_INT32</b> type. 
+     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>.
+     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters.
+     *       The quantization version requires data input of the <b>OH_NN_INT32</b> type.
      *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.
      *
      * Parameters:
@@ -682,10 +682,10 @@ typedef enum {
      * Inputs:
      *
      * * <b>input</b>: input tensor.
-     * * <b>weight</b>: convolution weight in [outChannel, kernelHeight, kernelWidth, 1] format. 
+     * * <b>weight</b>: convolution weight in [outChannel, kernelHeight, kernelWidth, 1] format.
      *       <b>outChannel</b> is equal to <b>channelMultiplier</b> multiplied by <b>inChannel</b>.
-     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>. 
-     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters. 
+     * * <b>bias</b>: bias of the convolution. It is an array with a length of <b>[outChannel]</b>.
+     *       In quantization scenarios, the <b>bias</b> parameter does not require quantization parameters.
      *       The quantization version requires data input of the <b>OH_NN_INT32</b> type. 
      *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.
      *
@@ -805,7 +805,7 @@ typedef enum {
      * * <b>weight</b>: weight tensor for a full connection.
      * * <b>bias</b>: full-connection bias. In quantization scenarios, no quantized parameter is required
      *       for this parameter. If quantization is required, the data must be of the OH_NN_INT32 type.
-     *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.      
+     *       The actual quantization parameters are determined by <b>input</b> and <b>weight</b>.
      *
      * Parameters:
      *
@@ -891,7 +891,7 @@ typedef enum {
 
     /**
      * Calculates the maximum of <b>input1</b> and <b>input2</b> element-wise. The inputs of <b>input1</b> and <b>input2</b>
-     * comply with the implicit type conversion rules to make the data types consistent. 
+     * comply with the implicit type conversion rules to make the data types consistent.
      * * The inputs must be two tensors or one tensor and one scalar.
      * When the inputs are two tensors, their data types cannot be both NN_BOOL.
      * Their shapes can be broadcast to the same size.
@@ -929,7 +929,7 @@ typedef enum {
      *       or <b>1</b> (valid). The nearest neighbor value is used for padding.
      *       <b>0</b> (same): The height and width of the output are the same as those of the input. The total padding
      *       quantity is calculated horizontally and vertically and evenly distributed to the top, bottom, left, and
-     *       right if possible. Otherwise, the last additional padding will be completed from the bottom and right.  
+     *       right if possible. Otherwise, the last additional padding will be completed from the bottom and right.
      *       <b>1</b> (valid): The possible maximum height and width of the output will be returned in case of
      *       no padding. The excessive pixels will be discarded.
      * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
@@ -1545,7 +1545,7 @@ typedef enum {
     OH_NN_OPS_REDUCE_PROD = 50,
 
     /**
-     * Operates the logical OR in the specified dimension. If <b>keepDims</b> is set to <b>false</b>, 
+     * Operates the logical OR in the specified dimension. If <b>keepDims</b> is set to <b>false</b>,
      * the number of dimensions is reduced for the input; if <b>keepDims</b> is set to <b>true</b>,
      *       the number of dimensions is retained.
      *
@@ -1653,9 +1653,9 @@ typedef enum {
  * @brief Enumerates the tensor data types.
  *
  * Tensors are usually used to set the input, output, and operator parameters of a model. When a tensor is used
- * as the input or output of a model (or operator), set the tensor type to {@link OH_NN_TENSOR}. 
+ * as the input or output of a model (or operator), set the tensor type to {@link OH_NN_TENSOR}.
  * When the tensor is used as an operator parameter, select an enumerated value other than {@link OH_NN_TENSOR} as the
- * tensor type. Assume that the <b>pad</b> parameter of the {@link OH_NN_OPS_CONV2D} operator is being set. 
+ * tensor type. Assume that the <b>pad</b> parameter of the {@link OH_NN_OPS_CONV2D} operator is being set.
  * You need to set the <b>type</b> attribute of the {@link OH_NN_Tensor} instance to {@link OH_NN_CONV2D_PAD}.
  * The settings of other operator parameters are similar. The enumerated values are named
  * in the format OH_NN_{<i>Operator name</i>}_{<i>Attribute name</i>}.
