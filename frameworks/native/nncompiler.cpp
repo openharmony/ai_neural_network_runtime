@@ -255,7 +255,7 @@ bool NNCompiler::IsBuild() const
 }
 
 OH_NN_ReturnCode NNCompiler::IsSupportedModel(const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph,
-                                               bool& isSupportedModel) const
+                                              bool& isSupportedModel) const
 {
     std::vector<bool> supportedList;
     OH_NN_ReturnCode ret = m_device->GetSupportedOperation(liteGraph, supportedList);
