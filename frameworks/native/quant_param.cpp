@@ -52,7 +52,8 @@ std::vector<uint32_t> QuantParams::GetNumBits() const
 OH_NN_ReturnCode QuantParams::CopyToCompat(std::vector<OHOS::NeuralNetworkRuntime::QuantParam>& compatQuantParams) const
 {
     if ((m_scales.size() != m_zeroPoints.size()) || (m_zeroPoints.size() != m_numBits.size())) {
-        LOGE("CopyToCompat failed, the size of scales(%zu), zeroPoints(%zu) and numBits(%zu) are not equal.", m_scales.size(), m_zeroPoints.size(), m_numBits.size());
+        LOGE("CopyToCompat failed, the size of scales(%zu), zeroPoints(%zu) and numBits(%zu) are not equal.",
+            m_scales.size(), m_zeroPoints.size(), m_numBits.size());
         return OH_NN_INVALID_PARAMETER;
     }
 

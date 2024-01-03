@@ -188,7 +188,8 @@ OH_NN_ReturnCode NNTensor::BuildFromTensorDesc(const NN_TensorDesc* tensorDesc)
     }
     std::vector<int32_t> dimensions(shape, shape + shapeNum);
 
-    // OH_NNCore_TensorDesc does not include quant parameters and tensor type, should be set using indenpendent interface.
+    // OH_NNCore_TensorDesc does not include quant parameters and tensor type,
+    // should be setted by using indenpendent interface.
     returnCode = Build(dataType, dimensions, {}, OH_NN_TENSOR);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("BuildFromTensorDesc failed, error happened when building NNTensor.");

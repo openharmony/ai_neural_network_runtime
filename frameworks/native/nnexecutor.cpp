@@ -567,7 +567,7 @@ OH_NN_ReturnCode NNExecutor::SetInput(uint32_t index, const OH_NN_Tensor& nnTens
 }
 
 OH_NN_ReturnCode NNExecutor::SetInputFromMemory(
-    uint32_t index, const OH_NN_Tensor& nnTensor,const OH_NN_Memory& memory)
+    uint32_t index, const OH_NN_Tensor& nnTensor, const OH_NN_Memory& memory)
 {
     auto nnRet = CheckInputDimRanges(index, nnTensor);
     if (nnRet == OH_NN_OPERATION_FORBIDDEN) {
