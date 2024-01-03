@@ -114,15 +114,15 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
         return ret;
     }
 
-    if ((uint64_t)version > cacheInfo.version) {
+    if (static_cast<uint64_t>(version) > cacheInfo.version) {
         LOGE("[NNCompiledCache] Restore failed, version is not match. The current version is %{public}u, "
              "but the cache files version is %{public}zu.",
              version,
-             (size_t)cacheInfo.version);
+             static_cast<size_t>(cacheInfo.version));
         return OH_NN_INVALID_PARAMETER;
     }
 
-    if ((uint64_t)version < cacheInfo.version) {
+    if (static_cast<uint64_t>(version) < cacheInfo.version) {
         LOGE("[NNCompiledCache] Restore failed, the current version is lower than the cache files, "
              "please set a higher version.");
         return OH_NN_OPERATION_FORBIDDEN;
@@ -275,7 +275,7 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
     }
 
     int charNumber = NUMBER_CACHE_INFO_MEMBERS * sizeof(uint64_t);
-    if (!infoCacheFile.read((char*)&(modelCacheInfo), charNumber)) {
+    if (!infoCacheFile.read(reinterpret_cast<char*>(&(modelCacheInfo)), charNumber)) {
         LOGE("[NNCompiledCache] CheckCacheInfo failed, error happened when reading cache info file.");
         infoCacheFile.close();
         return OH_NN_INVALID_FILE;
@@ -297,7 +297,8 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
     std::vector<uint64_t> modelCheckSum;
     modelCheckSum.resize(modelCacheInfo.fileNumber);
     modelCacheInfo.modelCheckSum.resize(modelCacheInfo.fileNumber);
-    if (!infoCacheFile.read((char*)&modelCheckSum[0], modelCacheInfo.fileNumber * sizeof(uint64_t))) {
+    if (!infoCacheFile.read(reinterpret_cast<char*>(&modelCheckSum[0]),
+        modelCacheInfo.fileNumber * sizeof(uint64_t))) {
         LOGE("[NNCompiledCache] CheckCacheInfo failed. The info cache file has been changed.");
         infoCacheFile.close();
         return OH_NN_INVALID_FILE;
