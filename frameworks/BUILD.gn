@@ -39,8 +39,6 @@ nnrt_sources = [
   "native/ops_builder.cpp",
   "native/ops_registry.cpp",
   "native/quant_param.cpp",
-  "native/register_hdi_device_v1_0.cpp",
-  "native/register_hdi_device_v2_0.cpp",
   "native/transform.cpp",
   "native/validation.cpp",
 ]
