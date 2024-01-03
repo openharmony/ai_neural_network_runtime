@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-class TensorDesc{
+class TensorDesc {
 public:
     TensorDesc() = default;
     ~TensorDesc() = default;
@@ -42,13 +42,11 @@ public:
     OH_NN_ReturnCode SetName(const char* name);
     OH_NN_ReturnCode GetName(const char** name) const;
 
-
 private:
     OH_NN_DataType m_dataType {OH_NN_UNKNOWN};
     OH_NN_Format m_format {OH_NN_FORMAT_NONE};
     std::vector<int32_t> m_shape;
     std::string m_name;
-
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
