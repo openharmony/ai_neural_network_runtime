@@ -79,8 +79,8 @@ OH_NNCompilation *OH_NNCompilation_Construct(const OH_NNModel *model);
  * and you have to choose only one of the three construction methods. \n
  *
  * Offline model is a type of model that is offline compiled by the model converter provided by a device vendor.
- * So that the offline model can only be used on the specified device, but the
- * compilation time of offline model is usually much less than {@link OH_NNModel}. \n
+ * So that the offline model can only be used on the specified device,
+ * but the compilation time of offline model is usually much less than {@link OH_NNModel}. \n
  *
  * You should perform the offline compilation during your development
  * and deploy the offline model in your app package. \n
@@ -385,8 +385,8 @@ NN_TensorDesc *OH_NNTensorDesc_Create();
 /**
  * @brief Releases an {@link NN_TensorDesc} instance.
  *
- * When the {@link NN_TensorDesc} instance is no longer used, this method needs to be called to release it. Otherwise,
- * the memory leak will occur. \n
+ * When the {@link NN_TensorDesc} instance is no longer used, this method needs to be called to release it.
+ * Otherwise, the memory leak will occur. \n
  *
  * If <b>tensorDesc</b> or <b>*tensorDesc</b> is a null pointer,
  * this method will return error code and does not execute the release. \n

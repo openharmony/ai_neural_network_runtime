@@ -96,7 +96,8 @@ OH_NN_ReturnCode OH_NNQuantParam_SetScales(NN_QuantParam *quantParams, const dou
  * @version 1.0
  */
 OH_NN_ReturnCode OH_NNQuantParam_SetZeroPoints(NN_QuantParam *quantParams,
-                                               const int32_t *zeroPoints, size_t quantCount);
+                                               const int32_t *zeroPoints,
+                                               size_t quantCount);
 
 /**
  * @brief Sets the number bits of the {@link NN_QuantParam} instance.
