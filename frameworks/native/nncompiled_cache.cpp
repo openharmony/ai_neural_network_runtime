@@ -339,8 +339,8 @@ unsigned short NNCompiledCache::GetCrc16(char* buffer, size_t length) const
     unsigned int sum = 0;
     while (length > 1) {
         sum += *(reinterpret_cast<unsigned short*>(buffer));
-	length -= sizeof(unsigned short);
-	buffer += sizeof(unsigned short);
+        length -= sizeof(unsigned short);
+        buffer += sizeof(unsigned short);
     }
 
     if (length > 0) {
@@ -348,7 +348,7 @@ unsigned short NNCompiledCache::GetCrc16(char* buffer, size_t length) const
     }
 
     while (sum >> HEX_UNIT) {
-	sum = (sum >> HEX_UNIT) + (sum & 0xffff);
+        sum = (sum >> HEX_UNIT) + (sum & 0xffff);
     }
 
     return static_cast<unsigned short>(~sum);
