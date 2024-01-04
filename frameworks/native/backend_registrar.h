@@ -34,7 +34,7 @@ public:
 
 #define REGISTER_BACKEND(backend, creator)                                                            \
     namespace {                                                                                       \
-    static OHOS::NeuralNetworkRuntime::BackendRegistrar g_##backendName##_backend_registrar(creator); \
+    static OHOS::NeuralNetworkRuntime::BackendRegistrar g_##backend##_backend_registrar(creator); \
     } // namespace
 } // NeuralNetworkRuntime
 } // OHOS
