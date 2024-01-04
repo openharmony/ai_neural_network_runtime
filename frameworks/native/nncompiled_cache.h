@@ -63,7 +63,7 @@ private:
                                     const std::string& cacheDir) const;
     OH_NN_ReturnCode CheckCacheInfo(NNCompiledCacheInfo& modelCacheInfo, const std::string& cacheInfoPath) const;
     OH_NN_ReturnCode ReadCacheModelFile(const std::string& file, Buffer& cache) const;
-    unsigned short GetCrc16(const unsigned char* buffer, size_t length) const;
+    unsigned short GetCrc16(char* buffer, size_t length) const;
     OH_NN_ReturnCode GetCacheFileLength(std::ifstream& ifs, int& fileSize) const;
 
 private:
