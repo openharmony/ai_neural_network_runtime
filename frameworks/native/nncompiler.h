@@ -65,6 +65,7 @@ private:
 
     OH_NN_ReturnCode NormalBuild();
     OH_NN_ReturnCode BuildOfflineModel();
+    OH_NN_ReturnCode CheckModelParameter() const;
     OH_NN_ReturnCode IsOfflineModel(bool& isOfflineModel) const;
     OH_NN_ReturnCode IsSupportedModel(const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph,
                                       bool& isSupportedModel) const;
