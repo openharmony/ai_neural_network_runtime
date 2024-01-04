@@ -20,7 +20,6 @@
 #include <climits>
 #include <securec.h>
 
-#include "inner_model.h"
 #include "validation.h"
 #include "nncompiled_cache.h"
 #include "common/utils.h"
@@ -122,13 +121,13 @@ NNCompiler::NNCompiler(const void* model, std::shared_ptr<Device> device, size_t
 {
     m_device = device;
     m_backendID = backendID;
-    const InnerModel* innerModel = reinterpret_cast<const InnerModel*>(model);
-    m_liteGraph = innerModel->GetLiteGraphs();
-    m_inputTensorDescs = innerModel->GetInputTensorDescs();
-    m_outputTensorDescs = innerModel->GetOutputTensorDescs();
-    m_metaGraph = innerModel->GetMetaGraph();
-    m_quantBuffer = innerModel->GetQuantBuffer();
-    m_modelName = innerModel->GetModelName();
+    m_innerModel = const_cast<InnerModel*>(reinterpret_cast<const InnerModel*>(model));
+    m_liteGraph = m_innerModel->GetLiteGraphs();
+    m_inputTensorDescs = m_innerModel->GetInputTensorDescs();
+    m_outputTensorDescs = m_innerModel->GetOutputTensorDescs();
+    m_metaGraph = m_innerModel->GetMetaGraph();
+    m_quantBuffer = m_innerModel->GetQuantBuffer();
+    m_modelName = m_innerModel->GetModelName();
 }
 
 NNCompiler::~NNCompiler()
@@ -277,26 +276,44 @@ OH_NN_ReturnCode NNCompiler::IsSupportedModel(const std::shared_ptr<mindspore::l
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode NNCompiler::IsOfflineModel(bool& isOfflineModel) const
+OH_NN_ReturnCode NNCompiler::CheckModelParameter() const
 {
-    isOfflineModel = false; // Initialize the returned value
-    if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
-        LOGE("[Compilation] LiteGraph and metaGraph are empty when identifying the offline model.");
-        return OH_NN_NULL_PTR;
+    // If m_innerModel is not passed, the compiler must be construct from cache, jump check m_innerModel.
+    if (m_innerModel == nullptr) {
+        LOGW("[NNCompiler] Restoring from cache not need to check model.");
+        return OH_NN_SUCCESS;
     }
 
-    if ((m_liteGraph != nullptr) && (m_metaGraph != nullptr)) {
-        LOGE("[Compilation] LiteGraph and metaGraph are not empty when identifying the offline model.");
+    // m_innerModel is not constructed completely.
+    if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
+        LOGE("[NNCompiler] LiteGraph and metaGraph are empty, m_innerModel is not constructed completely.");
         return OH_NN_INVALID_PARAMETER;
     }
 
+    if ((m_liteGraph != nullptr) && (m_metaGraph != nullptr)) {
+        LOGE("[NNCompiler] Both LiteGraph and metaGraph are not empty.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNCompiler::IsOfflineModel(bool& isOfflineModel) const
+{
+    // If m_innerModel is not passed, the compiler must be construct from cache, jump check m_innerModel.
+    if (m_innerModel == nullptr) {
+        LOGW("[NNCompiler] Restoring from cache not need to judge offline model.");
+        return OH_NN_SUCCESS;
+    }
+
+    isOfflineModel = false; // Initialize the returned value
     if (m_metaGraph != nullptr) {
         isOfflineModel = false;
         return OH_NN_SUCCESS;
     }
 
     if (m_liteGraph->all_nodes_.size() == 0) {
-        LOGE("[Compilation] Find empty node in the model.");
+        LOGE("[NNCompiler] Find empty node in the model.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -308,7 +325,7 @@ OH_NN_ReturnCode NNCompiler::IsOfflineModel(bool& isOfflineModel) const
 
     const mindspore::lite::LiteGraph::Node* pNode = m_liteGraph->all_nodes_[0];
     if (pNode == nullptr) {
-        LOGE("[Compilation] Find invalid node in the model.");
+        LOGE("[NNCompiler] Find invalid node in the model.");
         return OH_NN_NULL_PTR;
     }
 
@@ -325,7 +342,7 @@ OH_NN_ReturnCode NNCompiler::BuildOfflineModel()
     ModelConfig config {m_enableFp16, m_performance, m_priority};
     OH_NN_ReturnCode ret = m_device->PrepareOfflineModel(m_liteGraph, config, m_preparedModel);
     if (ret != OH_NN_SUCCESS) {
-        LOGE("[Compilation] Preparing model failed when building from offline model.");
+        LOGE("[NNCompiler] Preparing model failed when building from offline model.");
         return ret;
     }
 
@@ -335,7 +352,7 @@ OH_NN_ReturnCode NNCompiler::BuildOfflineModel()
 OH_NN_ReturnCode NNCompiler::NormalBuild()
 {
     if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
-        LOGE("[NNCompiler] Build failed, both liteGraph and metaGraph are nullptr.");
+        LOGW("[NNCompiler] Build failed, both liteGraph and metaGraph are nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -348,7 +365,7 @@ OH_NN_ReturnCode NNCompiler::NormalBuild()
     bool isSupportedModel = true;
     OH_NN_ReturnCode ret = IsSupportedModel(m_liteGraph, isSupportedModel);
     if (ret != OH_NN_SUCCESS) {
-        LOGE("[NNCompiler] Build failed, error happend when judge if support the model.");
+        LOGE("[NNCompiler] Build failed, error happened when judge if support the model.");
         return ret;
     } else if (!isSupportedModel) {
         LOGE("[NNCompiler] Build failed, current device not support the model.");
@@ -393,9 +410,15 @@ OH_NN_ReturnCode NNCompiler::Build()
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
+    OH_NN_ReturnCode ret = CheckModelParameter();
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNCompiler] CheckModelParameter failed, some error happened when checking model parameter.");
+        return ret;
+    }
+
     // Prepare from offline model.
     bool isOfflineModel {false};
-    OH_NN_ReturnCode ret = IsOfflineModel(isOfflineModel);
+    ret = IsOfflineModel(isOfflineModel);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] Build failed, fail to identify the offline model.");
         return ret;
