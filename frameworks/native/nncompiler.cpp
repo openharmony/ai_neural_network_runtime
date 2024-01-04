@@ -20,7 +20,6 @@
 #include <climits>
 #include <securec.h>
 
-#include "inner_model.h"
 #include "validation.h"
 #include "nncompiled_cache.h"
 #include "common/utils.h"
@@ -122,13 +121,13 @@ NNCompiler::NNCompiler(const void* model, std::shared_ptr<Device> device, size_t
 {
     m_device = device;
     m_backendID = backendID;
-    const InnerModel* innerModel = reinterpret_cast<const InnerModel*>(model);
-    m_liteGraph = innerModel->GetLiteGraphs();
-    m_inputTensorDescs = innerModel->GetInputTensorDescs();
-    m_outputTensorDescs = innerModel->GetOutputTensorDescs();
-    m_metaGraph = innerModel->GetMetaGraph();
-    m_quantBuffer = innerModel->GetQuantBuffer();
-    m_modelName = innerModel->GetModelName();
+    m_innerModel = const_cast<InnerModel*>(reinterpret_cast<const InnerModel*>(model));
+    m_liteGraph = m_innerModel->GetLiteGraphs();
+    m_inputTensorDescs = m_innerModel->GetInputTensorDescs();
+    m_outputTensorDescs = m_innerModel->GetOutputTensorDescs();
+    m_metaGraph = m_innerModel->GetMetaGraph();
+    m_quantBuffer = m_innerModel->GetQuantBuffer();
+    m_modelName = m_innerModel->GetModelName();
 }
 
 NNCompiler::~NNCompiler()
@@ -279,6 +278,12 @@ OH_NN_ReturnCode NNCompiler::IsSupportedModel(const std::shared_ptr<mindspore::l
 
 OH_NN_ReturnCode NNCompiler::IsOfflineModel(bool& isOfflineModel) const
 {
+    // If m_innerModel is not passed, the compiler must be construct from cache, jump check m_innerModel.
+    if (m_innerModel == nullptr) {
+        LOGE("[Compilation] Restore from cache not need judge offline model.");
+        return OH_NN_SUCCESS;
+    }
+
     isOfflineModel = false; // Initialize the returned value
     if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
         LOGE("[Compilation] LiteGraph and metaGraph are empty when identifying the offline model.");

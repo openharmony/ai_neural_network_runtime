@@ -82,6 +82,7 @@ private:
     Buffer m_quantBuffer {nullptr, 0};
     std::string m_modelName;
     void* m_metaGraph {nullptr};
+    InnerModel* m_innerModel {nullptr};
     std::shared_ptr<mindspore::lite::LiteGraph> m_liteGraph {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
