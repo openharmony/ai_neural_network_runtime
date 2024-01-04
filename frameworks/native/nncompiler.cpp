@@ -280,18 +280,18 @@ OH_NN_ReturnCode NNCompiler::IsOfflineModel(bool& isOfflineModel) const
 {
     // If m_innerModel is not passed, the compiler must be construct from cache, jump check m_innerModel.
     if (m_innerModel == nullptr) {
-        LOGE("[Compilation] Restore from cache not need judge offline model.");
+        LOGE("[NNCompiler] Restoring from cache not need to judge offline model.");
         return OH_NN_SUCCESS;
     }
 
     isOfflineModel = false; // Initialize the returned value
     if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
-        LOGE("[Compilation] LiteGraph and metaGraph are empty when identifying the offline model.");
+        LOGE("[NNCompiler] LiteGraph and metaGraph are empty when identifying the offline model.");
         return OH_NN_NULL_PTR;
     }
 
     if ((m_liteGraph != nullptr) && (m_metaGraph != nullptr)) {
-        LOGE("[Compilation] LiteGraph and metaGraph are not empty when identifying the offline model.");
+        LOGE("[NNCompiler] LiteGraph and metaGraph are not empty when identifying the offline model.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -301,7 +301,7 @@ OH_NN_ReturnCode NNCompiler::IsOfflineModel(bool& isOfflineModel) const
     }
 
     if (m_liteGraph->all_nodes_.size() == 0) {
-        LOGE("[Compilation] Find empty node in the model.");
+        LOGE("[NNCompiler] Find empty node in the model.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -313,7 +313,7 @@ OH_NN_ReturnCode NNCompiler::IsOfflineModel(bool& isOfflineModel) const
 
     const mindspore::lite::LiteGraph::Node* pNode = m_liteGraph->all_nodes_[0];
     if (pNode == nullptr) {
-        LOGE("[Compilation] Find invalid node in the model.");
+        LOGE("[NNCompiler] Find invalid node in the model.");
         return OH_NN_NULL_PTR;
     }
 
@@ -330,7 +330,7 @@ OH_NN_ReturnCode NNCompiler::BuildOfflineModel()
     ModelConfig config {m_enableFp16, m_performance, m_priority};
     OH_NN_ReturnCode ret = m_device->PrepareOfflineModel(m_liteGraph, config, m_preparedModel);
     if (ret != OH_NN_SUCCESS) {
-        LOGE("[Compilation] Preparing model failed when building from offline model.");
+        LOGE("[NNCompiler] Preparing model failed when building from offline model.");
         return ret;
     }
 
