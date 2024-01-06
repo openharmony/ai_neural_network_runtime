@@ -16,7 +16,6 @@
 #include "backend_manager.h"
 
 #include <algorithm>
-#include "common/log.h"
 #include "cpp_type.h"
 
 namespace OHOS {
