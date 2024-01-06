@@ -16,6 +16,7 @@
 #ifndef NEURAL_NETWORK_CORE_BACKEND_MANAGER_H
 #define NEURAL_NETWORK_CORE_BACKEND_MANAGER_H
 
+#include <dlfcn.h>
 #include <string>
 #include <vector>
 #include <memory>
@@ -25,6 +26,7 @@
 #include <functional>
 
 #include "backend.h"
+#include "common/log.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -39,6 +41,13 @@ public:
 
     static BackendManager& GetInstance()
     {
+        if (dlopen("libneural_network_runtime_ext.so", RTLD_NOLOAD) == nullptr) {
+            LOGI("dlopen libneural_network_runtime_ext.so.");
+	    void* libHandle = dlopen("libneural_network_runtime_ext.so", RTLD_NOW | RTLD_GLOBAL);
+	    if (libHandle == nullptr) {
+	        LOGW("Failed to dlopen libneural_network_runtime_ext.so.");
+	    }
+	}
         static BackendManager instance;
         return instance;
     }
