@@ -87,7 +87,7 @@ NNRT_API OH_NN_ReturnCode OH_NNDevice_GetName(size_t deviceID, const char **name
 
 NNRT_API OH_NN_ReturnCode OH_NNDevice_GetType(size_t deviceID, OH_NN_DeviceType* deviceType)
 {
-    BackendManager& backendManager = BackendManager::GetInstance();
+    const BackendManager& backendManager = BackendManager::GetInstance();
     std::shared_ptr<Backend> backend = backendManager.GetBackend(deviceID);
     if (backend == nullptr) {
         LOGE("OH_NNDevice_GetType failed, passed invalid deviceID.");
@@ -384,7 +384,7 @@ OH_NN_ReturnCode CreateCompiler(Compilation* compilation, Compiler** compiler)
         return OH_NN_INVALID_PARAMETER;
     }
 
-    BackendManager& manager = BackendManager::GetInstance();
+    const BackendManager& manager = BackendManager::GetInstance();
     std::shared_ptr<Backend> backend = manager.GetBackend(compilation->backendID);
     if (backend == nullptr) {
         LOGE("CreateCompiler failed, fail to get backend %{public}zu.", compilation->backendID);
@@ -524,7 +524,7 @@ NNRT_API void OH_NNCompilation_Destroy(OH_NNCompilation **compilation)
 
     Compilation* compilationImpr = reinterpret_cast<Compilation*>(*compilation);
     if (compilationImpr->compiler != nullptr) {
-        BackendManager& manager = BackendManager::GetInstance();
+        const BackendManager& manager = BackendManager::GetInstance();
         std::shared_ptr<Backend> backend = manager.GetBackend(compilationImpr->backendID);
         if (backend == nullptr) {
             LOGE("OH_NNCompilation_Destroy failed, fail to get backend %{public}zu.", compilationImpr->backendID);
@@ -864,7 +864,7 @@ NNRT_API OH_NN_ReturnCode OH_NNTensor_Destroy(NN_Tensor **tensor)
 
     Tensor* tensorImpl = reinterpret_cast<Tensor*>(*tensor);
     size_t backendID = tensorImpl->GetBackendID();
-    BackendManager& backendManager = BackendManager::GetInstance();
+    const BackendManager& backendManager = BackendManager::GetInstance();
     std::shared_ptr<Backend> backend = backendManager.GetBackend(backendID);
     if (backend == nullptr) {
         LOGE("OH_NNTensor_Destroy failed, passed invalid backend name %{public}zu.", backendID);
@@ -1001,7 +1001,7 @@ NNRT_API void OH_NNExecutor_Destroy(OH_NNExecutor **executor)
 
     Executor *executorImpl = reinterpret_cast<Executor *>(*executor);
     size_t backendID = executorImpl->GetBackendID();
-    BackendManager& backendManager = BackendManager::GetInstance();
+    const BackendManager& backendManager = BackendManager::GetInstance();
     std::shared_ptr<Backend> backend = backendManager.GetBackend(backendID);
     if (backend == nullptr) {
         LOGE("OH_NNExecutor_Destroy failed, failed to get backend of %{public}zu.", backendID);
