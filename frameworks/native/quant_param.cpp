@@ -19,17 +19,17 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-void QuantParams::SetScales(std::vector<double> scales)
+void QuantParams::SetScales(const std::vector<double>& scales)
 {
     m_scales = scales;
 }
 
-void QuantParams::SetZeroPoints(std::vector<int32_t> zeroPoints)
+void QuantParams::SetZeroPoints(const std::vector<int32_t>& zeroPoints)
 {
     m_zeroPoints = zeroPoints;
 }
 
-void QuantParams::SetNumBits(std::vector<uint32_t> numBits)
+void QuantParams::SetNumBits(const std::vector<uint32_t>& numBits)
 {
     m_numBits = numBits;
 }

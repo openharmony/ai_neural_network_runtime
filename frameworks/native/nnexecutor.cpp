@@ -29,13 +29,11 @@ namespace NeuralNetworkRuntime {
 NNExecutor::NNExecutor(size_t backendID, std::shared_ptr<Device> device, std::shared_ptr<PreparedModel> preparedModel,
     const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& inputTensorDescs,
     const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& outputTensorDescs)
-{
-    m_backendID = backendID;
-    m_device = device;
-    m_preparedModel = preparedModel;
-    m_inputTensorDescs = inputTensorDescs;
-    m_outputTensorDescs = outputTensorDescs;
-}
+    : m_backendID(backendID),
+    m_device(device),
+    m_preparedModel(preparedModel),
+    m_inputTensorDescs(inputTensorDescs),
+    m_outputTensorDescs(outputTensorDescs) {}
 
 OH_NN_ReturnCode NNExecutor::GetInputDimRange(
     size_t inputIndex, size_t** minInputDims, size_t** maxInputDims, size_t* shapeNum) const
