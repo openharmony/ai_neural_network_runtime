@@ -42,6 +42,10 @@ NNTensor2_0::~NNTensor2_0()
 
 OH_NN_ReturnCode NNTensor2_0::SetTensorDesc(const TensorDesc* tensorDesc)
 {
+    if (m_tensorDesc != nullptr) {
+        delete m_tensorDesc;
+        m_tensorDesc = nullptr;
+    }
     m_tensorDesc = new (std::nothrow) TensorDesc();
     if (m_tensorDesc == nullptr) {
         LOGE("[NNTensor2_0] SetTensorDesc failed, failed to create desc for tensor.");

@@ -63,7 +63,7 @@ std::shared_ptr<Backend> HDIDeviceV1_0Creator()
         return nullptr;
     }
 
-    std::shared_ptr<Backend> backend = std::make_shared<NNBackend>(device, std::hash<std::string>{}(backendName));
+    std::shared_ptr<Backend> backend = CreateSharedPtr<NNBackend>(device, std::hash<std::string>{}(backendName));
     if (backend == nullptr) {
         LOGW("Failed to register backend, because fail to create backend.");
     }

@@ -62,11 +62,11 @@ void GetInputNameAndShape(string& inputShapeString, std::map<string, std::vector
     if (inputShapeString == "") {
         return;
     }
-    int pos = inputShapeString.find_last_of(":");
+    size_t pos = inputShapeString.find_last_of(":");
     string userInputName = inputShapeString.substr(0, pos);
 
     string dimString = inputShapeString.substr(pos + 1);
-    int dimPos = dimString.find(",");
+    size_t dimPos = dimString.find(",");
     std::vector<int> inputDims;
     while (dimPos != dimString.npos) {
         inputDims.push_back(std::stoi(dimString.substr(0, dimPos)));
@@ -95,7 +95,7 @@ TfLiteStatus FilterDynamicInputs(Settings& settings, std::unique_ptr<tflite::Int
     // Get input names and shapes
     std::map<string, std::vector<int>> userInputShapes;
     string inputShapeString = settings.inputShape;
-    int pos = inputShapeString.find(";");
+    size_t pos = inputShapeString.find(";");
     while (pos != inputShapeString.npos) {
         GetInputNameAndShape(inputShapeString, userInputShapes);
         inputShapeString = inputShapeString.substr(pos + 1);
