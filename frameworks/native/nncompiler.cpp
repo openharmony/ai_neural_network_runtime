@@ -118,9 +118,9 @@ NNCompiler::NNCompiler(std::shared_ptr<Device> device, size_t backendID)
     m_backendID(backendID) {}
 
 NNCompiler::NNCompiler(const void* model, std::shared_ptr<Device> device, size_t backendID)
+    : m_device(device),
+    m_backendID(backendID)
 {
-    m_device = device;
-    m_backendID = backendID;
     m_innerModel = const_cast<InnerModel*>(reinterpret_cast<const InnerModel*>(model));
     m_liteGraph = m_innerModel->GetLiteGraphs();
     m_inputTensorDescs = m_innerModel->GetInputTensorDescs();
@@ -263,13 +263,13 @@ OH_NN_ReturnCode NNCompiler::IsSupportedModel(const std::shared_ptr<mindspore::l
         return ret;
     }
 
-    for (bool isSupport : supportedList) {
-        if (!isSupport) {
-            LOGE("[NNCompiler] Build failed, current device not support the model, device id: %{public}zu.",
-                m_backendID);
-            isSupportedModel = false;
-            return OH_NN_FAILED;
-        }
+    bool isNotSupport = std::any_of(supportedList.begin(), supportedList.end(), [](bool isSupport) {
+        return !isSupport;
+    });
+    if (isNotSupport) {
+        LOGE("[NNCompiler] Build failed, current device not support the model, device id: %{public}zu.", m_backendID);
+        isSupportedModel = false;
+        return OH_NN_FAILED;
     }
 
     isSupportedModel = true;
@@ -461,7 +461,7 @@ void NNCompiler::ReleaseBuffer(std::vector<Buffer>& buffers) const
 {
     for (size_t i = 0; i < buffers.size(); ++i) {
         // release tensor buffer which is allocated by new method.
-        delete[] (char*)buffers[i].data;
+        delete[] reinterpret_cast<char*>(buffers[i].data);
     }
     buffers.clear();
 }

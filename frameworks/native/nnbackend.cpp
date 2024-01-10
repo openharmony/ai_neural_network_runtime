@@ -33,9 +33,7 @@ NNBackend::NNBackend(const std::shared_ptr<Device>& device, size_t backendID)
 
 NNBackend::~NNBackend()
 {
-    if (m_device != nullptr) {
-        m_device = nullptr;
-    }
+    m_device = nullptr;
 }
 
 size_t NNBackend::GetBackendID() const

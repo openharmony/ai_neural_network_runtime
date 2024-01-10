@@ -28,9 +28,9 @@ public:
     QuantParams() = default;
     ~QuantParams() = default;
 
-    void SetScales(std::vector<double> scales);
-    void SetZeroPoints(std::vector<int32_t> zeroPoints);
-    void SetNumBits(std::vector<uint32_t> numBits);
+    void SetScales(const std::vector<double>& scales);
+    void SetZeroPoints(const std::vector<int32_t>& zeroPoints);
+    void SetNumBits(const std::vector<uint32_t>& numBits);
 
     std::vector<double> GetScales() const;
     std::vector<int32_t> GetZeroPoints() const;

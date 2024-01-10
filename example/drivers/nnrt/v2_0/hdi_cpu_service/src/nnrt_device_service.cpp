@@ -302,7 +302,7 @@ NNRT_ReturnCode NnrtDeviceService::ValidateModel(const Model& model) const
     size_t tensorSize = model.allTensors.size();
     auto inputIt = std::find_if(model.inputIndex.begin(), model.inputIndex.end(), [tensorSize](size_t inputIndex) {
         return inputIndex > tensorSize;
-    })
+    });
     if (inputIt != model.inputIndex.end()) {
         HDF_LOGE("Input index is invalid, index=%u", *inputIt);
         return NNRT_ReturnCode::NNRT_INVALID_INPUT;
@@ -310,7 +310,7 @@ NNRT_ReturnCode NnrtDeviceService::ValidateModel(const Model& model) const
 
     auto outputIt = std::find_if(model.outputIndex.begin(), model.outputIndex.end(), [tensorSize](size_t outputIndex) {
         return outputIndex > tensorSize;
-    })
+    });
     if (outputIt != model.outputIndex.end()) {
         HDF_LOGE("Output index is invalid, index=%u", *outputIt);
         return NNRT_ReturnCode::NNRT_INVALID_OUTPUT;
@@ -547,7 +547,7 @@ NNRT_ReturnCode NnrtDeviceService::ParseCustomAttributes(const std::map<std::str
                 HDF_LOGE("ConvertVecToString failed.");
                 return ret;
             }
-            if (attr2 != "LOW" || attr2 != "HIGH") {
+            if (attr2 != "LOW" && attr2 != "HIGH") {
                 HDF_LOGE("attr2 is neither LOW nor HIGH.");
                 return NNRT_ReturnCode::NNRT_INVALID_PARAMETER;
             }

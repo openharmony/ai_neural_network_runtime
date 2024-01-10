@@ -37,7 +37,8 @@ public:
           m_compiled(false),
           m_nnrt(nnrt),
           m_nnModel(nullptr),
-          m_pNnCompilation(nullptr) {}
+          m_pNnCompilation(nullptr),
+          m_nnrtDevice{0} {}
 
     NnrtDelegateKernel() : NnrtDelegateKernel(NnrtImplementation()) {}
     virtual ~NnrtDelegateKernel()
