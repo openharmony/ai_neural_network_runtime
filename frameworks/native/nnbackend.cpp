@@ -144,8 +144,6 @@ OH_NN_ReturnCode NNBackend::DestroyCompiler(Compiler* compiler)
     }
 
     delete compiler;
-    compiler = nullptr;
-
     return OH_NN_SUCCESS;
 }
 
@@ -179,8 +177,6 @@ OH_NN_ReturnCode NNBackend::DestroyExecutor(Executor* executor)
     }
 
     delete executor;
-    executor = nullptr;
-
     return OH_NN_SUCCESS;
 }
 
@@ -215,8 +211,6 @@ OH_NN_ReturnCode NNBackend::DestroyTensor(Tensor* tensor)
     }
 
     delete tensor;
-    tensor = nullptr;
-
     return OH_NN_SUCCESS;
 }
 
