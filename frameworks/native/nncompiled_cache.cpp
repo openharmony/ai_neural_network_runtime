@@ -19,7 +19,7 @@
 #include <functional>
 #include <memory>
 
-#include "common/log.h"
+#include "common/utils.h"
 #include "backend_manager.h"
 #include "nnbackend.h"
 
@@ -134,7 +134,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
 
 OH_NN_ReturnCode NNCompiledCache::SetBackend(size_t backendID)
 {
-    BackendManager& backendManager = BackendManager::GetInstance();
+    const BackendManager& backendManager = BackendManager::GetInstance();
     std::shared_ptr<Backend> backend = backendManager.GetBackend(backendID);
     if (backend == nullptr) {
         LOGE("[NNCompiledCache] SetBackend failed, backend with backendID %{public}zu is not exist.", backendID);
@@ -163,7 +163,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheFiles(const std::vector<OHOS::Neu
 {
     const size_t cacheNumber = caches.size();
     uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber;
-    std::unique_ptr<uint64_t[]> cacheInfo = std::make_unique<uint64_t[]>(cacheSize);
+    std::unique_ptr<uint64_t[]> cacheInfo = CreateUniquePtr<uint64_t[]>(cacheSize);
     if (cacheInfo == nullptr) {
         LOGE("[NNCompiledCache] GenerateCacheFiles failed, fail to create cacheInfo instance.");
         return OH_NN_MEMORY_ERROR;

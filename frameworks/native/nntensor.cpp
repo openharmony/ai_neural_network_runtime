@@ -208,10 +208,6 @@ OH_NN_ReturnCode NNTensor2_0::AllocateMemory(size_t length)
     }
 
     auto* nnBackend = reinterpret_cast<NNBackend*>(backend.get());
-    if (nnBackend == nullptr) {
-        LOGE("NNTensor2_0::AllocateMemory failed, failed to convert backend to nnbackend.");
-        return OH_NN_NULL_PTR;
-    }
     auto device = nnBackend->GetDevice();
     if (device == nullptr) {
         LOGE("NNTensor2_0::AllocateMemory failed, device of nnbackend is nullptr.");
@@ -259,10 +255,6 @@ OH_NN_ReturnCode NNTensor2_0::ReleaseMemory()
     }
 
     auto* nnrtBackend = reinterpret_cast<NNBackend*>(backend.get());
-    if (nnrtBackend == nullptr) {
-        LOGE("NNTensor2_0::ReleaseMemory failed, failed to convert backend to nnbackend.");
-        return OH_NN_NULL_PTR;
-    }
     auto device = nnrtBackend->GetDevice();
     if (device == nullptr) {
         LOGE("");
