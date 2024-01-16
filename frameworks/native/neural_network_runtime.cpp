@@ -144,11 +144,6 @@ OH_NN_ReturnCode OH_NNModel_AddTensorToModel(OH_NNModel* model, const NN_TensorD
     }
 
     auto* innerModel = reinterpret_cast<OHOS::NeuralNetworkRuntime::InnerModel*>(model);
-    if (innerModel == nullptr) {
-        LOGE("OH_NNModel_AddTensorToModel failed, error happened when converting model.");
-        return OH_NN_FAILED;
-    }
-
     OH_NN_ReturnCode returnCode = innerModel->AddTensorDesc(tensorDesc);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("OH_NNModel_AddTensorToModel failed, error happened when adding tensor to model.");

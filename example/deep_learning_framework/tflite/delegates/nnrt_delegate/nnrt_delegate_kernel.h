@@ -35,10 +35,10 @@ public:
     explicit NnrtDelegateKernel(const NnrtApi* nnrt)
         : m_initialised(false),
           m_compiled(false),
+          m_nnrtDevice{0},
           m_nnrt(nnrt),
           m_nnModel(nullptr),
-          m_pNnCompilation(nullptr),
-          m_nnrtDevice{0} {}
+          m_pNnCompilation(nullptr) {}
 
     NnrtDelegateKernel() : NnrtDelegateKernel(NnrtImplementation()) {}
     virtual ~NnrtDelegateKernel()
