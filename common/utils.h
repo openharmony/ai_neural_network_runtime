@@ -36,6 +36,19 @@ std::shared_ptr<T> CreateSharedPtr(Args&&... args)
     return tPtr;
 };
 
+template<typename T, typename... Args>
+std::unique_ptr<T> CreateUniquePtr(Args&&... args)
+{
+    std::unique_ptr<T> tPtr = nullptr;
+    try {
+        tPtr = std::make_unique<T>(args...);
+    } catch (const std::bad_alloc& except) {
+        LOGW("Create a new unique pointer failed. Error: %s", except.what());
+        return nullptr;
+    }
+    return tPtr;
+}
+
 std::string GenUniqueName(const std::string&, const std::string&, const std::string&);
 
 } // namespace NeuralNetworkRuntime
