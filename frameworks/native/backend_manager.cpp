@@ -29,6 +29,7 @@ BackendManager::~BackendManager()
 
 const std::vector<size_t>& BackendManager::GetAllBackendsID()
 {
+    const std::lock_guard<std::mutex> lock(m_mtx);
     m_tmpBackendIds.clear();
     std::shared_ptr<Backend> backend {nullptr};
     for (auto iter = m_backends.begin(); iter != m_backends.end(); ++iter) {
@@ -65,6 +66,7 @@ std::shared_ptr<Backend> BackendManager::GetBackend(size_t backendID) const
 
 const std::string& BackendManager::GetBackendName(size_t backendID)
 {
+    const std::lock_guard<std::mutex> lock(m_mtx);
     m_tmpBackendName.clear();
     if (m_backends.empty()) {
         LOGE("[BackendManager] GetBackendName failed, there is no registered backend can be used.");
