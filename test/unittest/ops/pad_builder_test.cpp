@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/pad_builder.h"
+#include "ops/pad_builder.h"
 
 #include "ops_test.h"
 

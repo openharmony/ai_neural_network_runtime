@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/avgpool_builder.h"
+#include "ops/avgpool_builder.h"
 
 #include "ops_test.h"
 

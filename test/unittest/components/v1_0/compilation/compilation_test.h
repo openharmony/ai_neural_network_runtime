@@ -18,8 +18,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frameworks/native/compilation.h"
-#include "frameworks/native/inner_model.h"
+#include "compilation.h"
+#include "inner_model.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

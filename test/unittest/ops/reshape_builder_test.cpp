@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/reshape_builder.h"
+#include "ops/reshape_builder.h"
 
 #include "ops_test.h"
 

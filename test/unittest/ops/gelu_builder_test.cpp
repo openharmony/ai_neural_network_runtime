@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/gelu_builder.h"
+#include "ops/gelu_builder.h"
 
 #include "ops_test.h"
 

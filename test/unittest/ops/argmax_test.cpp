@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/argmax_builder.h"
+#include "ops/argmax_builder.h"
 
 #include "ops_test.h"
 

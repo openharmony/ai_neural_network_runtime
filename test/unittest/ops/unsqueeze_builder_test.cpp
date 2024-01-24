@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/unsqueeze_builder.h"
+#include "ops/unsqueeze_builder.h"
 
 #include <gtest/gtest.h>
-#include "frameworks/native/nn_tensor.h"
+#include "nn_tensor.h"
 #include "ops_test.h"
 
 using namespace testing;

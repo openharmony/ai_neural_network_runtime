@@ -1,0 +1,136 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+
+config("nnrt_config") {
+  cflags = [ "-fstack-protector-all" ]
+  cflags_cc = [ "-fexceptions" ]
+  include_dirs = [
+    "../../..",
+    "./",
+    "../neural_network_core",
+    "../../../interfaces/innerkits/c",
+  ]
+}
+
+nnrt_sources = [
+  "hdi_device_v1_0.cpp",
+  "hdi_device_v2_0.cpp",
+  "hdi_prepared_model_v1_0.cpp",
+  "hdi_prepared_model_v2_0.cpp",
+  "inner_model.cpp",
+  "memory_manager.cpp",
+  "neural_network_runtime.cpp",
+  "neural_network_runtime_compat.cpp",
+  "nn_tensor.cpp",
+  "nnbackend.cpp",
+  "nncompiled_cache.cpp",
+  "nncompiler.cpp",
+  "nnexecutor.cpp",
+  "nntensor.cpp",
+  "ops_builder.cpp",
+  "ops_registry.cpp",
+  "quant_param.cpp",
+  "transform.cpp",
+]
+
+ops_sources = [
+  "ops/add_builder.cpp",
+  "ops/argmax_builder.cpp",
+  "ops/avgpool_builder.cpp",
+  "ops/batch_to_space_nd_builder.cpp",
+  "ops/batchnorm_builder.cpp",
+  "ops/bias_add_builder.cpp",
+  "ops/cast_builder.cpp",
+  "ops/concat_builder.cpp",
+  "ops/conv2d_builder.cpp",
+  "ops/conv2d_transpose_builder.cpp",
+  "ops/depthwise_conv2d_native_builder.cpp",
+  "ops/div_builder.cpp",
+  "ops/eltwise_builder.cpp",
+  "ops/expandims_builder.cpp",
+  "ops/fill_builder.cpp",
+  "ops/fullconnection_builder.cpp",
+  "ops/gather_builder.cpp",
+  "ops/gelu_builder.cpp",
+  "ops/hswish_builder.cpp",
+  "ops/layernorm_builder.cpp",
+  "ops/lessequal_builder.cpp",
+  "ops/matmul_builder.cpp",
+  "ops/maximum_builder.cpp",
+  "ops/maxpool_builder.cpp",
+  "ops/mul_builder.cpp",
+  "ops/onehot_builder.cpp",
+  "ops/ops_validation.cpp",
+  "ops/pad_builder.cpp",
+  "ops/pooling_builder.cpp",
+  "ops/pow_builder.cpp",
+  "ops/prelu_builder.cpp",
+  "ops/quant_dtype_cast_builder.cpp",
+  "ops/reduceall_builder.cpp",
+  "ops/reducemean_builder.cpp",
+  "ops/reduceprod_builder.cpp",
+  "ops/relu6_builder.cpp",
+  "ops/relu_builder.cpp",
+  "ops/reshape_builder.cpp",
+  "ops/resize_bilinear_builder.cpp",
+  "ops/rsqrt_builder.cpp",
+  "ops/scale_builder.cpp",
+  "ops/shape_builder.cpp",
+  "ops/sigmoid_builder.cpp",
+  "ops/slice_builder.cpp",
+  "ops/softmax_builder.cpp",
+  "ops/space_to_batch_nd_builder.cpp",
+  "ops/split_builder.cpp",
+  "ops/sqrt_builder.cpp",
+  "ops/squared_difference_builder.cpp",
+  "ops/squeeze_builder.cpp",
+  "ops/stack_builder.cpp",
+  "ops/strided_slice_builder.cpp",
+  "ops/sub_builder.cpp",
+  "ops/tanh_builder.cpp",
+  "ops/tile_builder.cpp",
+  "ops/top_k_builder.cpp",
+  "ops/transpose_builder.cpp",
+  "ops/unsqueeze_builder.cpp",
+]
+
+ohos_shared_library("libneural_network_runtime") {
+  sources = nnrt_sources
+  sources += ops_sources
+  output_extension = "so"
+
+  install_images = [
+    "system",
+    "updater",
+  ]
+
+  public_configs = [ ":nnrt_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "drivers_interface_nnrt:libnnrt_proxy_2.0",
+    "hdf_core:libhdf_utils",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+    "mindspore:mindir_lib",
+  ]
+
+  deps = [ "../neural_network_core:libneural_network_core" ]
+
+  subsystem_name = "ai"
+  innerapi_tags = [ "ndk" ]
+  part_name = "neural_network_runtime"
+}
