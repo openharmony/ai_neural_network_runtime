@@ -15,8 +15,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frameworks/native/validation.h"
-#include "frameworks/native/nn_tensor.h"
+#include "validation.h"
+#include "nn_tensor.h"
 
 using namespace testing;
 using namespace testing::ext;

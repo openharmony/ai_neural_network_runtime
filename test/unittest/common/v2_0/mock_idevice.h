@@ -18,9 +18,9 @@
 
 #include <gmock/gmock.h>
 
-#include "frameworks/native/hdi_prepared_model_v2_0.h"
-#include "frameworks/native/memory_manager.h"
-#include "frameworks/native/transform.h"
+#include "hdi_prepared_model_v2_0.h"
+#include "memory_manager.h"
+#include "transform.h"
 
 namespace OHOS {
 namespace HDI {

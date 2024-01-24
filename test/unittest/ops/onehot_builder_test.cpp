@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/onehot_builder.h"
+#include "ops/onehot_builder.h"
 
 #include "ops_test.h"
 

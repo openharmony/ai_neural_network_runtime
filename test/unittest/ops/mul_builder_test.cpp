@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/mul_builder.h"
+#include "ops/mul_builder.h"
 
 #include "ops_test.h"
 

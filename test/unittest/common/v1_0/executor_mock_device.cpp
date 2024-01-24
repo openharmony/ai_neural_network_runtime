@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/compilation.h"
-#include "frameworks/native/execution_plan.h"
-#include "frameworks/native/hdi_device_v1_0.h"
+#include "compilation.h"
+#include "execution_plan.h"
+#include "hdi_device_v1_0.h"
 #include "test/unittest/common/v1_0/mock_idevice.h"
 
 OH_NN_ReturnCode OHOS::HDI::Nnrt::V1_0::MockIPreparedModel::m_ExpectRetCode = OH_NN_OPERATION_FORBIDDEN;

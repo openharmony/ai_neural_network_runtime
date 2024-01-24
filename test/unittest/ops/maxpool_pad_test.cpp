@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/maxpool_builder.h"
+#include "ops/maxpool_builder.h"
 
 #include "ops_test.h"
 

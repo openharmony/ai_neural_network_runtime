@@ -17,8 +17,8 @@
 #include <gmock/gmock.h>
 
 #include "common/log.h"
-#include "frameworks/native/device_manager.h"
-#include "frameworks/native/hdi_device_v2_0.h"
+#include "device_manager.h"
+#include "hdi_device_v2_0.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"
 
 using namespace testing;

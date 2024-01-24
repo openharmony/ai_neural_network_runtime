@@ -18,7 +18,7 @@
 
 #include <gtest/gtest.h>
 #include <memory>
-#include "frameworks/native/ops_builder.h"
+#include "ops_builder.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

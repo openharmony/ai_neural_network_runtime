@@ -15,10 +15,10 @@
 
 #include <gtest/gtest.h>
 
-#include "frameworks/native/validation.h"
-#include "frameworks/native/ops_registry.h"
-#include "frameworks/native/ops/add_builder.h"
-#include "frameworks/native/ops/div_builder.h"
+#include "validation.h"
+#include "ops_registry.h"
+#include "ops/add_builder.h"
+#include "ops/div_builder.h"
 
 using namespace testing;
 using namespace testing::ext;

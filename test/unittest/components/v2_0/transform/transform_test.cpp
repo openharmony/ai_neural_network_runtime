@@ -15,8 +15,8 @@
 
 #include <gtest/gtest.h>
 
-#include "frameworks/native/transform.h"
-#include "frameworks/native/memory_manager.h"
+#include "transform.h"
+#include "memory_manager.h"
 
 using namespace testing;
 using namespace testing::ext;

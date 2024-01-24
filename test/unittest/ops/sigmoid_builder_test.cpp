@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/sigmoid_builder.h"
+#include "ops/sigmoid_builder.h"
 
 #include "ops_test.h"
 

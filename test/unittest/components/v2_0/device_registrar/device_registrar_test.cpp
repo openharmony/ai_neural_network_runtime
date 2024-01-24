@@ -20,9 +20,9 @@
 #include <gtest/gtest.h>
 
 #include "common/log.h"
-#include "frameworks/native/device_registrar.h"
-#include "frameworks/native/hdi_device_v2_0.h"
-#include "frameworks/native/device_manager.h"
+#include "device_registrar.h"
+#include "hdi_device_v2_0.h"
+#include "device_manager.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"
 
 using namespace testing;
