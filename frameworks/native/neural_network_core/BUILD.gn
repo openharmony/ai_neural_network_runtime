@@ -17,10 +17,10 @@ config("nnrt_config") {
   cflags = [ "-fstack-protector-all" ]
   cflags_cc = [ "-fexceptions" ]
   include_dirs = [
-    "../../..",
-    "../neural_network_runtime",
     "./",
+    "../neural_network_runtime",
     "../../../interfaces/innerkits/c",
+    "../../../interfaces/kits/c",
   ]
 }
 
@@ -41,6 +41,8 @@ ohos_shared_library("libneural_network_core") {
     "system",
     "updater",
   ]
+
+  include_dirs = [ "../../.." ]
 
   public_configs = [ ":nnrt_config" ]
 

@@ -47,7 +47,15 @@
                 },
                 {
                     "type": "so",
-                    "name": "//foundation/ai/neural_network_runtime:nncore_target",
+                    "name": "//foundation/ai/neural_network_runtime/frameworks/native/neural_network_core:libneural_network_core",
+                    "header": {
+                        "header_files": [],
+                        "header_base":"//foundation/ai/neural_network_runtime/interfaces/kits/c"
+                    }
+                },
+                {
+                    "type": "so",
+                    "name": "//foundation/ai/neural_network_runtime/frameworks/native/neural_network_runtime:libneural_network_runtime",
                     "header": {
                         "header_files": [],
                         "header_base":"//foundation/ai/neural_network_runtime/interfaces/kits/c"

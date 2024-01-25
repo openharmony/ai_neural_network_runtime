@@ -17,10 +17,10 @@ config("nnrt_config") {
   cflags = [ "-fstack-protector-all" ]
   cflags_cc = [ "-fexceptions" ]
   include_dirs = [
-    "../../..",
     "./",
     "../neural_network_core",
     "../../../interfaces/innerkits/c",
+    "../../../interfaces/kits/c",
   ]
 }
 
@@ -116,6 +116,8 @@ ohos_shared_library("libneural_network_runtime") {
     "updater",
   ]
 
+  include_dirs = [ "../../.." ]
+
   public_configs = [ ":nnrt_config" ]
 
   external_deps = [
@@ -125,7 +127,7 @@ ohos_shared_library("libneural_network_runtime") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 
   deps = [ "../neural_network_core:libneural_network_core" ]
