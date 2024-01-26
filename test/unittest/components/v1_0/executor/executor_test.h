@@ -20,7 +20,7 @@
 
 #include "mindir.h"
 
-#include "frameworks/native/executor.h"
+#include "executor.h"
 
 namespace MSLITE = mindspore::lite;
 namespace OHOS {

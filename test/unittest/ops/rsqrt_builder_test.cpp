@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/rsqrt_builder.h"
+#include "ops/rsqrt_builder.h"
 
 #include "ops_test.h"
 

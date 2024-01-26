@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/scale_builder.h"
+#include "ops/scale_builder.h"
 
 #include "ops_test.h"
 

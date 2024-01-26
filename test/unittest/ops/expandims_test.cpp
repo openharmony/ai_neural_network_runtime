@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/expandims_builder.h"
+#include "ops/expandims_builder.h"
 
 #include "ops_test.h"
 

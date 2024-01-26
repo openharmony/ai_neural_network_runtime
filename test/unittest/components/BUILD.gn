@@ -21,6 +21,8 @@ config("module_private_config") {
   include_dirs = [
     "//third_party/googletest/googlemock/include",
     "../../..",
+    "../../../frameworks/native/neural_network_runtime",
+    "../../../frameworks/native/neural_network_core",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
   ]
@@ -34,7 +36,8 @@ ohos_unittest("CompilationV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -57,7 +60,8 @@ ohos_unittest("ExecutorV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -80,7 +84,8 @@ ohos_unittest("DeviceManagerV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -102,7 +107,8 @@ ohos_unittest("DeviceRegistrarV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -125,7 +131,8 @@ ohos_unittest("HDIDeviceV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -148,7 +155,8 @@ ohos_unittest("HDIPreparedModelV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -170,7 +178,8 @@ ohos_unittest("MemoryManagerTest") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -190,7 +199,8 @@ ohos_unittest("TransformV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -211,7 +221,8 @@ ohos_unittest("InnerModelV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -233,7 +244,8 @@ ohos_unittest("NnTensorV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -255,7 +267,8 @@ ohos_unittest("NnValidationV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -277,7 +290,8 @@ ohos_unittest("OpsRegistryV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -302,7 +316,8 @@ ohos_unittest("NeuralNetworkRuntimeV1_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -325,7 +340,8 @@ ohos_unittest("CompilationV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -348,7 +364,8 @@ ohos_unittest("ExecutorV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -371,7 +388,8 @@ ohos_unittest("DeviceManagerV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -393,7 +411,8 @@ ohos_unittest("DeviceRegistrarV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -416,7 +435,8 @@ ohos_unittest("HDIDeviceV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -439,7 +459,8 @@ ohos_unittest("HDIPreparedModelV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -460,7 +481,8 @@ ohos_unittest("TransformV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -481,7 +503,8 @@ ohos_unittest("InnerModelV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -503,7 +526,8 @@ ohos_unittest("NnTensorV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -525,7 +549,8 @@ ohos_unittest("NnValidationV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -547,7 +572,8 @@ ohos_unittest("OpsRegistryV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -572,7 +598,8 @@ ohos_unittest("NeuralNetworkRuntimeV2_0Test") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "../../../frameworks:libneural_network_runtime",
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

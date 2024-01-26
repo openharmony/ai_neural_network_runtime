@@ -19,7 +19,9 @@ config("system_test_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/ai/neural_network_runtime",
+    "../..",
+    "../../frameworks/native/neural_network_runtime",
+    "../../frameworks/native/neural_network_core",
     "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
   ]
 
@@ -60,7 +62,8 @@ ohos_systemtest("End2EndTest") {
   configs = [ ":system_test_config" ]
 
   deps = [
-    "//foundation/ai/neural_network_runtime/frameworks:libneural_network_runtime",
+    "../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../frameworks/native/neural_network_runtime:libneural_network_runtime",
     "//third_party/googletest:gtest_main",
   ]
 

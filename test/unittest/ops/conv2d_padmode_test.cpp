@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/conv2d_builder.h"
+#include "ops/conv2d_builder.h"
 
 #include "ops_test.h"
 

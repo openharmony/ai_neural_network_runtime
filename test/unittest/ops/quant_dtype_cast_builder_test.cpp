@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/quant_dtype_cast_builder.h"
+#include "ops/quant_dtype_cast_builder.h"
 
 #include "ops_test.h"
 

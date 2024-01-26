@@ -20,7 +20,7 @@
 
 #include "mindir.h"
 
-#include "frameworks/native/nn_tensor.h"
+#include "nn_tensor.h"
 #include "test/unittest/common/base_test.h"
 
 namespace OHOS {

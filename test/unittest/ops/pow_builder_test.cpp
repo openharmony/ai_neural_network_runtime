@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/pow_builder.h"
+#include "ops/pow_builder.h"
 
 #include "ops_test.h"
 

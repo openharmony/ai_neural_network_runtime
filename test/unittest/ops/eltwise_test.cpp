@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/eltwise_builder.h"
+#include "ops/eltwise_builder.h"
 
 #include "ops_test.h"
 
