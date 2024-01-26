@@ -343,6 +343,14 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_SetPerformanceMode(OH_NNCompilation *
     Compilation* compilationImpr = reinterpret_cast<Compilation*>(compilation);
     compilationImpr->performance = performanceMode;
 
+    if (compilationImpr->compiler != nullptr) {
+        OH_NN_ReturnCode ret = compilationImpr->compiler->SetPerformance(performanceMode);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("OH_NNCompilation_SetPerformanceMode failed.");
+            return ret;
+        }
+    }
+
     return OH_NN_SUCCESS;
 }
 
@@ -355,6 +363,14 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_SetPriority(OH_NNCompilation *compila
 
     Compilation* compilationImpr = reinterpret_cast<Compilation*>(compilation);
     compilationImpr->priority = priority;
+
+    if (compilationImpr->compiler != nullptr) {
+        OH_NN_ReturnCode ret = compilationImpr->compiler->SetPriority(priority);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("OH_NNCompilation_SetPriority failed.");
+            return ret;
+        }
+    }
 
     return OH_NN_SUCCESS;
 }

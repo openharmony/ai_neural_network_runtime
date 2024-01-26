@@ -32,9 +32,9 @@ namespace OHOS {
 namespace NeuralNetworkRuntime {
 class BackendManager {
 public:
-    const std::vector<size_t>& GetAllBackendsID();
+    std::vector<size_t> GetAllBackendsID();
     std::shared_ptr<Backend> GetBackend(size_t backendID) const;
-    const std::string& GetBackendName(size_t backendID);
+    std::string GetBackendName(size_t backendID);
 
     // Register backend by C++ API
     OH_NN_ReturnCode RegisterBackend(std::function<std::shared_ptr<Backend>()> creator);
@@ -64,9 +64,6 @@ private:
     // key is the name of backend.
     std::unordered_map<size_t, std::shared_ptr<Backend>> m_backends;
     std::mutex m_mtx;
-
-    std::string m_tmpBackendName;
-    std::vector<size_t> m_tmpBackendIds;
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
