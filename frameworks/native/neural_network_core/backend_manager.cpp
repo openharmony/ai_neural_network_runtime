@@ -24,22 +24,20 @@ BackendManager::~BackendManager()
 {
     m_backends.clear();
     m_backendIDs.clear();
-    m_tmpBackendIds.clear();
 }
 
-const std::vector<size_t>& BackendManager::GetAllBackendsID()
+std::vector<size_t> BackendManager::GetAllBackendsID()
 {
-    const std::lock_guard<std::mutex> lock(m_mtx);
-    m_tmpBackendIds.clear();
+    std::vector<size_t> tmpBackendIds;
     std::shared_ptr<Backend> backend {nullptr};
     for (auto iter = m_backends.begin(); iter != m_backends.end(); ++iter) {
         backend = iter->second;
         if (!IsValidBackend(backend)) {
             continue;
         }
-        m_tmpBackendIds.emplace_back(iter->first);
+        tmpBackendIds.emplace_back(iter->first);
     }
-    return m_tmpBackendIds;
+    return tmpBackendIds;
 }
 
 std::shared_ptr<Backend> BackendManager::GetBackend(size_t backendID) const
@@ -64,13 +62,12 @@ std::shared_ptr<Backend> BackendManager::GetBackend(size_t backendID) const
     return iter->second;
 }
 
-const std::string& BackendManager::GetBackendName(size_t backendID)
+std::string BackendManager::GetBackendName(size_t backendID)
 {
-    const std::lock_guard<std::mutex> lock(m_mtx);
-    m_tmpBackendName.clear();
+    std::string tmpBackendName;
     if (m_backends.empty()) {
         LOGE("[BackendManager] GetBackendName failed, there is no registered backend can be used.");
-        return m_tmpBackendName;
+        return tmpBackendName;
     }
 
     auto iter = m_backends.begin();
@@ -82,15 +79,15 @@ const std::string& BackendManager::GetBackendName(size_t backendID)
 
     if (iter == m_backends.end()) {
         LOGE("[BackendManager] GetBackendName failed, backendID %{public}zu is not registered.", backendID);
-        return m_tmpBackendName;
+        return tmpBackendName;
     }
 
-    OH_NN_ReturnCode ret = iter->second->GetBackendName(m_tmpBackendName);
+    OH_NN_ReturnCode ret = iter->second->GetBackendName(tmpBackendName);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[BackendManager] GetBackendName failed, fail to get backendName from backend.");
     }
 
-    return m_tmpBackendName;
+    return tmpBackendName;
 }
 
 OH_NN_ReturnCode BackendManager::RegisterBackend(std::function<std::shared_ptr<Backend>()> creator)
