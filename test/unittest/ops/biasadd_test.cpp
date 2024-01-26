@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/bias_add_builder.h"
+#include "ops/bias_add_builder.h"
 
 #include "ops_test.h"
 

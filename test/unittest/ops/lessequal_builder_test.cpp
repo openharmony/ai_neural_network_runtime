@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/lessequal_builder.h"
+#include "ops/lessequal_builder.h"
 
 #include "ops_test.h"
 

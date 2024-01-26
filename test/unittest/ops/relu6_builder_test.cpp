@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/relu6_builder.h"
+#include "ops/relu6_builder.h"
 
 #include "ops_test.h"
 

@@ -14,9 +14,9 @@
  */
 
 #include "common/utils.h"
-#include "frameworks/native/device_manager.h"
-#include "frameworks/native/hdi_device_v1_0.h"
-#include "frameworks/native/nn_tensor.h"
+#include "device_manager.h"
+#include "hdi_device_v1_0.h"
+#include "nn_tensor.h"
 #include "test/unittest/common/v1_0/mock_idevice.h"
 
 OH_NN_ReturnCode OHOS::HDI::Nnrt::V1_0::MockIPreparedModel::m_ExpectRetCode = OH_NN_OPERATION_FORBIDDEN;

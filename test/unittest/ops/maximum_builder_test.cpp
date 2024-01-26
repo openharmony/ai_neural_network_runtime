@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/maximum_builder.h"
+#include "ops/maximum_builder.h"
 
 #include "ops_test.h"
 

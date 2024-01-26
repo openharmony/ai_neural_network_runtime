@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/resize_bilinear_builder.h"
+#include "ops/resize_bilinear_builder.h"
 
 #include "ops_test.h"
 

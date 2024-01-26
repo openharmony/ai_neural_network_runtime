@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/batchnorm_builder.h"
+#include "ops/batchnorm_builder.h"
 
 #include "ops_test.h"
 

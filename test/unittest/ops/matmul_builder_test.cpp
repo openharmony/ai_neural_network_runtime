@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/matmul_builder.h"
+#include "ops/matmul_builder.h"
 
 #include "ops_test.h"
 

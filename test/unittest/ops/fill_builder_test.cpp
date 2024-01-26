@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/fill_builder.h"
+#include "ops/fill_builder.h"
 
 #include "ops_test.h"
 

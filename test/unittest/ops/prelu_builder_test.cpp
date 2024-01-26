@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/prelu_builder.h"
+#include "ops/prelu_builder.h"
 
 #include "ops_test.h"
 
