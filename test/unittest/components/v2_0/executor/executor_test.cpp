@@ -16,8 +16,8 @@
 #include "executor_test.h"
 
 #include "common/scoped_trace.h"
-#include "frameworks/native/compilation.h"
-#include "frameworks/native/inner_model.h"
+#include "compilation.h"
+#include "inner_model.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"
 
 using namespace OHOS::NeuralNetworkRuntime;

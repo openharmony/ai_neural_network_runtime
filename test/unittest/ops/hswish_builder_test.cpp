@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/hswish_builder.h"
+#include "ops/hswish_builder.h"
 
 #include "ops_test.h"
 

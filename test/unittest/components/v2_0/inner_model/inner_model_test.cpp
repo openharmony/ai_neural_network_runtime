@@ -18,8 +18,8 @@
 
 #include "common/utils.h"
 #include "common/log.h"
-#include "frameworks/native/nn_tensor.h"
-#include "frameworks/native/inner_model.h"
+#include "nn_tensor.h"
+#include "inner_model.h"
 
 using namespace testing;
 using namespace testing::ext;

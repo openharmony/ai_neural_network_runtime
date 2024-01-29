@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/layernorm_builder.h"
+#include "ops/layernorm_builder.h"
 
 #include "ops_test.h"
 

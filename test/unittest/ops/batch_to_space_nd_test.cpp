@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/batch_to_space_nd_builder.h"
+#include "ops/batch_to_space_nd_builder.h"
 
 #include "ops_test.h"
 

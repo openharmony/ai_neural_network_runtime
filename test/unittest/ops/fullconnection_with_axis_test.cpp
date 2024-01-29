@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/fullconnection_builder.h"
+#include "ops/fullconnection_builder.h"
 
 #include "ops_test.h"
 
