@@ -16,7 +16,7 @@
 #include "neural_network_runtime_inner_test.h"
 
 #include "mindir.h"
-#include "frameworks/native/inner_model.h"
+#include "inner_model.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

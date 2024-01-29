@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/gather_builder.h"
+#include "ops/gather_builder.h"
 
 #include "ops_test.h"
 

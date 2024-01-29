@@ -15,9 +15,13 @@ import("//build/ohos.gni")
 
 group("nnrt_target") {
   deps = [
-    "frameworks:libneural_network_core",
-    "frameworks:libneural_network_runtime",
+    "frameworks/native/neural_network_core:libneural_network_core",
+    "frameworks/native/neural_network_runtime:libneural_network_runtime",
   ]
+}
+
+group("nncore_target") {
+  deps = [ "frameworks/native/neural_network_core:libneural_network_core" ]
 }
 
 group("nnrt_test_target") {

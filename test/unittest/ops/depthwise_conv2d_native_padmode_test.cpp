@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/depthwise_conv2d_native_builder.h"
+#include "ops/depthwise_conv2d_native_builder.h"
 
 #include "ops_test.h"
 

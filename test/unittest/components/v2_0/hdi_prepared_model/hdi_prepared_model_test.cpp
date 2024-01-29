@@ -21,9 +21,9 @@
 #include <gmock/gmock.h>
 
 #include "common/log.h"
-#include "frameworks/native/hdi_prepared_model_v2_0.h"
-#include "frameworks/native/memory_manager.h"
-#include "frameworks/native/transform.h"
+#include "hdi_prepared_model_v2_0.h"
+#include "memory_manager.h"
+#include "transform.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"
 #include "test/unittest/common/file_utils.h"
 

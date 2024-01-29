@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/cast_builder.h"
+#include "ops/cast_builder.h"
 
 #include "ops_test.h"
 

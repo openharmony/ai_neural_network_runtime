@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/div_builder.h"
+#include "ops/div_builder.h"
 
 #include "ops_test.h"
 

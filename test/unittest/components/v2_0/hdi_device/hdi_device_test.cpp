@@ -24,7 +24,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "frameworks/native/hdi_device_v2_0.h"
+#include "hdi_device_v2_0.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"
 #include "test/unittest/common/file_utils.h"
 

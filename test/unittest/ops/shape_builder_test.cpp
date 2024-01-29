@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/shape_builder.h"
+#include "ops/shape_builder.h"
 
 #include "ops_test.h"
 

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "frameworks/native/ops/reducemean_builder.h"
+#include "ops/reducemean_builder.h"
 
 #include "ops_test.h"
 

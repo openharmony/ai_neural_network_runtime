@@ -17,10 +17,10 @@
 #include <gtest/gtest.h>
 
 #include "common/utils.h"
-#include "frameworks/native/inner_model.h"
-#include "frameworks/native/hdi_device_v2_0.h"
-#include "frameworks/native/device_manager.h"
-#include "frameworks/native/ops/div_builder.h"
+#include "inner_model.h"
+#include "hdi_device_v2_0.h"
+#include "device_manager.h"
+#include "ops/div_builder.h"
 #include "mock_idevice.h"
 
 namespace OHOS {
