@@ -201,13 +201,13 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::ExportModelCache(std::vector<ModelBuffer>
     int bufferSize = 13;
     ModelBuffer modelBuffer;
     std::string aBuffer = "mock_buffer_a";
-    modelBuffer.buffer = (void*)aBuffer.c_str();
+    modelBuffer.buffer = static_cast<void*>(aBuffer.c_str());
     modelBuffer.length = bufferSize;
     modelCache.emplace_back(modelBuffer);
 
     ModelBuffer modelBuffer2;
     std::string bBuffer = "mock_buffer_b";
-    modelBuffer2.buffer = (void*)bBuffer.c_str();
+    modelBuffer2.buffer = static_cast<void*>(bBuffer.c_str());
     modelBuffer2.length = bufferSize;
     modelCache.emplace_back(modelBuffer2);
 
@@ -226,7 +226,7 @@ void* HDIDeviceV2_0::AllocateBuffer(size_t length)
         return nullptr;
     }
 
-    void* buffer = (void*)malloc(length);
+    void* buffer = static_cast<void*>(malloc(length));
     if (buffer == nullptr) {
         LOGE("HDIDeviceV2_0 mock AllocateBuffer failed, the buffer is nullptr");
         return nullptr;

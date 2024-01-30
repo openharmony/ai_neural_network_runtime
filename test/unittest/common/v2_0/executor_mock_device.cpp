@@ -45,7 +45,7 @@ void* HDIDeviceV2_0::AllocateBuffer(size_t length)
         return nullptr;
     }
 
-    void* buffer = (void*)malloc(length);
+    void* buffer = static_cast<void*>(malloc(length));
     if (buffer == nullptr) {
         LOGE("alloct buffer failed");
         return nullptr;
