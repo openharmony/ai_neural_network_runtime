@@ -30,6 +30,8 @@ nnrt_sources = [
   "hdi_prepared_model_v1_0.cpp",
   "hdi_prepared_model_v2_0.cpp",
   "inner_model.cpp",
+  "lite_graph_to_hdi_model_v1_0.cpp",
+  "lite_graph_to_hdi_model_v2_0.cpp",
   "memory_manager.cpp",
   "neural_network_runtime.cpp",
   "neural_network_runtime_compat.cpp",
@@ -127,6 +129,7 @@ ohos_shared_library("libneural_network_runtime") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
+    "ipc:ipc_core",
     "mindspore:mindir",
   ]
 
