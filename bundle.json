@@ -28,6 +28,7 @@
                 "hdf_core",
                 "hilog",
                 "hitrace",
+                "ipc",
                 "mindspore"
             ],
             "third_party": []
