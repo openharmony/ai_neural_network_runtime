@@ -19,6 +19,7 @@
 #include "mindir.h"
 
 #include "hdi_prepared_model_v1_0.h"
+#include "lite_graph_to_hdi_model_v1_0.h"
 #include "memory_manager.h"
 #include "transform.h"
 #include "common/log.h"
@@ -164,7 +165,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetSupportedOperation(std::shared_ptr<const mind
         }
     }
 
-    auto iModel = mindspore::lite::MindIR_LiteGraph_To_Model(model.get(), tensorBuffer);
+    auto iModel = V1::LiteGraph_To_HDIModel(model.get(), tensorBuffer);
     if (iModel == nullptr) {
         LOGE("Parse litegraph to hdi model failed.");
         ReleaseSharedBuffer(tensorBuffer);
@@ -173,7 +174,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::GetSupportedOperation(std::shared_ptr<const mind
 
     hdiRet = m_iDevice->GetSupportedOperation(*iModel, ops);
 
-    mindspore::lite::MindIR_Model_Destroy(&iModel);
+    V1::HDIModel_Destroy(&iModel);
     auto ret = ReleaseSharedBuffer(tensorBuffer);
     if (ret != OH_NN_SUCCESS) {
         LOGE("Release tensorBuffer failed.");
@@ -255,7 +256,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(std::shared_ptr<const mindspore::li
         }
     }
 
-    V1_0::Model* iModel = mindspore::lite::MindIR_LiteGraph_To_Model(model.get(), tensorBuffer);
+    V1_0::Model* iModel = V1::LiteGraph_To_HDIModel(model.get(), tensorBuffer);
     if (iModel == nullptr) {
         LOGE("Parse litegraph to hdi model failed.");
         ReleaseSharedBuffer(tensorBuffer);
@@ -270,7 +271,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(std::shared_ptr<const mindspore::li
 
     auto preparedRet = m_iDevice->PrepareModel(*iModel, iModelConfig, iPreparedModel);
 
-    mindspore::lite::MindIR_Model_Destroy(&iModel);
+    V1::HDIModel_Destroy(&iModel);
     auto ret = ReleaseSharedBuffer(tensorBuffer);
     if (ret != OH_NN_SUCCESS) {
         LOGE("Release tensorBuffer failed.");
