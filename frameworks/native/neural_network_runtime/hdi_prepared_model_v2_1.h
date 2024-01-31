@@ -27,16 +27,16 @@
 #include "hdi_prepared_model_v2_0.h"
 #include "refbase.h"
 
-namespace v2_1 = OHOS::HDI::Nnrt::v2_1;
+namespace V2_1 = OHOS::HDI::Nnrt::V2_1;
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 class HDIPreparedModelV2_1 : public HDIPreparedModelV2_0 {
 public:
-    explicit HDIPreparedModelV2_1(OHOS::sptr<v2_1::IPreparedModel> hdiPreparedModel);
+    explicit HDIPreparedModelV2_1(OHOS::sptr<V2_1::IPreparedModel> hdiPreparedModel);
 
 private:
-    OHOS::sptr<v2_1::IPreparedModel> m_hdiPreparedModel {nullptr};
+    OHOS::sptr<V2_1::IPreparedModel> m_hdiPreparedModel {nullptr};
 };
 } // namespace NeuralNetworkRuntime
 } // OHOS
