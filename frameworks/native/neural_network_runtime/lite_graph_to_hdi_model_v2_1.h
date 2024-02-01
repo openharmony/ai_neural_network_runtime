@@ -21,11 +21,11 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-namespace V2 {
+namespace NNRt_V2_1 {
 void HDIModel_Destroy(OHOS::HDI::Nnrt::V2_1::Model **model);
 OHOS::HDI::Nnrt::V2_1::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteGraph *lite_graph,
     const OHOS::HDI::Nnrt::V2_1::SharedBuffer &buffer);
-} // V2
+} // NNRt_V2_1
 } // NeuralNetworkRuntime
 } // OHOS
 
