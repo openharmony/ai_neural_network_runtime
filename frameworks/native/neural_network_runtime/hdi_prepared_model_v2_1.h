@@ -24,18 +24,35 @@
 #include <v2_1/nnrt_types.h>
 
 #include "cpp_type.h"
-#include "hdi_prepared_model_v2_0.h"
+#include "prepared_model.h"
 #include "refbase.h"
 
 namespace V2_1 = OHOS::HDI::Nnrt::V2_1;
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-class HDIPreparedModelV2_1 : public HDIPreparedModelV2_0 {
+class HDIPreparedModelV2_1 : public PreparedModel {
 public:
     explicit HDIPreparedModelV2_1(OHOS::sptr<V2_1::IPreparedModel> hdiPreparedModel);
 
+    OH_NN_ReturnCode ExportModelCache(std::vector<Buffer>& modelCache) override;
+
+    OH_NN_ReturnCode Run(const std::vector<IOTensor>& inputs,
+                         const std::vector<IOTensor>& outputs,
+                         std::vector<std::vector<int32_t>>& outputsDims,
+                         std::vector<bool>& isOutputBufferEnough) override;
+
+    OH_NN_ReturnCode Run(const std::vector<NN_Tensor*>& inputs,
+                         const std::vector<NN_Tensor*>& outputs,
+                         std::vector<std::vector<int32_t>>& outputsDims,
+                         std::vector<bool>& isOutputBufferEnough) override;
+
+    OH_NN_ReturnCode GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
+                                       std::vector<std::vector<uint32_t>>& maxInputDims) override;
+
 private:
+    // first: major version, second: minor version
+    std::pair<uint32_t, uint32_t> m_hdiVersion;
     OHOS::sptr<V2_1::IPreparedModel> m_hdiPreparedModel {nullptr};
 };
 } // namespace NeuralNetworkRuntime

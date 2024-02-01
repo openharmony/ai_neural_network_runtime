@@ -28,8 +28,7 @@ typedef void *PrimitivePtr;
 typedef void *TensorPtr;
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-namespace V2_1 {
-
+namespace V2 {
 std::vector<int8_t> ConvertAbs(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
@@ -1241,214 +1240,214 @@ std::vector<int8_t> ConvertErf(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> Convert(NodeType type, PrimitivePtr primitive)
+std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr primitive)
 {
     switch (type) {
-        case NODE_TYPE_ACTIVATION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ACTIVATION:
             return ConvertActivation(primitive);
             break;
-        case NODE_TYPE_ABS:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ABS:
             return ConvertAbs(primitive);
             break;
-        case NODE_TYPE_ADD_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ADD_FUSION:
             return ConvertAddFusion(primitive);
             break;
-        case NODE_TYPE_ARGMAX_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ARGMAX_FUSION:
             return ConvertArgMaxFusion(primitive);
             break;
-        case NODE_TYPE_AVGPOOL_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_AVGPOOL_FUSION:
             return ConvertAvgPoolFusion(primitive);
             break;
-        case NODE_TYPE_BATCH_TO_SPACE_ND:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_BATCH_TO_SPACE_ND:
             return ConvertBatchToSpaceND(primitive);
             break;
-        case NODE_TYPE_BIAS_ADD:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_BIAS_ADD:
             return ConvertBiasAdd(primitive);
             break;
-        case NODE_TYPE_BROADCAST_TO:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_BROADCAST_TO:
             return ConvertBroadcastTo(primitive);
             break;
-        case NODE_TYPE_CAST:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_CAST:
             return ConvertCast(primitive);
             break;
-        case NODE_TYPE_CLIP:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_CLIP:
             return ConvertClip(primitive);
             break;
-        case NODE_TYPE_CONCAT:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_CONCAT:
             return ConvertConcat(primitive);
             break;
-        case NODE_TYPE_CONV2D_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_CONV2D_FUSION:
             return ConvertConv2DFusion(primitive);
             break;
-        case NODE_TYPE_CONV2D_TRANSPOSE_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_CONV2D_TRANSPOSE_FUSION:
             return ConvertConv2dTransposeFusion(primitive);
             break;
-        case NODE_TYPE_CONSTANT_OF_SHAPE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_CONSTANT_OF_SHAPE:
             return ConvertConstantOfShape(primitive);
             break;
-        case NODE_TYPE_DEPTH_TO_SPACE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_DEPTH_TO_SPACE:
             return ConvertDepthToSpace(primitive);
             break;
-        case NODE_TYPE_DIV_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_DIV_FUSION:
             return ConvertDivFusion(primitive);
             break;
-        case NODE_TYPE_ELTWISE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ELTWISE:
             return ConvertEltwise(primitive);
             break;
-        case NODE_TYPE_EQUAL:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_EQUAL:
             return ConvertEqual(primitive);
             break;
-        case NODE_TYPE_EXPFUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_EXPFUSION:
             return ConvertExpFusion(primitive);
             break;
-        case NODE_TYPE_EXPAND_DIMS:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_EXPAND_DIMS:
             return ConvertExpandDims(primitive);
             break;
-        case NODE_TYPE_FLATTEN:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_FLATTEN:
             return ConvertFlatten(primitive);
             break;
-        case NODE_TYPE_FILL:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_FILL:
             return ConvertFill(primitive);
             break;
-        case NODE_TYPE_FULL_CONNECTION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_FULL_CONNECTION:
             return ConvertFullConnection(primitive);
             break;
-        case NODE_TYPE_FUSED_BATCH_NORM:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_FUSED_BATCH_NORM:
             return ConvertFusedBatchNorm(primitive);
             break;
-        case NODE_TYPE_GATHER:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_GATHER:
             return ConvertGather(primitive);
             break;
-        case NODE_TYPE_GREATER:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_GREATER:
             return ConvertGreater(primitive);
             break;
-        case NODE_TYPE_GREATER_EQUAL:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_GREATER_EQUAL:
             return ConvertGreaterEqual(primitive);
             break;
-        case NODE_TYPE_INSTANCE_NORM:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_INSTANCE_NORM:
             return ConvertInstanceNorm(primitive);
             break;
-        case NODE_TYPE_LAYER_NORM_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LAYER_NORM_FUSION:
             return ConvertLayerNormFusion(primitive);
             break;
-        case NODE_TYPE_LEAKY_RELU:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LEAKY_RELU:
             return ConvertLeakyRelu(primitive);
             break;
-        case NODE_TYPE_LESS:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LESS:
             return ConvertLess(primitive);
             break;
-        case NODE_TYPE_LESS_EQUAL:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LESS_EQUAL:
             return ConvertLessEqual(primitive);
             break;
-        case NODE_TYPE_LSTM:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LSTM:
             return ConvertLstm(primitive);
             break;
-        case NODE_TYPE_MATMUL_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_MATMUL_FUSION:
             return ConvertMatMulFusion(primitive);
             break;
-        case NODE_TYPE_MAXIMUM:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_MAXIMUM:
             return ConvertMaximum(primitive);
             break;
-        case NODE_TYPE_MAX_POOL_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_MAX_POOL_FUSION:
             return ConvertMaxPoolFusion(primitive);
             break;
-        case NODE_TYPE_MUL_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_MUL_FUSION:
             return ConvertMulFusion(primitive);
             break;
-        case NODE_TYPE_NOT_EQUAL:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_NOT_EQUAL:
             return ConvertNotEqual(primitive);
             break;
-        case NODE_TYPE_ONE_HOT:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ONE_HOT:
             return ConvertOneHot(primitive);
             break;
-        case NODE_TYPE_PAD_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_PAD_FUSION:
             return ConvertPadFusion(primitive);
             break;
-        case NODE_TYPE_POW_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_POW_FUSION:
             return ConvertPowFusion(primitive);
             break;
-        case NODE_TYPE_PRELU_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_PRELU_FUSION:
             return ConvertPReLUFusion(primitive);
             break;
-        case NODE_TYPE_QUANT_DTYPE_CAST:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_QUANT_DTYPE_CAST:
             return ConvertQuantDTypeCast(primitive);
             break;
-        case NODE_TYPE_RANGE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_RANGE:
             return ConvertRange(primitive);
             break;
-        case NODE_TYPE_REAL_DIV:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_REAL_DIV:
             return ConvertRealDiv(primitive);
             break;
-        case NODE_TYPE_REDUCE_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_REDUCE_FUSION:
             return ConvertReduceFusion(primitive);
             break;
-        case NODE_TYPE_RESHAPE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_RESHAPE:
             return ConvertReshape(primitive);
             break;
-        case NODE_TYPE_RESIZE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_RESIZE:
             return ConvertResize(primitive);
             break;
-        case NODE_TYPE_RSQRT:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_RSQRT:
             return ConvertRsqrt(primitive);
             break;
-        case NODE_TYPE_SCALE_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SCALE_FUSION:
             return ConvertScaleFusion(primitive);
             break;
-        case NODE_TYPE_SHAPE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SHAPE:
             return ConvertShape(primitive);
             break;
-        case NODE_TYPE_SLICE_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SLICE_FUSION:
             return ConvertSliceFusion(primitive);
             break;
-        case NODE_TYPE_SOFTMAX:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SOFTMAX:
             return ConvertSoftmax(primitive);
             break;
-        case NODE_TYPE_SPACE_TO_BATCH_ND:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SPACE_TO_BATCH_ND:
             return ConvertSpaceToBatchND(primitive);
             break;
-        case NODE_TYPE_SPLIT:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SPLIT:
             return ConvertSplit(primitive);
             break;
-        case NODE_TYPE_SQRT:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SQRT:
             return ConvertSqrt(primitive);
             break;
-        case NODE_TYPE_SQUARED_DIFFERENCE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SQUARED_DIFFERENCE:
             return ConvertSquaredDifference(primitive);
             break;
-        case NODE_TYPE_SQUEEZE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SQUEEZE:
             return ConvertSqueeze(primitive);
             break;
-        case NODE_TYPE_SQUARE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SQUARE:
             return ConvertSquare(primitive);
             break;
-        case NODE_TYPE_STACK:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_STACK:
             return ConvertStack(primitive);
             break;
-        case NODE_TYPE_STRIDED_SLICE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_STRIDED_SLICE:
             return ConvertStridedSlice(primitive);
             break;
-        case NODE_TYPE_SUB_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SUB_FUSION:
             return ConvertSubFusion(primitive);
             break;
-        case NODE_TYPE_TILE_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_TILE_FUSION:
             return ConvertTileFusion(primitive);
             break;
-        case NODE_TYPE_TOPK_FUSION:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_TOPK_FUSION:
             return ConvertTopKFusion(primitive);
             break;
-        case NODE_TYPE_TRANSPOSE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_TRANSPOSE:
             return ConvertTranspose(primitive);
             break;
-        case NODE_TYPE_UNSQUEEZE:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_UNSQUEEZE:
             return ConvertUnsqueeze(primitive);
             break;
-        case NODE_TYPE_UNSTACK:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_UNSTACK:
             return ConvertUnstack(primitive);
             break;
-        case NODE_TYPE_SELECT:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SELECT:
             return ConvertSelect(primitive);
             break;
-        case NODE_TYPE_ERF:
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ERF:
             return ConvertErf(primitive);
             break;
         default:
@@ -1545,7 +1544,8 @@ OHOS::HDI::Nnrt::V2_1::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteG
             LOGE("MindIR_LiteGraph_To_Model v2_1 failed, node primitive is nullptr.");
             return nullptr;
         }
-        tmp.nodeType = static_cast<NodeType>(mindspore::lite::MindIR_Primitive_GetType(node->primitive_));
+        tmp.nodeType = static_cast<OHOS::HDI::Nnrt::V2_1::NodeType>(
+            mindspore::lite::MindIR_Primitive_GetType(node->primitive_));
         tmp.nodeAttr = Convert(tmp.nodeType, node->primitive_);
         tmp.inputIndex = node->input_indices_;
         tmp.outputIndex = node->output_indices_;
@@ -1593,7 +1593,7 @@ OHOS::HDI::Nnrt::V2_1::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteG
         subGraph.emplace_back(tmp);
     }
 
-    auto *ret_model = new (std::nothrow) Model();
+    auto *ret_model = new (std::nothrow) OHOS::HDI::Nnrt::V2_1::Model();
     if (ret_model == nullptr) {
         LOGE("MindIR_LiteGraph_To_Model v2_1 failed, new Model failed.");
         return nullptr;
@@ -1606,7 +1606,6 @@ OHOS::HDI::Nnrt::V2_1::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteG
     ret_model->subGraph = subGraph;
     return ret_model;
 }
-
-} // v2_1
+} // v2
 } // NeuralNetworkRuntime
 } // OHOS
