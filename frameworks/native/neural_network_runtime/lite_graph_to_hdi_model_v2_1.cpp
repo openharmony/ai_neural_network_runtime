@@ -28,7 +28,7 @@ typedef void *PrimitivePtr;
 typedef void *TensorPtr;
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-namespace V2 {
+namespace NNRt_V2_1 {
 std::vector<int8_t> ConvertAbs(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
@@ -1606,6 +1606,6 @@ OHOS::HDI::Nnrt::V2_1::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteG
     ret_model->subGraph = subGraph;
     return ret_model;
 }
-} // v2
+} // NNRt_V2_1
 } // NeuralNetworkRuntime
 } // OHOS
