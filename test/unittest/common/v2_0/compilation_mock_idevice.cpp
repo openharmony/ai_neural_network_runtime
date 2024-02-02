@@ -226,7 +226,7 @@ void* HDIDeviceV2_0::AllocateBuffer(size_t length)
         return nullptr;
     }
 
-    void* buffer = static_cast<void*>(malloc(length));
+    void* buffer = malloc(length);
     if (buffer == nullptr) {
         LOGE("HDIDeviceV2_0 mock AllocateBuffer failed, the buffer is nullptr");
         return nullptr;
