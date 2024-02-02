@@ -19,6 +19,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <map>
 
 #include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
 
@@ -37,6 +38,9 @@ struct ModelConfig {
     bool enableFloat16;
     OH_NN_PerformanceMode mode;
     OH_NN_Priority priority;
+    std::string isProfiling;
+    std::string cachePath;
+    std::map<std::string, std::string> opLayout;
 };
 
 struct Buffer {
