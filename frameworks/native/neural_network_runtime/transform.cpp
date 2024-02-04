@@ -161,9 +161,10 @@ OH_NN_DataType MSToNN::TransformDataType(mindspore::lite::DataType type)
 std::vector<QuantParam> MSToNN::TransformQuantParams(std::vector<mindspore::lite::QuantParam> msQuantParams)
 {
     std::vector<QuantParam> nnQuantParam;
-    for (const mindspore::lite::QuantParam& param : msQuantParams) {
-        nnQuantParam.emplace_back((QuantParam){param.numBits, param.scale, param.zeroPoint});
-    }
+    std::transform(msQuantParams.begin(), msQuantParams.end(), std::back_inserter(nnQuantParam),
+        [](mindspore::lite::QuantParam quantParam) {
+            return (QuantParam){quantParam.numBits, quantParam.scale, quantParam.zeroPoint};
+        });
     return nnQuantParam;
 }
 

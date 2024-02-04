@@ -35,18 +35,20 @@ OH_NN_ReturnCode SplitBuilder::SetInputAndOutput(const std::vector<uint32_t> &in
     }
 
     auto allTensorSize = allTensors.size();
-    for (auto index : inputsIndex) {
-        if (index >= allTensorSize) {
-            LOGE("[SplitBuilder] InputsIndex of Split is out of range.");
-            return OH_NN_INVALID_PARAMETER;
-        }
+    bool isOverTensorSize = std::any_of(inputsIndex.begin(), inputsIndex.end(), [allTensorSize](uint32_t index) {
+        return index >= allTensorSize;
+    });
+    if (isOverTensorSize) {
+        LOGE("[SplitBuilder] InputsIndex of Split is out of range.");
+        return OH_NN_INVALID_PARAMETER;
     }
 
-    for (auto index : outputsIndex) {
-        if (index >= allTensorSize) {
-            LOGE("[SplitBuilder] OutputsIndex of Split is out of range.");
-            return OH_NN_INVALID_PARAMETER;
-        }
+    isOverTensorSize = std::any_of(outputsIndex.begin(), outputsIndex.end(), [allTensorSize](uint32_t index) {
+        return index >= allTensorSize;
+    });
+    if (isOverTensorSize) {
+        LOGE("[SplitBuilder] InputsIndex of Split is out of range.");
+        return OH_NN_INVALID_PARAMETER;
     }
 
     m_inputsIndex = inputsIndex;
