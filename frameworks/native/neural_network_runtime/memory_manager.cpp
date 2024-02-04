@@ -31,7 +31,7 @@ void* MemoryManager::MapMemory(int fd, size_t length)
         return nullptr;
     }
 
-    if (length <= 0 || length > ALLOCATE_BUFFER_LIMIT) {
+    if (length == 0 || length > ALLOCATE_BUFFER_LIMIT) {
         LOGE("Invalid buffer size, it must greater than 0 and less than 1Gb. length=%zu", length);
         return nullptr;
     }

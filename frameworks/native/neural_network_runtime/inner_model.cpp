@@ -421,7 +421,7 @@ OH_NN_ReturnCode InnerModel::AddOperation(OH_NN_OperationType opType, const OH_N
     }
     std::vector<uint32_t> parameters = ConstructVectorFromArray(paramIndices.data, paramIndices.size);
 
-    Ops::OpsRegistry& opsRegistry = Ops::OpsRegistry::GetSingleton();
+    const Ops::OpsRegistry& opsRegistry = Ops::OpsRegistry::GetSingleton();
     std::unique_ptr<Ops::OpsBuilder> opsBuilder = opsRegistry.GetOpsBuilder(opType);
     if (opsBuilder == nullptr) {
         LOGE("AddOperation failed, cannot add operation of type: %d.", opType);
@@ -460,13 +460,15 @@ OH_NN_ReturnCode InnerModel::SpecifyInputsAndOutputs(
     m_inputIndices = ConstructVectorFromArray(inputIndices.data, inputIndices.size);
     m_outputIndices = ConstructVectorFromArray(outputIndices.data, outputIndices.size);
 
-    for (uint32_t i : m_inputIndices) {
-        m_inputTensors.emplace_back(m_allTensors[i]);
-    }
+    std::transform(m_inputIndices.begin(), m_inputIndices.end(), std::back_inserter(m_inputTensors),
+        [this](uint32_t i) {
+            return m_allTensors[i];
+        });
 
-    for (uint32_t i : m_outputIndices) {
-        m_outputTensors.emplace_back(m_allTensors[i]);
-    }
+    std::transform(m_outputIndices.begin(), m_outputIndices.end(), std::back_inserter(m_outputTensors),
+        [this](uint32_t i) {
+            return m_allTensors[i];
+        });
 
     return OH_NN_SUCCESS;
 }
@@ -629,14 +631,12 @@ void InnerModel::AddTensorsToLiteGraph(std::unordered_map<uint32_t, uint32_t>& m
     // Note: Indices in m_inputIndices and m_outputIndices have been checked in SpecifyInputAndOutput(), there is no
     // need to check twice.
     std::vector<uint32_t>& inputIndices = m_liteGraph->input_indices_;
-    for (uint32_t index : m_inputIndices) {
-        inputIndices.emplace_back(modelIDToGraphID.at(index));
-    }
+    std::transform(m_inputIndices.begin(), m_inputIndices.end(), std::back_inserter(inputIndices),
+        [modelIDToGraphID](uint32_t index) {return modelIDToGraphID.at(index);});
 
     std::vector<uint32_t>& outputIndices = m_liteGraph->output_indices_;
-    for (uint32_t index : m_outputIndices) {
-        outputIndices.emplace_back(modelIDToGraphID.at(index));
-    }
+    std::transform(m_outputIndices.begin(), m_outputIndices.end(), std::back_inserter(outputIndices),
+        [modelIDToGraphID](uint32_t index) {return modelIDToGraphID.at(index);});
 }
 
 OH_NN_ReturnCode InnerModel::AddNodesToLiteGraph(const std::unordered_map<uint32_t, uint32_t>& modelIDToGraphID)
