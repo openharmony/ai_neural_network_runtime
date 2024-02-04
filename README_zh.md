@@ -11,7 +11,7 @@ Neural Network Runtime与MindSpore Lite使用MindIR统一模型的中间表达�
 通常，AI应用、AI推理引擎、Neural Network Runtime处在同一个进程下，芯片驱动运行在另一个进程下，两者之间需要借助进程间通信（IPC）传递模型和计算数据。Neural Network Runtime根据HDI接口实现了HDI客户端，相应的，芯片厂商需要根据HDI接口实现并开放HDI服务。
 
 **图1** Neural Network Runtime架构图
-!["Neural Network Runtime架构图"](./figures/neural_network_runtime_intro.png)
+!["Neural Network Runtime架构图"](./figures/zh-cn_neural_network_runtime_intro.jpg)
 
 ## 目录
 
@@ -49,15 +49,15 @@ Neural Network Runtime与MindSpore Lite使用MindIR统一模型的中间表达�
 
 ### 接口说明
 
-- Native接口文档请参考：[Native接口](https://gitee.com/openharmony/ai_neural_network_runtime/tree/master/interfaces/kits/c)。
-- HDI接口文档请参考：[HDI接口](https://gitee.com/openharmony/drivers_interface/tree/master/nnrt)。
+- Native接口文档请参考：[Native接口](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/native-apis/_neural_nework_runtime.md)。
+- HDI接口文档请参考：[HDI接口](https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/reference/hdi-apis/_n_n_rt.md)。
 
 ### 使用说明
 
-- AI推理引擎/应用开发请参考：[Neural Network Runtime应用开发指导](./neural-network-runtime-guidelines.md)。
-- AI加速芯片驱动/设备开发请参考：[Neural Network Runtime设备开发指导](./example/drivers/README_zh.md)。
+- AI推理引擎/应用开发请参考：[Neural Network Runtime对接AI推理框架开发指导](./neural-network-runtime-guidelines.md)。
+- AI加速芯片驱动/设备开发请参考：[Neural Network Runtime设备接入指导](./example/drivers/README_zh.md)。
 
 ## 相关仓
 
-- [**neural_network_runtime**](https://gitee.com/openharmony-sig/neural_network_runtime)
+- [**neural_network_runtime**](https://gitee.com/openharmony/neural_network_runtime)
 - [third_party_mindspore](https://gitee.com/openharmony/third_party_mindspore)
