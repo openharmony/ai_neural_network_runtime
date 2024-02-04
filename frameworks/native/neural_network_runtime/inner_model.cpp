@@ -148,7 +148,8 @@ OH_NN_ReturnCode InnerModel::BuildFromLiteGraph(const MSLITE::LiteGraph* liteGra
 }
 
 OH_NN_ReturnCode InnerModel::BuildFromMetaGraph(
-    const void* metaGraph, const Buffer& quantBuffer, const std::string& modelName)
+    const void* metaGraph, const Buffer& quantBuffer, const std::string& modelName, const std::string& isProfiling,
+    std::map<std::string, std::string>& opLayouts)
 {
     NNRT_TRACE_NAME("Build model from meta graph");
     if (metaGraph == nullptr) {
@@ -169,7 +170,8 @@ OH_NN_ReturnCode InnerModel::BuildFromMetaGraph(
     m_metaGraph = const_cast<void*>(metaGraph);
     m_quantBuffer = quantBuffer;
     m_modelName = modelName;
-
+    m_isProfiling = isProfiling;
+    m_opLayouts = opLayouts;
     return OH_NN_SUCCESS;
 }
 
@@ -761,6 +763,16 @@ Buffer InnerModel::GetQuantBuffer() const
 std::string InnerModel::GetModelName() const
 {
     return m_modelName;
+}
+
+std::string InnerModel::GetProfiling() const
+{
+    return m_isProfiling;
+}
+
+std::map<std::string, std::string> InnerModel::GetOpLayouts() const
+{
+    return m_opLayouts;
 }
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS

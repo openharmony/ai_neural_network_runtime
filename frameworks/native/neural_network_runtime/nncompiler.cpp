@@ -128,6 +128,8 @@ NNCompiler::NNCompiler(const void* model, std::shared_ptr<Device> device, size_t
     m_metaGraph = m_innerModel->GetMetaGraph();
     m_quantBuffer = m_innerModel->GetQuantBuffer();
     m_modelName = m_innerModel->GetModelName();
+    m_isProfiling = m_innerModel->GetProfiling();
+    m_opLayouts = m_innerModel->GetOpLayouts();
 }
 
 NNCompiler::~NNCompiler()
@@ -373,7 +375,7 @@ OH_NN_ReturnCode NNCompiler::NormalBuild()
     }
 
     ModelConfig config {m_enableFp16, static_cast<OH_NN_PerformanceMode>(m_performance),
-        static_cast<OH_NN_Priority>(m_priority)};
+        static_cast<OH_NN_Priority>(m_priority), m_isProfiling, m_cachePath, m_opLayouts};
     if (m_liteGraph != nullptr) {
         ret = m_device->PrepareModel(m_liteGraph, config, m_preparedModel);
     }
