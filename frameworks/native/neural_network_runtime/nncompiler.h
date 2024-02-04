@@ -83,7 +83,7 @@ private:
     Buffer m_quantBuffer {nullptr, 0};
     std::string m_modelName;
     std::string m_isProfiling;
-    std::map<std:string, std::string> m_opLayouts;
+    std::map<std::string, std::string> m_opLayouts;
     void* m_metaGraph {nullptr};
     InnerModel* m_innerModel {nullptr};
     std::shared_ptr<mindspore::lite::LiteGraph> m_liteGraph {nullptr};

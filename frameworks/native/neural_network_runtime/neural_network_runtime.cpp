@@ -345,7 +345,7 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromMetaGraph(OH_NNModel *model, const
             LOGI("OH_NNModel_BuildFromMetaGraph isProfiling enable.");
         } else if (name == "opLayout") {
             opLayout.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
-            opLayout.insert({opLayout, "hiai::ExecuteDevice::CPU"});
+            opLayouts.insert({opLayout, "hiai::ExecuteDevice::CPU"});
             LOGI("OH_NNModel_BuildFromMetaGraph opLayout:%{public}s.", opLayout.c_str());
         }
     }
