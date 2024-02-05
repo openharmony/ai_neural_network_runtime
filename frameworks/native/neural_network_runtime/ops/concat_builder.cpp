@@ -105,18 +105,20 @@ OH_NN_ReturnCode ConcatBuilder::SetInputsAndOutputs(const std::vector<uint32_t>&
                                                     const std::vector<std::shared_ptr<NNTensor>>& allTensors)
 {
     size_t allTensorsSize = allTensors.size();
-    for (auto index : inputsIndex) {
-        if (index >= allTensorsSize) {
-            LOGE("[Concat] Invalid input index, it is out of range %zu.", allTensorsSize);
-            return OH_NN_INVALID_PARAMETER;
-        }
+    bool isOverTensorSize = std::any_of(inputsIndex.begin(), inputsIndex.end(), [allTensorsSize](uint32_t index) {
+        return index >= allTensorsSize;
+    });
+    if (isOverTensorSize) {
+        LOGE("[Concat] Invalid input index, it is out of range %zu.", allTensorsSize);
+        return OH_NN_INVALID_PARAMETER;
     }
 
-    for (auto index : outputsIndex) {
-        if (index >= allTensorsSize) {
-            LOGE("[Concat] Invalid output index, it is out of range %zu.", allTensorsSize);
-            return OH_NN_INVALID_PARAMETER;
-        }
+    isOverTensorSize = std::any_of(outputsIndex.begin(), outputsIndex.end(), [allTensorsSize](uint32_t index) {
+        return index >= allTensorsSize;
+    });
+    if (isOverTensorSize) {
+        LOGE("[Concat] Invalid output index, it is out of range %zu.", allTensorsSize);
+        return OH_NN_INVALID_PARAMETER;
     }
 
     m_inputsIndex.clear();

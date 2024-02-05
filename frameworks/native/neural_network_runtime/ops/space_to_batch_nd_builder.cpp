@@ -161,8 +161,8 @@ OH_NN_ReturnCode SpaceToBatchNDBuilder::SetPadData(std::shared_ptr<NNTensor> ten
     for (int i = 0; i < PADDINGS_DATA_SIZE; i++) {
         std::vector<int64_t> vect_data;
         vect_data.reserve(VECT_DATA_SIZE);
-        for (int i = 0; i < VECT_DATA_SIZE; ++i) {
-            vect_data.push_back(paddingsData[i]);
+        for (int j = 0; j < VECT_DATA_SIZE; ++j) {
+            vect_data.push_back(paddingsData[j]);
         }
         paddings.push_back(vect_data);
     }

@@ -28,19 +28,21 @@ void DestroyLiteGraphPrimitive(void* primitive)
 void OpsBuilder::GetInputIndex(std::vector<uint32_t>& inputsIndex,
                                const std::unordered_map<uint32_t, uint32_t>& modelIDToGraphID) const
 {
-    for (auto index : m_inputsIndex) {
-        // index has been prevented from taking value out of modelIDToGraphID, no need to check.
-        inputsIndex.emplace_back(modelIDToGraphID.at(index));
-    }
+    // index has been prevented from taking value out of modelIDToGraphID, no need to check.
+    std::transform(m_inputsIndex.begin(), m_inputsIndex.end(), std::back_inserter(inputsIndex),
+        [modelIDToGraphID](uint32_t index) {
+            return modelIDToGraphID.at(index);
+        });
 }
 
 void OpsBuilder::GetOutputIndex(std::vector<uint32_t>& outputsIndex,
                                 const std::unordered_map<uint32_t, uint32_t>& modelIDToGraphID) const
 {
-    for (auto index : m_outputsIndex) {
-        // index has been prevented from taking value out of modelIDToGraphID, no need to check.
-        outputsIndex.emplace_back(modelIDToGraphID.at(index));
-    }
+    // index has been prevented from taking value out of modelIDToGraphID, no need to check.
+    std::transform(m_outputsIndex.begin(), m_outputsIndex.end(), std::back_inserter(outputsIndex),
+        [modelIDToGraphID](uint32_t index) {
+            return modelIDToGraphID.at(index);
+        });
 }
 
 std::string OpsBuilder::GetName() const
@@ -71,18 +73,20 @@ OH_NN_ReturnCode OpsBuilder::CheckIOIndex(const std::vector<uint32_t>& inputsInd
     }
 
     size_t allTensorsSize = allTensors.size();
-    for (auto index : inputsIndex) {
-        if (index >= allTensorsSize) {
-            LOGE("The index of inputs is out of range.");
-            return OH_NN_INVALID_PARAMETER;
-        }
+    bool isOverTensorSize = std::any_of(inputsIndex.begin(), inputsIndex.end(), [allTensorsSize](uint32_t index) {
+        return index >= allTensorsSize;
+    });
+    if (isOverTensorSize) {
+        LOGE("The index of inputs is out of range.");
+        return OH_NN_INVALID_PARAMETER;
     }
 
-    for (auto index : outputsIndex) {
-        if (index >= allTensorsSize) {
-            LOGE("The index of outputs is out of range.");
-            return OH_NN_INVALID_PARAMETER;
-        }
+    isOverTensorSize = std::any_of(outputsIndex.begin(), outputsIndex.end(), [allTensorsSize](uint32_t index) {
+        return index >= allTensorsSize;
+    });
+    if (isOverTensorSize) {
+        LOGE("The index of outputs is out of range.");
+        return OH_NN_INVALID_PARAMETER;
     }
 
     return OH_NN_SUCCESS;
