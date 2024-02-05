@@ -23,21 +23,13 @@ namespace NeuralNetworkRuntime {
 BackendManager::~BackendManager()
 {
     m_backends.clear();
+    m_backendNames.clear();
     m_backendIDs.clear();
 }
 
-std::vector<size_t> BackendManager::GetAllBackendsID()
+const std::vector<size_t>& BackendManager::GetAllBackendsID()
 {
-    std::vector<size_t> tmpBackendIds;
-    std::shared_ptr<Backend> backend {nullptr};
-    for (auto iter = m_backends.begin(); iter != m_backends.end(); ++iter) {
-        backend = iter->second;
-        if (!IsValidBackend(backend)) {
-            continue;
-        }
-        tmpBackendIds.emplace_back(iter->first);
-    }
-    return tmpBackendIds;
+    return m_backendIDs;
 }
 
 std::shared_ptr<Backend> BackendManager::GetBackend(size_t backendID) const
@@ -62,32 +54,27 @@ std::shared_ptr<Backend> BackendManager::GetBackend(size_t backendID) const
     return iter->second;
 }
 
-std::string BackendManager::GetBackendName(size_t backendID)
+const std::string& BackendManager::GetBackendName(size_t backendID)
 {
-    std::string tmpBackendName;
-    if (m_backends.empty()) {
+    std::string emptyName;
+    if (m_backendNames.empty()) {
         LOGE("[BackendManager] GetBackendName failed, there is no registered backend can be used.");
-        return tmpBackendName;
+        return emptyName;
     }
 
-    auto iter = m_backends.begin();
+    auto iter = m_backendNames.begin();
     if (backendID == static_cast<size_t>(0)) {
         LOGI("[BackendManager] the backendID is 0, default return 1st backend.");
     } else {
-        iter = m_backends.find(backendID);
+        iter = m_backendNames.find(backendID);
     }
 
-    if (iter == m_backends.end()) {
+    if (iter == m_backendNames.end()) {
         LOGE("[BackendManager] GetBackendName failed, backendID %{public}zu is not registered.", backendID);
-        return tmpBackendName;
+        return emptyName;
     }
 
-    OH_NN_ReturnCode ret = iter->second->GetBackendName(tmpBackendName);
-    if (ret != OH_NN_SUCCESS) {
-        LOGE("[BackendManager] GetBackendName failed, fail to get backendName from backend.");
-    }
-
-    return tmpBackendName;
+    return iter->second;
 }
 
 OH_NN_ReturnCode BackendManager::RegisterBackend(std::function<std::shared_ptr<Backend>()> creator)
@@ -106,14 +93,22 @@ OH_NN_ReturnCode BackendManager::RegisterBackend(std::function<std::shared_ptr<B
     size_t backendID = regBackend->GetBackendID();
 
     const std::lock_guard<std::mutex> lock(m_mtx);
-    auto setResult = m_backendIDs.emplace(backendID);
-    if (!setResult.second) {
+    auto iter = std::find(m_backendIDs.begin(), m_backendIDs.end(), backendID);
+    if (iter != m_backendIDs.end()) {
         LOGE("[BackendManager] RegisterBackend failed, backend already exists, cannot register again. "
              "backendID=%{public}zu", backendID);
         return OH_NN_FAILED;
     }
 
+    std::string tmpBackendName;
+    auto ret = regBackend->GetBackendName(tmpBackendName);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[BackendManager] RegisterBackend failed, fail to get backend name.");
+        return OH_NN_FAILED;
+    }
     m_backends.emplace(backendID, regBackend);
+    m_backendIDs.emplace_back(backendID);
+    m_backendNames.emplace(backendID, tmpBackendName);
     return OH_NN_SUCCESS;
 }
 
