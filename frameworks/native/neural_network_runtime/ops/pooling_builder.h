@@ -28,9 +28,9 @@ public:
     PoolingBuilder() = default;
     virtual ~PoolingBuilder() = default;
 
-    OH_NN_ReturnCode PoolingBuild(const std::vector<uint32_t>& inputsIndex,
+    OH_NN_ReturnCode PoolingBuild(const std::vector<uint32_t>& paramsIndex,
+                                  const std::vector<uint32_t>& inputsIndex,
                                   const std::vector<uint32_t>& outputsIndex,
-                                  const std::vector<uint32_t>& paramsIndex,
                                   const std::vector<std::shared_ptr<NNTensor>>& allTensors);
 
     OH_NN_ReturnCode SetInputAndOutput(const std::vector<uint32_t>& inputsIndex,

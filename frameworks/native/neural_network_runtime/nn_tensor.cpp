@@ -28,7 +28,6 @@
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 const uint32_t SUPPORT_NUM_BIT = 8; // Currently support 8-bit quantization only
-const uint32_t INVALID_NUM_BIT = 0;
 
 void DestroyLiteGraphTensor(void* tensor)
 {
@@ -317,12 +316,13 @@ OH_NN_ReturnCode NNTensor::ParseQuantParams(const OH_NN_QuantParam* quantParam)
 
 OH_NN_ReturnCode NNTensor::ValidateQuantParams(const std::vector<QuantParam>& quantParams)
 {
-    for (const QuantParam& param : quantParams) {
-        // Only support 8-bit quantization in NNR version 1.0
-        if ((param.numBits != SUPPORT_NUM_BIT) || (param.numBits == INVALID_NUM_BIT)) {
-            LOGE("ValidateQuantParams failed, get invalid numBits %d.", param.numBits);
+    // Only support 8-bit quantization in NNR version 1.0
+    auto paramIt = std::find_if(quantParams.begin(), quantParams.end(), [](QuantParam quant) {
+        return  quant.numBits != SUPPORT_NUM_BIT;
+    });
+    if (paramIt != quantParams.end()) {
+            LOGE("ValidateQuantParams failed, get invalid numBits %d.", paramIt->numBits);
             return OH_NN_INVALID_PARAMETER;
-        }
     }
 
     return OH_NN_SUCCESS;
