@@ -16,7 +16,7 @@
     "component": {
         "name": "neural_network_runtime",
         "subsystem": "ai",
-        "syscap": [],
+        "syscap": [ "SystemCapability.AI.NeuralNetworkRuntime" ],
         "features": [],
         "adapted_system_type": ["standard"],
         "rom": "1024KB",
