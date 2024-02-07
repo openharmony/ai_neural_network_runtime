@@ -56,10 +56,9 @@ std::shared_ptr<Backend> BackendManager::GetBackend(size_t backendID) const
 
 const std::string& BackendManager::GetBackendName(size_t backendID)
 {
-    std::string emptyName;
     if (m_backendNames.empty()) {
         LOGE("[BackendManager] GetBackendName failed, there is no registered backend can be used.");
-        return emptyName;
+        return m_emptyBackendName;
     }
 
     auto iter = m_backendNames.begin();
@@ -71,7 +70,7 @@ const std::string& BackendManager::GetBackendName(size_t backendID)
 
     if (iter == m_backendNames.end()) {
         LOGE("[BackendManager] GetBackendName failed, backendID %{public}zu is not registered.", backendID);
-        return emptyName;
+        return m_emptyBackendName;
     }
 
     return iter->second;
