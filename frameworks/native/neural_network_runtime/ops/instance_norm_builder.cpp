@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {
-static const int INPUT_NUM = 1;
+static const int INPUT_NUM = 3;
 static const int OUTPUT_NUM = 1;
 static const int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "InstanceNorm";

@@ -1811,6 +1811,8 @@ typedef enum {
      *
      * Inputs:
      * * <b>input</b>: A 4-dimensional tensor(B, C, H, W).
+     * * <b>scale</b>: The input 1-dimensional scale tensor of channel size.
+     * * <b>bias</b>: The input 1-dimensional bias tensor of channel size.
      *
      * Parameters:
      * <b>epsilon</b>: A small value to ensure that the variance is not 0.

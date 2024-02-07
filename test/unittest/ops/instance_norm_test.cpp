@@ -32,14 +32,16 @@ public:
 protected:
     void SaveParamsTensor(OH_NN_DataType dataType,
         const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetInputTensor();
 
 protected:
     InstanceNormBuilder m_builder;
-    std::vector<uint32_t> m_inputs {0};
-    std::vector<uint32_t> m_outputs {1};
-    std::vector<uint32_t> m_params {2};
-    std::vector<int32_t> m_inputDim {2, 2, 2};
-    std::vector<int32_t> m_outputDim {2, 2, 2};
+    std::vector<uint32_t> m_inputs {0, 1, 2};
+    std::vector<uint32_t> m_outputs {3};
+    std::vector<uint32_t> m_params {4};
+    std::vector<int32_t> m_inputDim {2, 2, 2, 2};
+    std::vector<int32_t> m_scaleAndBiasDim {1};
+    std::vector<int32_t> m_outputDim {2, 2, 2, 2};
     std::vector<int32_t> m_paramDim {};
 };
 
@@ -57,6 +59,21 @@ void InstanceNormBuilderTest::SaveParamsTensor(OH_NN_DataType dataType,
     m_allTensors.emplace_back(epsilonTensor);
 }
 
+void InstanceNormBuilderTest::SetInputTensor()
+{
+    m_inputsIndex = m_inputs;
+    std::shared_ptr<NNTensor> inputTensor;
+    inputTensor = TransToNNTensor(OH_NN_FLOAT32, m_inputDim, nullptr, OH_NN_TENSOR);
+    m_allTensors.emplace_back(inputTensor);
+
+    std::shared_ptr<NNTensor> scaleTensor;
+    scaleTensor = TransToNNTensor(OH_NN_FLOAT32, m_scaleAndBiasDim, nullptr, OH_NN_TENSOR);
+    m_allTensors.emplace_back(scaleTensor);
+
+    std::shared_ptr<NNTensor> biasTensor;
+    biasTensor = TransToNNTensor(OH_NN_FLOAT32, m_scaleAndBiasDim, nullptr, OH_NN_TENSOR);
+    m_allTensors.emplace_back(biasTensor);
+}
 /**
  * @tc.name: instance_norm_build_001
  * @tc.desc: Verify that the build function returns a successful message.
@@ -64,7 +81,7 @@ void InstanceNormBuilderTest::SaveParamsTensor(OH_NN_DataType dataType,
  */
 HWTEST_F(InstanceNormBuilderTest, instance_norm_build_001, TestSize.Level2)
 {
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
+    SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
     SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_INSTANCE_NORM_EPSILON);
 
@@ -79,7 +96,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_001, TestSize.Level2)
  */
 HWTEST_F(InstanceNormBuilderTest, instance_norm_build_002, TestSize.Level2)
 {
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
+    SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
     SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_INSTANCE_NORM_EPSILON);
 
@@ -95,11 +112,11 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_002, TestSize.Level2)
  */
 HWTEST_F(InstanceNormBuilderTest, instance_norm_build_003, TestSize.Level2)
 {
-    m_inputs = {0, 1};
-    m_outputs = {2};
-    m_params = {3};
+    m_inputs = {0, 1, 2, 3};
+    m_outputs = {4};
+    m_params = {5};
 
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
+    SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
     SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_INSTANCE_NORM_EPSILON);
 
@@ -114,10 +131,10 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_003, TestSize.Level2)
  */
 HWTEST_F(InstanceNormBuilderTest, instance_norm_build_004, TestSize.Level2)
 {
-    m_outputs = {1, 2};
-    m_params = {3};
+    m_outputs = {3, 4};
+    m_params = {5};
 
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
+    SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
     SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_INSTANCE_NORM_EPSILON);
 
@@ -143,7 +160,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_005, TestSize.Level2)
  */
 HWTEST_F(InstanceNormBuilderTest, instance_norm_build_006, TestSize.Level2)
 {
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
+    SetInputTensor();
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -156,7 +173,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_006, TestSize.Level2)
  */
 HWTEST_F(InstanceNormBuilderTest, instance_norm_build_007, TestSize.Level2)
 {
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
+    SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
     std::shared_ptr<NNTensor> epsilonTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
         nullptr, OH_NN_INSTANCE_NORM_EPSILON);
@@ -177,7 +194,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_007, TestSize.Level2)
  */
 HWTEST_F(InstanceNormBuilderTest, instance_norm_build_008, TestSize.Level2)
 {
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
+    SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
     SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
 
@@ -192,7 +209,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_008, TestSize.Level2)
  */
 HWTEST_F(InstanceNormBuilderTest, instance_norm_build_009, TestSize.Level2)
 {
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
+    SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
     std::shared_ptr<NNTensor> epsilonTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDim,
         nullptr, OH_NN_INSTANCE_NORM_EPSILON);
@@ -209,7 +226,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_009, TestSize.Level2)
  */
 HWTEST_F(InstanceNormBuilderTest, instance_norm_getprimitive_001, TestSize.Level2)
 {
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
+    SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
     SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_INSTANCE_NORM_EPSILON);
 
