@@ -62,6 +62,7 @@ private:
 private:
     std::vector<size_t> m_backendIDs;
     std::unordered_map<size_t, std::string> m_backendNames;
+    std::string m_emptyBackendName;
     // key is the name of backend.
     std::unordered_map<size_t, std::shared_ptr<Backend>> m_backends;
     std::mutex m_mtx;
