@@ -49,7 +49,7 @@ In the root directory of the OpenHarmony source code, call the following command
 
 ### API Description
 
-- [Native API reference](https://gitee.com/openharmony/docs/blob/master/en/application-dev/reference/native-apis/_neural_network_runtime.md)
+- [Native API reference](https://gitee.com/openharmony/docs/tree/master/zh-cn/application-dev/reference/apis-neural-network-runtime-kit)
 - [HDI API reference](https://gitee.com/openharmony/drivers_interface/tree/master/nnrt)
 
 ### How to Use
@@ -59,5 +59,5 @@ In the root directory of the OpenHarmony source code, call the following command
 
 ## Repositories Involved
 
-- [**neural_network_runtime**](https://gitee.com/openharmony/neural_network_runtime)
+- [neural_network_runtime](https://gitee.com/openharmony/neural_network_runtime)
 - [third_party_mindspore](https://gitee.com/openharmony/third_party_mindspore)
