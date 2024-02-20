@@ -1715,7 +1715,7 @@ typedef enum {
      * this will return floating-point division.
      *
      * Inputs:
-     * * <b>input1</b>: <i>n</i>-dimensional tensor. 
+     * * <b>input1</b>: <i>n</i>-dimensional tensor.
      * * <b>input2</b>: <i>n</i>-dimensional tensor. Has the same data type as x.
      *
      * Outputs:
@@ -1740,7 +1740,8 @@ typedef enum {
 
     /**
      * Selects elements from input1 or input2, depending on condition.
-     * The <b>input1</b> and <b>input2</b> tensors must all have the same shape, and the output will also have that shape.
+     * The <b>input1</b> and <b>input2</b> tensors must all have the same shape,
+     * and the output will also have that shape.
      * The condition tensor must be a scalar if <b>input1</b> and <b>input2</b> are scalars.
      * If <b>input1<b> and <b>input2</b> are vectors or higher rank, then condition must be either a scalar,
      * a vector with size matching the first dimension of input1, or must have the same shape as input1.
