@@ -60,7 +60,7 @@ bool ValidateFuseType(OH_NN_FuseType fuseType)
 
 bool ValidateTensorType(OH_NN_TensorType nnTensorType)
 {
-    if ((nnTensorType >= OH_NN_TENSOR) && (nnTensorType <= OH_NN_UNSQUEEZE_AXIS)) {
+    if ((nnTensorType >= OH_NN_TENSOR) && (nnTensorType <= OH_NN_CLIP_MIN)) {
         return true;
     }
     return false;
