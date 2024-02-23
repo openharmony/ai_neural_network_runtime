@@ -74,6 +74,7 @@ void InstanceNormBuilderTest::SetInputTensor()
     biasTensor = TransToNNTensor(OH_NN_FLOAT32, m_scaleAndBiasDim, nullptr, OH_NN_TENSOR);
     m_allTensors.emplace_back(biasTensor);
 }
+
 /**
  * @tc.name: instance_norm_build_001
  * @tc.desc: Verify that the build function returns a successful message.

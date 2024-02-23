@@ -24,11 +24,56 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "Pow";
 
 PowBuilder::PowBuilder() {}
 
 PowBuilder::~PowBuilder() {}
+
+OH_NN_ReturnCode PowBuilder::SetScale(std::shared_ptr<NNTensor> tensor)
+{
+    if (tensor->GetDataType() != OH_NN_FLOAT32) {
+        LOGE("[Pow] The scale should be type OH_NN_FLOAT32.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (tensor->GetElementCount() != SCALAR_LENGTH) {
+        LOGE("[Pow] The scale should be scalar.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[Pow] Tensor buffer is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    m_scale = *(static_cast<const float*>(buffer));
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode PowBuilder::SetShift(std::shared_ptr<NNTensor> tensor)
+{
+    if (tensor->GetDataType() != OH_NN_FLOAT32) {
+        LOGE("[Pow] The shift should be type OH_NN_FLOAT32.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (tensor->GetElementCount() != SCALAR_LENGTH) {
+        LOGE("[Pow] The shift should be scalar.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[Pow] Tensor buffer is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    m_shift = *(static_cast<const float*>(buffer));
+
+    return OH_NN_SUCCESS;
+}
 
 OH_NN_ReturnCode PowBuilder::Build(const std::vector<uint32_t>& paramsIndex,
                                    const std::vector<uint32_t>& inputsIndex,
@@ -46,15 +91,31 @@ OH_NN_ReturnCode PowBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return returnCode;
     }
 
-    if (!paramsIndex.empty()) {
-        LOGW("[Pow] Build failed, pow expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
 
     SetQuantType(outputsIndex, allTensors);
+    
+    for (int i : paramsIndex) {
+        std::shared_ptr<NNTensor> tensor = allTensors[i];
+        tensor->IdentifyOpParameter();
+        switch (tensor->GetType()) {
+            case OH_NN_POW_SCALE:
+                returnCode = SetScale(tensor);
+                break;
+            case OH_NN_POW_SHIFT:
+                returnCode = SetShift(tensor);
+                break;
+            default:
+                LOGE("[Pow] Build failed, param invalid, type=%d", tensor->GetType());
+                return OH_NN_INVALID_PARAMETER;
+        }
+
+        if (returnCode != OH_NN_SUCCESS) {
+            LOGE("[Pow] Build failed, passed invalid param.");
+            return returnCode;
+        }
+    }
 
     m_name = OP_NAME;
     m_isBuild = true;
@@ -68,10 +129,7 @@ LiteGraphPrimitvePtr PowBuilder::GetPrimitive()
         return {nullptr, DestroyLiteGraphPrimitive};
     }
 
-    float scale{1.0};
-    float shift{0.0};
-
-    void* primitive = mindspore::lite::MindIR_PowFusion_CreatePrimitive(scale, shift);
+    void* primitive = mindspore::lite::MindIR_PowFusion_CreatePrimitive(m_scale, m_shift);
     LiteGraphPrimitvePtr graphPrimitivePtr(primitive, DestroyLiteGraphPrimitive);
     return graphPrimitivePtr;
 }

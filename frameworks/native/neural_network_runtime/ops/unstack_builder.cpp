@@ -19,7 +19,7 @@ namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
-static const int OUTPUT_NUM = 1;
+static const int OUTPUT_MIN_NUM = 1;
 static const int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "Unstack";
 
@@ -59,10 +59,29 @@ OH_NN_ReturnCode UnstackBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
-    auto ret = CheckIOIndex(inputsIndex, outputsIndex, allTensors, INPUT_NUM, OUTPUT_NUM);
-    if (ret != OH_NN_SUCCESS) {
-        LOGE("[Unstack] Build failed, passed invalid input or output index.");
-        return ret;
+    if (inputsIndex.size() != INPUT_NUM) {
+        LOGE("[Unstack] The number of index of inputs don't equal to %d.", INPUT_NUM);
+        return OH_NN_INVALID_PARAMETER;
+    }
+    
+    if (outputsIndex.size() < OUTPUT_MIN_NUM) {
+        LOGE("[Unstack] The number of index of outputs don't larger than %d.", OUTPUT_MIN_NUM);
+        return OH_NN_INVALID_PARAMETER;
+    }
+    
+    size_t allTensorsSize = allTensors.size();
+    for (auto index : inputsIndex) {
+        if (index >= allTensorsSize) {
+            LOGE("The index of inputs is out of range.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+    }
+
+    for (auto index : outputsIndex) {
+        if (index >= allTensorsSize) {
+            LOGE("The index of outputs is out of range.");
+            return OH_NN_INVALID_PARAMETER;
+        }
     }
 
     m_inputsIndex = inputsIndex;
