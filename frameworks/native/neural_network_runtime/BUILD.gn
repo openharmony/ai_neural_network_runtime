@@ -100,7 +100,6 @@ ops_sources = [
   "ops/mod_builder.cpp",
   "ops/mul_builder.cpp",
   "ops/neg_builder.cpp",
-  "ops/normalize_builder.cpp",
   "ops/notequal_builder.cpp",
   "ops/onehot_builder.cpp",
   "ops/ops_validation.cpp",

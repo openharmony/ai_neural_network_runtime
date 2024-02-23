@@ -2173,19 +2173,6 @@ typedef enum {
      * * <b>output</b>: A tensor of type bool with the shape that <b>input0</b> and <b>input1</b> broadcast to.
      */
     OH_NN_OPS_LOGICAL_OR = 90,
-
-    /**
-     * Shift and scale inputs into a distribution centered around 0 with standard deviation 1.
-     * It accomplishes this by precomputing the mean and variance of the data, and calling
-     * <b>(x - mean) / sqrt(var)</b> at runtime.
-     *
-     * Inputs:
-     * * <b>input</b>: <i>n</i>-dimensional tensor.
-     *
-     * Outputs:
-     * * <b>output</b>: A tensor, has the same shape and data type as the input.
-     */
-    OH_NN_OPS_NORMALIZE = 91,
 } OH_NN_OperationType;
 
 /**

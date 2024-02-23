@@ -850,22 +850,6 @@ std::vector<int8_t> ConvertNeg(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertCustomNormalize(PrimitivePtr primitive)
-{
-    if (primitive == nullptr) {
-        LOGE("ConvertCustomNormalize v2_1 failed, primitive is nullptr.");
-        return {};
-    }
-
-    CustomNormalize customNormalize{};
-
-    OHOS::MessageParcel data;
-    (void)CustomNormalizeBlockMarshalling(data, customNormalize);
-    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
-                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
-    return ret;
-}
-
 std::vector<int8_t> ConvertNotEqual(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
@@ -1606,9 +1590,6 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_NEG:
             return ConvertNeg(primitive);
-            break;
-        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_CUSTOM_NORMALIZE:
-            return ConvertCustomNormalize(primitive);
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_NOT_EQUAL:
             return ConvertNotEqual(primitive);
