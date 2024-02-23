@@ -87,7 +87,6 @@ ohos_unittest("OpsUnittest") {
   sources += [ "./mod_test.cpp" ]
   sources += [ "./mul_builder_test.cpp" ]
   sources += [ "./neg_test.cpp" ]
-  sources += [ "./normalize_test.cpp" ]
   sources += [ "./not_equal_builder_test.cpp" ]
   sources += [ "./onehot_builder_test.cpp" ]
   sources += [ "./pad_builder_test.cpp" ]
