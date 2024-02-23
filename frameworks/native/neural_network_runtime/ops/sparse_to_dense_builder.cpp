@@ -43,8 +43,8 @@ OH_NN_ReturnCode SparseToDenseBuilder::Build(const std::vector<uint32_t>& params
     }
     
     if (!paramsIndex.empty()) {
-        LOGW("[SparseToDense] Build failed, the sparseToDense expects no parameters,
-             but receive %zu", paramsIndex.size());
+        LOGW("[SparseToDense] Build failed, the sparseToDense expects no parameters, but receive %zu", \
+             paramsIndex.size());
         return OH_NN_INVALID_PARAMETER;
     }
 
