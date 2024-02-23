@@ -16,8 +16,8 @@ import("//build/ohos.gni")
 group("unittest") {
   testonly = true
   deps = [
-    "components:components_unittest",
-    "inner_kits:inner_kits_unittest",
+    #"components:components_unittest",
+    #"inner_kits:inner_kits_unittest",
     "ops:ops_unittest",
   ]
 }

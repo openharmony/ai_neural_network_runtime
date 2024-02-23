@@ -85,6 +85,23 @@ std::vector<int8_t> ConvertAddFusion(PrimitivePtr primitive)
     return ret;
 }
 
+std::vector<int8_t> ConvertAll(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertAll v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    All all{};
+    all.keepDims = mindspore::lite::MindIR_All_GetKeepDims(primitive);
+
+    OHOS::MessageParcel data;
+    (void)AllBlockMarshalling(data, all);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
 std::vector<int8_t> ConvertArgMaxFusion(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
@@ -100,6 +117,23 @@ std::vector<int8_t> ConvertArgMaxFusion(PrimitivePtr primitive)
 
     OHOS::MessageParcel data;
     (void)ArgMaxFusionBlockMarshalling(data, arg_max_fusion);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
+std::vector<int8_t> ConvertAssert(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertAssert v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    Assert assert{};
+    assert.summarize = mindspore::lite::MindIR_Assert_GetSummarize(primitive);
+
+    OHOS::MessageParcel data;
+    (void)AssertBlockMarshalling(data, assert);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -278,6 +312,22 @@ std::vector<int8_t> ConvertConv2dTransposeFusion(PrimitivePtr primitive)
 
     OHOS::MessageParcel data;
     (void)Conv2dTransposeFusionBlockMarshalling(data, conv2d_transpose_fusion);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
+std::vector<int8_t> ConvertCos(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertCos v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    Cos cos{};
+
+    OHOS::MessageParcel data;
+    (void)CosBlockMarshalling(data, cos);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -601,6 +651,70 @@ std::vector<int8_t> ConvertLessEqual(PrimitivePtr primitive)
     return ret;
 }
 
+std::vector<int8_t> ConvertLog(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertLog v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    Log log{};
+
+    OHOS::MessageParcel data;
+    (void)LogBlockMarshalling(data, log);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
+std::vector<int8_t> ConvertLogicalAnd(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertLogicalAnd v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    LogicalAnd logicalAnd{};
+
+    OHOS::MessageParcel data;
+    (void)LogicalAndBlockMarshalling(data, logicalAnd);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
+std::vector<int8_t> ConvertLogicalNot(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertLogicalNot v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    LogicalNot logicalNot{};
+
+    OHOS::MessageParcel data;
+    (void)LogicalNotBlockMarshalling(data, logicalNot);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
+std::vector<int8_t> ConvertLogicalOr(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertLogicalOr v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    LogicalOr logicalOr{};
+
+    OHOS::MessageParcel data;
+    (void)LogicalOrBlockMarshalling(data, logicalOr);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
 std::vector<int8_t> ConvertLstm(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
@@ -687,6 +801,22 @@ std::vector<int8_t> ConvertMaxPoolFusion(PrimitivePtr primitive)
     return ret;
 }
 
+std::vector<int8_t> ConvertMod(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertMod v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    Mod mod{};
+
+    OHOS::MessageParcel data;
+    (void)ModBlockMarshalling(data, mod);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
 std::vector<int8_t> ConvertMulFusion(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
@@ -699,6 +829,38 @@ std::vector<int8_t> ConvertMulFusion(PrimitivePtr primitive)
         mindspore::lite::MindIR_MulFusion_GetActivationType(primitive));
     OHOS::MessageParcel data;
     (void)MulFusionBlockMarshalling(data, mul_fusion);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
+std::vector<int8_t> ConvertNeg(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertNeg v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    Neg neg{};
+
+    OHOS::MessageParcel data;
+    (void)NegBlockMarshalling(data, neg);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
+std::vector<int8_t> ConvertCustomNormalize(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertCustomNormalize v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    CustomNormalize customNormalize{};
+
+    OHOS::MessageParcel data;
+    (void)CustomNormalizeBlockMarshalling(data, customNormalize);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -819,6 +981,22 @@ std::vector<int8_t> ConvertRange(PrimitivePtr primitive)
 
     OHOS::MessageParcel data;
     (void)RangeBlockMarshalling(data, range);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
+std::vector<int8_t> ConvertReciprocal(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertReciprocal v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    Reciprocal reciprocal{};
+
+    OHOS::MessageParcel data;
+    (void)ReciprocalBlockMarshalling(data, reciprocal);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -946,6 +1124,23 @@ std::vector<int8_t> ConvertShape(PrimitivePtr primitive)
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
 }
+
+std::vector<int8_t> ConvertSin(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertSin v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    Sin sin{};
+
+    OHOS::MessageParcel data;
+    (void)SinBlockMarshalling(data, sin);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
 std::vector<int8_t> ConvertSliceFusion(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
@@ -990,6 +1185,21 @@ std::vector<int8_t> ConvertSpaceToBatchND(PrimitivePtr primitive)
     space_to_batch_n_d.paddings = mindspore::lite::MindIR_SpaceToBatchND_GetPaddings(primitive);
     OHOS::MessageParcel data;
     (void)SpaceToBatchNDBlockMarshalling(data, space_to_batch_n_d);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
+std::vector<int8_t> ConvertSparseToDense(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertSparseToDense v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    SparseToDense sparseToDense{};
+    OHOS::MessageParcel data;
+    (void)SparseToDenseBlockMarshalling(data, sparseToDense);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1208,6 +1418,22 @@ std::vector<int8_t> ConvertUnstack(PrimitivePtr primitive)
     return ret;
 }
 
+std::vector<int8_t> ConvertWhere(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertWhere v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    Where where{};
+
+    OHOS::MessageParcel data;
+    (void)WhereBlockMarshalling(data, where);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
 std::vector<int8_t> ConvertSelect(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
@@ -1252,8 +1478,14 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ADD_FUSION:
             return ConvertAddFusion(primitive);
             break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ALL:
+            return ConvertAll(primitive);
+            break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ARGMAX_FUSION:
             return ConvertArgMaxFusion(primitive);
+            break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ASSERT:
+            return ConvertAssert(primitive);
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_AVGPOOL_FUSION:
             return ConvertAvgPoolFusion(primitive);
@@ -1281,6 +1513,9 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_CONV2D_TRANSPOSE_FUSION:
             return ConvertConv2dTransposeFusion(primitive);
+            break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_COS:
+            return ConvertCos(primitive);
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_CONSTANT_OF_SHAPE:
             return ConvertConstantOfShape(primitive);
@@ -1339,6 +1574,18 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LESS_EQUAL:
             return ConvertLessEqual(primitive);
             break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LOG:
+            return ConvertLog(primitive);
+            break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LOGICAL_AND:
+            return ConvertLogicalAnd(primitive);
+            break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LOGICAL_NOT:
+            return ConvertLogicalNot(primitive);
+            break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LOGICAL_OR:
+            return ConvertLogicalOr(primitive);
+            break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LSTM:
             return ConvertLstm(primitive);
             break;
@@ -1351,8 +1598,17 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_MAX_POOL_FUSION:
             return ConvertMaxPoolFusion(primitive);
             break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_MOD:
+            return ConvertMod(primitive);
+            break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_MUL_FUSION:
             return ConvertMulFusion(primitive);
+            break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_NEG:
+            return ConvertNeg(primitive);
+            break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_CUSTOM_NORMALIZE:
+            return ConvertCustomNormalize(primitive);
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_NOT_EQUAL:
             return ConvertNotEqual(primitive);
@@ -1375,6 +1631,9 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_RANGE:
             return ConvertRange(primitive);
             break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_RECIPROCAL:
+            return ConvertReciprocal(primitive);
+            break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_REAL_DIV:
             return ConvertRealDiv(primitive);
             break;
@@ -1396,6 +1655,9 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SHAPE:
             return ConvertShape(primitive);
             break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SIN:
+            return ConvertSin(primitive);
+            break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SLICE_FUSION:
             return ConvertSliceFusion(primitive);
             break;
@@ -1404,6 +1666,9 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SPACE_TO_BATCH_ND:
             return ConvertSpaceToBatchND(primitive);
+            break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SPARSE_TO_DENSE:
+            return ConvertSparseToDense(primitive);
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SPLIT:
             return ConvertSplit(primitive);
@@ -1443,6 +1708,9 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_UNSTACK:
             return ConvertUnstack(primitive);
+            break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_WHERE:
+            return ConvertWhere(primitive);
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_SELECT:
             return ConvertSelect(primitive);
