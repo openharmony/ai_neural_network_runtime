@@ -2140,7 +2140,7 @@ typedef enum {
      * The condition tensor, decides which element is chosen.
      * * <b>input1</b>: <i>n</i>-dimensional tensor. If condition is rank 1,
      * x1 may have higher rank, but its first dimension must match the size of condition.
-     * * <b>input2</b>: <i>n</i>-dimensional tensor. 
+     * * <b>input2</b>: <i>n</i>-dimensional tensor.
      *
      * Outputs:
      * * <b>output</b>: A tensor, has the same shape as the input_cond.
