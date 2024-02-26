@@ -74,7 +74,7 @@ void PowBuilderTest::SaveScale(OH_NN_DataType dataType,
  * @tc.desc: Provide normal input, output, and parameters to verify the normal behavior of the Build function
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_001, TestSize.Level0)
+HWTEST_F(PowBuilderTest, pow_build_001, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_dim, nullptr);
@@ -90,7 +90,7 @@ HWTEST_F(PowBuilderTest, pow_build_001, TestSize.Level0)
  * @tc.desc: Call Build func twice to verify the abnormal behavior of the Build function
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_002, TestSize.Level0)
+HWTEST_F(PowBuilderTest, pow_build_002, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_dim, nullptr);
@@ -107,7 +107,7 @@ HWTEST_F(PowBuilderTest, pow_build_002, TestSize.Level0)
  * @tc.desc: Provide one more than normal input to verify the abnormal behavior of the Build function
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_003, TestSize.Level0)
+HWTEST_F(PowBuilderTest, pow_build_003, TestSize.Level1)
 {
     m_inputs = {0, 1, 2};
     m_outputs = {3};
@@ -127,7 +127,7 @@ HWTEST_F(PowBuilderTest, pow_build_003, TestSize.Level0)
  * @tc.desc: Provide one more than normal output to verify the abnormal behavior of the Build function
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_004, TestSize.Level0)
+HWTEST_F(PowBuilderTest, pow_build_004, TestSize.Level1)
 {
     m_outputs = {2, 3};
     m_params = {4, 5};
@@ -146,7 +146,7 @@ HWTEST_F(PowBuilderTest, pow_build_004, TestSize.Level0)
  * @tc.desc: Verify that the build function return a failed message with null allTensor
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_005, TestSize.Level0)
+HWTEST_F(PowBuilderTest, pow_build_005, TestSize.Level1)
 {
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputs, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -157,7 +157,7 @@ HWTEST_F(PowBuilderTest, pow_build_005, TestSize.Level0)
  * @tc.desc: Verify that the build function return a failed message without output tensor
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_006, TestSize.Level0)
+HWTEST_F(PowBuilderTest, pow_build_006, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_dim, nullptr);
 
@@ -170,10 +170,11 @@ HWTEST_F(PowBuilderTest, pow_build_006, TestSize.Level0)
  * @tc.desc: Verify that the build function returns a failed message with invalid shift's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_007, TestSize.Level2)
+HWTEST_F(PowBuilderTest, pow_build_007, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_dim, nullptr);
+
     std::shared_ptr<NNTensor> shiftTensor = TransToNNTensor(OH_NN_INT64, m_shiftDim,
         nullptr, OH_NN_POW_SHIFT);
     int64_t* shiftValue = new (std::nothrow) int64_t[1] {0};
@@ -191,10 +192,11 @@ HWTEST_F(PowBuilderTest, pow_build_007, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid scale's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_008, TestSize.Level2)
+HWTEST_F(PowBuilderTest, pow_build_008, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_dim, nullptr);
+
     SaveShift(OH_NN_FLOAT32, m_shiftDim, nullptr, OH_NN_POW_SHIFT);
     std::shared_ptr<NNTensor> scaleTensor = TransToNNTensor(OH_NN_INT64, m_scaleDim,
         nullptr, OH_NN_POW_SCALE);
@@ -212,7 +214,7 @@ HWTEST_F(PowBuilderTest, pow_build_008, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid shift param.
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_009, TestSize.Level2)
+HWTEST_F(PowBuilderTest, pow_build_009, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
@@ -228,7 +230,7 @@ HWTEST_F(PowBuilderTest, pow_build_009, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid scale param.
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_010, TestSize.Level2)
+HWTEST_F(PowBuilderTest, pow_build_010, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
@@ -244,10 +246,11 @@ HWTEST_F(PowBuilderTest, pow_build_010, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for shift.
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_011, TestSize.Level2)
+HWTEST_F(PowBuilderTest, pow_build_011, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
+
     std::shared_ptr<NNTensor> shiftTensor = TransToNNTensor(OH_NN_FLOAT32, m_shiftDim,
         nullptr, OH_NN_POW_SHIFT);
     m_allTensors.emplace_back(shiftTensor);
@@ -262,10 +265,11 @@ HWTEST_F(PowBuilderTest, pow_build_011, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for scale.
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_build_012, TestSize.Level2)
+HWTEST_F(PowBuilderTest, pow_build_012, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
+
     SaveShift(OH_NN_FLOAT32, m_shiftDim, nullptr, OH_NN_POW_SHIFT);
     std::shared_ptr<NNTensor> scaleTensor = TransToNNTensor(OH_NN_FLOAT32, m_scaleDim,
         nullptr, OH_NN_POW_SCALE);
@@ -280,7 +284,7 @@ HWTEST_F(PowBuilderTest, pow_build_012, TestSize.Level2)
  * @tc.desc: Verify the GetPrimitive function return nullptr
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_get_primitive_001, TestSize.Level0)
+HWTEST_F(PowBuilderTest, pow_get_primitive_001, TestSize.Level1)
 {
     LiteGraphTensorPtr primitive = m_builder.GetPrimitive();
     LiteGraphTensorPtr expectPrimitive = {nullptr, DestroyLiteGraphPrimitive};
@@ -292,10 +296,11 @@ HWTEST_F(PowBuilderTest, pow_get_primitive_001, TestSize.Level0)
  * @tc.desc: Verify the normal params return behavior of the getprimitive function
  * @tc.type: FUNC
  */
-HWTEST_F(PowBuilderTest, pow_get_primitive_002, TestSize.Level0)
+HWTEST_F(PowBuilderTest, pow_get_primitive_002, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_dim, nullptr);
+
     SaveShift(OH_NN_FLOAT32, m_shiftDim, nullptr, OH_NN_POW_SHIFT);
     SaveScale(OH_NN_FLOAT32, m_scaleDim, nullptr, OH_NN_POW_SCALE);
 

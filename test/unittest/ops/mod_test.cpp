@@ -60,7 +60,7 @@ void ModBuilderTest::SetInputTensor()
  * @tc.desc: Verify that the build function returns a successful message.
  * @tc.type: FUNC
  */
-HWTEST_F(ModBuilderTest, mod_build_001, TestSize.Level2)
+HWTEST_F(ModBuilderTest, mod_build_001, TestSize.Level1)
 {
     SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
@@ -74,7 +74,7 @@ HWTEST_F(ModBuilderTest, mod_build_001, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with true m_isBuild.
  * @tc.type: FUNC
  */
-HWTEST_F(ModBuilderTest, mod_build_002, TestSize.Level2)
+HWTEST_F(ModBuilderTest, mod_build_002, TestSize.Level1)
 {
     SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
@@ -89,7 +89,7 @@ HWTEST_F(ModBuilderTest, mod_build_002, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalided input.
  * @tc.type: FUNC
  */
-HWTEST_F(ModBuilderTest, mod_build_003, TestSize.Level2)
+HWTEST_F(ModBuilderTest, mod_build_003, TestSize.Level1)
 {
     m_inputs = {0, 1, 2};
     m_outputs = {3};
@@ -106,7 +106,7 @@ HWTEST_F(ModBuilderTest, mod_build_003, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalided output.
  * @tc.type: FUNC
  */
-HWTEST_F(ModBuilderTest, mod_build_004, TestSize.Level2)
+HWTEST_F(ModBuilderTest, mod_build_004, TestSize.Level1)
 {
     m_outputs = {2, 3};
 
@@ -122,7 +122,7 @@ HWTEST_F(ModBuilderTest, mod_build_004, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with empty allTensor.
  * @tc.type: FUNC
  */
-HWTEST_F(ModBuilderTest, mod_build_005, TestSize.Level2)
+HWTEST_F(ModBuilderTest, mod_build_005, TestSize.Level1)
 {
     OH_NN_ReturnCode ret = m_builder.Build(m_paramsIndex, m_inputs, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -133,7 +133,7 @@ HWTEST_F(ModBuilderTest, mod_build_005, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without output tensor.
  * @tc.type: FUNC
  */
-HWTEST_F(ModBuilderTest, mod_build_006, TestSize.Level2)
+HWTEST_F(ModBuilderTest, mod_build_006, TestSize.Level1)
 {
     SetInputTensor();
 
@@ -146,7 +146,7 @@ HWTEST_F(ModBuilderTest, mod_build_006, TestSize.Level2)
  * @tc.desc: Verify that the getPrimitive function returns a successful message
  * @tc.type: FUNC
  */
-HWTEST_F(ModBuilderTest, mod_getprimitive_001, TestSize.Level2)
+HWTEST_F(ModBuilderTest, mod_getprimitive_001, TestSize.Level1)
 {
     SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
@@ -162,7 +162,7 @@ HWTEST_F(ModBuilderTest, mod_getprimitive_001, TestSize.Level2)
  * @tc.desc: Verify that the getPrimitive function returns a failed message without build.
  * @tc.type: FUNC
  */
-HWTEST_F(ModBuilderTest, mod_getprimitive_002, TestSize.Level2)
+HWTEST_F(ModBuilderTest, mod_getprimitive_002, TestSize.Level1)
 {
     LiteGraphPrimitvePtr primitive = m_builder.GetPrimitive();
     LiteGraphPrimitvePtr expectPrimitive(nullptr, DestroyLiteGraphPrimitive);
