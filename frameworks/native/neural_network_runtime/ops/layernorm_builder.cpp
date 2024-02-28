@@ -185,6 +185,15 @@ OH_NN_ReturnCode LayerNormBuilder::ValidateGammaAndBetaShape(const std::vector<u
     auto gammaShape = allTensors[inputsIndex[INPUT_GAMMA]]->GetDimensions();
     auto betaShape = allTensors[inputsIndex[INPUT_BETA]]->GetDimensions();
     int inputShapeSize = static_cast<int>(inputShape.size());
+    if (gammaShape.size() != static_cast<size_t>(inputShapeSize - beginAxis)) {
+        LOGE("[LayerNormBuilder] Invalid gamma dimension, gamma dimension should be equal to normalized dimension.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (betaShape.size() != static_cast<size_t>(inputShapeSize - beginAxis)) {
+        LOGE("[LayerNormBuilder] Invalid beta dimension, beta dimension should be equal to normalized dimension.");
+        return OH_NN_INVALID_PARAMETER;
+    }
 
     for (auto i = beginAxis; i < inputShapeSize; i++) {
         if (gammaShape[i - beginAxis] != inputShape[i]) {
