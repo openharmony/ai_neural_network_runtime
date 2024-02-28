@@ -99,7 +99,14 @@ LiteGraphPrimitvePtr LeakyReluBuilder::GetPrimitive()
         return {nullptr, DestroyLiteGraphPrimitive};
     }
 
-    void* primitive = mindspore::lite::MindIR_LeakyRelu_CreatePrimitive(m_negativeSlope);
+    float alpha {m_negativeSlope};
+    float minVal {0.0f};
+    float maxVal {0.0f};
+    bool approximate {false};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_RELU};
+
+    void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType, alpha,
+                                                                         minVal, maxVal, approximate);
     LiteGraphPrimitvePtr graphPrimitivePtr(primitive, DestroyLiteGraphPrimitive) ;
     return graphPrimitivePtr;
 }

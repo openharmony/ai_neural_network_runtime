@@ -1711,19 +1711,6 @@ typedef enum {
     OH_NN_OPS_EXP = 60,
 
     /**
-     * Return input1 / input2 element-wise for real types. If input1 and input2 are reals,
-     * this will return floating-point division.
-     *
-     * Inputs:
-     * * <b>input1</b>: <i>n</i>-dimensional tensor.
-     * * <b>input2</b>: <i>n</i>-dimensional tensor. Has the same data type as x.
-     *
-     * Outputs:
-     * * <b>output</b>: A tensor, has the same data type as x.
-     */
-    OH_NN_OPS_REAL_DIV = 61,
-
-    /**
      * Returns the tensor resulted from performing the less logical operation elementwise\n
      * on the input tensors <b>input1</b> and <b>input2</b>.
      *
@@ -1736,7 +1723,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor, the shape is the same as the one after broadcasting, and the data type is bool.
      */
-    OH_NN_OPS_LESS = 62,
+    OH_NN_OPS_LESS = 61,
 
     /**
      * Selects elements from input1 or input2, depending on condition.
@@ -1758,7 +1745,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor, has the same shape as the input_cond.
      */
-    OH_NN_OPS_SELECT = 63,
+    OH_NN_OPS_SELECT = 62,
 
     /**
      * Calculates the square of a tensor.
@@ -1769,7 +1756,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor, has the same shape and dtype as the input.
      */
-    OH_NN_OPS_SQUARE = 64,
+    OH_NN_OPS_SQUARE = 63,
 
     /**
      * Flattens the input tensor into a 2D matrix. If input tensor has shape (d_0, d_1, … d_n),
@@ -1790,7 +1777,7 @@ typedef enum {
      * with input dimensions up to axis flattened to the outer dimension of
      * the output and remaining input dimensions flattened into the inner dimension of the output.
      */
-    OH_NN_OPS_FLATTEN = 65,
+    OH_NN_OPS_FLATTEN = 64,
 
     /**
      * DepthToSpace rearranges (permutes) data from depth into blocks of spatial data.
@@ -1812,7 +1799,7 @@ typedef enum {
      * * <b>output</b>: Output tensor of [N, H * blocksize, W * blocksize, C/(blocksize * blocksize)] for NHWC format
      * or [N, C/(blocksize * blocksize), H * blocksize, W * blocksize] for NCHW format.
      */
-    OH_NN_OPS_DEPTH_TO_SPACE = 66,
+    OH_NN_OPS_DEPTH_TO_SPACE = 65,
 
     /**
      * Generate a tensor containing a sequence of numbers that begin at <b>start</b>\n
@@ -1830,7 +1817,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A <i>1</i>-dimensional tensor with specific data type containing generated range of values.
      */
-    OH_NN_OPS_RANGE = 67,
+    OH_NN_OPS_RANGE = 66,
 
     /**
      * Carries out instance normalization as formula <b>y = scale * (x - mean) / sqrt(variance + epsilon) + B</b>,
@@ -1850,7 +1837,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor, has the same shape as the input.
      */
-    OH_NN_OPS_INSTANCE_NORM = 68,
+    OH_NN_OPS_INSTANCE_NORM = 67,
 
     /**
      * Generate a tensor with given value and shape.
@@ -1866,7 +1853,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor, has the same shape as the input.
      */
-    OH_NN_OPS_CONSTANT_OF_SHAPE = 69,
+    OH_NN_OPS_CONSTANT_OF_SHAPE = 68,
 
     /**
      * Broadcast a tensor for a compatiable shape.
@@ -1880,7 +1867,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor after broadcasted.
      */
-    OH_NN_OPS_BROADCAST_TO = 70,
+    OH_NN_OPS_BROADCAST_TO = 69,
 
     /**
      * Returns the tensor resulted from performing the equal logical operation elementwise\n
@@ -1893,7 +1880,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor.
      */
-    OH_NN_OPS_EQUAL = 71,
+    OH_NN_OPS_EQUAL = 70,
 
      /**
      * Returns the tensor resulted from performing the greater logical operation elementwise\n
@@ -1906,7 +1893,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor.
      */
-    OH_NN_OPS_GREATER = 72,
+    OH_NN_OPS_GREATER = 71,
 
     /**
      * Returns the tensor resulted from performing the not_equal logical operation elementwise\n
@@ -1919,7 +1906,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor.
      */
-    OH_NN_OPS_NOT_EQUAL = 73,
+    OH_NN_OPS_NOT_EQUAL = 72,
 
     /**
      * Returns the tensor resulted from performing the greater_equal logical operation elementwise\n
@@ -1932,7 +1919,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor.
      */
-    OH_NN_OPS_GREATER_EQUAL = 74,
+    OH_NN_OPS_GREATER_EQUAL = 73,
 
     /**
      * LeakyRelu takes input data (Tensor) and an argument alpha, and produces one output data (Tensor)
@@ -1948,7 +1935,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor, with the same data type and shape as the input tensor.
      */
-    OH_NN_OPS_LEAKY_RELU = 75,
+    OH_NN_OPS_LEAKY_RELU = 74,
 
     /**
      * Computes an one-layer LSTM. This operator is usually supported via some custom implementation.
@@ -1984,7 +1971,7 @@ typedef enum {
      * * <b>cy</b>: The last output tensor of the cell,
      * shape is [num_directions * num_layers, batch_size, hidden_size].
      */
-    OH_NN_OPS_LSTM = 76,
+    OH_NN_OPS_LSTM = 75,
 
     /**
      * Returns a tensor of the same type and shape as input tensor with its value clipped to min and max.
@@ -2000,7 +1987,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: <i>n</i>-dimensional tensor., with the same data type and shape as the input tensor.
      */
-    OH_NN_OPS_CLIP = 77,
+    OH_NN_OPS_CLIP = 76,
 
     /**
      * Determine whether all emements in a given tensor are non-zero. It returns a boolean tensor
@@ -2017,7 +2004,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: Indices or values before the maximum input tensor on the axis.
      */
-    OH_NN_OPS_ALL = 78,
+    OH_NN_OPS_ALL = 77,
 
     /**
      * Asserts that the given condition si true.
@@ -2034,7 +2021,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: Tensor after average pooling.
      */
-    OH_NN_OPS_ASSERT = 79,
+    OH_NN_OPS_ASSERT = 78,
 
     /**
      * Calculates the cosine of the given input tensor, element-wise.
@@ -2045,7 +2032,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: <i>n</i>-dimensional tensor. The cosine of the input tensor computed element-wise.
      */
-    OH_NN_OPS_COS = 80,
+    OH_NN_OPS_COS = 79,
 
     /**
      * Calculates the result of nature logarithm of the input.
@@ -2056,7 +2043,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: <i>n</i>-dimensional tensor with the same shape as the input tensor.
      */
-    OH_NN_OPS_LOG = 81,
+    OH_NN_OPS_LOG = 80,
 
     /**
      * Calculates the truth value of <b>input0</b> and <b>input1</b> element-wise.
@@ -2068,7 +2055,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor of type bool with the shape that <b>x1</b> and <b>x2</b> broadcast to.
      */
-    OH_NN_OPS_LOGICAL_AND = 82,
+    OH_NN_OPS_LOGICAL_AND = 81,
 
     /**
      * Calculates the truth value of NOT <b>x</b> element-wise.
@@ -2079,7 +2066,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor of type bool with the shape of <b>input</b>.
      */
-    OH_NN_OPS_LOGICAL_NOT = 83,
+    OH_NN_OPS_LOGICAL_NOT = 82,
 
     /**
      * Computes the remainder of dividing the first input tensor by the second input tensor element-wise.
@@ -2097,7 +2084,7 @@ typedef enum {
      * * <b>output</b>: The shape is the same shape as the boradcast shape. The data type is the type with
      * the higher precision or the highest data type between the two inputs.
      */
-    OH_NN_OPS_MOD = 84,
+    OH_NN_OPS_MOD = 83,
 
     /**
      * Returns a tensor with negative values of the input tensor element-wise.
@@ -2108,7 +2095,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor with the same shape as the input tensor.
      */
-    OH_NN_OPS_NEG = 85,
+    OH_NN_OPS_NEG = 84,
 
     /**
      * Calculate reciprocal of a tensor element-wise.
@@ -2119,7 +2106,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor with the same shape as the input tensor.
      */
-    OH_NN_OPS_RECIPROCAL = 86,
+    OH_NN_OPS_RECIPROCAL = 85,
 
     /**
      * Calculate sine of the input element-wise.
@@ -2130,7 +2117,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor with the same data type and shape as the input tensor.
      */
-    OH_NN_OPS_SIN = 87,
+    OH_NN_OPS_SIN = 86,
 
     /**
      * Selects elements from x1 or x2 based on condition and returns a tensor.
@@ -2145,7 +2132,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor, has the same shape as the input_cond.
      */
-    OH_NN_OPS_WHERE = 88,
+    OH_NN_OPS_WHERE = 87,
 
     /**
      * Converts a sparse representation into a dense tensor.
@@ -2160,7 +2147,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor. The data type is the same as values, and the shape is specified by sparseShape.
      */
-    OH_NN_OPS_SPARSE_TO_DENSE = 89,
+    OH_NN_OPS_SPARSE_TO_DENSE = 88,
 
     /**
      * Calculates the truth value of <b>input0</b> or <b>input1</b> element-wise.
@@ -2172,7 +2159,7 @@ typedef enum {
      * Outputs:
      * * <b>output</b>: A tensor of type bool with the shape that <b>input0</b> and <b>input1</b> broadcast to.
      */
-    OH_NN_OPS_LOGICAL_OR = 90,
+    OH_NN_OPS_LOGICAL_OR = 89,
 } OH_NN_OperationType;
 
 /**
