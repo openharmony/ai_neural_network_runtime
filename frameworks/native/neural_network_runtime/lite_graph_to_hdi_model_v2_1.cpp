@@ -29,22 +29,6 @@ typedef void *TensorPtr;
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace NNRt_V2_1 {
-std::vector<int8_t> ConvertAbs(PrimitivePtr primitive)
-{
-    if (primitive == nullptr) {
-        LOGE("ConvertAbs v2_1 failed, primitive is nullptr.");
-        return {};
-    }
-
-    Abs abs{};
-
-    OHOS::MessageParcel data;
-    (void)AbsBlockMarshalling(data, abs);
-    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
-                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
-    return ret;
-}
-
 std::vector<int8_t> ConvertActivation(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
@@ -604,23 +588,6 @@ std::vector<int8_t> ConvertLayerNormFusion(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertLeakyRelu(PrimitivePtr primitive)
-{
-    if (primitive == nullptr) {
-        LOGE("ConvertLeakyRelu v2_1 failed, primitive is nullptr.");
-        return {};
-    }
-
-    LeakyRelu leakyRelu{};
-    leakyRelu.negative_slope = mindspore::lite::MindIR_LeakyRelu_GetNegativeSlope(primitive);
-
-    OHOS::MessageParcel data;
-    (void)LeakyReluBlockMarshalling(data, leakyRelu);
-    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
-                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
-    return ret;
-}
-
 std::vector<int8_t> ConvertLess(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
@@ -981,22 +948,6 @@ std::vector<int8_t> ConvertReciprocal(PrimitivePtr primitive)
 
     OHOS::MessageParcel data;
     (void)ReciprocalBlockMarshalling(data, reciprocal);
-    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
-                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
-    return ret;
-}
-
-std::vector<int8_t> ConvertRealDiv(PrimitivePtr primitive)
-{
-    if (primitive == nullptr) {
-        LOGE("ConvertRealDiv v2_1 failed, primitive is nullptr.");
-        return {};
-    }
-
-    RealDiv realDiv{};
-    
-    OHOS::MessageParcel data;
-    (void)RealDivBlockMarshalling(data, realDiv);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1456,9 +1407,6 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ACTIVATION:
             return ConvertActivation(primitive);
             break;
-        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ABS:
-            return ConvertAbs(primitive);
-            break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_ADD_FUSION:
             return ConvertAddFusion(primitive);
             break;
@@ -1549,9 +1497,6 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LAYER_NORM_FUSION:
             return ConvertLayerNormFusion(primitive);
             break;
-        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LEAKY_RELU:
-            return ConvertLeakyRelu(primitive);
-            break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LESS:
             return ConvertLess(primitive);
             break;
@@ -1614,9 +1559,6 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_RECIPROCAL:
             return ConvertReciprocal(primitive);
-            break;
-        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_REAL_DIV:
-            return ConvertRealDiv(primitive);
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_REDUCE_FUSION:
             return ConvertReduceFusion(primitive);
