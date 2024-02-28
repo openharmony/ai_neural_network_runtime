@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_prebuilt_shared_library("mindspore_demo") {
-  source = "../mindspore/mindspore/libmindspore-lite.huawei.so"
+  source = "../mindspore/mindspore/libmindspore-lite.so"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_nnrt"
