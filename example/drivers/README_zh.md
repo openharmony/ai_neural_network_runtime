@@ -213,8 +213,9 @@ AI芯片设备HDI服务开发者具体可通过以下步骤实现AI专用加速�
           "components": [
             "c_utils",
             "hdf_core",
-            "hilog_native",
-            "ipc"
+            "hilog",
+            "ipc",
+            "drivers_interface_nnrt"
           ],
           "third_part": [
             "bounds_checking_function"
@@ -464,6 +465,6 @@ rm -rf ./out
       mkdir drivers/peripheral/nnrt/v2_0/mindspore/mindspore
 
       # 从out目录将mindspore动态库拷贝到drivers/peripheral/nnrt/v2_0/mindspore/mindspore下
-      cp out/rk3568/package/phone/system/lib/libmindspore-lite.huawei.so drivers/peripheral/nnrt/v2_0/mindspore/mindspore/
+      cp out/rk3568/package/phone/system/lib/libmindspore-lite.so drivers/peripheral/nnrt/v2_0/mindspore/mindspore/
       ```
 4. 其他配置请参考本教程上面的[开发步骤](#开发步骤)章节。
