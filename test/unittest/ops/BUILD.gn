@@ -94,7 +94,6 @@ ohos_unittest("OpsUnittest") {
   sources += [ "./prelu_builder_test.cpp" ]
   sources += [ "./quant_dtype_cast_builder_test.cpp" ]
   sources += [ "./range_test.cpp" ]
-  sources += [ "./real_div_test.cpp" ]
   sources += [ "./reciprocal_test.cpp" ]
   sources += [ "./reduce_all_builder_test.cpp" ]
   sources += [ "./reduce_mean_builder_test.cpp" ]

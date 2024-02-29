@@ -103,7 +103,7 @@ LiteGraphPrimitvePtr LeakyReluBuilder::GetPrimitive()
     float minVal {0.0f};
     float maxVal {0.0f};
     bool approximate {false};
-    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_RELU};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_LEAKY_RELU};
 
     void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType, alpha,
                                                                          minVal, maxVal, approximate);
