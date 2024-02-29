@@ -62,11 +62,11 @@ LiteGraphPrimitvePtr AbsBuilder::GetPrimitive()
         return {nullptr, DestroyLiteGraphPrimitive};
     }
 
-    float alpha{0.0f};
-    float minVal{0.0f};
-    float maxVal{0.0f};
-    bool approximate{false};
-    mindspore::lite::ActivationType activationType{mindspore::lite::ACTIVATION_TYPE_ABS};
+    float alpha {0.0f};
+    float minVal {0.0f};
+    float maxVal {0.0f};
+    bool approximate {false};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_ABS};
 
     void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType, alpha,
                                                                          minVal, maxVal, approximate);
