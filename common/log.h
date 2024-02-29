@@ -17,19 +17,23 @@
 #define NEURAL_NETWORK_RUNTIME_LOG_H
 
 #include <cstdarg>
-#include "hilog/log_c.h"
+#include "hilog/log.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-constexpr unsigned int NNR_LOG_DOMAIN = 0xD002101;
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD002101
 
-#define LOGD(...) HiLogPrint(LOG_CORE, LOG_DEBUG, NNR_LOG_DOMAIN, "NNRt", __VA_ARGS__)
-#define LOGI(...) HiLogPrint(LOG_CORE, LOG_INFO, NNR_LOG_DOMAIN, "NNRt", __VA_ARGS__)
-#define LOGW(...) HiLogPrint(LOG_CORE, LOG_WARN, NNR_LOG_DOMAIN, "NNRt", __VA_ARGS__)
-#define LOGE(...) HiLogPrint(LOG_CORE, LOG_ERROR, NNR_LOG_DOMAIN, "NNRt", __VA_ARGS__)
-#define LOGF(...) HiLogPrint(LOG_CORE, LOG_FATAL, NNR_LOG_DOMAIN, "NNRt", __VA_ARGS__)
+#undef LOG_TAG
+#define LOG_TAG "NNRt"
+
+#define LOGD(...) HILOG_DEBUG(LOG_CORE, __VA_ARGS__)
+#define LOGI(...) HILOG_INFO(LOG_CORE, __VA_ARGS__)
+#define LOGW(...) HILOG_WARN(LOG_CORE, __VA_ARGS__)
+#define LOGE(...) HILOG_ERROR(LOG_CORE, __VA_ARGS__)
+#define LOGF(...) HILOG_FATAL(LOG_CORE, __VA_ARGS__)
 
 #ifdef __cplusplus
 }
