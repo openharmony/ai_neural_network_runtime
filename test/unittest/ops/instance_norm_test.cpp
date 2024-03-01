@@ -74,12 +74,13 @@ void InstanceNormBuilderTest::SetInputTensor()
     biasTensor = TransToNNTensor(OH_NN_FLOAT32, m_scaleAndBiasDim, nullptr, OH_NN_TENSOR);
     m_allTensors.emplace_back(biasTensor);
 }
+
 /**
  * @tc.name: instance_norm_build_001
  * @tc.desc: Verify that the build function returns a successful message.
  * @tc.type: FUNC
  */
-HWTEST_F(InstanceNormBuilderTest, instance_norm_build_001, TestSize.Level2)
+HWTEST_F(InstanceNormBuilderTest, instance_norm_build_001, TestSize.Level1)
 {
     SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
@@ -94,7 +95,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_001, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with true m_isBuild.
  * @tc.type: FUNC
  */
-HWTEST_F(InstanceNormBuilderTest, instance_norm_build_002, TestSize.Level2)
+HWTEST_F(InstanceNormBuilderTest, instance_norm_build_002, TestSize.Level1)
 {
     SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
@@ -110,7 +111,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_002, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalided input.
  * @tc.type: FUNC
  */
-HWTEST_F(InstanceNormBuilderTest, instance_norm_build_003, TestSize.Level2)
+HWTEST_F(InstanceNormBuilderTest, instance_norm_build_003, TestSize.Level1)
 {
     m_inputs = {0, 1, 2, 3};
     m_outputs = {4};
@@ -129,7 +130,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_003, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalided output.
  * @tc.type: FUNC
  */
-HWTEST_F(InstanceNormBuilderTest, instance_norm_build_004, TestSize.Level2)
+HWTEST_F(InstanceNormBuilderTest, instance_norm_build_004, TestSize.Level1)
 {
     m_outputs = {3, 4};
     m_params = {5};
@@ -147,7 +148,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_004, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with empty allTensor.
  * @tc.type: FUNC
  */
-HWTEST_F(InstanceNormBuilderTest, instance_norm_build_005, TestSize.Level2)
+HWTEST_F(InstanceNormBuilderTest, instance_norm_build_005, TestSize.Level1)
 {
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputs, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -158,7 +159,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_005, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without output tensor.
  * @tc.type: FUNC
  */
-HWTEST_F(InstanceNormBuilderTest, instance_norm_build_006, TestSize.Level2)
+HWTEST_F(InstanceNormBuilderTest, instance_norm_build_006, TestSize.Level1)
 {
     SetInputTensor();
 
@@ -171,10 +172,11 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_006, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid epsilon's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(InstanceNormBuilderTest, instance_norm_build_007, TestSize.Level2)
+HWTEST_F(InstanceNormBuilderTest, instance_norm_build_007, TestSize.Level1)
 {
     SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
+
     std::shared_ptr<NNTensor> epsilonTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
         nullptr, OH_NN_INSTANCE_NORM_EPSILON);
     int64_t* epsilonValue = new (std::nothrow) int64_t [1]{0.0f};
@@ -192,7 +194,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_007, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid epsilon param.
  * @tc.type: FUNC
  */
-HWTEST_F(InstanceNormBuilderTest, instance_norm_build_008, TestSize.Level2)
+HWTEST_F(InstanceNormBuilderTest, instance_norm_build_008, TestSize.Level1)
 {
     SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
@@ -207,10 +209,11 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_008, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for epsilon.
  * @tc.type: FUNC
  */
-HWTEST_F(InstanceNormBuilderTest, instance_norm_build_009, TestSize.Level2)
+HWTEST_F(InstanceNormBuilderTest, instance_norm_build_009, TestSize.Level1)
 {
     SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
+
     std::shared_ptr<NNTensor> epsilonTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDim,
         nullptr, OH_NN_INSTANCE_NORM_EPSILON);
     m_allTensors.emplace_back(epsilonTensor);
@@ -224,7 +227,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_build_009, TestSize.Level2)
  * @tc.desc: Verify that the getPrimitive function returns a successful message
  * @tc.type: FUNC
  */
-HWTEST_F(InstanceNormBuilderTest, instance_norm_getprimitive_001, TestSize.Level2)
+HWTEST_F(InstanceNormBuilderTest, instance_norm_getprimitive_001, TestSize.Level1)
 {
     SetInputTensor();
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_outputDim, nullptr);
@@ -245,7 +248,7 @@ HWTEST_F(InstanceNormBuilderTest, instance_norm_getprimitive_001, TestSize.Level
  * @tc.desc: Verify that the getPrimitive function returns a failed message without build.
  * @tc.type: FUNC
  */
-HWTEST_F(InstanceNormBuilderTest, instance_norm_getprimitive_002, TestSize.Level2)
+HWTEST_F(InstanceNormBuilderTest, instance_norm_getprimitive_002, TestSize.Level1)
 {
     LiteGraphPrimitvePtr primitive = m_builder.GetPrimitive();
     LiteGraphPrimitvePtr expectPrimitive(nullptr, DestroyLiteGraphPrimitive);

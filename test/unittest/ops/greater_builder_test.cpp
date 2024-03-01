@@ -47,7 +47,7 @@ void GreaterBuilderTest::TearDown() {}
  * @tc.desc: Verify that the build function returns a successful message.
  * @tc.type: FUNC
  */
-HWTEST_F(GreaterBuilderTest, greater_build_001, TestSize.Level0)
+HWTEST_F(GreaterBuilderTest, greater_build_001, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
@@ -61,7 +61,7 @@ HWTEST_F(GreaterBuilderTest, greater_build_001, TestSize.Level0)
  * @tc.desc: Verify that the build function returns a failed message with true m_isBuild.
  * @tc.type: FUNC
  */
-HWTEST_F(GreaterBuilderTest, greater_build_002, TestSize.Level0)
+HWTEST_F(GreaterBuilderTest, greater_build_002, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
@@ -76,7 +76,7 @@ HWTEST_F(GreaterBuilderTest, greater_build_002, TestSize.Level0)
  * @tc.desc: Verify that the build function returns a failed message with invalided input.
  * @tc.type: FUNC
  */
-HWTEST_F(GreaterBuilderTest, greater_build_003, TestSize.Level0)
+HWTEST_F(GreaterBuilderTest, greater_build_003, TestSize.Level1)
 {
     m_inputs = {0, 1, 2, 3};
     m_outputs = {4};
@@ -93,7 +93,7 @@ HWTEST_F(GreaterBuilderTest, greater_build_003, TestSize.Level0)
  * @tc.desc: Verify that the build function returns a failed message with invalided output.
  * @tc.type: FUNC
  */
-HWTEST_F(GreaterBuilderTest, greater_build_004, TestSize.Level0)
+HWTEST_F(GreaterBuilderTest, greater_build_004, TestSize.Level1)
 {
     std::vector<uint32_t> m_outputs = {2, 3, 4};
 
@@ -109,7 +109,7 @@ HWTEST_F(GreaterBuilderTest, greater_build_004, TestSize.Level0)
  * @tc.desc: Verify that the build function returns a failed message with empty allTensor.
  * @tc.type: FUNC
  */
-HWTEST_F(GreaterBuilderTest, greater_build_005, TestSize.Level0)
+HWTEST_F(GreaterBuilderTest, greater_build_005, TestSize.Level1)
 {
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputs, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -120,7 +120,7 @@ HWTEST_F(GreaterBuilderTest, greater_build_005, TestSize.Level0)
  * @tc.desc: Verify that the build function returns a failed message without output tensor.
  * @tc.type: FUNC
  */
-HWTEST_F(GreaterBuilderTest, greater_build_006, TestSize.Level0)
+HWTEST_F(GreaterBuilderTest, greater_build_006, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
 
@@ -133,7 +133,7 @@ HWTEST_F(GreaterBuilderTest, greater_build_006, TestSize.Level0)
  * @tc.desc: Verify that the build function returns a failed message with a virtual parameter.
  * @tc.type: FUNC
  */
-HWTEST_F(GreaterBuilderTest, greater_build_007, TestSize.Level0)
+HWTEST_F(GreaterBuilderTest, greater_build_007, TestSize.Level1)
 {
     std::vector<uint32_t> m_params = {3};
     std::vector<int32_t> paramDim = {};
@@ -153,7 +153,7 @@ HWTEST_F(GreaterBuilderTest, greater_build_007, TestSize.Level0)
  * @tc.desc: Verify that the getPrimitive function returns a successful message
  * @tc.type: FUNC
  */
-HWTEST_F(GreaterBuilderTest, greater_getprimitive_001, TestSize.Level0)
+HWTEST_F(GreaterBuilderTest, greater_getprimitive_001, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
@@ -169,7 +169,7 @@ HWTEST_F(GreaterBuilderTest, greater_getprimitive_001, TestSize.Level0)
  * @tc.desc: Verify that the getPrimitive function returns a failed message without build.
  * @tc.type: FUNC
  */
-HWTEST_F(GreaterBuilderTest, greater_getprimitive_002, TestSize.Level0)
+HWTEST_F(GreaterBuilderTest, greater_getprimitive_002, TestSize.Level1)
 {
     LiteGraphPrimitvePtr primitive = m_builder.GetPrimitive();
     LiteGraphPrimitvePtr expectPrimitive(nullptr, DestroyLiteGraphPrimitive);

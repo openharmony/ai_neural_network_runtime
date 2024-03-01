@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef NEURAL_NETWORK_RUNTIME_REAL_DIV_BUILDER_H
-#define NEURAL_NETWORK_RUNTIME_REAL_DIV_BUILDER_H
+#ifndef NEURAL_NETWORK_RUNTIME_LOGICAL_NOT_BUILDER_H
+#define NEURAL_NETWORK_RUNTIME_LOGICAL_NOT_BUILDER_H
 
 #include "mindir.h"
 
@@ -24,10 +24,10 @@
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {
-class RealDivBuilder : public OpsBuilder {
+class LogicalNotBuilder : public OpsBuilder {
 public:
-    RealDivBuilder();
-    ~RealDivBuilder() override;
+    LogicalNotBuilder();
+    ~LogicalNotBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
                            const std::vector<uint32_t>& inputsIndex,
                            const std::vector<uint32_t>& outputsIndex,
@@ -39,4 +39,4 @@ public:
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
 
-#endif // NEURAL_NETWORK_RUNTIME_REAL_DIV_BUILDER_H
+#endif // NEURAL_NETWORK_RUNTIME_LOGICAL_NOT_BUILDER_H

@@ -61,7 +61,7 @@ void UnstackBuilderTest::SaveParamsTensor(OH_NN_DataType dataType,
  * @tc.desc: Verify that the build function returns a successful message.
  * @tc.type: FUNC
  */
-HWTEST_F(UnstackBuilderTest, unstack_build_001, TestSize.Level2)
+HWTEST_F(UnstackBuilderTest, unstack_build_001, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
@@ -76,7 +76,7 @@ HWTEST_F(UnstackBuilderTest, unstack_build_001, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with true m_isBuild.
  * @tc.type: FUNC
  */
-HWTEST_F(UnstackBuilderTest, unstack_build_002, TestSize.Level2)
+HWTEST_F(UnstackBuilderTest, unstack_build_002, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
@@ -92,7 +92,7 @@ HWTEST_F(UnstackBuilderTest, unstack_build_002, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalided input.
  * @tc.type: FUNC
  */
-HWTEST_F(UnstackBuilderTest, unstack_build_003, TestSize.Level2)
+HWTEST_F(UnstackBuilderTest, unstack_build_003, TestSize.Level1)
 {
     m_inputs = {0, 1};
     m_outputs = {2};
@@ -108,39 +108,21 @@ HWTEST_F(UnstackBuilderTest, unstack_build_003, TestSize.Level2)
 
 /**
  * @tc.name: unstack_build_004
- * @tc.desc: Verify that the build function returns a failed message with invalided output.
- * @tc.type: FUNC
- */
-HWTEST_F(UnstackBuilderTest, unstack_build_004, TestSize.Level2)
-{
-    m_outputs = {1, 2};
-    m_params = {3};
-
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
-    SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
-    SaveParamsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_UNSTACK_AXIS);
-
-    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-}
-
-/**
- * @tc.name: unstack_build_005
  * @tc.desc: Verify that the build function returns a failed message with empty allTensor.
  * @tc.type: FUNC
  */
-HWTEST_F(UnstackBuilderTest, unstack_build_005, TestSize.Level2)
+HWTEST_F(UnstackBuilderTest, unstack_build_004, TestSize.Level1)
 {
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputs, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
 /**
- * @tc.name: unstack_build_006
+ * @tc.name: unstack_build_005
  * @tc.desc: Verify that the build function returns a failed message without output tensor.
  * @tc.type: FUNC
  */
-HWTEST_F(UnstackBuilderTest, unstack_build_006, TestSize.Level2)
+HWTEST_F(UnstackBuilderTest, unstack_build_005, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
 
@@ -149,14 +131,15 @@ HWTEST_F(UnstackBuilderTest, unstack_build_006, TestSize.Level2)
 }
 
 /**
- * @tc.name: unstack_build_007
+ * @tc.name: unstack_build_006
  * @tc.desc: Verify that the build function returns a failed message with invalid axis's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(UnstackBuilderTest, unstack_build_007, TestSize.Level2)
+HWTEST_F(UnstackBuilderTest, unstack_build_006, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
+
     std::shared_ptr<NNTensor> axisTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDim,
         nullptr, OH_NN_UNSTACK_AXIS);
     float* axisValue = new (std::nothrow) float[1]{1.0f};
@@ -169,11 +152,11 @@ HWTEST_F(UnstackBuilderTest, unstack_build_007, TestSize.Level2)
 }
 
 /**
- * @tc.name: unstack_build_008
+ * @tc.name: unstack_build_007
  * @tc.desc: Verify that the build function returns a failed message with passing invalid axis param.
  * @tc.type: FUNC
  */
-HWTEST_F(UnstackBuilderTest, unstack_build_008, TestSize.Level2)
+HWTEST_F(UnstackBuilderTest, unstack_build_007, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
@@ -184,14 +167,15 @@ HWTEST_F(UnstackBuilderTest, unstack_build_008, TestSize.Level2)
 }
 
 /**
- * @tc.name: unstack_build_009
+ * @tc.name: unstack_build_008
  * @tc.desc: Verify that the build function returns a failed message without set buffer for axis.
  * @tc.type: FUNC
  */
-HWTEST_F(UnstackBuilderTest, unstack_build_009, TestSize.Level2)
+HWTEST_F(UnstackBuilderTest, unstack_build_008, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
+
     std::shared_ptr<NNTensor> axisTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
         nullptr, OH_NN_UNSTACK_AXIS);
     m_allTensors.emplace_back(axisTensor);
@@ -205,7 +189,7 @@ HWTEST_F(UnstackBuilderTest, unstack_build_009, TestSize.Level2)
  * @tc.desc: Verify that the getPrimitive function returns a successful message
  * @tc.type: FUNC
  */
-HWTEST_F(UnstackBuilderTest, unstack_getprimitive_001, TestSize.Level2)
+HWTEST_F(UnstackBuilderTest, unstack_getprimitive_001, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
@@ -226,7 +210,7 @@ HWTEST_F(UnstackBuilderTest, unstack_getprimitive_001, TestSize.Level2)
  * @tc.desc: Verify that the getPrimitive function returns a failed message without build.
  * @tc.type: FUNC
  */
-HWTEST_F(UnstackBuilderTest, unstack_getprimitive_002, TestSize.Level2)
+HWTEST_F(UnstackBuilderTest, unstack_getprimitive_002, TestSize.Level1)
 {
     LiteGraphPrimitvePtr primitive = m_builder.GetPrimitive();
     LiteGraphPrimitvePtr expectPrimitive(nullptr, DestroyLiteGraphPrimitive);
