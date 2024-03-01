@@ -31,6 +31,14 @@ public:
                            const std::vector<std::shared_ptr<NNTensor>>& allTensors) override;
 
     LiteGraphPrimitvePtr GetPrimitive() override;
+
+private:
+    OH_NN_ReturnCode SetScale(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetShift(std::shared_ptr<NNTensor> tensor);
+
+private:
+    float m_scale {1.0f};
+    float m_shift {0.0f};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

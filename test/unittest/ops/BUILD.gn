@@ -33,8 +33,10 @@ ohos_unittest("OpsUnittest") {
 
   sources = [ "./abs_test.cpp" ]
   sources += [ "./add_test.cpp" ]
+  sources += [ "./all_test.cpp" ]
   sources += [ "./argmax_test.cpp" ]
   sources += [ "./avgpool_pad_test.cpp" ]
+  sources += [ "./assert_test.cpp" ]
   sources += [ "./avgpool_padmod_test.cpp" ]
   sources += [ "./batch_to_space_nd_test.cpp" ]
   sources += [ "./batchnorm_builder_test.cpp" ]
@@ -49,6 +51,7 @@ ohos_unittest("OpsUnittest") {
   sources += [ "./conv2d_padmode_test.cpp" ]
   sources += [ "./conv2d_tranpose_padmode_test.cpp" ]
   sources += [ "./conv2d_transpose_pad_test.cpp" ]
+  sources += [ "./cos_test.cpp" ]
   sources += [ "./depth_to_space_test.cpp" ]
   sources += [ "./depthwise_conv2d_native_pad_test.cpp" ]
   sources += [ "./depthwise_conv2d_native_padmode_test.cpp" ]
@@ -72,12 +75,18 @@ ohos_unittest("OpsUnittest") {
   sources += [ "./leaky_relu_test.cpp" ]
   sources += [ "./less_test.cpp" ]
   sources += [ "./lessequal_builder_test.cpp" ]
+  sources += [ "./log_test.cpp" ]
+  sources += [ "./logical_and_test.cpp" ]
+  sources += [ "./logical_not_test.cpp" ]
+  sources += [ "./logical_or_test.cpp" ]
   sources += [ "./lstm_test.cpp" ]
   sources += [ "./maximum_builder_test.cpp" ]
   sources += [ "./maxpool_pad_test.cpp" ]
   sources += [ "./maxpool_padmode_test.cpp" ]
   sources += [ "./matmul_builder_test.cpp" ]
+  sources += [ "./mod_test.cpp" ]
   sources += [ "./mul_builder_test.cpp" ]
+  sources += [ "./neg_test.cpp" ]
   sources += [ "./not_equal_builder_test.cpp" ]
   sources += [ "./onehot_builder_test.cpp" ]
   sources += [ "./pad_builder_test.cpp" ]
@@ -85,7 +94,7 @@ ohos_unittest("OpsUnittest") {
   sources += [ "./prelu_builder_test.cpp" ]
   sources += [ "./quant_dtype_cast_builder_test.cpp" ]
   sources += [ "./range_test.cpp" ]
-  sources += [ "./real_div_test.cpp" ]
+  sources += [ "./reciprocal_test.cpp" ]
   sources += [ "./reduce_all_builder_test.cpp" ]
   sources += [ "./reduce_mean_builder_test.cpp" ]
   sources += [ "./reduce_prod_builder_test.cpp" ]
@@ -98,9 +107,11 @@ ohos_unittest("OpsUnittest") {
   sources += [ "./select_test.cpp" ]
   sources += [ "./shape_builder_test.cpp" ]
   sources += [ "./sigmoid_builder_test.cpp" ]
+  sources += [ "./sin_test.cpp" ]
   sources += [ "./slice_builder_test.cpp" ]
   sources += [ "./softmax_builder_test.cpp" ]
   sources += [ "./spacetobatchnd_builder_test.cpp" ]
+  sources += [ "./sparse_to_dense_test.cpp" ]
   sources += [ "./split_builder_test.cpp" ]
   sources += [ "./sqrt_builder_test.cpp" ]
   sources += [ "./square_test.cpp" ]
@@ -115,6 +126,7 @@ ohos_unittest("OpsUnittest") {
   sources += [ "./transpose_builder_test.cpp" ]
   sources += [ "./unsqueeze_builder_test.cpp" ]
   sources += [ "./unstack_test.cpp" ]
+  sources += [ "./where_test.cpp" ]
   sources += [ "./ops_test.cpp" ]
   sources += [ "../common/base_test.cpp" ]
 
@@ -128,7 +140,7 @@ ohos_unittest("OpsUnittest") {
   ]
 
   external_deps = [
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "drivers_interface_nnrt:libnnrt_proxy_2.1",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "mindspore:mindir",

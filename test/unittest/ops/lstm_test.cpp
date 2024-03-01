@@ -224,10 +224,11 @@ void LSTMBuilderTest::SetOutputTensor()
  * @tc.desc: Verify that the build function returns a successful message.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_001, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_001, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -248,10 +249,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_001, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with true m_isBuild.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_002, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_002, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -273,7 +275,7 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_002, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalided input.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_003, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_003, TestSize.Level1)
 {
     m_inputs = {0, 1, 2, 3, 4, 5, 6};
     m_outputs = {7, 8, 9};
@@ -281,6 +283,7 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_003, TestSize.Level2)
 
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -301,13 +304,14 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_003, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalided output.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_004, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_004, TestSize.Level1)
 {
     m_outputs = {6, 7, 8, 9};
     m_params = {10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
 
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -328,7 +332,7 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_004, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with empty allTensor.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_005, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_005, TestSize.Level1)
 {
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputs, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -339,7 +343,7 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_005, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without output tensor.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_006, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_006, TestSize.Level1)
 {
     SetInputTensor();
 
@@ -352,10 +356,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_006, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid bidirectional's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_007, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_007, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     std::shared_ptr<NNTensor> bidirectionalTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
         nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     int64_t* bidirectionalValue = new (std::nothrow) int64_t [1]{0};
@@ -382,10 +387,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_007, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid has_bias's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_008, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_008, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     std::shared_ptr<NNTensor> hasBiasTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
         nullptr, OH_NN_LSTM_HAS_BIAS);
@@ -412,10 +418,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_008, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid input_size's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_009, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_009, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     std::shared_ptr<NNTensor> inputSizeTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDim,
@@ -442,10 +449,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_009, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid hidden_size's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_010, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_010, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -472,10 +480,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_010, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid num_layers's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_011, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_011, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -502,10 +511,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_011, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid num_directions's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_012, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_012, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -532,10 +542,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_012, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid dropout's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_013, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_013, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -562,10 +573,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_013, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid zoneout_cell's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_014, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_014, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -592,10 +604,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_014, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid zoneout_hidden's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_015, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_015, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -622,10 +635,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_015, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with invalid proj_size's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_016, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_016, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -652,10 +666,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_016, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid bidirectional param.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_017, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_017, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -676,10 +691,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_017, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid has_bias param.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_018, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_018, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -700,10 +716,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_018, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid input_size param.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_019, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_019, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
@@ -724,10 +741,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_019, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid hidden_size param.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_020, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_020, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -748,10 +766,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_020, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid num_layers param.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_021, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_021, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -772,10 +791,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_021, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid num_directions param.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_022, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_022, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -796,10 +816,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_022, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid dropout param.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_023, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_023, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -820,10 +841,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_023, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid zoneout_cell param.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_024, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_024, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -844,10 +866,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_024, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid zoneout_cell param.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_025, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_025, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -868,10 +891,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_025, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid zoneout_hidden param.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_026, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_026, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -892,10 +916,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_026, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message with passing invalid proj_size param.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_027, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_027, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -916,10 +941,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_027, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for bidirectional.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_028, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_028, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     std::shared_ptr<NNTensor> bidirectionalTensor = TransToNNTensor(OH_NN_BOOL, m_paramDim,
         nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     m_allTensors.emplace_back(bidirectionalTensor);
@@ -942,10 +968,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_028, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for has_bias.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_029, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_029, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     std::shared_ptr<NNTensor> hasBiasTensor = TransToNNTensor(OH_NN_BOOL, m_paramDim,
         nullptr, OH_NN_LSTM_HAS_BIAS);
@@ -968,10 +995,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_029, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for input_size.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_030, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_030, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     std::shared_ptr<NNTensor> inputSizeTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
@@ -994,10 +1022,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_030, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for hidden_size.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_031, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_031, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -1021,10 +1050,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_031, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for num_layers.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_032, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_032, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -1048,10 +1078,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_032, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for num_directions.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_033, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_033, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -1075,10 +1106,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_033, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for dropout.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_034, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_034, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -1101,10 +1133,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_034, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for zoneout_cell.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_035, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_035, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -1127,10 +1160,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_035, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for zoneout_hidden.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_036, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_036, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -1153,10 +1187,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_036, TestSize.Level2)
  * @tc.desc: Verify that the build function returns a failed message without set buffer for proj_size.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_build_037, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_build_037, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -1179,10 +1214,11 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_037, TestSize.Level2)
  * @tc.desc: Verify that the getPrimitive function returns a successful message.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_getprimitive_001, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_getprimitive_001, TestSize.Level1)
 {
     SetInputTensor();
     SetOutputTensor();
+
     SaveBidirectional(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_BIDIRECTIONAL);
     SaveHasBias(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_LSTM_HAS_BIAS);
     SaveInputSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_INPUT_SIZE);
@@ -1237,7 +1273,7 @@ HWTEST_F(LSTMBuilderTest, LSTM_getprimitive_001, TestSize.Level2)
  * @tc.desc: Verify that the getPrimitive function returns a failed message without build.
  * @tc.type: FUNC
  */
-HWTEST_F(LSTMBuilderTest, LSTM_getprimitive_002, TestSize.Level2)
+HWTEST_F(LSTMBuilderTest, LSTM_getprimitive_002, TestSize.Level1)
 {
     LiteGraphPrimitvePtr primitive = m_builder.GetPrimitive();
     LiteGraphPrimitvePtr expectPrimitive(nullptr, DestroyLiteGraphPrimitive);
