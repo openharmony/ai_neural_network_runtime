@@ -97,6 +97,9 @@ OH_NN_ReturnCode BatchToSpaceNDBuilder::Build(const std::vector<uint32_t>& param
         return returnCode;
     }
 
+    m_inputsIndex = inputsIndex;
+    m_outputsIndex = outputsIndex;
+
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         switch (tensor->GetType()) {
