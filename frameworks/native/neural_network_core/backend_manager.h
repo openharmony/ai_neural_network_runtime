@@ -41,11 +41,15 @@ public:
 
     static BackendManager& GetInstance()
     {
-        if (dlopen("libneural_network_runtime_ext.so", RTLD_NOLOAD) == nullptr) {
-            LOGI("dlopen libneural_network_runtime_ext.so.");
-            void* libHandle = dlopen("libneural_network_runtime_ext.so", RTLD_NOW | RTLD_GLOBAL);
-            if (libHandle == nullptr) {
-                LOGW("Failed to dlopen libneural_network_runtime_ext.so.");
+        // if libneural_network_runtime.so loaded
+        if (dlopen("libneural_network_runtime.so", RTLD_NOLOAD) != nullptr) {
+            // if libneural_network_runtime_ext.so not loaded, try to dlopen it
+            if (dlopen("libneural_network_runtime_ext.so", RTLD_NOLOAD) == nullptr) {
+                LOGI("dlopen libneural_network_runtime_ext.so.");
+                void* libHandle = dlopen("libneural_network_runtime_ext.so", RTLD_NOW | RTLD_GLOBAL);
+                if (libHandle == nullptr) {
+                    LOGW("Failed to dlopen libneural_network_runtime_ext.so.");
+                }
             }
         }
         static BackendManager instance;
