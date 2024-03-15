@@ -132,7 +132,7 @@ std::vector<int8_t> ConvertBatchToSpaceND(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertBiasAdd(PrimitivePtr primitive)
+std::vector<int8_t> ConvertBiasAdd(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertBiasAdd v2 failed, primitive is nullptr.");
@@ -147,7 +147,7 @@ std::vector<int8_t> ConvertBiasAdd(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertCast(PrimitivePtr primitive)
+std::vector<int8_t> ConvertCast(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertCast v2 failed, primitive is nullptr.");
@@ -265,7 +265,7 @@ std::vector<int8_t> ConvertEltwise(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertExpandDims(PrimitivePtr primitive)
+std::vector<int8_t> ConvertExpandDims(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertExpandDims v2 failed, primitive is nullptr.");
@@ -280,7 +280,7 @@ std::vector<int8_t> ConvertExpandDims(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertFill(PrimitivePtr primitive)
+std::vector<int8_t> ConvertFill(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertFill v2 failed, primitive is nullptr.");
@@ -332,7 +332,7 @@ std::vector<int8_t> ConvertFusedBatchNorm(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertGather(PrimitivePtr primitive)
+std::vector<int8_t> ConvertGather(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertGather v2 failed, primitive is nullptr.");
@@ -367,7 +367,7 @@ std::vector<int8_t> ConvertLayerNormFusion(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertLessEqual(PrimitivePtr primitive)
+std::vector<int8_t> ConvertLessEqual(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertLessEqual v2 failed, primitive is nullptr.");
@@ -402,7 +402,7 @@ std::vector<int8_t> ConvertMatMulFusion(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertMaximum(PrimitivePtr primitive)
+std::vector<int8_t> ConvertMaximum(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertMaximum v2 failed, primitive is nullptr.");
@@ -562,7 +562,7 @@ std::vector<int8_t> ConvertReduceFusion(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertReshape(PrimitivePtr primitive)
+std::vector<int8_t> ConvertReshape(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertReshape v2 failed, primitive is nullptr.");
@@ -602,7 +602,7 @@ std::vector<int8_t> ConvertResize(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertRsqrt(PrimitivePtr primitive)
+std::vector<int8_t> ConvertRsqrt(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertRsqrt v2 failed, primitive is nullptr.");
@@ -635,7 +635,7 @@ std::vector<int8_t> ConvertScaleFusion(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertShape(PrimitivePtr primitive)
+std::vector<int8_t> ConvertShape(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertShape v2 failed, primitive is nullptr.");
@@ -716,7 +716,7 @@ std::vector<int8_t> ConvertSplit(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertSqrt(PrimitivePtr primitive)
+std::vector<int8_t> ConvertSqrt(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertSqrt v2 failed, primitive is nullptr.");
@@ -730,7 +730,7 @@ std::vector<int8_t> ConvertSqrt(PrimitivePtr primitive)
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
 }
-std::vector<int8_t> ConvertSquaredDifference(PrimitivePtr primitive)
+std::vector<int8_t> ConvertSquaredDifference(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertSquaredDifference v2 failed, primitive is nullptr.");
@@ -847,7 +847,7 @@ std::vector<int8_t> ConvertTopKFusion(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertTranspose(PrimitivePtr primitive)
+std::vector<int8_t> ConvertTranspose(const PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
         LOGE("ConvertTranspose v2 failed, primitive is nullptr.");
@@ -1101,8 +1101,6 @@ OHOS::HDI::Nnrt::V2_0::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteG
 
     LOGI("MindIR_LiteGraph_To_Model begin"); // todo 改称hitrace
 
-    std::vector<uint32_t> inputIndex;
-    std::vector<uint32_t> outputIndex;
     std::vector<OHOS::HDI::Nnrt::V2_0::Node> nodes;
     std::vector<OHOS::HDI::Nnrt::V2_0::Tensor> allTensors;
     std::vector<OHOS::HDI::Nnrt::V2_0::SubGraph> subGraph;
