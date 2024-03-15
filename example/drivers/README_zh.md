@@ -439,14 +439,14 @@ rm -rf ./out
 2. 在```drivers/peripheral/nnrt```下补充```bundle.json```文件，```bundle.json```的写法参考本教程上面[开发步骤](#开发步骤)中的[实现HDI服务](#实现hdi服务)章节。
 
 3. 由于Demo依赖MindSpore Lite CPU算子，因此需要添加MindSpore Lite依赖文件：
-    - 下载MindSpore Lite的头文件，[MindSpore Lite 1.8.1](https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.8.1/MindSpore/lite/release/android/gpu/mindspore-lite-1.8.1-android-aarch64.tar.gz)。
     - 在```drivers/peripheral/nnrt/v2_0```下创建```mindspore```目录，用于存放mindspore动态库和头文件。
       ```shell
       mkdir drivers/peripheral/nnrt/v2_0/mindspore
       ```
-    - 解压```mindspore-lite-1.8.1-android-aarch64.tar.gz```文件，将```runtime/include```目录拷贝到```drivers/peripheral/nnrt/v2_0/mindspore```目录下。
+    - 将所需的头文件拷贝到```drivers/peripheral/nnrt/v2_0/mindspore```目录下。
       ```shell
-      cp mindspore-lite-1.8.1-android-aarch64/runtime/include drivers/peripheral/nnrt/v2_0/mindspore
+      cp -r third_party/mindspore/mindspore-src/source/include drivers/peripheral/nnrt/v2_0/mindspore
+      cp -r third_party/mindspore/mindspore-src/source/mindspore/core/mindapi drivers/peripheral/nnrt/v2_0/mindspore/include/
       ```
     - Demo还依赖mindspore的```schema```文件：
       ```shell
