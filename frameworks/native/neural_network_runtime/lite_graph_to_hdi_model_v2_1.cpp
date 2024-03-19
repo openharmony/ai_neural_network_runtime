@@ -325,7 +325,7 @@ std::vector<int8_t> ConvertConstantOfShape(PrimitivePtr primitive)
     }
 
     ConstantOfShape constantOfShape{};
-    constantOfShape.data_type = mindspore::lite::MindIR_ConstantOfShape_GetDataType(primitive);
+    constantOfShape.dataType = mindspore::lite::MindIR_ConstantOfShape_GetDataType(primitive);
     constantOfShape.value = mindspore::lite::MindIR_ConstantOfShape_GetValue(primitive);
 
     OHOS::MessageParcel data;
@@ -343,7 +343,7 @@ std::vector<int8_t> ConvertDepthToSpace(PrimitivePtr primitive)
     }
 
     DepthToSpace depthToSpace{};
-    depthToSpace.block_size = mindspore::lite::MindIR_DepthToSpace_GetBlockSize(primitive);
+    depthToSpace.blockSize = mindspore::lite::MindIR_DepthToSpace_GetBlockSize(primitive);
     depthToSpace.format = static_cast<Format>(
         mindspore::lite::MindIR_DepthToSpace_GetFormat(primitive));
     depthToSpace.mode = mindspore::lite::MindIR_DepthToSpace_GetMode(primitive);
@@ -691,15 +691,15 @@ std::vector<int8_t> ConvertLstm(PrimitivePtr primitive)
 
     LSTM lSTM{};
     lSTM.bidirectional = mindspore::lite::MindIR_LSTM_GetBidirectional(primitive);
-    lSTM.has_bias = mindspore::lite::MindIR_LSTM_GetHasBias(primitive);
-    lSTM.input_size = mindspore::lite::MindIR_LSTM_GetInputSize(primitive);
-    lSTM.hidden_size = mindspore::lite::MindIR_LSTM_GetHiddenSize(primitive);
-    lSTM.num_layers = mindspore::lite::MindIR_LSTM_GetNumLayers(primitive);
-    lSTM.num_directions = mindspore::lite::MindIR_LSTM_GetNumDirections(primitive);
+    lSTM.hasBias = mindspore::lite::MindIR_LSTM_GetHasBias(primitive);
+    lSTM.inputSize = mindspore::lite::MindIR_LSTM_GetInputSize(primitive);
+    lSTM.hiddenSize = mindspore::lite::MindIR_LSTM_GetHiddenSize(primitive);
+    lSTM.numLayers = mindspore::lite::MindIR_LSTM_GetNumLayers(primitive);
+    lSTM.numDirections = mindspore::lite::MindIR_LSTM_GetNumDirections(primitive);
     lSTM.dropout = mindspore::lite::MindIR_LSTM_GetDropout(primitive);
-    lSTM.zoneout_cell = mindspore::lite::MindIR_LSTM_GetZoneoutCell(primitive);
-    lSTM.zoneout_hidden = mindspore::lite::MindIR_LSTM_GetZoneoutHidden(primitive);
-    lSTM.proj_size = mindspore::lite::MindIR_LSTM_GetProjSize(primitive);
+    lSTM.zoneoutCell = mindspore::lite::MindIR_LSTM_GetZoneoutCell(primitive);
+    lSTM.zoneoutHidden = mindspore::lite::MindIR_LSTM_GetZoneoutHidden(primitive);
+    lSTM.projSize = mindspore::lite::MindIR_LSTM_GetProjSize(primitive);
 
     OHOS::MessageParcel data;
     (void)LSTMBlockMarshalling(data, lSTM);
@@ -925,7 +925,7 @@ std::vector<int8_t> ConvertRange(PrimitivePtr primitive)
     }
 
     Range range{};
-    range.d_type = mindspore::lite::MindIR_Range_GetDType(primitive);
+    range.dataType = mindspore::lite::MindIR_Range_GetDType(primitive);
     range.start = mindspore::lite::MindIR_Range_GetStart(primitive);
     range.limit = mindspore::lite::MindIR_Range_GetLimit(primitive);
     range.delta = mindspore::lite::MindIR_Range_GetDelta(primitive);
