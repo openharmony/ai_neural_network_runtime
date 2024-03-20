@@ -23,6 +23,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 1;
 static const std::string OP_NAME = "Add";
 
 AddBuilder::AddBuilder() {}
@@ -71,6 +72,12 @@ OH_NN_ReturnCode AddBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Add] Build failed, the param index of Add operation is invalid.");
+        return ret;
+    }
 
     for (uint32_t i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];

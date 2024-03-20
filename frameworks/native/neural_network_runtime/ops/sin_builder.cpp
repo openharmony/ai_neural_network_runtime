@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "Sin";
 
 SinBuilder::SinBuilder() {}
@@ -41,14 +42,15 @@ OH_NN_ReturnCode SinBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         LOGE("[Sin] Build failed, passed invalid input or output index.");
         return ret;
     }
-    
-    if (!paramsIndex.empty()) {
-        LOGW("[Sin] Build failed, the sin expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Sin] Build failed, passed invalid input or output index.");
+        return ret;
+    }
 
     m_name = OP_NAME;
     m_isBuild = true;

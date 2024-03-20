@@ -35,11 +35,14 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
+    OH_NN_ReturnCode SetCoeff(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetReduceToEnd(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode SetKeepDims(std::shared_ptr<NNTensor> tensor);
 
 private:
     bool m_keepDims{false};
-    mindspore::lite::ReduceMode m_mode{mindspore::lite::REDUCE_MODE_MEAN};
+    float m_coeff {0.0f};
+    bool m_reduceToEnd {false};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

@@ -48,9 +48,9 @@ private:
     OH_NN_ReturnCode SetActivation(std::shared_ptr<NNTensor> tensor);
 
 private:
-    int64_t m_group{1};
-    int64_t m_inChannel{0};
-    int64_t m_outChannel{0};
+    int64_t m_group {1};
+    int64_t m_inChannel {0};
+    int64_t m_outChannel {0};
     std::vector<int64_t> m_kernelSize;
     std::vector<int64_t> m_strides;
     std::vector<int64_t> m_padList;

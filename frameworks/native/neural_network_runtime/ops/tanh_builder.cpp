@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 1;
 static const std::string OP_NAME = "Tanh";
 
 TanhBuilder::TanhBuilder() {}
@@ -48,13 +49,14 @@ OH_NN_ReturnCode TanhBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return returnCode;
     }
 
-    if (!paramsIndex.empty()) {
-        LOGE("[TanhBuilder] TanhBuilder expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[TanhBuilder] Passed invalid param index.");
+        return returnCode;
+    }
 
     // The quantization type of the first output determinies that of the operator.
     SetQuantType(outputsIndex, allTensors);

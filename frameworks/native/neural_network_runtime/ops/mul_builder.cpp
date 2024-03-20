@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 1;
 static const int SCALE_LENGTH = 1;
 static const std::string OP_NAME = "Mul";
 
@@ -79,6 +80,12 @@ OH_NN_ReturnCode MulBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[Mul] Mul build failed. Passed invalid param index of Mul operation index.");
+        return returnCode;
+    }
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];

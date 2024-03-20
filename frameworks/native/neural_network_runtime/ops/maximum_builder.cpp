@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "Maximum";
 
 MaximumBuilder::MaximumBuilder() {}
@@ -46,13 +47,14 @@ OH_NN_ReturnCode MaximumBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return ret;
     }
 
-    if (!paramsIndex.empty()) {
-        LOGW("[Maximum] Maximum Build failed. Maximum expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Maximum] Maximum Build failed. The param index of Maximum operation is invalid.");
+        return ret;
+    }
 
     m_isBuild = true;
     m_name = OP_NAME;

@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 4;
 static const std::string OP_NAME = "ArgMax";
 
 ArgMaxBuilder::ArgMaxBuilder() {}
@@ -31,7 +32,7 @@ OH_NN_ReturnCode ArgMaxBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
     tensor->IdentifyOpParameter();
 
     if (tensor->GetDataType() != OH_NN_INT64) {
-        LOGE("[ArgMax] SetAxis failed, the axis should be type HNN_INT64.");
+        LOGE("[ArgMax] SetAxis failed, the axis should be type OH_NN_INT64.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -45,12 +46,31 @@ OH_NN_ReturnCode ArgMaxBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
+OH_NN_ReturnCode ArgMaxBuilder::SetTopK(std::shared_ptr<NNTensor> tensor)
+{
+    tensor->IdentifyOpParameter();
+
+    if (tensor->GetDataType() != OH_NN_INT64) {
+        LOGE("[ArgMax] SetTopK failed, the topK should be type OH_NN_INT64.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[ArgMax] SetTopK GetBuffer return nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    m_topK = *(static_cast<int64_t*>(buffer));
+    return OH_NN_SUCCESS;
+}
+
 OH_NN_ReturnCode ArgMaxBuilder::SetKeepdims(std::shared_ptr<NNTensor> tensor)
 {
     tensor->IdentifyOpParameter();
 
     if (tensor->GetDataType() != OH_NN_BOOL) {
-        LOGE("[ArgMax] SetKeepdims failed, the keep_dims should be type HNN_BOOL.");
+        LOGE("[ArgMax] SetKeepdims failed, the keep_dims should be type OH_NN_BOOL.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -60,6 +80,25 @@ OH_NN_ReturnCode ArgMaxBuilder::SetKeepdims(std::shared_ptr<NNTensor> tensor)
         return OH_NN_INVALID_PARAMETER;
     }
     m_keepDims = *(static_cast<bool*>(buffer));
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode ArgMaxBuilder::SetOutMaxValue(std::shared_ptr<NNTensor> tensor)
+{
+    tensor->IdentifyOpParameter();
+
+    if (tensor->GetDataType() != OH_NN_BOOL) {
+        LOGE("[ArgMax] SetOutMaxValue failed, the outMaxValue should be type OH_NN_BOOL.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[ArgMax] SetOutMaxValue GetBuffer return nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    m_outMaxValue = *(static_cast<bool*>(buffer));
 
     return OH_NN_SUCCESS;
 }
@@ -87,14 +126,26 @@ OH_NN_ReturnCode ArgMaxBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
 
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[ArgMax] Build failed, passed invalid param index.");
+        return returnCode;
+    }
+
     for (int i : paramsIndex) {
         const std::shared_ptr<NNTensor> tensor = allTensors[i];
         switch (tensor->GetType()) {
             case OH_NN_ARG_MAX_AXIS:
                 returnCode = SetAxis(tensor);
                 break;
+            case OH_NN_ARG_MAX_TOP_K:
+                returnCode = SetTopK(tensor);
+                break;
             case OH_NN_ARG_MAX_KEEPDIMS:
                 returnCode = SetKeepdims(tensor);
+                break;
+            case OH_NN_ARG_MAX_OUT_MAX_VALUE:
+                returnCode = SetOutMaxValue(tensor);
                 break;
             default:
                 LOGE("[ArgMax] Build failed, param invalid, type = %d.", tensor->GetType());

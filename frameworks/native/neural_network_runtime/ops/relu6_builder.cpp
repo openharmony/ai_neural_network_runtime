@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "Relu6";
 
 Relu6Builder::Relu6Builder() {}
@@ -46,13 +47,14 @@ OH_NN_ReturnCode Relu6Builder::Build(const std::vector<uint32_t>& paramsIndex,
         return returnCode;
     }
 
-    if (!paramsIndex.empty()) {
-        LOGW("[Relu6] Build failed, the Relu6 expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[Relu6] Build failed, passed invaid param indices.");
+        return returnCode;
+    }
 
     SetQuantType(outputsIndex, allTensors);
 

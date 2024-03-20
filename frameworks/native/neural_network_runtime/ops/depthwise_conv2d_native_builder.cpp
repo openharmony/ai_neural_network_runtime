@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 3;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 8;
 static const int PAD_MODE_SIZE = 1;
 static const int PAD_LIST_SIZE = 4;
 static const int IN_CHANNEL_IN_INPUT = 3;
@@ -208,6 +209,12 @@ OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::Build(const std::vector<uint32_t>
 
     OH_NN_ReturnCode ret = SetInputAndOutput(inputsIndex, outputsIndex, allTensors);
     if (ret != OH_NN_SUCCESS) {
+        return ret;
+    }
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[DepthwiseConv2DNative] Build failed, passed invalid param index.");
         return ret;
     }
 

@@ -58,10 +58,10 @@ void LayerNormBuilderTest::TearDown() {}
 void LayerNormBuilderTest::SaveNormAixsTensor(OH_NN_DataType dataType,
     const std::vector<int32_t> &dim, const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
 {
-    int32_t* beginNormAxisValue = new (std::nothrow) int32_t(1);
+    int64_t* beginNormAxisValue = new (std::nothrow) int64_t(1);
     EXPECT_NE(nullptr, beginNormAxisValue);
     std::shared_ptr<NNTensor> normAxisTensor = TransToNNTensor(dataType, dim, quantParam, type);
-    normAxisTensor->SetBuffer(beginNormAxisValue, sizeof(int32_t));
+    normAxisTensor->SetBuffer(beginNormAxisValue, sizeof(int64_t));
     m_allTensors.emplace_back(normAxisTensor);
 }
 
@@ -78,10 +78,10 @@ void LayerNormBuilderTest::SaveEpsilonTensor(OH_NN_DataType dataType,
 void LayerNormBuilderTest::SaveParamAxisTensor(OH_NN_DataType dataType,
     const std::vector<int32_t> &dim, const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
 {
-    int32_t* beginNormParamValue = new (std::nothrow) int32_t(1);
+    int64_t* beginNormParamValue = new (std::nothrow) int64_t(1);
     EXPECT_NE(nullptr, beginNormParamValue);
     std::shared_ptr<NNTensor> paramAxisTensor = TransToNNTensor(dataType, dim, quantParam, type);
-    paramAxisTensor->SetBuffer(beginNormParamValue, sizeof(int32_t));
+    paramAxisTensor->SetBuffer(beginNormParamValue, sizeof(int64_t));
     m_allTensors.emplace_back(paramAxisTensor);
 }
 
@@ -106,9 +106,9 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_001, TestSize.Level0)
 {
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
     OH_NN_ReturnCode ret = m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
@@ -123,9 +123,9 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_002, TestSize.Level0)
 {
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
     EXPECT_EQ(OH_NN_SUCCESS, m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors));
     OH_NN_ReturnCode ret = m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors);
@@ -145,9 +145,9 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_003, TestSize.Level0)
 
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
     OH_NN_ReturnCode ret = m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -165,9 +165,9 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_004, TestSize.Level0)
 
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
     OH_NN_ReturnCode ret = m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -214,7 +214,7 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_007, TestSize.Level0)
     m_allTensors.emplace_back(normAxisTensor);
 
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
     OH_NN_ReturnCode ret = m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -234,13 +234,13 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_008, TestSize.Level0)
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
 
     std::shared_ptr<NNTensor> normAxisTensor;
-    normAxisTensor = TransToNNTensor(OH_NN_INT32, expectParamDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
-    int32_t beginNormAxisValue[2] = {1, 2};
-    normAxisTensor->SetBuffer(beginNormAxisValue, 2 * sizeof(int32_t));
+    normAxisTensor = TransToNNTensor(OH_NN_INT64, expectParamDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    int64_t beginNormAxisValue[2] = {1, 2};
+    normAxisTensor->SetBuffer(beginNormAxisValue, 2 * sizeof(int64_t));
     m_allTensors.emplace_back(normAxisTensor);
 
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
     OH_NN_ReturnCode ret = m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -256,8 +256,8 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_009, TestSize.Level0)
 {
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
     std::shared_ptr<NNTensor> epsilonTensor;
     epsilonTensor = TransToNNTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
@@ -281,8 +281,8 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_010, TestSize.Level0)
 
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
     std::shared_ptr<NNTensor> epsilonTensor;
     epsilonTensor = TransToNNTensor(OH_NN_FLOAT32, expectParamDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
@@ -304,7 +304,7 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_011, TestSize.Level0)
 {
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
 
     std::shared_ptr<NNTensor> paramAxisTensor;
@@ -329,13 +329,13 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_012, TestSize.Level0)
 
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
 
     std::shared_ptr<NNTensor> paramAxisTensor;
-    paramAxisTensor = TransToNNTensor(OH_NN_INT32, expectParamDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
-    int32_t beginNormParamValue[2] = {1, 1};
-    paramAxisTensor->SetBuffer(beginNormParamValue, 2 * sizeof(int32_t));
+    paramAxisTensor = TransToNNTensor(OH_NN_INT64, expectParamDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    int64_t beginNormParamValue[2] = {1, 1};
+    paramAxisTensor->SetBuffer(beginNormParamValue, 2 * sizeof(int64_t));
     m_allTensors.emplace_back(paramAxisTensor);
 
     OH_NN_ReturnCode ret = m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors);
@@ -352,9 +352,9 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_0013, TestSize.Level0)
 {
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_BATCH_NORM_EPSILON);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_BATCH_NORM_EPSILON);
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
     OH_NN_ReturnCode ret = m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -370,10 +370,10 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_014, TestSize.Level0)
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
     std::shared_ptr<NNTensor> normAxisTensor;
-    normAxisTensor = TransToNNTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    normAxisTensor = TransToNNTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
     m_allTensors.emplace_back(normAxisTensor);
 
     OH_NN_ReturnCode ret = m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors);
@@ -389,8 +389,8 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_015, TestSize.Level0)
 {
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
     std::shared_ptr<NNTensor> epsilonTensor;
     epsilonTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
@@ -409,11 +409,11 @@ HWTEST_F(LayerNormBuilderTest, layernorm_build_016, TestSize.Level0)
 {
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
 
     std::shared_ptr<NNTensor> paramAxisTensor;
-    paramAxisTensor = TransToNNTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    paramAxisTensor = TransToNNTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
     m_allTensors.emplace_back(paramAxisTensor);
 
     OH_NN_ReturnCode ret = m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors);
@@ -429,13 +429,13 @@ HWTEST_F(LayerNormBuilderTest, layernorm_getprimitive_001, TestSize.Level0)
 {
     SetInputTensor(m_inputTensor);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveNormAixsTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
+    SaveNormAixsTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_NORM_AXIS);
     SaveEpsilonTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_EPSILON);
-    SaveParamAxisTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
+    SaveParamAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS);
 
-    int32_t beginNormAxisValue = 1;
+    int64_t beginNormAxisValue = 1;
     float epsilonValue = 0.0f;
-    int32_t beginNormParamValue = 1;
+    int64_t beginNormParamValue = 1;
     EXPECT_EQ(OH_NN_SUCCESS, m_layerNorm.Build(m_params, m_inputs, m_outputsIndex, m_allTensors));
     LiteGraphPrimitvePtr primitive = m_layerNorm.GetPrimitive();
     LiteGraphPrimitvePtr expectPrimitive(nullptr, DestroyLiteGraphPrimitive);

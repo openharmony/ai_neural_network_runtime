@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUMS = 1;
 static const int OUTPUT_NUMS = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "Relu";
 
 ReluBuilder::ReluBuilder() {}
@@ -46,13 +47,14 @@ OH_NN_ReturnCode ReluBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return returnCode;
     }
 
-    if (!paramsIndex.empty()) {
-        LOGW("[Relu] Build failed, the Relu expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[Relu] Build failed, passed invalid param indices.");
+        return returnCode;
+    }
 
     SetQuantType(outputsIndex, allTensors);
 

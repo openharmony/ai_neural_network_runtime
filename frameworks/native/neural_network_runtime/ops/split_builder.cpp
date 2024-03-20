@@ -19,6 +19,7 @@ namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 3;
 static const std::string OP_NAME = "Split";
 
 SplitBuilder::SplitBuilder() {}
@@ -133,6 +134,12 @@ OH_NN_ReturnCode SplitBuilder::Build(const std::vector<uint32_t> &paramsIndex,
     OH_NN_ReturnCode returnCode = SetInputAndOutput(inputsIndex, outputsIndex, allTensors);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("[SplitBuilder] Set index of inputs or outputs failed.");
+        return returnCode;
+    }
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[SplitBuilder] Build failed, passed invalid param index.");
         return returnCode;
     }
 

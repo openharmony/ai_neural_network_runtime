@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 6;
 static const int OUTPUT_NUM = 3;
+static const int PARAM_MAX_NUM = 10;
 static const int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "LSTM";
 
@@ -315,6 +316,12 @@ OH_NN_ReturnCode LSTMBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[LSTM] Build failed, passed invalid param index.");
+        return ret;
+    }
 
     ret = ParseParam(paramsIndex, allTensors);
     if (ret != OH_NN_SUCCESS) {

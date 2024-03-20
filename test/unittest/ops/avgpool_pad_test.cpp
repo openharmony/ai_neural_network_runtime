@@ -31,6 +31,10 @@ public:
 
     void SetPad(OH_NN_DataType dataType,
         const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetRoundMode(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetGlobal(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
     void SetPadParams();
 
 public:
@@ -43,19 +47,39 @@ public:
     std::vector<int32_t> m_param_dim{};
     std::vector<uint32_t> m_inputs{0};
     std::vector<uint32_t> m_outputs{1};
-    std::vector<uint32_t> m_params{2, 3, 4, 5};
+    std::vector<uint32_t> m_params{2, 3, 4, 5, 6, 7};
 };
 
 void AvgPoolPadBuilderTest::SetUp() {}
 
 void AvgPoolPadBuilderTest::TearDown() {}
 
+void AvgPoolPadBuilderTest::SetRoundMode(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
+    int32_t* roundModeValue = new (std::nothrow) int32_t(0);
+    EXPECT_NE(nullptr, roundModeValue);
+    tensor->SetBuffer(roundModeValue, sizeof(int32_t));
+    m_allTensors.emplace_back(tensor);
+}
+
+void AvgPoolPadBuilderTest::SetGlobal(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
+    bool* globalValue = new (std::nothrow) bool(false);
+    EXPECT_NE(nullptr, globalValue);
+    tensor->SetBuffer(globalValue, sizeof(bool));
+    m_allTensors.emplace_back(tensor);
+}
+
 void AvgPoolPadBuilderTest::SetPad(OH_NN_DataType dataType,
     const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
 {
     int32_t padNum{4};
     std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
-    int64_t* padValue = new (std::nothrow) int64_t[padNum]{0, 0, 0, 0};
+    int64_t* padValue = new (std::nothrow) int64_t[padNum] {0, 0, 0, 0};
     EXPECT_NE(nullptr, padValue);
     tensor->SetBuffer(padValue, sizeof(int64_t) * padNum);
     m_allTensors.emplace_back(tensor);
@@ -67,6 +91,8 @@ void AvgPoolPadBuilderTest::SetPadParams()
     SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_AVG_POOL_STRIDE);
     SetPad(OH_NN_INT64, m_pad_dim, nullptr, OH_NN_AVG_POOL_PAD);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_AVG_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
 }
 
 /**
@@ -107,7 +133,7 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_003, TestSize.Level1)
 {
     m_inputs = {};
     m_outputs = {0};
-    m_params = {1, 2, 3, 4};
+    m_params = {1, 2, 3, 4, 5, 6};
     m_paramsIndex = m_params;
 
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -126,7 +152,7 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_004, TestSize.Level1)
 {
     m_inputs = {0};
     m_outputs = {};
-    m_params = {1, 2, 3, 4};
+    m_params = {1, 2, 3, 4, 5, 6};
     m_paramsIndex = m_params;
 
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -143,9 +169,9 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_004, TestSize.Level1)
  */
 HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_005, TestSize.Level1)
 {
-    m_inputs = {6};
+    m_inputs = {8};
     m_outputs = {1};
-    m_params = {2, 3, 4, 5};
+    m_params = {2, 3, 4, 5, 6, 7};
     m_paramsIndex = m_params;
 
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -163,8 +189,8 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_005, TestSize.Level1)
 HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_006, TestSize.Level1)
 {
     m_inputs = {0};
-    m_outputs = {6};
-    m_params = {2, 3, 4, 5};
+    m_outputs = {8};
+    m_params = {2, 3, 4, 5, 6, 7};
     m_paramsIndex = m_params;
 
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -196,7 +222,10 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_007, TestSize.Level1)
     SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_AVG_POOL_STRIDE);
     SetPad(OH_NN_INT64, m_pad_dim, nullptr, OH_NN_AVG_POOL_PAD);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_AVG_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+    tensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -220,7 +249,10 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_008, TestSize.Level1)
 
     SetPad(OH_NN_INT64, m_pad_dim, nullptr, OH_NN_AVG_POOL_PAD);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_AVG_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+    tensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -244,9 +276,11 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_009, TestSize.Level1)
     tensor->SetBuffer(padValue, sizeof(int32_t) * padNum);
     m_allTensors.emplace_back(tensor);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_AVG_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+    tensor->SetBuffer(nullptr, 0);
 }
-
 
 /**
  * @tc.name: avgpool_build_pad_010
@@ -269,15 +303,72 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_010, TestSize.Level1)
 
     tensor->SetBuffer(activationValue, sizeof(int32_t));
     m_allTensors.emplace_back(tensor);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+    tensor->SetBuffer(nullptr, 0);
 }
 
 /**
  * @tc.name: avgpool_build_pad_011
- * @tc.desc: Verify the activation scalar length of the build function
+ * @tc.desc: Verify the invalid roundMode of the build function
  * @tc.type: FUNC
  */
 HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_011, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetKernelSize(OH_NN_INT64, m_kenelsize_dim, nullptr, OH_NN_AVG_POOL_KERNEL_SIZE);
+    SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_AVG_POOL_STRIDE);
+    SetPad(OH_NN_INT64, m_pad_dim, nullptr, OH_NN_AVG_POOL_PAD);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_AVG_POOL_ACTIVATION_TYPE);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, m_param_dim, nullptr,
+        OH_NN_AVG_POOL_ROUND_MODE);
+    int64_t* roundModeValue = new (std::nothrow) int64_t(0);
+    EXPECT_NE(nullptr, roundModeValue);
+
+    tensor->SetBuffer(roundModeValue, sizeof(int64_t));
+    m_allTensors.emplace_back(tensor);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+    tensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: avgpool_build_pad_012
+ * @tc.desc: Verify the invalid activation of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_012, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetKernelSize(OH_NN_INT64, m_kenelsize_dim, nullptr, OH_NN_AVG_POOL_KERNEL_SIZE);
+    SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_AVG_POOL_STRIDE);
+    SetPad(OH_NN_INT64, m_pad_dim, nullptr, OH_NN_AVG_POOL_PAD);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_AVG_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT32, m_param_dim, nullptr,
+        OH_NN_AVG_POOL_GLOBAL);
+    int32_t* globalValue = new (std::nothrow) int32_t(0);
+    EXPECT_NE(nullptr, globalValue);
+
+    tensor->SetBuffer(globalValue, sizeof(int32_t));
+    m_allTensors.emplace_back(tensor);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+    tensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: avgpool_build_pad_013
+ * @tc.desc: Verify the activation scalar length of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_013, TestSize.Level1)
 {
     m_param_dim = {2};
     m_paramsIndex = m_params;
@@ -298,11 +389,11 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_011, TestSize.Level1)
 }
 
 /**
- * @tc.name: avgpool_build_pad_012
+ * @tc.name: avgpool_build_pad_014
  * @tc.desc: Verify the avgpool without set kernelsize of the build function
  * @tc.type: FUNC
  */
-HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_012, TestSize.Level1)
+HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_014, TestSize.Level1)
 {
     m_paramsIndex = m_params;
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -315,15 +406,17 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_012, TestSize.Level1)
     SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_AVG_POOL_STRIDE);
     SetPad(OH_NN_INT64, m_pad_dim, nullptr, OH_NN_AVG_POOL_PAD);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_AVG_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
- * @tc.name: avgpool_build_pad_013
+ * @tc.name: avgpool_build_pad_015
  * @tc.desc: Verify the avgpool without set stride of the build function
  * @tc.type: FUNC
  */
-HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_013, TestSize.Level1)
+HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_015, TestSize.Level1)
 {
     m_paramsIndex = m_params;
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -335,15 +428,17 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_013, TestSize.Level1)
 
     SetPad(OH_NN_INT64, m_pad_dim, nullptr, OH_NN_AVG_POOL_PAD);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_AVG_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
- * @tc.name: avgpool_build_pad_014
+ * @tc.name: avgpool_build_pad_016
  * @tc.desc: Verify the avgpool without set pad of the build function
  * @tc.type: FUNC
  */
-HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_014, TestSize.Level1)
+HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_016, TestSize.Level1)
 {
     m_paramsIndex = m_params;
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -351,19 +446,21 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_014, TestSize.Level1)
 
     SetKernelSize(OH_NN_INT64, m_kenelsize_dim, nullptr, OH_NN_AVG_POOL_KERNEL_SIZE);
     SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_AVG_POOL_STRIDE);
-    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, m_pad_dim, nullptr, OH_NN_AVG_POOL_PAD);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT32, m_pad_dim, nullptr, OH_NN_AVG_POOL_PAD);
     m_allTensors.emplace_back(tensor);
 
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_AVG_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
- * @tc.name: avgpool_build_pad_015
+ * @tc.name: avgpool_build_pad_017
  * @tc.desc: Verify the avgpool without set activation of the build function
  * @tc.type: FUNC
  */
-HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_015, TestSize.Level1)
+HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_017, TestSize.Level1)
 {
     m_paramsIndex = m_params;
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -375,6 +472,54 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_015, TestSize.Level1)
 
     std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT8, m_param_dim, nullptr,
         OH_NN_AVG_POOL_ACTIVATION_TYPE);
+    m_allTensors.emplace_back(tensor);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: avgpool_build_pad_018
+ * @tc.desc: Verify the avgpool without set activation of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_018, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetKernelSize(OH_NN_INT64, m_kenelsize_dim, nullptr, OH_NN_AVG_POOL_KERNEL_SIZE);
+    SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_AVG_POOL_STRIDE);
+    SetPad(OH_NN_INT64, m_pad_dim, nullptr, OH_NN_AVG_POOL_PAD);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_AVG_POOL_ACTIVATION_TYPE);
+
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, m_param_dim, nullptr,
+        OH_NN_AVG_POOL_ROUND_MODE);
+    m_allTensors.emplace_back(tensor);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: avgpool_build_pad_019
+ * @tc.desc: Verify the avgpool without set activation of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_019, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetKernelSize(OH_NN_INT64, m_kenelsize_dim, nullptr, OH_NN_AVG_POOL_KERNEL_SIZE);
+    SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_AVG_POOL_STRIDE);
+    SetPad(OH_NN_INT64, m_pad_dim, nullptr, OH_NN_AVG_POOL_PAD);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_AVG_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
+
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT8, m_param_dim, nullptr,
+        OH_NN_AVG_POOL_GLOBAL);
     m_allTensors.emplace_back(tensor);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
@@ -408,6 +553,12 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_getprimitive_pad_001, TestSize.Level1)
     int8_t activationValue = 0;
     int expectActivation = mindspore::lite::MindIR_AvgPoolFusion_GetActivationType(primitive.get());
     EXPECT_EQ(activationValue, expectActivation);
+    mindspore::lite::RoundMode roundModeValue = mindspore::lite::ROUND_MODE_FLOOR;
+    auto expectRoundMode = mindspore::lite::MindIR_AvgPoolFusion_GetRoundMode(primitive.get());
+    EXPECT_EQ(roundModeValue, expectRoundMode);
+    bool globalValue = false;
+    bool expectGlobal = mindspore::lite::MindIR_AvgPoolFusion_GetGlobal(primitive.get());
+    EXPECT_EQ(globalValue, expectGlobal);
 }
 
 /**

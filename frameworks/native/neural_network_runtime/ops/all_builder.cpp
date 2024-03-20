@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 1;
 static const int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "All";
 
@@ -64,9 +65,15 @@ OH_NN_ReturnCode AllBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         LOGE("[All] Build failed, passed invalid input or output index.");
         return ret;
     }
-    
+
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[All] Build failed, passed invalid param index.");
+        return ret;
+    }
 
     OH_NN_ReturnCode returnCode;
     for (int i : paramsIndex) {

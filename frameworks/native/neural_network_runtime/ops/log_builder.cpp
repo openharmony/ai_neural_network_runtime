@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "Log";
 
 LogBuilder::LogBuilder() {}
@@ -41,10 +42,11 @@ OH_NN_ReturnCode LogBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         LOGE("[Log] Build failed, passed invalid input or output index.");
         return ret;
     }
-    
-    if (!paramsIndex.empty()) {
-        LOGW("[Log] Build failed, the log expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Log] Build failed, passed invalid param index.");
+        return ret;
     }
 
     m_inputsIndex = inputsIndex;

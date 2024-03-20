@@ -33,12 +33,16 @@ public:
         const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
     void SetArgmaxKeepdims(OH_NN_DataType dataType,
         const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetArgmaxTopK(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetArgmaxOutMaxValue(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
 
 public:
     ArgMaxBuilder m_builder;
     std::vector<uint32_t> m_inputs{0};
     std::vector<uint32_t> m_outputs{1};
-    std::vector<uint32_t> m_params{2, 3};
+    std::vector<uint32_t> m_params{2, 3, 4, 5};
     std::vector<int32_t> m_input_dim{3, 3};
     std::vector<int32_t> m_output_dim{3, 3};
     std::vector<int32_t> m_param_dim{};
@@ -64,7 +68,27 @@ void ArgMaxBuilderTest::SetArgmaxKeepdims(OH_NN_DataType dataType,
     std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
     bool* keepdimsValue = new (std::nothrow) bool(false);
     EXPECT_NE(nullptr, keepdimsValue);
-    tensor->SetBuffer(keepdimsValue, sizeof(keepdimsValue));
+    tensor->SetBuffer(keepdimsValue, sizeof(bool));
+    m_allTensors.emplace_back(tensor);
+}
+
+void ArgMaxBuilderTest::SetArgmaxTopK(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
+    int64_t* topKValue = new (std::nothrow) int64_t(0);
+    EXPECT_NE(nullptr, topKValue);
+    tensor->SetBuffer(topKValue, sizeof(int64_t));
+    m_allTensors.emplace_back(tensor);
+}
+
+void ArgMaxBuilderTest::SetArgmaxOutMaxValue(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
+    bool* outMaxValueValue = new (std::nothrow) bool(false);
+    EXPECT_NE(nullptr, outMaxValueValue);
+    tensor->SetBuffer(outMaxValueValue, sizeof(bool));
     m_allTensors.emplace_back(tensor);
 }
 
@@ -81,6 +105,8 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_001, TestSize.Level1)
 
     SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
     SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
 
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
@@ -93,7 +119,7 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_002, TestSize.Level1)
 {
     m_inputs = {0};
     m_outputs = {1};
-    m_params = {2, 3};
+    m_params = {2, 3, 4, 5};
 
     m_paramsIndex = m_params;
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -101,6 +127,9 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_002, TestSize.Level1)
 
     SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
     SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
@@ -122,6 +151,9 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_003, TestSize.Level1)
 
     SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
     SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -142,6 +174,9 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_004, TestSize.Level1)
 
     SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
     SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -162,6 +197,9 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_005, TestSize.Level1)
 
     SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
     SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -182,6 +220,9 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_006, TestSize.Level1)
 
     SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
     SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -203,6 +244,9 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_007, TestSize.Level1)
     tensor->SetBuffer(axisValueTest, sizeof(float));
     m_allTensors.emplace_back(tensor);
     SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -224,12 +268,15 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_008, TestSize.Level1)
 
     tensor->SetBuffer(keepdimsValue, sizeof(int64_t));
     m_allTensors.emplace_back(tensor);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
  * @tc.name: argmax_build_009
- * @tc.desc: Verify the invalid param to argmax of the build function
+ * @tc.desc: Verify the invalid keepdims of the build function
  * @tc.type: FUNC
  */
 HWTEST_F(ArgMaxBuilderTest, argmax_build_009, TestSize.Level1)
@@ -239,18 +286,21 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_009, TestSize.Level1)
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
 
     SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
-    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, m_param_dim, nullptr, OH_NN_AVG_POOL_STRIDE);
-    int64_t* strideValue = new (std::nothrow) int64_t(0);
-    EXPECT_NE(nullptr, strideValue);
+    SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
 
-    tensor->SetBuffer(strideValue, sizeof(int64_t));
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_FLOAT32, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    float* topKValueTest = new (std::nothrow) float(0);
+    EXPECT_NE(nullptr, topKValueTest);
+    tensor->SetBuffer(topKValueTest, sizeof(float));
     m_allTensors.emplace_back(tensor);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
  * @tc.name: argmax_build_010
- * @tc.desc: Verify the argmax without set axis of the build function
+ * @tc.desc: Verify the invalid keepdims of the build function
  * @tc.type: FUNC
  */
 HWTEST_F(ArgMaxBuilderTest, argmax_build_010, TestSize.Level1)
@@ -259,15 +309,22 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_010, TestSize.Level1)
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
 
-    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
-    m_allTensors.emplace_back(tensor);
+    SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
     SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+    int64_t* outMaxValue = new (std::nothrow) int64_t(0);
+    EXPECT_NE(nullptr, outMaxValue);
+    tensor->SetBuffer(outMaxValue, sizeof(int64_t));
+    m_allTensors.emplace_back(tensor);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
  * @tc.name: argmax_build_011
- * @tc.desc: Verify the argmax without set keepdims of the build function
+ * @tc.desc: Verify the invalid param to argmax's axis of the build function
  * @tc.type: FUNC
  */
 HWTEST_F(ArgMaxBuilderTest, argmax_build_011, TestSize.Level1)
@@ -276,18 +333,39 @@ HWTEST_F(ArgMaxBuilderTest, argmax_build_011, TestSize.Level1)
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
 
-    SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
-    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
-    m_allTensors.emplace_back(tensor);
+    SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
+    SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
- * @tc.name: add_getprimitive_001
- * @tc.desc: Verify the behavior of the GetPrimitive function
+ * @tc.name: argmax_build_012
+ * @tc.desc: Verify the invalid param to argmax's keepDims of the build function
  * @tc.type: FUNC
  */
-HWTEST_F(ArgMaxBuilderTest, add_getprimitive_001, TestSize.Level1)
+HWTEST_F(ArgMaxBuilderTest, argmax_build_012, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
+    SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: argmax_build_013
+ * @tc.desc: Verify the invalid param to argmax's topK of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ArgMaxBuilderTest, argmax_build_013, TestSize.Level1)
 {
     m_paramsIndex = m_params;
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -295,6 +373,126 @@ HWTEST_F(ArgMaxBuilderTest, add_getprimitive_001, TestSize.Level1)
 
     SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
     SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: argmax_build_014
+ * @tc.desc: Verify the invalid param to argmax's outMaxValue of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ArgMaxBuilderTest, argmax_build_014, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
+    SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: argmax_build_015
+ * @tc.desc: Verify the argmax without set axis of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ArgMaxBuilderTest, argmax_build_015, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
+    m_allTensors.emplace_back(tensor);
+    SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: argmax_build_016
+ * @tc.desc: Verify the argmax without set keepdims of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ArgMaxBuilderTest, argmax_build_016, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    m_allTensors.emplace_back(tensor);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: argmax_build_017
+ * @tc.desc: Verify the argmax without set topK of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ArgMaxBuilderTest, argmax_build_017, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
+    SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    m_allTensors.emplace_back(tensor);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: argmax_build_018
+ * @tc.desc: Verify the argmax without set outMaxValue of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ArgMaxBuilderTest, argmax_build_018, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
+    SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
+    m_allTensors.emplace_back(tensor);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: argmax_getprimitive_001
+ * @tc.desc: Verify the behavior of the GetPrimitive function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ArgMaxBuilderTest, argmax_getprimitive_001, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
+    SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 
     LiteGraphTensorPtr primitive = m_builder.GetPrimitive();
@@ -302,18 +500,22 @@ HWTEST_F(ArgMaxBuilderTest, add_getprimitive_001, TestSize.Level1)
     EXPECT_NE(expectPrimitive, primitive);
     EXPECT_NE(nullptr, primitive);
 
-    int64_t returnValue = mindspore::lite::MindIR_ArgMaxFusion_GetAxis(primitive.get());
-    EXPECT_EQ(returnValue, 0);
+    int64_t axisReturn = mindspore::lite::MindIR_ArgMaxFusion_GetAxis(primitive.get());
+    EXPECT_EQ(axisReturn, 0);
     bool keepdimsReturn = mindspore::lite::MindIR_ArgMaxFusion_GetKeepDims(primitive.get());
     EXPECT_EQ(keepdimsReturn, false);
+    int64_t topKReturn = mindspore::lite::MindIR_ArgMaxFusion_GetTopK(primitive.get());
+    EXPECT_EQ(topKReturn, 0);
+    bool outMaxValueReturn = mindspore::lite::MindIR_ArgMaxFusion_GetOutMaxValue(primitive.get());
+    EXPECT_EQ(outMaxValueReturn, false);
 }
 
 /**
- * @tc.name: add_getprimitive_002
+ * @tc.name: argmax_getprimitive_002
  * @tc.desc: Verify the behavior of the GetPrimitive function
  * @tc.type: FUNC
  */
-HWTEST_F(ArgMaxBuilderTest, add_getprimitive_002, TestSize.Level1)
+HWTEST_F(ArgMaxBuilderTest, argmax_getprimitive_002, TestSize.Level1)
 {
     m_paramsIndex = m_params;
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -321,6 +523,8 @@ HWTEST_F(ArgMaxBuilderTest, add_getprimitive_002, TestSize.Level1)
 
     SetArgmaxAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_AXIS);
     SetArgmaxKeepdims(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_KEEPDIMS);
+    SetArgmaxTopK(OH_NN_INT64, m_param_dim, nullptr, OH_NN_ARG_MAX_TOP_K);
+    SetArgmaxOutMaxValue(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_ARG_MAX_OUT_MAX_VALUE);
     LiteGraphTensorPtr primitive = m_builder.GetPrimitive();
     LiteGraphTensorPtr expectPrimitive = {nullptr, DestroyLiteGraphPrimitive};
     EXPECT_EQ(expectPrimitive, primitive);

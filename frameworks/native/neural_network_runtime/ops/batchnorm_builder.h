@@ -35,7 +35,7 @@ private:
     OH_NN_ReturnCode SetEpsilon(std::shared_ptr<NNTensor> tensor);
 
 private:
-    float m_epsilon{1e-7};
+    float m_epsilon {0.0001f};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

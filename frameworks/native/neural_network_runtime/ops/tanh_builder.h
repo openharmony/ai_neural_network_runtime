@@ -36,7 +36,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    mindspore::lite::ActivationType  m_activationType{mindspore::lite::ACTIVATION_TYPE_TANH};
+    mindspore::lite::ActivationType  m_activationType {mindspore::lite::ACTIVATION_TYPE_TANH};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

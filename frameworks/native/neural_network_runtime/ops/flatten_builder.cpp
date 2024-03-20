@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 1;
 static const int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "Flatten";
 
@@ -67,23 +68,28 @@ OH_NN_ReturnCode FlattenBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
-    
-    OH_NN_ReturnCode returnCode;
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Flatten] Build failed, passed invalid param index.");
+        return ret;
+    }
+
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
         switch (tensor->GetType()) {
             case OH_NN_FLATTEN_AXIS:
-                returnCode = SetAxis(tensor);
+                ret = SetAxis(tensor);
                 break;
             default:
                 LOGE("[Flatten] Build failed, param invalid, type=%d", tensor->GetType());
                 return OH_NN_INVALID_PARAMETER;
         }
 
-        if (returnCode != OH_NN_SUCCESS) {
+        if (ret != OH_NN_SUCCESS) {
             LOGE("[Flatten] Build failed, passed invalid param.");
-            return returnCode;
+            return ret;
         }
     }
 

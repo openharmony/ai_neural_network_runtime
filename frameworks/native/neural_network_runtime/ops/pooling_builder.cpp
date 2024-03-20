@@ -24,9 +24,13 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 8;
+static const int SCALAR_LENGTH = 1;
 static const int NUM_ELEMENT_PAD_MODE = 1;
 static const int NUM_ELEMENT_PAD_LIST = 4;
 static const int ACTIVATION_LENGTH = 1;
+static const std::unordered_map<int, mindspore::lite::RoundMode> roundList = {{0, mindspore::lite::ROUND_MODE_FLOOR},
+                                                                              {1, mindspore::lite::ROUND_MODE_CEIL}};
 
 OH_NN_ReturnCode PoolingBuilder::PoolingBuild(const std::vector<uint32_t>& paramsIndex,
                                               const std::vector<uint32_t>& inputsIndex,
@@ -42,6 +46,12 @@ OH_NN_ReturnCode PoolingBuilder::PoolingBuild(const std::vector<uint32_t>& param
     OH_NN_ReturnCode returnCode = SetInputAndOutput(inputsIndex, outputsIndex, allTensors);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("[PoolingBuilder] PoolingBuild failed, the SetInputAndOutput failed.");
+        return returnCode;
+    }
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[PoolingBuilder] PoolingBuild failed, passed invalid param index of Onehot operation index.");
         return returnCode;
     }
 
@@ -62,9 +72,17 @@ OH_NN_ReturnCode PoolingBuilder::PoolingBuild(const std::vector<uint32_t>& param
             case OH_NN_AVG_POOL_PAD:
                 returnCode = SetPadModeOrPaddings(tensor);
                 break;
+            case OH_NN_AVG_POOL_ROUND_MODE:
+            case OH_NN_MAX_POOL_ROUND_MODE:
+                returnCode = SetRoundMode(tensor);
+                break;
             case OH_NN_AVG_POOL_ACTIVATION_TYPE:
             case OH_NN_MAX_POOL_ACTIVATION_TYPE:
                 returnCode = SetActivation(tensor);
+                break;
+            case OH_NN_AVG_POOL_GLOBAL:
+            case OH_NN_MAX_POOL_GLOBAL:
+                returnCode = SetGlobal(tensor);
                 break;
             default:
                 LOGE("[PoolingBuilder] Build failed, param invalid, type = %d.", tensor->GetType());
@@ -186,10 +204,43 @@ OH_NN_ReturnCode PoolingBuilder::SetPadModeOrPaddings(std::shared_ptr<NNTensor> 
     return OH_NN_SUCCESS;
 }
 
+OH_NN_ReturnCode PoolingBuilder::SetRoundMode(std::shared_ptr<NNTensor> tensor)
+{
+    tensor->IdentifyOpParameter();
+
+    if (tensor->GetElementCount() != ACTIVATION_LENGTH) {
+        LOGE("[PoolingBuilder] SetRoundMode failed, the roundMode shoule be a scalar");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (tensor->GetDataType() != OH_NN_INT32) {
+        LOGE("[PoolingBuilder] SetRoundMode failed, the roundMode should be type OH_NN_INT32.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[PoolingBuilder] SetRoundMode GetBuffer return nullptr");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    int roundModeKey = *(static_cast<int*>(buffer));
+    auto it = roundList.find(roundModeKey);
+    if (it != roundList.end()) {
+        m_roundMode = it->second;
+    } else {
+        LOGE("[PoolingBuilder] The roundMode value should between [0, 1], but get %d.", roundModeKey);
+        LOGE("[PoolingBuilder] roundMode: 0-OH_NN_ROUND_FLOOR, 1-OH_NN_ROUND_CEIL");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
 OH_NN_ReturnCode PoolingBuilder::SetActivation(std::shared_ptr<NNTensor> tensor)
 {
     tensor->IdentifyOpParameter();
-    // Set ActivationType
+
     if (tensor->GetElementCount() != ACTIVATION_LENGTH) {
         LOGE("[PoolingBuilder] SetActivation failed, the Activation shoule be a scalar");
         return OH_NN_INVALID_PARAMETER;
@@ -213,6 +264,28 @@ OH_NN_ReturnCode PoolingBuilder::SetActivation(std::shared_ptr<NNTensor> tensor)
     }
     auto fuseType = (OH_NN_FuseType)(*pFuseData);
     m_activationType = NNToMS::TransfromFusionType(fuseType);
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode PoolingBuilder::SetGlobal(std::shared_ptr<NNTensor> tensor)
+{
+    if (tensor->GetDataType() != OH_NN_BOOL) {
+        LOGE("[PoolingBuilder] The global should be type OH_NN_BOOL.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (tensor->GetElementCount() != SCALAR_LENGTH) {
+        LOGE("[PoolingBuilder] The global should be scalar.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[PoolingBuilder] Tensor buffer is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    m_global = *(static_cast<bool*>(buffer));
 
     return OH_NN_SUCCESS;
 }
