@@ -37,12 +37,10 @@ public:
 
 private:
     OH_NN_ReturnCode SetBlockSize(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetFormat(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode SetMode(std::shared_ptr<NNTensor> tensor);
 
 private:
     int64_t m_blockSize {0};
-    mindspore::lite::Format m_format {mindspore::lite::FORMAT_NCHW};
     std::string m_mode;
 };
 } // namespace Ops

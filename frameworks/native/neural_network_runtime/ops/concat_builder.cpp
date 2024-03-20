@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static constexpr int MINIMUM_INTPUT = 2;
 static constexpr int OUTPUT_NUM = 1;
+static constexpr int PARAM_MAX_NUM = 1;
 static constexpr int AXIS_LENGTH = 1;
 static const std::string OP_NAME = "Concat";
 
@@ -73,6 +74,12 @@ OH_NN_ReturnCode ConcatBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     OH_NN_ReturnCode returnCode = SetInputsAndOutputs(inputsIndex, outputsIndex, allTensors);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("[Concat] Build failed, set inputs or outputs failed.");
+        return returnCode;
+    }
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[Concat] Build failed, passed invalid param index.");
         return returnCode;
     }
 

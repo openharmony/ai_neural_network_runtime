@@ -39,7 +39,7 @@ private:
     OH_NN_ReturnCode SetMode(std::shared_ptr<NNTensor> tensor);
 
 private:
-    mindspore::lite::EltwiseMode m_mode{mindspore::lite::ELTWISE_MODE_PROD};
+    mindspore::lite::EltwiseMode m_mode {mindspore::lite::ELTWISE_MODE_PROD};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

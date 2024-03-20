@@ -22,6 +22,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 2;
 static const std::string OP_NAME = "SpaceToBatchND";
 static const int PADDINGS_DATA_SIZE = 2;
 static const int VECT_DATA_SIZE = 2;
@@ -117,6 +118,12 @@ OH_NN_ReturnCode SpaceToBatchNDBuilder::Build(const std::vector<uint32_t>& param
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[SpaceToBatchNDBuilder] Passed invalid param index.");
+        return returnCode;
+    }
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];

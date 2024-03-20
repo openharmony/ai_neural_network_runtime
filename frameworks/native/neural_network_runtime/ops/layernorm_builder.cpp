@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 3;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 4;
 static const int INPUT_X = 0;
 static const int INPUT_GAMMA = 1;
 static const int INPUT_BETA = 2;
@@ -36,8 +37,8 @@ LayerNormBuilder::~LayerNormBuilder() {}
 OH_NN_ReturnCode LayerNormBuilder::SetBeginNormAxis(std::shared_ptr<NNTensor> tensor)
 {
     tensor->IdentifyOpParameter();
-    if (tensor->GetDataType() != OH_NN_INT32) {
-        LOGE("[LayerNormBuilder] SetBeginNormAxis failed. The has_bias should be type OH_NN_INT32.");
+    if (tensor->GetDataType() != OH_NN_INT64) {
+        LOGE("[LayerNormBuilder] SetBeginNormAxis failed. The has_bias should be type OH_NN_INT64.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -52,7 +53,7 @@ OH_NN_ReturnCode LayerNormBuilder::SetBeginNormAxis(std::shared_ptr<NNTensor> te
         return OH_NN_INVALID_PARAMETER;
     }
 
-    m_beginNormAxis = *static_cast<int32_t*>(buffer);
+    m_beginNormAxis = *static_cast<int64_t*>(buffer);
     return OH_NN_SUCCESS;
 }
 
@@ -82,8 +83,8 @@ OH_NN_ReturnCode LayerNormBuilder::SetEpsilon(std::shared_ptr<NNTensor> tensor)
 OH_NN_ReturnCode LayerNormBuilder::SetBeginParamsAxis(std::shared_ptr<NNTensor> tensor)
 {
     tensor->IdentifyOpParameter();
-    if (tensor->GetDataType() != OH_NN_INT32) {
-        LOGE("[LayerNormBuilder] SetBeginParamsAxis failed. The has_bias should be type OH_NN_INT32.");
+    if (tensor->GetDataType() != OH_NN_INT64) {
+        LOGE("[LayerNormBuilder] SetBeginParamsAxis failed. The has_bias should be type OH_NN_INT64.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -98,7 +99,7 @@ OH_NN_ReturnCode LayerNormBuilder::SetBeginParamsAxis(std::shared_ptr<NNTensor> 
         return OH_NN_INVALID_PARAMETER;
     }
 
-    m_beginParamsAxis = *static_cast<int32_t*>(buffer);
+    m_beginParamsAxis = *static_cast<int64_t*>(buffer);
     return OH_NN_SUCCESS;
 }
 
@@ -120,6 +121,12 @@ OH_NN_ReturnCode LayerNormBuilder::Build(const std::vector<uint32_t>& paramsInde
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[LayerNormBuilder] Build failed. Passed invalid param index.");
+        return returnCode;
+    }
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
@@ -145,7 +152,7 @@ OH_NN_ReturnCode LayerNormBuilder::Build(const std::vector<uint32_t>& paramsInde
     }
 
     auto inputShape = allTensors[inputsIndex[INPUT_X]]->GetDimensions();
-    int inputShapeSize = static_cast<int>(inputShape.size());
+    int64_t inputShapeSize = static_cast<int64_t>(inputShape.size());
     // beginNormAxis must great than 1, because normal shape cannot equal input shape.
     if (m_beginNormAxis >= inputShapeSize || m_beginNormAxis < 1) {
         LOGE("[LayerNormBuilder] Build failed, invalid beginNormAxis value, it should be [1, rank(input)).");
@@ -179,12 +186,12 @@ LiteGraphPrimitvePtr LayerNormBuilder::GetPrimitive()
 }
 
 OH_NN_ReturnCode LayerNormBuilder::ValidateGammaAndBetaShape(const std::vector<uint32_t>& inputsIndex,
-    int beginAxis, const std::vector<std::shared_ptr<NNTensor>>& allTensors) const
+    int64_t beginAxis, const std::vector<std::shared_ptr<NNTensor>>& allTensors) const
 {
     auto inputShape = allTensors[inputsIndex[INPUT_X]]->GetDimensions();
     auto gammaShape = allTensors[inputsIndex[INPUT_GAMMA]]->GetDimensions();
     auto betaShape = allTensors[inputsIndex[INPUT_BETA]]->GetDimensions();
-    int inputShapeSize = static_cast<int>(inputShape.size());
+    int64_t inputShapeSize = static_cast<int64_t>(inputShape.size());
     if (gammaShape.size() != static_cast<size_t>(inputShapeSize - beginAxis)) {
         LOGE("[LayerNormBuilder] Invalid gamma dimension, gamma dimension should be equal to normalized dimension.");
         return OH_NN_INVALID_PARAMETER;

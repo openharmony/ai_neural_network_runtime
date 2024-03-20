@@ -33,12 +33,14 @@ public:
     void SetInputToAlltensor();
     void SetActivation(OH_NN_DataType dataType,
         const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetHasBias(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
 
 public:
     FullConnectionBuilder m_builder;
     std::vector<uint32_t> m_inputs {0, 1, 2};
     std::vector<uint32_t> m_outputs {3};
-    std::vector<uint32_t> m_params {4};
+    std::vector<uint32_t> m_params {4, 5};
     std::vector<int32_t> m_output_dim {2, 2};
     std::vector<int32_t> m_param_dim {};
 };
@@ -81,6 +83,17 @@ void FullConnectionBuilderTest::SetActivation(OH_NN_DataType dataType,
     m_allTensors.emplace_back(tensor);
 }
 
+void FullConnectionBuilderTest::SetHasBias(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
+    bool* hasBiasValue = new (std::nothrow) bool (true);
+    EXPECT_NE(nullptr, hasBiasValue);
+
+    tensor->SetBuffer(hasBiasValue, sizeof(bool));
+    m_allTensors.emplace_back(tensor);
+}
+
 /**
  * @tc.name: fullconnection_build_001
  * @tc.desc: Verify the success of the build function
@@ -94,6 +107,8 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_build_001, TestSize.Level1)
 
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -110,6 +125,8 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_build_002, TestSize.Level1)
 
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
@@ -122,13 +139,15 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_build_002, TestSize.Level1)
 HWTEST_F(FullConnectionBuilderTest, fullconnection_build_003, TestSize.Level1)
 {
     m_outputs = {};
-    m_params = {3};
+    m_params = {3, 4};
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
     SetInputToAlltensor();
 
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -141,7 +160,7 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_build_004, TestSize.Level1)
 {
     m_inputs = {0, 1, 6};
     m_outputs = {3};
-    m_params = {4};
+    m_params = {4, 5};
 
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
@@ -149,6 +168,8 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_build_004, TestSize.Level1)
 
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -172,6 +193,7 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_build_005, TestSize.Level1)
 
     tensor->SetBuffer(activationValue, sizeof(int32_t));
     m_allTensors.emplace_back(tensor);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -182,6 +204,30 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_build_005, TestSize.Level1)
  */
 
 HWTEST_F(FullConnectionBuilderTest, fullconnection_build_006, TestSize.Level1)
+{
+    m_inputsIndex = m_inputs;
+    m_paramsIndex = m_params;
+    SetInputToAlltensor();
+
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT32, m_param_dim, nullptr,
+        OH_NN_FULL_CONNECTION_HAS_BIAS);
+    int32_t *hasBiasValue = new (std::nothrow) int32_t(1);
+    EXPECT_NE(nullptr, hasBiasValue);
+
+    tensor->SetBuffer(hasBiasValue, sizeof(int32_t));
+    m_allTensors.emplace_back(tensor);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: fullconnection_build_008
+ * @tc.desc: Verify the behavior of the build function
+ * @tc.type: FUNC
+ */
+
+HWTEST_F(FullConnectionBuilderTest, fullconnection_build_008, TestSize.Level1)
 {
     m_param_dim = {2};
     m_inputsIndex = m_inputs;
@@ -196,16 +242,17 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_build_006, TestSize.Level1)
 
     tensor->SetBuffer(activationValue, 2 * sizeof(int8_t));
     m_allTensors.emplace_back(tensor);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
- * @tc.name: fullconnection_build_007
+ * @tc.name: fullconnection_build_009
  * @tc.desc: Verify the invalid avtivation value of the build function
  * @tc.type: FUNC
  */
 
-HWTEST_F(FullConnectionBuilderTest, fullconnection_build_007, TestSize.Level1)
+HWTEST_F(FullConnectionBuilderTest, fullconnection_build_009, TestSize.Level1)
 {
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
@@ -219,16 +266,17 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_build_007, TestSize.Level1)
 
     tensor->SetBuffer(activationValue, sizeof(int8_t));
     m_allTensors.emplace_back(tensor);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
- * @tc.name: fullconnection_build_008
+ * @tc.name: fullconnection_build_010
  * @tc.desc: Verify the invalid param to fullconnection of the build function
  * @tc.type: FUNC
  */
 
-HWTEST_F(FullConnectionBuilderTest, fullconnection_build_008, TestSize.Level1)
+HWTEST_F(FullConnectionBuilderTest, fullconnection_build_010, TestSize.Level1)
 {
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
@@ -242,6 +290,25 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_build_008, TestSize.Level1)
     tensor->SetBuffer(activationValue, sizeof(int8_t));
 
     m_allTensors.emplace_back(tensor);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: fullconnection_build_011
+ * @tc.desc: Verify the invalid avtivation value of the build function
+ * @tc.type: FUNC
+ */
+
+HWTEST_F(FullConnectionBuilderTest, fullconnection_build_011, TestSize.Level1)
+{
+    m_inputsIndex = m_inputs;
+    m_paramsIndex = m_params;
+    SetInputToAlltensor();
+
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -258,6 +325,7 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_getprimitive_001, TestSize.Le
 
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
     LiteGraphTensorPtr primitive = m_builder.GetPrimitive();
     LiteGraphTensorPtr expectPrimitive = {nullptr, DestroyLiteGraphPrimitive};
@@ -265,6 +333,8 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_getprimitive_001, TestSize.Le
 
     int8_t activationReturn = mindspore::lite::MindIR_FullConnection_GetActivationType(primitive.get());
     EXPECT_EQ(activationReturn, 0);
+    bool hasBiasReturn = mindspore::lite::MindIR_FullConnection_GetHasBias(primitive.get());
+    EXPECT_EQ(hasBiasReturn, true);
 }
 
 /**
@@ -280,6 +350,7 @@ HWTEST_F(FullConnectionBuilderTest, fullconnection_getprimitive_002, TestSize.Le
 
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
     LiteGraphTensorPtr primitive = m_builder.GetPrimitive();
     LiteGraphTensorPtr expectPrimitive = {nullptr, DestroyLiteGraphPrimitive};
     EXPECT_EQ(expectPrimitive, primitive);

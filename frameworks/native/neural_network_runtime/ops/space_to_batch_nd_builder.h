@@ -39,7 +39,7 @@ private:
     OH_NN_ReturnCode SetPaddings(std::shared_ptr<NNTensor> tensor);
 
 private:
-    std::vector<std::vector<int64_t>> paddings {};
+    std::vector<std::vector<int64_t>> paddings;
     std::vector<int64_t> block_shape {};
 };
 } // namespace Ops

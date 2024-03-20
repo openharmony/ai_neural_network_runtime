@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUMS = 1;
 static const int OUTPUT_NUMS = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "Hswish";
 
 HswishBuilder::HswishBuilder() {}
@@ -46,9 +47,10 @@ OH_NN_ReturnCode HswishBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return returnCode;
     }
 
-    if (!paramsIndex.empty()) {
-        LOGW("[Hswish] Build failed, hswish expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[Hswish] Build failed, passed invalid param indices.");
+        return returnCode;
     }
 
     m_inputsIndex = inputsIndex;

@@ -23,6 +23,8 @@ namespace Ops {
 static const std::string OP_NAME = "TopK";
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 2;
+static const int PARAM_MAX_NUM = 2;
+static const int SCALAR_LENGTH = 1;
 
 TopKBuilder::TopKBuilder() {}
 
@@ -41,6 +43,28 @@ OH_NN_ReturnCode TopKBuilder::SetSorted(std::shared_ptr<NNTensor> tensor)
         return OH_NN_INVALID_PARAMETER;
     }
     m_sorted = *(static_cast<const bool *>(buffer));
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode TopKBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+{
+    if (tensor->GetDataType() != OH_NN_INT64) {
+        LOGE("[TopK] The axis should be type OH_NN_INT64.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (tensor->GetElementCount() != SCALAR_LENGTH) {
+        LOGE("[TopK] The axis should be scalar.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[TopK] Tensor buffer is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    m_axis = *(static_cast<const int64_t*>(buffer));
 
     return OH_NN_SUCCESS;
 }
@@ -70,12 +94,21 @@ OH_NN_ReturnCode TopKBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
 
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[TopK] Passed invalid param index.");
+        return returnCode;
+    }
+
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
         switch (tensor->GetType()) {
             case OH_NN_TOP_K_SORTED:
                 returnCode = SetSorted(tensor);
+                break;
+            case OH_NN_TOP_K_AXIS:
+                returnCode = SetAxis(tensor);
                 break;
             default:
                 LOGE("[TopK] Parameter Type is invalid. type=%d", tensor->GetType());
@@ -100,8 +133,7 @@ LiteGraphPrimitvePtr TopKBuilder::GetPrimitive()
         return {nullptr, DestroyLiteGraphPrimitive};
     }
 
-    int64_t axis = 0;
-    auto primitive = mindspore::lite::MindIR_TopKFusion_CreatePrimitive(m_sorted, axis);
+    auto primitive = mindspore::lite::MindIR_TopKFusion_CreatePrimitive(m_sorted, m_axis);
     if (primitive == nullptr) {
         LOGE("[TopK] MindIR_TopKFusion_CreatePrimitive failed.");
         return {nullptr, DestroyLiteGraphPrimitive};

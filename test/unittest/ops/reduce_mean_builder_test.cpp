@@ -30,14 +30,18 @@ public:
     void TearDown() override;
 
 protected:
-    void SaveParamsTensor(OH_NN_DataType dataType,
+    void SetKeepDims(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetCoeff(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetReduceToEnd(OH_NN_DataType dataType,
         const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
 
 protected:
     ReduceMeanBuilder m_builder;
     std::vector<uint32_t> m_inputs {0, 1};
     std::vector<uint32_t> m_outputs {2};
-    std::vector<uint32_t> m_params {3};
+    std::vector<uint32_t> m_params {3, 4, 5};
     std::vector<int32_t> m_inputDim {3, 5, 6, 4};
     std::vector<int32_t> m_outputDim {3, 5, 6, 1};
     std::vector<int32_t> m_paramDim {1};
@@ -47,7 +51,7 @@ void ReduceMeanBuilderTest::SetUp() {}
 
 void ReduceMeanBuilderTest::TearDown() {}
 
-void ReduceMeanBuilderTest::SaveParamsTensor(OH_NN_DataType dataType,
+void ReduceMeanBuilderTest::SetKeepDims(OH_NN_DataType dataType,
     const std::vector<int32_t> &dim, const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
 {
     std::shared_ptr<NNTensor> keepDimsTensor = TransToNNTensor(dataType, dim, quantParam, type);
@@ -55,6 +59,26 @@ void ReduceMeanBuilderTest::SaveParamsTensor(OH_NN_DataType dataType,
     EXPECT_NE(nullptr, keepDimsValue);
     keepDimsTensor->SetBuffer(keepDimsValue, sizeof(bool));
     m_allTensors.emplace_back(keepDimsTensor);
+}
+
+void ReduceMeanBuilderTest::SetCoeff(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim, const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> coeffTensor = TransToNNTensor(dataType, dim, quantParam, type);
+    float *coeffValue = new (std::nothrow) float(0.0f);
+    EXPECT_NE(nullptr, coeffValue);
+    coeffTensor->SetBuffer(coeffValue, sizeof(float));
+    m_allTensors.emplace_back(coeffTensor);
+}
+
+void ReduceMeanBuilderTest::SetReduceToEnd(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim, const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> reduceToEndTensor = TransToNNTensor(dataType, dim, quantParam, type);
+    bool *reduceToEndValue = new (std::nothrow) bool(true);
+    EXPECT_NE(nullptr, reduceToEndValue);
+    reduceToEndTensor->SetBuffer(reduceToEndValue, sizeof(bool));
+    m_allTensors.emplace_back(reduceToEndTensor);
 }
 
 /**
@@ -66,7 +90,9 @@ HWTEST_F(ReduceMeanBuilderTest, reducemean_build_001, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
@@ -81,7 +107,9 @@ HWTEST_F(ReduceMeanBuilderTest, reducemean_build_002, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
 
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors));
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
@@ -97,11 +125,13 @@ HWTEST_F(ReduceMeanBuilderTest, reducemean_build_003, TestSize.Level0)
 {
     m_inputs = {0, 1, 2};
     m_outputs = {3};
-    m_params = {4};
+    m_params = {4, 5, 6};
 
     SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -115,11 +145,13 @@ HWTEST_F(ReduceMeanBuilderTest, reducemean_build_003, TestSize.Level0)
 HWTEST_F(ReduceMeanBuilderTest, reducemean_build_004, TestSize.Level0)
 {
     m_outputs = {2, 3};
-    m_params = {4};
+    m_params = {4, 5, 6};
 
     SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -164,6 +196,8 @@ HWTEST_F(ReduceMeanBuilderTest, reducemean_build_007, TestSize.Level0)
     int64_t keepDimsValue = 1;
     keepDimsTensor->SetBuffer(&keepDimsValue, sizeof(keepDimsValue));
     m_allTensors.emplace_back(keepDimsTensor);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -172,10 +206,56 @@ HWTEST_F(ReduceMeanBuilderTest, reducemean_build_007, TestSize.Level0)
 
 /**
  * @tc.name: reducemean_build_008
- * @tc.desc: Verify that the build function return a failed message with invalided keepdims's dimension
+ * @tc.desc: Verify that the build function return a failed message with invalided coeff's dataType
  * @tc.type: FUNC
  */
 HWTEST_F(ReduceMeanBuilderTest, reducemean_build_008, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
+
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    std::shared_ptr<NNTensor> coeffTensor = TransToNNTensor(OH_NN_INT64,
+        m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    int64_t coeffValue = 1;
+    coeffTensor->SetBuffer(&coeffValue, sizeof(int64_t));
+    m_allTensors.emplace_back(coeffTensor);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    coeffTensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: reducemean_build_009
+ * @tc.desc: Verify that the build function return a failed message with invalided reduceToEnd's dataType
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReduceMeanBuilderTest, reducemean_build_009, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
+
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    std::shared_ptr<NNTensor> reduceToEndTensor = TransToNNTensor(OH_NN_INT64,
+        m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
+    int64_t reduceToEndValue = 1;
+    reduceToEndTensor->SetBuffer(&reduceToEndValue, sizeof(reduceToEndValue));
+    m_allTensors.emplace_back(reduceToEndTensor);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    reduceToEndTensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: reducemean_build_010
+ * @tc.desc: Verify that the build function return a failed message with invalided keepdims's dimension
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReduceMeanBuilderTest, reducemean_build_010, TestSize.Level0)
 {
     m_paramDim = {1, 2};
 
@@ -187,6 +267,8 @@ HWTEST_F(ReduceMeanBuilderTest, reducemean_build_008, TestSize.Level0)
     bool keepDimsValue[2] = {true, true};
     keepDimsTensor->SetBuffer(keepDimsValue, 2 * sizeof(bool));
     m_allTensors.emplace_back(keepDimsTensor);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -194,26 +276,112 @@ HWTEST_F(ReduceMeanBuilderTest, reducemean_build_008, TestSize.Level0)
 }
 
 /**
- * @tc.name: reducemean_build_009
+ * @tc.name: reducemean_build_011
+ * @tc.desc: Verify that the build function return a failed message with invalided coeff's dimension
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReduceMeanBuilderTest, reducemean_build_011, TestSize.Level0)
+{
+    m_paramDim = {1, 2};
+
+    SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
+
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    std::shared_ptr<NNTensor> coeffTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
+        nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    float coeffValue[2] = {1.0f, 1.0f};
+    coeffTensor->SetBuffer(coeffValue, 2 * sizeof(float));
+    m_allTensors.emplace_back(coeffTensor);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    coeffTensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: reducemean_build_012
+ * @tc.desc: Verify that the build function return a failed message with invalided reduceToEnd's dimension
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReduceMeanBuilderTest, reducemean_build_012, TestSize.Level0)
+{
+    m_paramDim = {1, 2};
+
+    SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
+
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    std::shared_ptr<NNTensor> reduceToEndTensor = TransToNNTensor(OH_NN_BOOL, m_paramDim,
+        nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
+    bool reduceToEndValue[2] = {true, true};
+    reduceToEndTensor->SetBuffer(reduceToEndValue, 2 * sizeof(bool));
+    m_allTensors.emplace_back(reduceToEndTensor);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    reduceToEndTensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: reducemean_build_013
  * @tc.desc: Verify that the build function return a failed message with invalided parameter
  * @tc.type: FUNC
  */
-HWTEST_F(ReduceMeanBuilderTest, reducemean_build_009, TestSize.Level0)
+HWTEST_F(ReduceMeanBuilderTest, reducemean_build_013, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_ALL_COEFF);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_ALL_REDUCE_TO_END);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
 /**
- * @tc.name: reducemean_build_010
+ * @tc.name: reducemean_build_014
+ * @tc.desc: Verify that the build function return a failed message with invalided coeff parameter
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReduceMeanBuilderTest, reducemean_build_014, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/**
+ * @tc.name: reducemean_build_015
+ * @tc.desc: Verify that the build function return a failed message with invalided reduceToEnd parameter
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReduceMeanBuilderTest, reducemean_build_015, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/**
+ * @tc.name: reducemean_build_016
  * @tc.desc: Verify that the build function return a failed message with empty keepdims's buffer
  * @tc.type: FUNC
  */
-HWTEST_F(ReduceMeanBuilderTest, reducemean_build_010, TestSize.Level0)
+HWTEST_F(ReduceMeanBuilderTest, reducemean_build_016, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
@@ -221,10 +389,54 @@ HWTEST_F(ReduceMeanBuilderTest, reducemean_build_010, TestSize.Level0)
     std::shared_ptr<NNTensor> keepDimsTensor = TransToNNTensor(OH_NN_BOOL,
         m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
     m_allTensors.emplace_back(keepDimsTensor);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
     keepDimsTensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: reducemean_build_017
+ * @tc.desc: Verify that the build function return a failed message with empty coeff's buffer
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReduceMeanBuilderTest, reducemean_build_017, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
+
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    std::shared_ptr<NNTensor> coeffTensor = TransToNNTensor(OH_NN_INT64,
+        m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    m_allTensors.emplace_back(coeffTensor);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    coeffTensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: reducemean_build_018
+ * @tc.desc: Verify that the build function return a failed message with empty reduceToEnd's buffer
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReduceMeanBuilderTest, reducemean_build_018, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
+
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    std::shared_ptr<NNTensor> reduceToEndTensor = TransToNNTensor(OH_NN_BOOL,
+        m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
+    m_allTensors.emplace_back(reduceToEndTensor);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    reduceToEndTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -248,15 +460,24 @@ HWTEST_F(ReduceMeanBuilderTest, reducemean_get_primitive_002, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_KEEP_DIMS);
+    SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_COEFF);
+    SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_MEAN_REDUCE_TO_END);
 
     bool keepDimsValue = true;
+    float coeffValue = 0.0f;
+    bool reduceToEndValue = true;
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors));
     LiteGraphTensorPtr reducemeanPrimitive = m_builder.GetPrimitive();
     LiteGraphTensorPtr expectPrimitive = {nullptr, DestroyLiteGraphPrimitive};
+
     EXPECT_NE(reducemeanPrimitive, expectPrimitive);
-    auto returnValue = mindspore::lite::MindIR_ReduceFusion_GetKeepDims(reducemeanPrimitive.get());
-    EXPECT_EQ(returnValue, keepDimsValue);
+    auto returnKeepDimsValue = mindspore::lite::MindIR_ReduceFusion_GetKeepDims(reducemeanPrimitive.get());
+    EXPECT_EQ(returnKeepDimsValue, keepDimsValue);
+    auto returnCoeffValue = mindspore::lite::MindIR_ReduceFusion_GetCoeff(reducemeanPrimitive.get());
+    EXPECT_EQ(returnCoeffValue, coeffValue);
+    auto returnReduceToEndValue = mindspore::lite::MindIR_ReduceFusion_GetReduceToEnd(reducemeanPrimitive.get());
+    EXPECT_EQ(returnReduceToEndValue, reduceToEndValue);
 }
 } // namespace UnitTest
 } // namespace NeuralNetworkRuntime

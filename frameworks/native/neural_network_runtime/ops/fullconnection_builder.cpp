@@ -21,9 +21,8 @@
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {
-static constexpr int INPUT_WITH_AXIS = 2;
-static constexpr int INPUT_WITHOUT_AXIS = 1;
 static constexpr int OUTPUT_NUM = 1;
+static constexpr int PARAM_NUM = 4;
 static constexpr int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "FullConnection";
 
@@ -40,17 +39,65 @@ OH_NN_ReturnCode FullConnectionBuilder::SetFullConnectionInput(const std::vector
         return OH_NN_INVALID_PARAMETER;
     }
     size_t allTensorsSize = allTensors.size();
-    bool isOverTensorSize = std::any_of(inputsIndex.begin(), inputsIndex.end(), [allTensorsSize](uint32_t index) {
-        return index >= allTensorsSize;
-    });
-    if (isOverTensorSize) {
-        LOGE("[FullConnection] SetFullConnectionInput failed, the index of inputs is out of range.");
-        return OH_NN_INVALID_PARAMETER;
+    for (auto index : inputsIndex) {
+        if (index >= allTensorsSize) {
+            LOGE("[FullConnection] SetFullConnectionInput failed, the index of inputs is out of range.");
+            return OH_NN_INVALID_PARAMETER;
+        }
     }
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
 
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode FullConnectionBuilder::SetHasBias(std::shared_ptr<NNTensor> tensor)
+{
+    if (tensor->GetDataType() != OH_NN_BOOL) {
+        LOGE("[FullConnection] The hasBias should be type OH_NN_BOOL.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (tensor->GetElementCount() != SCALAR_LENGTH) {
+        LOGE("[FullConnection] The hasBias should be scalar.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[FullConnection] Tensor buffer is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    m_hasBias = *(static_cast<bool*>(buffer));
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode FullConnectionBuilder::SetUseAxis(std::shared_ptr<NNTensor> tensor)
+{
+    if (tensor->GetDataType() != OH_NN_BOOL) {
+        LOGE("[FullConnection] The useAxis should be type OH_NN_BOOL.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (tensor->GetElementCount() != SCALAR_LENGTH) {
+        LOGE("[FullConnection] The useAxis should be scalar.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[FullConnection] Tensor buffer is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    bool useAxis = *(static_cast<bool*>(buffer));
+    if (!useAxis && m_useAxis) {
+        LOGE("[FullConnection] SetAxis but set useAxis false.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    m_useAxis = useAxis;
     return OH_NN_SUCCESS;
 }
 
@@ -86,27 +133,26 @@ OH_NN_ReturnCode FullConnectionBuilder::SetFullConnectionActivation(std::shared_
 
 OH_NN_ReturnCode FullConnectionBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
 {
-    if (m_useAxis) {
-        tensor->IdentifyOpParameter();
+    tensor->IdentifyOpParameter();
 
-        if (tensor->GetElementCount() != SCALAR_LENGTH) {
-            LOGE("[FullConnection] SetFullConnectionActivation failed, the axis shoule be a scalar");
-            return OH_NN_INVALID_PARAMETER;
-        }
-
-        if (tensor->GetDataType() != OH_NN_INT64) {
-            LOGE("[FullConnection] SetFullConnectionActivation failed, the Axis should be type OH_NN_INT64.");
-            return OH_NN_INVALID_PARAMETER;
-        }
-
-        void* buffer = tensor->GetBuffer();
-        if (buffer == nullptr) {
-            LOGE("[FullConnection] SetAxis GetBuffer return nullptr");
-            return OH_NN_INVALID_PARAMETER;
-        }
-
-        m_axis = *static_cast<int64_t*>(buffer);
+    if (tensor->GetElementCount() != SCALAR_LENGTH) {
+        LOGE("[FullConnection] SetAxis failed, the axis shoule be a scalar");
+        return OH_NN_INVALID_PARAMETER;
     }
+
+    if (tensor->GetDataType() != OH_NN_INT64) {
+        LOGE("[FullConnection] SetAxis failed, the Axis should be type OH_NN_INT64.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[FullConnection] SetAxis GetBuffer return nullptr");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    m_axis = *static_cast<int64_t*>(buffer);
+    m_useAxis = true;
     return OH_NN_SUCCESS;
 }
 
@@ -121,34 +167,42 @@ OH_NN_ReturnCode FullConnectionBuilder::Build(const std::vector<uint32_t>& param
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
-    bool useAxis = false;
-    if (paramsIndex.size() == INPUT_WITH_AXIS) {
-        useAxis = true;
-    } else if (paramsIndex.size() != INPUT_WITHOUT_AXIS) {
-        LOGE("[FullConnection] Build failed, the index of inputs should equal to %d if axis used or %d if not.",
-            INPUT_WITH_AXIS, INPUT_WITHOUT_AXIS);
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     OH_NN_ReturnCode returnCode = SetFullConnectionInput(inputsIndex, outputsIndex, allTensors);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("[FullConnection] Build failed, SetFullConnectionInput failed.");
         return returnCode;
     }
 
-    // Set axis
-    m_useAxis = useAxis;
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[FullConnection] Build failed, passed invalid param index.");
+        return returnCode;
+    }
+
+    for (int i : paramsIndex) {
+        std::shared_ptr<NNTensor> tensor = allTensors[i];
+        if (tensor->GetType() == OH_NN_FULL_CONNECTION_AXIS) {
+            returnCode = SetAxis(tensor);
+            break;
+        }
+    }
+
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i]; // 参数 tensor
         switch (tensor->GetType()) {
             case OH_NN_FULL_CONNECTION_AXIS:
-                returnCode = SetAxis(tensor);
+                break;
+            case OH_NN_FULL_CONNECTION_HAS_BIAS:
+                returnCode = SetHasBias(tensor);
+                break;
+            case OH_NN_FULL_CONNECTION_USE_AXIS:
+                returnCode = SetUseAxis(tensor);
                 break;
             case OH_NN_FULL_CONNECTION_ACTIVATIONTYPE:
                 returnCode = SetFullConnectionActivation(tensor);
                 break;
             default:
-                LOGE("[FullConnection] Build failed, param invalid, type = %d.", tensor->GetType());
+                LOGE("[FullConnection] Build failed, param invalid, type = %{public}d.", tensor->GetType());
                 return OH_NN_INVALID_PARAMETER;
         }
         if (returnCode != OH_NN_SUCCESS) {

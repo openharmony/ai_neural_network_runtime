@@ -36,16 +36,14 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetDType(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode SetStart(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode SetLimit(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode SetDelta(std::shared_ptr<NNTensor> tensor);
 
 private:
-    int64_t m_dType {0.0f};
-    int64_t m_start {0.0f};
-    int64_t m_limit {0.0f};
-    int64_t m_delta {1.0f};
+    int64_t m_start {0};
+    int64_t m_limit {0};
+    int64_t m_delta {1};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

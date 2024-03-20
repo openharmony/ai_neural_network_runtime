@@ -35,7 +35,7 @@ private:
     OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
 
 private:
-    int64_t m_axis{-1};
+    int64_t m_axis {0};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

@@ -22,6 +22,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "Transpose";
 
 TransposeBuilder::TransposeBuilder() {}
@@ -50,13 +51,14 @@ OH_NN_ReturnCode TransposeBuilder::Build(const std::vector<uint32_t>& paramsInde
         return returnCode;
     }
 
-    if (!paramsIndex.empty()) {
-        LOGE("[TransposeBuilder] TransposeBuilder expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[TransposeBuilder] Passed invalid param index.");
+        return returnCode;
+    }
 
     m_isBuild = true;
     m_name = OP_NAME;

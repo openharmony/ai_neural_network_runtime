@@ -65,6 +65,9 @@ protected:
                                   const std::vector<std::shared_ptr<NNTensor>>& allTensors,
                                   const size_t inputNum,
                                   const size_t outputNum) const;
+    OH_NN_ReturnCode CheckParamIndex(const std::vector<uint32_t>& paramsIndex,
+                                     const std::vector<std::shared_ptr<NNTensor>>& allTensors,
+                                     const size_t paramNum) const;
     void SetQuantType(const std::vector<uint32_t>& outputsIndex,
                       const std::vector<std::shared_ptr<NNTensor>>& allTensors);
 

@@ -39,7 +39,7 @@ private:
     OH_NN_ReturnCode SetActivation(std::shared_ptr<NNTensor>& tensor);
 
 private:
-    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

@@ -36,13 +36,13 @@ private:
     OH_NN_ReturnCode SetEpsilon(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode SetBeginParamsAxis(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode ValidateGammaAndBetaShape(const std::vector<uint32_t>& inputsIndex,
-        int beginAxis, const std::vector<std::shared_ptr<NNTensor>>& allTensors) const;
+        int64_t beginAxis, const std::vector<std::shared_ptr<NNTensor>>& allTensors) const;
 
 private:
-    int m_beginNormAxis{1};
-    float m_epsilon{1e-7};
-    bool m_elementwiseAffine{false};
-    int m_beginParamsAxis{1};
+    int64_t m_beginNormAxis {0};
+    float m_epsilon {0.00001f};
+    bool m_elementwiseAffine {false};
+    int64_t m_beginParamsAxis {0};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

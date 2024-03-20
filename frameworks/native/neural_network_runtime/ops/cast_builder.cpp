@@ -24,6 +24,7 @@ namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
 static const int INPUT_TYPE = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "Cast";
 
 CastBuilder::CastBuilder() {}
@@ -47,6 +48,12 @@ OH_NN_ReturnCode CastBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
 
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Cast] Build failed, the param index of Cast operation is invalid.");
+        return ret;
+    }
+
     auto castType = allTensors[inputsIndex[INPUT_TYPE]]->GetBuffer();
     if (castType == nullptr) {
         LOGE("[Cast] Build castType GetBuffer return nullptr.");
@@ -55,11 +62,6 @@ OH_NN_ReturnCode CastBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     OH_NN_DataType* castTypeInt = reinterpret_cast<OH_NN_DataType *>(castType);
     if (!Validation::ValidateTensorDataType(*castTypeInt)) {
         LOGE("[Cast] Type of cast operator is not validation.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (!paramsIndex.empty()) {
-        LOGE("[Cast] Cast expects no parameters");
         return OH_NN_INVALID_PARAMETER;
     }
 
