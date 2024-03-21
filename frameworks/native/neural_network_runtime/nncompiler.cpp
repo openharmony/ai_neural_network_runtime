@@ -377,7 +377,7 @@ OH_NN_ReturnCode NNCompiler::NormalBuild()
     ModelConfig config {m_enableFp16, static_cast<OH_NN_PerformanceMode>(m_performance),
         static_cast<OH_NN_Priority>(m_priority), m_isProfiling, m_cachePath, m_opLayouts};
     if (m_liteGraph != nullptr) {
-        ret = m_device->PrepareModel(m_liteGraph, config, m_preparedModel);
+        ret = m_device->PrepareModel(m_liteGraph, m_quantBuffer, config, m_preparedModel);
     }
     if (m_metaGraph != nullptr) {
         ret = m_device->PrepareModel(m_metaGraph, m_quantBuffer, config, m_preparedModel);
