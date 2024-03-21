@@ -238,7 +238,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::IsModelCacheSupported(bool& isSupported)
 }
 
 OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
-    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
+    const Buffer& quantBuffer, const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     if (model == nullptr) {
         LOGE("Model is nullptr, cannot prepare model.");

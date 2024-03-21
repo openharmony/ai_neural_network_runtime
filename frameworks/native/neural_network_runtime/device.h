@@ -49,6 +49,7 @@ public:
     virtual OH_NN_ReturnCode IsModelCacheSupported(bool& isSupported) = 0;
 
     virtual OH_NN_ReturnCode PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
+                                          const Buffer& quantBuffer,
                                           const ModelConfig& config,
                                           std::shared_ptr<PreparedModel>& preparedModel) = 0;
     virtual OH_NN_ReturnCode PrepareModel(const void* metaGraph,

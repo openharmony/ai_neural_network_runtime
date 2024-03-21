@@ -54,7 +54,7 @@ public:
     OH_NN_ReturnCode GetSupportedOperation(std::shared_ptr<const mindspore::lite::LiteGraph> model,
                                            std::vector<bool>& ops);
 
-private:
+protected:
     std::shared_ptr<Device> m_device;
     size_t m_backendID;
 };
