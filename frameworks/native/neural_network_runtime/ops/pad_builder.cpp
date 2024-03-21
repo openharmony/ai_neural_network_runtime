@@ -27,11 +27,11 @@ static const int OUTPUT_NUM = 1;
 static const int PARAM_MAX_NUM = 2;
 static const int SCALE_LENGTH = 1;
 static const std::string OP_NAME = "Pad";
-static const std::unordered_map<int, mindspore::lite::PaddingMode> paddingList =
-    {{0, mindspore::lite::PADDING_MODE_CONSTANT},
-     {1, mindspore::lite::PADDING_MODE_REFLECT},
-     {2, mindspore::lite::PADDING_MODE_SYMMETRIC},
-     {3, mindspore::lite::PADDING_MODE_RESERVED}};
+static const std::unordered_map<int, mindspore::lite::PaddingMode> paddingList = {
+    {0, mindspore::lite::PADDING_MODE_CONSTANT},
+    {1, mindspore::lite::PADDING_MODE_REFLECT},
+    {2, mindspore::lite::PADDING_MODE_SYMMETRIC},
+    {3, mindspore::lite::PADDING_MODE_RESERVED}};
 
 PadBuilder::PadBuilder() {}
 
