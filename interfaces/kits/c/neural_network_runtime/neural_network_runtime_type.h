@@ -871,7 +871,7 @@ typedef enum {
      *
      * Outputs:
      *
-     * * A tensor of the data type OH_NN_BOOL. When a quantization model is used, the quantization parameters of the
+     * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used, the quantization parameters of the
      *   output cannot be omitted. However, values of the quantization parameters do not affect the result.
      */
     OH_NN_OPS_LESS_EQUAL = 18,
@@ -888,6 +888,8 @@ typedef enum {
      *
      * * <b>TransposeX</b>: Boolean value indicating whether to transpose <b>input1</b>.
      * * <b>TransposeY</b>: Boolean value indicating whether to transpose <b>input2</b>.
+     * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
+     *       The specified activation function is called before output.
      *
      * Outputs:
      *
@@ -991,7 +993,7 @@ typedef enum {
      *
      * Outputs:
      *
-     * * Product of each element of <b>input1</b> and <b>input2</b>.
+     * * <b>output</b>: Product of each element of <b>input1</b> and <b>input2</b>.
      */
     OH_NN_OPS_MUL = 22,
 
@@ -1329,7 +1331,7 @@ typedef enum {
      *
      * Outputs:
      *
-     * * A tensor, with the same data type as <b>input</b>.
+     * * <b>output</b>: A tensor, with the same data type as <b>input</b>.
      *       The number of dimensions of the output tensor is rank(input[0])+1.
      */
     OH_NN_OPS_STRIDED_SLICE = 37,
@@ -1618,6 +1620,7 @@ typedef enum {
      *
      * * <b>src_t</b>: data type of the input.
      * * <b>dst_t</b>: data type of the output.
+     * * <b>axis</b>: dimensional of the input to convert.
      *
      * Outputs:
      *
@@ -1981,8 +1984,9 @@ typedef enum {
      *
      * Outputs:
      *
-     * * A tensor of the data type OH_NN_BOOL. When a quantization model is used, the quantization parameters of the
-     *   output cannot be omitted. However, values of the quantization parameters do not affect the result.
+     * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used,
+     *       the quantization parameters of the output cannot be omitted. However,
+     *       values of the quantization parameters do not affect the result.
      */
     OH_NN_OPS_GREATER = 71,
 
@@ -1998,8 +2002,9 @@ typedef enum {
      *
      * Outputs:
      *
-     * * A tensor of the data type OH_NN_BOOL. When a quantization model is used, the quantization parameters of the
-     *   output cannot be omitted. However, values of the quantization parameters do not affect the result.
+     * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used,
+     *       the quantization parameters of the output cannot be omitted. However,
+     *       values of the quantization parameters do not affect the result.
      */
     OH_NN_OPS_NOT_EQUAL = 72,
 
@@ -2015,8 +2020,9 @@ typedef enum {
      *
      * Outputs:
      *
-     * * A tensor of the data type OH_NN_BOOL. When a quantization model is used, the quantization parameters of the
-     *   output cannot be omitted. However, values of the quantization parameters do not affect the result.
+     * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used,
+     *       the quantization parameters of the output cannot be omitted. However,
+     *       values of the quantization parameters do not affect the result.
      */
     OH_NN_OPS_GREATER_EQUAL = 73,
 

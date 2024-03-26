@@ -160,9 +160,9 @@ LiteGraphPrimitvePtr ReduceProdBuilder::GetPrimitive()
         return {nullptr, DestroyLiteGraphPrimitive};
     }
 
-    mindspore::lite::ReduceMode m_mode{mindspore::lite::REDUCE_MODE_PROD};
+    mindspore::lite::ReduceMode mode {mindspore::lite::REDUCE_MODE_PROD};
 
-    void* primitive = mindspore::lite::MindIR_ReduceFusion_CreatePrimitive(m_keepDims, m_mode, m_reduceToEnd, m_coeff);
+    void* primitive = mindspore::lite::MindIR_ReduceFusion_CreatePrimitive(m_keepDims, mode, m_reduceToEnd, m_coeff);
     LiteGraphPrimitvePtr graphPrimitivePtr(primitive, DestroyLiteGraphPrimitive);
     return graphPrimitivePtr;
 }
