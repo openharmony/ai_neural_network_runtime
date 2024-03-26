@@ -24,7 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
-static const int PARAM_MAX_NUM = 8;
+static const int PARAM_MAX_NUM = 7;
 static const int SCALAR_LENGTH = 1;
 static const int NUM_ELEMENT_PAD_MODE = 1;
 static const int NUM_ELEMENT_PAD_LIST = 4;

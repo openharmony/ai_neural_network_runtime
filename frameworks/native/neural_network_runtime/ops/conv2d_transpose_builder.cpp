@@ -24,7 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static constexpr int INPUT_NUM = 3;
 static constexpr int OUTPUT_NUM = 1;
-static constexpr int PARAM_MAX_NUM = 10;
+static constexpr int PARAM_MAX_NUM = 7;
 static constexpr int INPUT_WEIGHT = 1;
 static constexpr int WEIGHT_SIZE = 4;
 static constexpr int OUT_CHANNEL_INDEX = 0;

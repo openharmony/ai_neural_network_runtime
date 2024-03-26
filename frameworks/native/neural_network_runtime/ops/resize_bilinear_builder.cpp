@@ -22,7 +22,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
-static const int PARAM_MAX_NUM = 6;
+static const int PARAM_MAX_NUM = 5;
 static const int SCALE_LENGTH = 1;
 static const std::string OP_NAME = "ResizeBilinear";
 
