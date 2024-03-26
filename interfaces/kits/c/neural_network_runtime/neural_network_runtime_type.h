@@ -1635,7 +1635,7 @@ typedef enum {
      * Inputs:
      *
      * * <b>input</b>: <i>n</i>-dimensional tensor.
-     * * <b>input</b> <i>k</i>: first <i>k</i> records of data and their indices.
+     * * <b>k</b>: first <i>k</i> records of data and their indices.
      *
      * Parameters:
      *
