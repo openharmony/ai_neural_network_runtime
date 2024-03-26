@@ -156,7 +156,6 @@ LiteGraphPrimitvePtr RangeBuilder::GetPrimitive()
     }
 
     int64_t dType {0.0f};
-
     void* primitive = mindspore::lite::MindIR_Range_CreatePrimitive(dType, m_start, m_limit, m_delta);
     LiteGraphPrimitvePtr graphPrimitivePtr(primitive, DestroyLiteGraphPrimitive) ;
     return graphPrimitivePtr;

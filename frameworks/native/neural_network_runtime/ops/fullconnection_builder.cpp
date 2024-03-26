@@ -93,11 +93,13 @@ OH_NN_ReturnCode FullConnectionBuilder::SetUseAxis(std::shared_ptr<NNTensor> ten
     }
 
     bool useAxis = *(static_cast<bool*>(buffer));
-    if (!useAxis && m_useAxis) {
+    if (m_isSetAxis && !useAxis) {
         LOGE("[FullConnection] SetAxis but set useAxis false.");
         return OH_NN_INVALID_PARAMETER;
     }
+
     m_useAxis = useAxis;
+    m_isSetUseAxis = true;
     return OH_NN_SUCCESS;
 }
 
@@ -151,8 +153,14 @@ OH_NN_ReturnCode FullConnectionBuilder::SetAxis(std::shared_ptr<NNTensor> tensor
         return OH_NN_INVALID_PARAMETER;
     }
 
+    if (m_isSetUseAxis && !m_useAxis) {
+        LOGE("[FullConnection] SetUseAxis false but set useAxis.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
     m_axis = *static_cast<int64_t*>(buffer);
     m_useAxis = true;
+    m_isSetAxis = true;
     return OH_NN_SUCCESS;
 }
 
@@ -180,17 +188,10 @@ OH_NN_ReturnCode FullConnectionBuilder::Build(const std::vector<uint32_t>& param
     }
 
     for (int i : paramsIndex) {
-        std::shared_ptr<NNTensor> tensor = allTensors[i];
-        if (tensor->GetType() == OH_NN_FULL_CONNECTION_AXIS) {
-            returnCode = SetAxis(tensor);
-            break;
-        }
-    }
-
-    for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i]; // 参数 tensor
         switch (tensor->GetType()) {
             case OH_NN_FULL_CONNECTION_AXIS:
+                returnCode = SetAxis(tensor);
                 break;
             case OH_NN_FULL_CONNECTION_HAS_BIAS:
                 returnCode = SetHasBias(tensor);
