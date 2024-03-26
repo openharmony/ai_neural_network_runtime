@@ -39,10 +39,10 @@ private:
         int64_t beginAxis, const std::vector<std::shared_ptr<NNTensor>>& allTensors) const;
 
 private:
-    int64_t m_beginNormAxis {0};
-    float m_epsilon {0.00001f};
+    int64_t m_beginNormAxis {1};
+    float m_epsilon {1e-7};
     bool m_elementwiseAffine {false};
-    int64_t m_beginParamsAxis {0};
+    int64_t m_beginParamsAxis {1};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

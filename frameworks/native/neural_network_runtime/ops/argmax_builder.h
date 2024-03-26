@@ -41,7 +41,7 @@ private:
     OH_NN_ReturnCode SetOutMaxValue(std::shared_ptr<NNTensor> tensor);
 
 private:
-    int64_t m_axis {0};
+    int64_t m_axis {-1};
     int64_t m_topK {1};
     bool m_keepDims {false};
     bool m_outMaxValue {false};

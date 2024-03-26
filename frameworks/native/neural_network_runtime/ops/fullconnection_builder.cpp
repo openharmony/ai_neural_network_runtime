@@ -22,7 +22,7 @@ namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {
 static constexpr int OUTPUT_NUM = 1;
-static constexpr int PARAM_NUM = 4;
+static constexpr int PARAM_MAX_NUM = 4;
 static constexpr int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "FullConnection";
 
@@ -173,7 +173,7 @@ OH_NN_ReturnCode FullConnectionBuilder::Build(const std::vector<uint32_t>& param
         return returnCode;
     }
 
-    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("[FullConnection] Build failed, passed invalid param index.");
         return returnCode;
