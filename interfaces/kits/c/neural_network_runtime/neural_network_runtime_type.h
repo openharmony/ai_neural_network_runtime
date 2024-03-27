@@ -871,8 +871,9 @@ typedef enum {
      *
      * Outputs:
      *
-     * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used, the quantization parameters of the
-     *   output cannot be omitted. However, values of the quantization parameters do not affect the result.
+     * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used,
+     *   the quantization parameters of the output cannot be omitted.
+     *   However, values of the quantization parameters do not affect the result.
      */
     OH_NN_OPS_LESS_EQUAL = 18,
 
