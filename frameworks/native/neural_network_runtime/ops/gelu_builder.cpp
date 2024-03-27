@@ -24,11 +24,35 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUMS = 1;
 static const int OUTPUT_NUMS = 1;
+static const int PARAM_MAX_NUM = 1;
+static const int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "Gelu";
 
 GeluBuilder::GeluBuilder() {}
 
 GeluBuilder::~GeluBuilder() {}
+
+OH_NN_ReturnCode GeluBuilder::SetApproximate(std::shared_ptr<NNTensor> tensor)
+{
+    if (tensor->GetDataType() != OH_NN_BOOL) {
+        LOGE("[GeLU] The approximate should be type OH_NN_BOOL.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (tensor->GetElementCount() != SCALAR_LENGTH) {
+        LOGE("[GeLU] The approximate should be scalar.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[GeLU] Tensor buffer is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    m_approximate = *(static_cast<bool*>(buffer));
+
+    return OH_NN_SUCCESS;
+}
 
 OH_NN_ReturnCode GeluBuilder::Build(const std::vector<uint32_t>& paramsIndex,
                                     const std::vector<uint32_t>& inputsIndex,
@@ -46,9 +70,27 @@ OH_NN_ReturnCode GeluBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return returnCode;
     }
 
-    if (!paramsIndex.empty()) {
-        LOGW("[Gelu] Build failed, gelu expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[Gelu] Build failed, passed invalid param indices.");
+        return returnCode;
+    }
+
+    for (int i : paramsIndex) {
+        std::shared_ptr<NNTensor> tensor = allTensors[i];
+        tensor->IdentifyOpParameter();
+        switch (tensor->GetType()) {
+            case OH_NN_GELU_APPROXIMATE:
+                returnCode = SetApproximate(tensor);
+                break;
+            default:
+                LOGE("[Gelu] Build failed, param invalid, type = %d.", tensor->GetType());
+                return OH_NN_INVALID_PARAMETER;
+        }
+        if (returnCode != OH_NN_SUCCESS) {
+            LOGE("[Gelu] Build failed, passed invalid param.");
+            return returnCode;
+        }
     }
 
     m_inputsIndex = inputsIndex;
@@ -70,9 +112,8 @@ LiteGraphPrimitvePtr GeluBuilder::GetPrimitive()
     float alpha = 0.0f;
     float minVal = 0.0f;
     float maxVal = 0.0f;
-    bool approximate = false;
     void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType,
-        alpha, minVal, maxVal, approximate);
+        alpha, minVal, maxVal, m_approximate);
     LiteGraphPrimitvePtr graphPrimitivePtr(primitive, DestroyLiteGraphPrimitive);
     return graphPrimitivePtr;
 }

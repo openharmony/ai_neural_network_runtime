@@ -60,7 +60,7 @@ bool ValidateFuseType(OH_NN_FuseType fuseType)
 
 bool ValidateTensorType(OH_NN_TensorType nnTensorType)
 {
-    if ((nnTensorType >= OH_NN_TENSOR) && (nnTensorType <= OH_NN_POW_SHIFT)) {
+    if ((nnTensorType >= OH_NN_TENSOR) && (nnTensorType <= OH_NN_TILE_DIMS)) {
         return true;
     }
     return false;

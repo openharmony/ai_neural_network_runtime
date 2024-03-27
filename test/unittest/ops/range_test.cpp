@@ -30,8 +30,6 @@ public:
     void TearDown() override;
 
 protected:
-    void SaveDType(OH_NN_DataType dataType,
-        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
     void SaveStart(OH_NN_DataType dataType,
         const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
     void SaveLimit(OH_NN_DataType dataType,
@@ -43,7 +41,7 @@ protected:
     RangeBuilder m_builder;
     std::vector<uint32_t> m_inputs {0};
     std::vector<uint32_t> m_outputs {1};
-    std::vector<uint32_t> m_params {2, 3, 4, 5};
+    std::vector<uint32_t> m_params {2, 3, 4};
     std::vector<int32_t> m_dim {3};
     std::vector<int32_t> m_paramDim {};
 };
@@ -51,16 +49,6 @@ protected:
 void RangeBuilderTest::SetUp() {}
 
 void RangeBuilderTest::TearDown() {}
-
-void RangeBuilderTest::SaveDType(OH_NN_DataType dataType,
-    const std::vector<int32_t> &dim, const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
-{
-    std::shared_ptr<NNTensor> dTypeTensor = TransToNNTensor(dataType, dim, quantParam, type);
-    int64_t* dTypeValue = new (std::nothrow) int64_t [1]{0};
-    EXPECT_NE(nullptr, dTypeValue);
-    dTypeTensor->SetBuffer(dTypeValue, sizeof(int64_t));
-    m_allTensors.emplace_back(dTypeTensor);
-}
 
 void RangeBuilderTest::SaveStart(OH_NN_DataType dataType,
     const std::vector<int32_t> &dim, const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
@@ -101,7 +89,6 @@ HWTEST_F(RangeBuilderTest, range_build_001, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
     SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
     SaveDelta(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DELTA);
@@ -119,7 +106,6 @@ HWTEST_F(RangeBuilderTest, range_build_002, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
     SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
     SaveDelta(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DELTA);
@@ -138,11 +124,10 @@ HWTEST_F(RangeBuilderTest, range_build_003, TestSize.Level1)
 {
     m_inputs = {0, 1};
     m_outputs = {2};
-    m_params = {3, 4, 5, 6};
+    m_params = {3, 4, 5};
 
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
     SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
     SaveDelta(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DELTA);
@@ -159,11 +144,10 @@ HWTEST_F(RangeBuilderTest, range_build_003, TestSize.Level1)
 HWTEST_F(RangeBuilderTest, range_build_004, TestSize.Level1)
 {
     m_outputs = {1, 2};
-    m_params = {3, 4, 5, 6};
+    m_params = {3, 4, 5};
 
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
     SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
     SaveDelta(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DELTA);
@@ -198,7 +182,7 @@ HWTEST_F(RangeBuilderTest, range_build_006, TestSize.Level1)
 
 /**
  * @tc.name: range_build_007
- * @tc.desc: Verify that the build function returns a failed message with invalid dType's dataType.
+ * @tc.desc: Verify that the build function returns a failed message with invalid start's dataType.
  * @tc.type: FUNC
  */
 HWTEST_F(RangeBuilderTest, range_build_007, TestSize.Level1)
@@ -206,32 +190,6 @@ HWTEST_F(RangeBuilderTest, range_build_007, TestSize.Level1)
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
 
-    std::shared_ptr<NNTensor> dTypeTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDim,
-        nullptr, OH_NN_RANGE_DTYPE);
-    float* dTypeValue = new (std::nothrow) float [1]{0.0f};
-    EXPECT_NE(nullptr, dTypeValue);
-    dTypeTensor->SetBuffer(dTypeValue, sizeof(float));
-    m_allTensors.emplace_back(dTypeTensor);
-    SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
-    SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
-    SaveDelta(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DELTA);
-
-    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    dTypeTensor->SetBuffer(nullptr, 0);
-}
-
-/**
- * @tc.name: range_build_008
- * @tc.desc: Verify that the build function returns a failed message with invalid start's dataType.
- * @tc.type: FUNC
- */
-HWTEST_F(RangeBuilderTest, range_build_008, TestSize.Level1)
-{
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
-    SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
-
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     std::shared_ptr<NNTensor> startTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDim,
         nullptr, OH_NN_RANGE_START);
     float* startValue = new (std::nothrow) float [1]{0.0f};
@@ -247,16 +205,15 @@ HWTEST_F(RangeBuilderTest, range_build_008, TestSize.Level1)
 }
 
 /**
- * @tc.name: range_build_009
+ * @tc.name: range_build_008
  * @tc.desc: Verify that the build function returns a failed message with invalid limit's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(RangeBuilderTest, range_build_009, TestSize.Level1)
+HWTEST_F(RangeBuilderTest, range_build_008, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
 
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
     std::shared_ptr<NNTensor> limitTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDim,
         nullptr, OH_NN_RANGE_LIMIT);
@@ -272,16 +229,15 @@ HWTEST_F(RangeBuilderTest, range_build_009, TestSize.Level1)
 }
 
 /**
- * @tc.name: range_build_010
+ * @tc.name: range_build_009
  * @tc.desc: Verify that the build function returns a failed message with invalid delta's dataType.
  * @tc.type: FUNC
  */
-HWTEST_F(RangeBuilderTest, range_build_010, TestSize.Level1)
+HWTEST_F(RangeBuilderTest, range_build_009, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
 
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
     SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
     std::shared_ptr<NNTensor> deltaTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDim,
@@ -297,35 +253,15 @@ HWTEST_F(RangeBuilderTest, range_build_010, TestSize.Level1)
 }
 
 /**
- * @tc.name: range_build_011
- * @tc.desc: Verify that the build function returns a failed message with passing invalid dType param.
- * @tc.type: FUNC
- */
-HWTEST_F(RangeBuilderTest, range_build_011, TestSize.Level1)
-{
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
-    SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
-
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
-    SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
-    SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
-    SaveDelta(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DELTA);
-
-    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-}
-
-/**
- * @tc.name: range_build_012
+ * @tc.name: range_build_010
  * @tc.desc: Verify that the build function returns a failed message with passing invalid start param.
  * @tc.type: FUNC
  */
-HWTEST_F(RangeBuilderTest, range_build_012, TestSize.Level1)
+HWTEST_F(RangeBuilderTest, range_build_010, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
 
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
     SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
     SaveDelta(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DELTA);
@@ -335,16 +271,15 @@ HWTEST_F(RangeBuilderTest, range_build_012, TestSize.Level1)
 }
 
 /**
- * @tc.name: range_build_013
+ * @tc.name: range_build_011
  * @tc.desc: Verify that the build function returns a failed message with passing invalid limit param.
  * @tc.type: FUNC
  */
-HWTEST_F(RangeBuilderTest, range_build_013, TestSize.Level1)
+HWTEST_F(RangeBuilderTest, range_build_011, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
 
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
     SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
     SaveDelta(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DELTA);
@@ -354,16 +289,15 @@ HWTEST_F(RangeBuilderTest, range_build_013, TestSize.Level1)
 }
 
 /**
- * @tc.name: range_build_014
+ * @tc.name: range_build_012
  * @tc.desc: Verify that the build function returns a failed message with passing invalid delta param.
  * @tc.type: FUNC
  */
-HWTEST_F(RangeBuilderTest, range_build_014, TestSize.Level1)
+HWTEST_F(RangeBuilderTest, range_build_012, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
 
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
     SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
     SaveDelta(OH_NN_INT64, m_paramDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
@@ -373,37 +307,15 @@ HWTEST_F(RangeBuilderTest, range_build_014, TestSize.Level1)
 }
 
 /**
- * @tc.name: range_build_015
- * @tc.desc: Verify that the build function returns a failed message without set buffer for dType.
- * @tc.type: FUNC
- */
-HWTEST_F(RangeBuilderTest, range_build_015, TestSize.Level1)
-{
-    SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
-    SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
-
-    std::shared_ptr<NNTensor> dTypeTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
-        nullptr, OH_NN_RANGE_DTYPE);
-    m_allTensors.emplace_back(dTypeTensor);
-    SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
-    SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
-    SaveDelta(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DELTA);
-
-    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-}
-
-/**
- * @tc.name: range_build_016
+ * @tc.name: range_build_013
  * @tc.desc: Verify that the build function returns a failed message without set buffer for start.
  * @tc.type: FUNC
  */
-HWTEST_F(RangeBuilderTest, range_build_016, TestSize.Level1)
+HWTEST_F(RangeBuilderTest, range_build_013, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
 
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     std::shared_ptr<NNTensor> startTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
         nullptr, OH_NN_RANGE_START);
     m_allTensors.emplace_back(startTensor);
@@ -415,16 +327,15 @@ HWTEST_F(RangeBuilderTest, range_build_016, TestSize.Level1)
 }
 
 /**
- * @tc.name: range_build_017
+ * @tc.name: range_build_014
  * @tc.desc: Verify that the build function returns a failed message without set buffer for limit.
  * @tc.type: FUNC
  */
-HWTEST_F(RangeBuilderTest, range_build_017, TestSize.Level1)
+HWTEST_F(RangeBuilderTest, range_build_014, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
 
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
     std::shared_ptr<NNTensor> limitTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
         nullptr, OH_NN_RANGE_LIMIT);
@@ -436,16 +347,15 @@ HWTEST_F(RangeBuilderTest, range_build_017, TestSize.Level1)
 }
 
 /**
- * @tc.name: range_build_018
+ * @tc.name: range_build_015
  * @tc.desc: Verify that the build function returns a failed message without set buffer for delta.
  * @tc.type: FUNC
  */
-HWTEST_F(RangeBuilderTest, range_build_018, TestSize.Level1)
+HWTEST_F(RangeBuilderTest, range_build_015, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
 
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
     SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
     std::shared_ptr<NNTensor> deltaTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
@@ -465,12 +375,10 @@ HWTEST_F(RangeBuilderTest, range_getprimitive_001, TestSize.Level1)
 {
     SaveInputTensor(m_inputs, OH_NN_INT32, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT32, m_dim, nullptr);
-    SaveDType(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DTYPE);
     SaveStart(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_START);
     SaveLimit(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_LIMIT);
     SaveDelta(OH_NN_INT64, m_paramDim, nullptr, OH_NN_RANGE_DELTA);
 
-    int64_t dTypeValue = 0;
     int64_t startValue = 0;
     int64_t limitValue = 3;
     int64_t deltaValue = 1;
@@ -479,8 +387,6 @@ HWTEST_F(RangeBuilderTest, range_getprimitive_001, TestSize.Level1)
     LiteGraphPrimitvePtr expectPrimitive(nullptr, DestroyLiteGraphPrimitive);
     EXPECT_NE(expectPrimitive, primitive);
 
-    auto returnDTypeValue = mindspore::lite::MindIR_Range_GetDType(primitive.get());
-    EXPECT_EQ(returnDTypeValue, dTypeValue);
     auto returnStartValue = mindspore::lite::MindIR_Range_GetStart(primitive.get());
     EXPECT_EQ(returnStartValue, startValue);
     auto returnLimitValue = mindspore::lite::MindIR_Range_GetLimit(primitive.get());

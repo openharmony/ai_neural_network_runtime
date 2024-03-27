@@ -30,14 +30,16 @@ public:
     void TearDown() override;
 
 protected:
-    void SaveParamsTensor(OH_NN_DataType dataType,
+    void SetConstValueTensor(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetPaddingModeTensor(OH_NN_DataType dataType,
         const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
 
 protected:
     PadBuilder m_pad;
     std::vector<uint32_t> m_inputs {0, 1};
     std::vector<uint32_t> m_outputs {2};
-    std::vector<uint32_t> m_params {3};
+    std::vector<uint32_t> m_params {3, 4};
     std::vector<int32_t> m_inputDim {1, 1, 2, 3};
     std::vector<int32_t> m_outputDim {1, 2, 7, 7};
     std::vector<int32_t> m_paramDim {};
@@ -47,7 +49,7 @@ void PadBuilderTest::SetUp() {}
 
 void PadBuilderTest::TearDown() {}
 
-void PadBuilderTest::SaveParamsTensor(OH_NN_DataType dataType,
+void PadBuilderTest::SetConstValueTensor(OH_NN_DataType dataType,
     const std::vector<int32_t> &dim, const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
 {
     std::shared_ptr<NNTensor> constantValueTensor = TransToNNTensor(dataType, dim, quantParam, type);
@@ -55,6 +57,16 @@ void PadBuilderTest::SaveParamsTensor(OH_NN_DataType dataType,
     EXPECT_NE(nullptr, constantValue);
     constantValueTensor->SetBuffer(constantValue, sizeof(float));
     m_allTensors.emplace_back(constantValueTensor);
+}
+
+void PadBuilderTest::SetPaddingModeTensor(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim, const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> paddingModeValueTensor = TransToNNTensor(dataType, dim, quantParam, type);
+    int32_t* paddingModeValue = new (std::nothrow) int32_t(0);
+    EXPECT_NE(nullptr, paddingModeValue);
+    paddingModeValueTensor->SetBuffer(paddingModeValue, sizeof(int32_t));
+    m_allTensors.emplace_back(paddingModeValueTensor);
 }
 
 /**
@@ -66,7 +78,8 @@ HWTEST_F(PadBuilderTest, pad_build_001, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    SetConstValueTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    SetPaddingModeTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_PAD_PADDING_MODE);
 
     OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
@@ -81,7 +94,8 @@ HWTEST_F(PadBuilderTest, pad_build_002, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    SetConstValueTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    SetPaddingModeTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_PAD_PADDING_MODE);
 
     EXPECT_EQ(OH_NN_SUCCESS, m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors));
     OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
@@ -97,11 +111,12 @@ HWTEST_F(PadBuilderTest, pad_build_003, TestSize.Level0)
 {
     m_inputs = {0, 1, 2};
     m_outputs = {3};
-    m_params = {4};
+    m_params = {4, 5};
 
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    SetConstValueTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    SetPaddingModeTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_PAD_PADDING_MODE);
 
     OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -115,11 +130,12 @@ HWTEST_F(PadBuilderTest, pad_build_003, TestSize.Level0)
 HWTEST_F(PadBuilderTest, pad_build_004, TestSize.Level0)
 {
     m_outputs = {2, 3};
-    m_params = {4};
+    m_params = {4, 5};
 
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    SetConstValueTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    SetPaddingModeTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_PAD_PADDING_MODE);
 
     OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -163,6 +179,7 @@ HWTEST_F(PadBuilderTest, pad_build_007, TestSize.Level0)
     int32_t constantValue = 0;
     constantValueTensor->SetBuffer(&constantValue, sizeof(constantValue));
     m_allTensors.emplace_back(constantValueTensor);
+    SetPaddingModeTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_PAD_PADDING_MODE);
 
     OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -171,10 +188,32 @@ HWTEST_F(PadBuilderTest, pad_build_007, TestSize.Level0)
 
 /**
  * @tc.name: pad_build_008
- * @tc.desc: Verify that the build function returns a failed message with invalid constant's dimension.
+ * @tc.desc: Verify that the build function returns a failed message with invalid paddingMode's dataType.
  * @tc.type: FUNC
  */
 HWTEST_F(PadBuilderTest, pad_build_008, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
+
+    SetConstValueTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    std::shared_ptr<NNTensor> paddingModeTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
+        nullptr, OH_NN_PAD_PADDING_MODE);
+    int64_t paddingMode = 0;
+    paddingModeTensor->SetBuffer(&paddingMode, sizeof(int64_t));
+    m_allTensors.emplace_back(paddingModeTensor);
+
+    OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    paddingModeTensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: pad_build_009
+ * @tc.desc: Verify that the build function returns a failed message with invalid constant's dimension.
+ * @tc.type: FUNC
+ */
+HWTEST_F(PadBuilderTest, pad_build_009, TestSize.Level0)
 {
     m_paramDim = {2};
 
@@ -186,38 +225,76 @@ HWTEST_F(PadBuilderTest, pad_build_008, TestSize.Level0)
     float constantValue[2] = {2.0, 2.0};
     constantValueTensor->SetBuffer(constantValue, 2 * sizeof(float));
     m_allTensors.emplace_back(constantValueTensor);
+    SetPaddingModeTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_PAD_PADDING_MODE);
+
     OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
     constantValueTensor->SetBuffer(nullptr, 0);
 }
 
 /**
- * @tc.name: pad_build_009
- * @tc.desc: Verify that the build function returns a failed message with passing invalid param.
- * @tc.type: FUNC
- */
-HWTEST_F(PadBuilderTest, pad_build_009, TestSize.Level0)
-{
-    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_inputDim, nullptr);
-    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_ONE_HOT_AXIS);
-
-    OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-}
-
-/**
  * @tc.name: pad_build_010
- * @tc.desc: Verify that the build function returns a failed message without set buffer for constantValue.
+ * @tc.desc: Verify that the build function returns a failed message with passing invalid constvalue.
  * @tc.type: FUNC
  */
 HWTEST_F(PadBuilderTest, pad_build_010, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
+    SetConstValueTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_ONE_HOT_AXIS);
+    SetPaddingModeTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_PAD_PADDING_MODE);
+
+    OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/**
+ * @tc.name: pad_build_011
+ * @tc.desc: Verify that the build function returns a failed message with passing invalid paddingMode.
+ * @tc.type: FUNC
+ */
+HWTEST_F(PadBuilderTest, pad_build_011, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
+    SetConstValueTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    SetPaddingModeTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_ONE_HOT_AXIS);
+
+    OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/**
+ * @tc.name: pad_build_012
+ * @tc.desc: Verify that the build function returns a failed message without set buffer for constantValue.
+ * @tc.type: FUNC
+ */
+HWTEST_F(PadBuilderTest, pad_build_012, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
     std::shared_ptr<NNTensor> constantValueTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDim,
         nullptr, OH_NN_PAD_CONSTANT_VALUE);
     m_allTensors.emplace_back(constantValueTensor);
+    SetPaddingModeTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_PAD_PADDING_MODE);
+
+    OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/**
+ * @tc.name: pad_build_013
+ * @tc.desc: Verify that the build function returns a failed message without set buffer for paddingMode.
+ * @tc.type: FUNC
+ */
+HWTEST_F(PadBuilderTest, pad_build_013, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_inputDim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
+    SetConstValueTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    std::shared_ptr<NNTensor> paddingModeTensor = TransToNNTensor(OH_NN_INT32, m_paramDim,
+        nullptr, OH_NN_PAD_PADDING_MODE);
+    m_allTensors.emplace_back(paddingModeTensor);
 
     OH_NN_ReturnCode ret = m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -232,9 +309,11 @@ HWTEST_F(PadBuilderTest, pad_getprimitive_001, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_outputDim, nullptr);
-    SaveParamsTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    SetConstValueTensor(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_PAD_CONSTANT_VALUE);
+    SetPaddingModeTensor(OH_NN_INT32, m_paramDim, nullptr, OH_NN_PAD_PADDING_MODE);
 
     float constantValue = 2.0;
+    mindspore::lite::PaddingMode paddingModeValue = mindspore::lite::PADDING_MODE_CONSTANT;
     EXPECT_EQ(OH_NN_SUCCESS, m_pad.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors));
     LiteGraphPrimitvePtr primitive = m_pad.GetPrimitive();
     LiteGraphPrimitvePtr expectPrimitive(nullptr, DestroyLiteGraphPrimitive);
@@ -242,6 +321,8 @@ HWTEST_F(PadBuilderTest, pad_getprimitive_001, TestSize.Level0)
 
     auto returnValue = mindspore::lite::MindIR_PadFusion_GetConstantValue(primitive.get());
     EXPECT_EQ(returnValue, constantValue);
+    auto returnPaddingMode = mindspore::lite::MindIR_PadFusion_GetPaddingMode(primitive.get());
+    EXPECT_EQ(returnPaddingMode, paddingModeValue);
 }
 
 /**

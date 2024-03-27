@@ -22,11 +22,37 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 3;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 1;
 static const std::string OP_NAME = "Slice";
 
 SliceBuilder::SliceBuilder() {}
 
 SliceBuilder::~SliceBuilder() {}
+
+OH_NN_ReturnCode SliceBuilder::SetAxes(std::shared_ptr<NNTensor> tensor)
+{
+    if (tensor->GetDataType() != OH_NN_INT64) {
+        LOGE("[SliceBuilder] The axes should be type OH_NN_INT64.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    m_axes.clear();
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[SliceBuilder] Tensor buffer is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    int64_t* pAxes = static_cast<int64_t*>(buffer);
+
+    uint32_t elementCount = tensor->GetElementCount();
+    for (uint32_t i = 0; i < elementCount; ++i) {
+        m_axes.emplace_back(*pAxes);
+        ++pAxes;
+    }
+    return OH_NN_SUCCESS;
+}
 
 /**
  * Build method.
@@ -50,9 +76,27 @@ OH_NN_ReturnCode SliceBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return returnCode;
     }
 
-    if (!paramsIndex.empty()) {
-        LOGE("[SliceBuilder] slice expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[SliceBuilder] Passed invalid param index.");
+        return returnCode;
+    }
+
+    for (int i : paramsIndex) {
+        std::shared_ptr<NNTensor> tensor = allTensors[i];
+        tensor->IdentifyOpParameter();
+        switch (tensor->GetType()) {
+            case OH_NN_SLICE_AXES:
+                returnCode = SetAxes(tensor);
+                break;
+            default:
+                LOGE("[SliceBuilder] Build failed, param invalid, type = %d.", tensor->GetType());
+                return OH_NN_INVALID_PARAMETER;
+        }
+        if (returnCode != OH_NN_SUCCESS) {
+            LOGE("[SliceBuilder] Build failed, passed invalid param.");
+            return returnCode;
+        }
     }
 
     m_inputsIndex = inputsIndex;

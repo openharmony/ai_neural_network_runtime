@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static constexpr int INPUT_NUM = 3;
 static constexpr int OUTPUT_NUM = 1;
+static constexpr int PARAM_MAX_NUM = 7;
 static constexpr int INPUT_WEIGHT = 1;
 static constexpr int WEIGHT_SIZE = 4;
 static constexpr int OUT_CHANNEL_INDEX = 0;
@@ -248,6 +249,12 @@ OH_NN_ReturnCode Conv2DTransposeBuilder::Build(const std::vector<uint32_t>& para
 
     OH_NN_ReturnCode returnCode = SetInput(inputsIndex, outputsIndex, allTensors);
     if (returnCode != OH_NN_SUCCESS) {
+        return returnCode;
+    }
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[Conv2DTranspose] Build failed, passed invalid param index.");
         return returnCode;
     }
 

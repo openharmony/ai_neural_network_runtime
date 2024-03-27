@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "ExpandDims";
 
 ExpandDimsBuilder::ExpandDimsBuilder() {}
@@ -45,9 +46,10 @@ OH_NN_ReturnCode ExpandDimsBuilder::Build(const std::vector<uint32_t>& paramsInd
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
 
-    if (!paramsIndex.empty()) {
-        LOGE("[ExpandDims] Build failed, expandDims expects no parameters");
-        return OH_NN_INVALID_PARAMETER;
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[ExpandDims] Build failed, the param index of ExpandDims operation is invalid.");
+        return ret;
     }
 
     m_isBuild = true;

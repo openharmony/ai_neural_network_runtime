@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUMS = 2;
 static const int OUTPUT_NUMS = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "PRelu";
 
 PReluBuilder::PReluBuilder() {}
@@ -46,13 +47,14 @@ OH_NN_ReturnCode PReluBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return returnCode;
     }
 
-    if (!paramsIndex.empty()) {
-        LOGW("[PRelu] Build failed, the PRelu expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[PRelu] Build failed, passed invalid param index of PRelu operation index.");
+        return returnCode;
+    }
 
     m_name = OP_NAME;
     m_isBuild = true;

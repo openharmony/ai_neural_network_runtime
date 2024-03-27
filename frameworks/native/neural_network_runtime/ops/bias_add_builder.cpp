@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "BiasAdd";
 
 BiasAddBuilder::BiasAddBuilder() {}
@@ -44,9 +45,11 @@ OH_NN_ReturnCode BiasAddBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
-    if (!paramsIndex.empty()) {
-        LOGE("[BiasAdd] Build failed, expects no parameters");
-        return OH_NN_INVALID_PARAMETER;
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[BiasAdd] Build failed, passed invalid param index.");
+        return returnCode;
     }
 
     // The quantization type of the first output determinies that of the operator.

@@ -42,7 +42,7 @@ private:
 
 private:
     float m_base {-1.0f};
-    float m_scale {0.1f};
+    float m_scale {1.0f};
     float m_shift {0.0f};
 };
 } // namespace Ops

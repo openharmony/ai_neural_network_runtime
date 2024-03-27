@@ -32,6 +32,8 @@ protected:
         const std::vector<uint32_t>& outputsIndex) override;
     void SaveSortedTensor(OH_NN_DataType dataType, const std::vector<int32_t> &dim,
         const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SaveAxisTensor(OH_NN_DataType dataType, const std::vector<int32_t> &dim,
+        const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
 
 protected:
     TopKBuilder m_builder;
@@ -49,11 +51,21 @@ void TopKBuilderTest::InitTensor(const std::vector<uint32_t>& inputsIndex, const
     SaveOutputTensor(outputsIndex, OH_NN_FLOAT32, OutputDim, nullptr);
 }
 
+void TopKBuilderTest::SaveAxisTensor(OH_NN_DataType dataType, const std::vector<int32_t> &dim,
+    const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> axisTensor = TransToNNTensor(dataType, dim, quantParam, type);
+    int64_t* axisValue = new (std::nothrow) int64_t[1] {0};
+    EXPECT_NE(nullptr, axisValue);
+    axisTensor->SetBuffer(axisValue, sizeof(int64_t));
+    m_allTensors.emplace_back(axisTensor);
+}
+
 void TopKBuilderTest::SaveSortedTensor(OH_NN_DataType dataType, const std::vector<int32_t> &dim,
     const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
 {
     std::shared_ptr<NNTensor> topkTensor = TransToNNTensor(dataType, dim, quantParam, type);
-    bool* topkValue = new (std::nothrow) bool[1]{true};
+    bool* topkValue = new (std::nothrow) bool[1] {true};
     EXPECT_NE(nullptr, topkValue);
     topkTensor->SetBuffer(topkValue, sizeof(bool));
     m_allTensors.emplace_back(topkTensor);
@@ -69,12 +81,14 @@ HWTEST_F(TopKBuilderTest, topk_build_001, TestSize.Level0)
 {
     std::vector<uint32_t> inputsIndex = { 0, 1 };
     std::vector<uint32_t> outputsIndex = { 2, 3 };
+    std::vector<uint32_t> paramsIndex = { 4, 5 };
     std::vector<int32_t> paramDim = {};
 
     InitTensor(inputsIndex, outputsIndex);
     SaveSortedTensor(OH_NN_BOOL, paramDim, nullptr, OH_NN_TOP_K_SORTED);
+    SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
 
-    OH_NN_ReturnCode ret = m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
+    OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
 }
 
@@ -87,13 +101,15 @@ HWTEST_F(TopKBuilderTest, topk_build_002, TestSize.Level0)
 {
     std::vector<uint32_t> inputsIndex = { 0, 1 };
     std::vector<uint32_t> outputsIndex = { 2, 3 };
+    std::vector<uint32_t> paramsIndex = { 4, 5 };
     std::vector<int32_t> paramDim = {};
 
     InitTensor(inputsIndex, outputsIndex);
     SaveSortedTensor(OH_NN_BOOL, paramDim, nullptr, OH_NN_TOP_K_SORTED);
+    SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
 
-    EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
-    OH_NN_ReturnCode ret = m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+    OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, ret);
 }
 
@@ -106,12 +122,14 @@ HWTEST_F(TopKBuilderTest, topk_build_003, TestSize.Level0)
 {
     std::vector<uint32_t> inputsIndex = { 0, 1, 2, 3 };
     std::vector<uint32_t> outputsIndex = { 4, 5 };
+    std::vector<uint32_t> paramsIndex = { 6, 7 };
     std::vector<int32_t> paramDim = {};
 
     InitTensor(inputsIndex, outputsIndex);
     SaveSortedTensor(OH_NN_BOOL, paramDim, nullptr, OH_NN_TOP_K_SORTED);
+    SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
 
-    OH_NN_ReturnCode ret = m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
+    OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
@@ -124,12 +142,14 @@ HWTEST_F(TopKBuilderTest, topk_builder_004, TestSize.Level0)
 {
     std::vector<uint32_t> inputsIndex = { 0, 1 };
     std::vector<uint32_t> outputsIndex = { 2, 3, 4 };
+    std::vector<uint32_t> paramsIndex = { 5, 6 };
     std::vector<int32_t> paramDim = {};
 
     InitTensor(inputsIndex, outputsIndex);
     SaveSortedTensor(OH_NN_BOOL, paramDim, nullptr, OH_NN_TOP_K_SORTED);
+    SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
 
-    OH_NN_ReturnCode ret = m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
+    OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
@@ -142,7 +162,7 @@ HWTEST_F(TopKBuilderTest, topk_build_005, TestSize.Level0)
 {
     std::vector<uint32_t> inputsIndex = { 0, 1, 2 };
     std::vector<uint32_t> outputsIndex = { 3, 4 };
-    std::vector<uint32_t> paramsIndex = { 5 };
+    std::vector<uint32_t> paramsIndex = { 5, 6, 7 };
 
     OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, inputsIndex, outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -157,12 +177,14 @@ HWTEST_F(TopKBuilderTest, topk_build_006, TestSize.Level0)
 {
     std::vector<uint32_t> inputsIndex = { 0, 1 };
     std::vector<uint32_t> outputsIndex = { 2, 3 };
+    std::vector<uint32_t> paramsIndex = { 4, 5 };
     std::vector<int32_t> paramDim = {};
 
     InitTensor(inputsIndex, outputsIndex);
     SaveSortedTensor(OH_NN_INT8, paramDim, nullptr, OH_NN_TOP_K_SORTED);
+    SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
 
-    OH_NN_ReturnCode ret = m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
+    OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
@@ -175,12 +197,14 @@ HWTEST_F(TopKBuilderTest, topk_build_007, TestSize.Level0)
 {
     std::vector<uint32_t> inputsIndex = { 0, 1 };
     std::vector<uint32_t> outputsIndex = { 2, 3 };
+    std::vector<uint32_t> paramsIndex = { 4, 5 };
     std::vector<int32_t> paramDim = {};
 
     InitTensor(inputsIndex, outputsIndex);
     SaveSortedTensor(OH_NN_INT32, paramDim, nullptr, OH_NN_TOP_K_SORTED);
+    SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
 
-    OH_NN_ReturnCode ret = m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
+    OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
@@ -193,6 +217,7 @@ HWTEST_F(TopKBuilderTest, topk_build_008, TestSize.Level0)
 {
     std::vector<uint32_t> inputsIndex = { 0, 1 };
     std::vector<uint32_t> outputsIndex = { 2, 3 };
+    std::vector<uint32_t> paramsIndex = { 4, 5 };
     std::vector<int32_t> paramDim = {};
 
     InitTensor(inputsIndex, outputsIndex);
@@ -200,26 +225,72 @@ HWTEST_F(TopKBuilderTest, topk_build_008, TestSize.Level0)
     std::shared_ptr<NNTensor> topkTensor = TransToNNTensor(OH_NN_BOOL, paramDim, nullptr, OH_NN_TOP_K_SORTED);
     topkTensor->SetBuffer(nullptr, 0);
     m_allTensors.emplace_back(topkTensor);
+    SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
 
-    OH_NN_ReturnCode ret = m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
+    OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
 /**
  * @tc.name: topk_build_009
- * @tc.desc: Provide invalid parameter type to verify the abnormal behavior of the Build function
+ * @tc.desc: Provide axis parameter buffer is nullptr to verify the abnormal behavior of the Build function
  * @tc.type: FUNC
  */
 HWTEST_F(TopKBuilderTest, topk_build_009, TestSize.Level0)
 {
     std::vector<uint32_t> inputsIndex = { 0, 1 };
     std::vector<uint32_t> outputsIndex = { 2, 3 };
+    std::vector<uint32_t> paramsIndex = { 4, 5 };
+    std::vector<int32_t> paramDim = {};
+
+    InitTensor(inputsIndex, outputsIndex);
+
+    SaveSortedTensor(OH_NN_INT32, paramDim, nullptr, OH_NN_TOP_K_SORTED);
+    std::shared_ptr<NNTensor> axisTensor = TransToNNTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
+    axisTensor->SetBuffer(nullptr, 0);
+    m_allTensors.emplace_back(axisTensor);
+
+    OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/**
+ * @tc.name: topk_build_010
+ * @tc.desc: Provide invalid parameter type to verify the abnormal behavior of the Build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(TopKBuilderTest, topk_build_010, TestSize.Level0)
+{
+    std::vector<uint32_t> inputsIndex = { 0, 1 };
+    std::vector<uint32_t> outputsIndex = { 2, 3 };
+    std::vector<uint32_t> paramsIndex = { 4, 5 };
     std::vector<int32_t> paramDim = {};
 
     InitTensor(inputsIndex, outputsIndex);
     SaveSortedTensor(OH_NN_BOOL, paramDim, nullptr, OH_NN_SCALE_AXIS);
+    SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
 
-    OH_NN_ReturnCode ret = m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
+    OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/**
+ * @tc.name: topk_build_011
+ * @tc.desc: Provide invalid parameter type to verify the abnormal behavior of the Build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(TopKBuilderTest, topk_build_011, TestSize.Level0)
+{
+    std::vector<uint32_t> inputsIndex = { 0, 1 };
+    std::vector<uint32_t> outputsIndex = { 2, 3 };
+    std::vector<uint32_t> paramsIndex = { 4, 5 };
+    std::vector<int32_t> paramDim = {};
+
+    InitTensor(inputsIndex, outputsIndex);
+    SaveSortedTensor(OH_NN_BOOL, paramDim, nullptr, OH_NN_TOP_K_SORTED);
+    SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_SCALE_AXIS);
+
+    OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
@@ -244,10 +315,14 @@ HWTEST_F(TopKBuilderTest, topk_get_primitive_002, TestSize.Level0)
 {
     std::vector<uint32_t> inputsIndex = { 0, 1 };
     std::vector<uint32_t> outputsIndex = { 2, 3 };
+    std::vector<uint32_t> paramsIndex = { 4, 5 };
     std::vector<int32_t> paramDim = {};
+
     InitTensor(inputsIndex, outputsIndex);
     SaveSortedTensor(OH_NN_BOOL, paramDim, nullptr, OH_NN_TOP_K_SORTED);
+    SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
 
+    int64_t axisValue = 0;
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
     LiteGraphTensorPtr primitive = m_builder.GetPrimitive();
     LiteGraphTensorPtr expectPrimitive = { nullptr, DestroyLiteGraphPrimitive };
@@ -255,6 +330,8 @@ HWTEST_F(TopKBuilderTest, topk_get_primitive_002, TestSize.Level0)
 
     auto sortedReturn = mindspore::lite::MindIR_TopKFusion_GetSorted(primitive.get());
     EXPECT_EQ(sortedReturn, m_topkValue);
+    auto axisReturn = mindspore::lite::MindIR_TopKFusion_GetAxis(primitive.get());
+    EXPECT_EQ(axisReturn, axisValue);
 }
 } // namespace UnitTest
 } // namespace NeuralNetworkRuntime

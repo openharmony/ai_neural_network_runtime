@@ -30,6 +30,12 @@ public:
                            const std::vector<uint32_t>& outputsIndex,
                            const std::vector<std::shared_ptr<NNTensor>>& allTensors) override;
     LiteGraphPrimitvePtr GetPrimitive() override;
+
+private:
+    OH_NN_ReturnCode SetApproximate(std::shared_ptr<NNTensor> tensor);
+
+private:
+    bool m_approximate {false};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

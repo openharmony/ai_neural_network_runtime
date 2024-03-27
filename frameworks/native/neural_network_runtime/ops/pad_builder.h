@@ -18,6 +18,8 @@
 
 #include "ops_builder.h"
 
+#include "mindir.h"
+
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {
@@ -33,10 +35,11 @@ public:
 
 private:
     OH_NN_ReturnCode SetConstantValue(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetPaddingMode(std::shared_ptr<NNTensor> tensor);
 
 private:
-    std::vector<std::vector<int64_t>> paddings{};
-    float m_constantValue{0.0};
+    float m_constantValue {0.0f};
+    mindspore::lite::PaddingMode m_paddingMode {mindspore::lite::PADDING_MODE_CONSTANT};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime
