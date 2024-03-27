@@ -35,10 +35,12 @@ public:
 private:
     OH_NN_ReturnCode SetSrcT(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode SetDstT(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
 
 private:
     const uint64_t* m_src_t{nullptr};
     const uint64_t* m_dst_t{nullptr};
+    int64_t m_axis {0};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime
