@@ -20,34 +20,13 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 3;
 static const int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "Range";
 
 RangeBuilder::RangeBuilder() {}
 
 RangeBuilder::~RangeBuilder() {}
-
-OH_NN_ReturnCode RangeBuilder::SetDType(std::shared_ptr<NNTensor> tensor)
-{
-    if (tensor->GetDataType() != OH_NN_INT64) {
-        LOGE("[Range] The dType should be type OH_NN_INT64.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (tensor->GetElementCount() != SCALAR_LENGTH) {
-        LOGE("[Range] The dType should be scalar.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    void* buffer = tensor->GetBuffer();
-    if (buffer == nullptr) {
-        LOGE("[Range] Tensor buffer is nullptr.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-    m_dType = *(static_cast<const int64_t*>(buffer));
-
-    return OH_NN_SUCCESS;
-}
 
 OH_NN_ReturnCode RangeBuilder::SetStart(std::shared_ptr<NNTensor> tensor)
 {
@@ -133,32 +112,34 @@ OH_NN_ReturnCode RangeBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
-    
-    OH_NN_ReturnCode returnCode;
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Range] Build failed, passed invalid param index.");
+        return ret;
+    }
+
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
         switch (tensor->GetType()) {
-            case OH_NN_RANGE_DTYPE:
-                returnCode = SetDType(tensor);
-                break;
             case OH_NN_RANGE_START:
-                returnCode = SetStart(tensor);
+                ret = SetStart(tensor);
                 break;
             case OH_NN_RANGE_LIMIT:
-                returnCode = SetLimit(tensor);
+                ret = SetLimit(tensor);
                 break;
             case OH_NN_RANGE_DELTA:
-                returnCode = SetDelta(tensor);
+                ret = SetDelta(tensor);
                 break;
             default:
                 LOGE("[Range] Build failed, param invalid, type=%d", tensor->GetType());
                 return OH_NN_INVALID_PARAMETER;
         }
 
-        if (returnCode != OH_NN_SUCCESS) {
+        if (ret != OH_NN_SUCCESS) {
             LOGE("[Range] Build failed, passed invalid param.");
-            return returnCode;
+            return ret;
         }
     }
 
@@ -174,7 +155,8 @@ LiteGraphPrimitvePtr RangeBuilder::GetPrimitive()
         return {nullptr, DestroyLiteGraphPrimitive};
     }
 
-    void* primitive = mindspore::lite::MindIR_Range_CreatePrimitive(m_dType, m_start, m_limit, m_delta);
+    int64_t dType {0.0f};
+    void* primitive = mindspore::lite::MindIR_Range_CreatePrimitive(dType, m_start, m_limit, m_delta);
     LiteGraphPrimitvePtr graphPrimitivePtr(primitive, DestroyLiteGraphPrimitive) ;
     return graphPrimitivePtr;
 }

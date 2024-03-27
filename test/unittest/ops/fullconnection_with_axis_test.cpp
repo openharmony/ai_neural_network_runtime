@@ -32,14 +32,18 @@ public:
     void SetInputToAlltensor();
     void SetActivation(OH_NN_DataType dataType,
         const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
-    void SeAxis(OH_NN_DataType dataType,
+    void SetAxis(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetUseAxis(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetHasBias(OH_NN_DataType dataType,
         const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
 
 public:
     FullConnectionBuilder m_builder;
     std::vector<uint32_t> m_inputs {0, 1, 2};
     std::vector<uint32_t> m_outputs {3};
-    std::vector<uint32_t> m_params {4, 5};
+    std::vector<uint32_t> m_params {4, 5, 6, 7};
     std::vector<int32_t> m_output_dim {2, 2};
     std::vector<int32_t> m_param_dim {};
 };
@@ -80,7 +84,7 @@ void FullConnectionAxisBuilderTest::SetActivation(OH_NN_DataType dataType,
     m_allTensors.emplace_back(tensor);
 }
 
-void FullConnectionAxisBuilderTest::SeAxis(OH_NN_DataType dataType,
+void FullConnectionAxisBuilderTest::SetAxis(OH_NN_DataType dataType,
     const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
 {
     std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
@@ -88,6 +92,28 @@ void FullConnectionAxisBuilderTest::SeAxis(OH_NN_DataType dataType,
     EXPECT_NE(nullptr, axisValue);
 
     tensor->SetBuffer(axisValue, sizeof(int64_t));
+    m_allTensors.emplace_back(tensor);
+}
+
+void FullConnectionAxisBuilderTest::SetUseAxis(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
+    bool* useAxisValue = new (std::nothrow) bool (true);
+    EXPECT_NE(nullptr, useAxisValue);
+
+    tensor->SetBuffer(useAxisValue, sizeof(bool));
+    m_allTensors.emplace_back(tensor);
+}
+
+void FullConnectionAxisBuilderTest::SetHasBias(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
+    bool* hasBiasValue = new (std::nothrow) bool (true);
+    EXPECT_NE(nullptr, hasBiasValue);
+
+    tensor->SetBuffer(hasBiasValue, sizeof(bool));
     m_allTensors.emplace_back(tensor);
 }
 
@@ -103,8 +129,11 @@ HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_001, TestSize.
     SetInputToAlltensor();
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
 
-    SeAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -120,8 +149,11 @@ HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_002, TestSize.
     SetInputToAlltensor();
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
 
-    SeAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
@@ -137,10 +169,13 @@ HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_003, TestSize.
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
     SetInputToAlltensor();
-
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
-    SeAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -151,14 +186,17 @@ HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_003, TestSize.
  */
 HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_004, TestSize.Level1)
 {
-    m_inputs = {0, 1, 6};
+    m_inputs = {0, 1, 8};
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
     SetInputToAlltensor();
-
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
-    SeAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -172,15 +210,17 @@ HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_005, TestSize.
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
     SetInputToAlltensor();
-
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
     std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT32, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
     int32_t *axisValueTest = new (std::nothrow) int32_t(0);
     EXPECT_NE(nullptr, axisValueTest);
-
     tensor->SetBuffer(axisValueTest, sizeof(int32_t));
     m_allTensors.emplace_back(tensor);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -194,16 +234,18 @@ HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_006, TestSize.
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
     SetInputToAlltensor();
-
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
-    SeAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
     std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT32, m_param_dim, nullptr,
         OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
     int32_t *activationValue = new (std::nothrow) int32_t(0);
     EXPECT_NE(nullptr, activationValue);
-
     tensor->SetBuffer(activationValue, sizeof(int32_t));
     m_allTensors.emplace_back(tensor);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -214,20 +256,21 @@ HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_006, TestSize.
  */
 HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_007, TestSize.Level1)
 {
-    std::vector<int32_t> paramDimTest = {2};
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
-
     SetInputToAlltensor();
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
-    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, paramDimTest, nullptr,
-        OH_NN_FULL_CONNECTION_AXIS);
-    int64_t *axisValueTest = new (std::nothrow) int64_t[2]{0, 0};
-    EXPECT_NE(nullptr, axisValueTest);
 
-    tensor->SetBuffer(axisValueTest, 2 * sizeof(int64_t));
-    m_allTensors.emplace_back(tensor);
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT32, m_param_dim, nullptr,
+        OH_NN_FULL_CONNECTION_USE_AXIS);
+    int32_t *useAxisValue = new (std::nothrow) int32_t(1);
+    EXPECT_NE(nullptr, useAxisValue);
+    tensor->SetBuffer(useAxisValue, sizeof(int32_t));
+    m_allTensors.emplace_back(tensor);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -238,57 +281,242 @@ HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_007, TestSize.
  */
 HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_008, TestSize.Level1)
 {
-    std::vector<int32_t> paramDimTest = {2};
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
     SetInputToAlltensor();
-
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
-    SeAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
-    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT8, paramDimTest, nullptr,
-        OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
-    int8_t *activationValue = new (std::nothrow) int8_t[2]{0, 0};
-    EXPECT_NE(nullptr, activationValue);
 
-    tensor->SetBuffer(activationValue, 2 * sizeof(int8_t));
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT32, m_param_dim, nullptr,
+        OH_NN_FULL_CONNECTION_HAS_BIAS);
+    int32_t *hasBiasValue = new (std::nothrow) int32_t(1);
+    EXPECT_NE(nullptr, hasBiasValue);
+    tensor->SetBuffer(hasBiasValue, sizeof(int32_t));
     m_allTensors.emplace_back(tensor);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
  * @tc.name: fullconnection_build_axis_009
- * @tc.desc: Verify the fullconnection without set axis of the build function
+ * @tc.desc: Verify the behavior of the build function
  * @tc.type: FUNC
  */
 HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_009, TestSize.Level1)
 {
+    std::vector<int32_t> paramDimTest = {2};
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
-    SetInputToAlltensor();
 
+    SetInputToAlltensor();
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
-    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, paramDimTest, nullptr,
+        OH_NN_FULL_CONNECTION_AXIS);
+    int64_t *axisValueTest = new (std::nothrow) int64_t[2]{0, 0};
+    EXPECT_NE(nullptr, axisValueTest);
+    tensor->SetBuffer(axisValueTest, 2 * sizeof(int64_t));
     m_allTensors.emplace_back(tensor);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
  * @tc.name: fullconnection_build_axis_010
- * @tc.desc: Verify the fullconnection without set activation of the build function
+ * @tc.desc: Verify the behavior of the build function
  * @tc.type: FUNC
  */
 HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_010, TestSize.Level1)
 {
+    std::vector<int32_t> paramDimTest = {2};
     m_inputsIndex = m_inputs;
     m_paramsIndex = m_params;
     SetInputToAlltensor();
-
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
-    SeAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT8, paramDimTest, nullptr,
+        OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    int8_t *activationValue = new (std::nothrow) int8_t[2]{0, 0};
+    EXPECT_NE(nullptr, activationValue);
+    tensor->SetBuffer(activationValue, 2 * sizeof(int8_t));
+    m_allTensors.emplace_back(tensor);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: fullconnection_build_axis_011
+ * @tc.desc: Verify the behavior of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_011, TestSize.Level1)
+{
+    std::vector<int32_t> paramDimTest = {2};
+    m_inputsIndex = m_inputs;
+    m_paramsIndex = m_params;
+    SetInputToAlltensor();
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_BOOL, paramDimTest, nullptr,
+        OH_NN_FULL_CONNECTION_USE_AXIS);
+    bool *useAxisValue = new (std::nothrow) bool[2] {true, true};
+    EXPECT_NE(nullptr, useAxisValue);
+    tensor->SetBuffer(useAxisValue, 2 * sizeof(int8_t));
+    m_allTensors.emplace_back(tensor);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: fullconnection_build_axis_012
+ * @tc.desc: Verify the behavior of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_012, TestSize.Level1)
+{
+    std::vector<int32_t> paramDimTest = {2};
+    m_inputsIndex = m_inputs;
+    m_paramsIndex = m_params;
+    SetInputToAlltensor();
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_BOOL, paramDimTest, nullptr,
+        OH_NN_FULL_CONNECTION_HAS_BIAS);
+    bool *hasBiasValue = new (std::nothrow) bool[2] {true, true};
+    EXPECT_NE(nullptr, hasBiasValue);
+    tensor->SetBuffer(hasBiasValue, 2 * sizeof(bool));
+    m_allTensors.emplace_back(tensor);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: fullconnection_build_axis_013
+ * @tc.desc: Verify the fullconnection without set axis of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_013, TestSize.Level1)
+{
+    m_inputsIndex = m_inputs;
+    m_paramsIndex = m_params;
+
+    SetInputToAlltensor();
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+    m_allTensors.emplace_back(tensor);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: fullconnection_build_axis_014
+ * @tc.desc: Verify the fullconnection without set activation of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_014, TestSize.Level1)
+{
+    m_inputsIndex = m_inputs;
+    m_paramsIndex = m_params;
+
+    SetInputToAlltensor();
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
     std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT8, m_param_dim, nullptr,
         OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
     m_allTensors.emplace_back(tensor);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: fullconnection_build_axis_015
+ * @tc.desc: Verify the fullconnection without set activation of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_015, TestSize.Level1)
+{
+    m_inputsIndex = m_inputs;
+    m_paramsIndex = m_params;
+
+    SetInputToAlltensor();
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_BOOL, m_param_dim, nullptr,
+        OH_NN_FULL_CONNECTION_USE_AXIS);
+    m_allTensors.emplace_back(tensor);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: fullconnection_build_axis_016
+ * @tc.desc: Verify the fullconnection without set activation of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_016, TestSize.Level1)
+{
+    m_inputsIndex = m_inputs;
+    m_paramsIndex = m_params;
+
+    SetInputToAlltensor();
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_BOOL, m_param_dim, nullptr,
+        OH_NN_FULL_CONNECTION_HAS_BIAS);
+    m_allTensors.emplace_back(tensor);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: fullconnection_build_axis_017
+ * @tc.desc: Verify the behavior of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_build_axis_017, TestSize.Level1)
+{
+    m_inputsIndex = m_inputs;
+    m_paramsIndex = m_params;
+    SetInputToAlltensor();
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_BOOL, m_param_dim, nullptr,
+        OH_NN_FULL_CONNECTION_USE_AXIS);
+    bool *useAxisValue = new (std::nothrow) bool(false);
+    EXPECT_NE(nullptr, useAxisValue);
+    tensor->SetBuffer(useAxisValue, sizeof(bool));
+    m_allTensors.emplace_back(tensor);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -303,8 +531,12 @@ HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_getprimitive_axis_001, Te
     m_paramsIndex = m_params;
     SetInputToAlltensor();
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
-    SeAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
+    SetUseAxis(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_USE_AXIS);
+    SetHasBias(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_HAS_BIAS);
+
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 
     LiteGraphTensorPtr primitive = m_builder.GetPrimitive();
@@ -315,6 +547,10 @@ HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_getprimitive_axis_001, Te
     EXPECT_EQ(returnValue, 0);
     bool activationReturn = mindspore::lite::MindIR_FullConnection_GetActivationType(primitive.get());
     EXPECT_EQ(activationReturn, 0);
+    bool useAxisReturn = mindspore::lite::MindIR_FullConnection_GetUseAxis(primitive.get());
+    EXPECT_EQ(useAxisReturn, true);
+    bool hasBiasReturn = mindspore::lite::MindIR_FullConnection_GetHasBias(primitive.get());
+    EXPECT_EQ(hasBiasReturn, true);
 }
 
 /**
@@ -329,7 +565,7 @@ HWTEST_F(FullConnectionAxisBuilderTest, fullconnection_getprimitive_axis_002, Te
     SetInputToAlltensor();
 
     SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
-    SeAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
+    SetAxis(OH_NN_INT64, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_AXIS);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_FULL_CONNECTION_ACTIVATIONTYPE);
 
     LiteGraphTensorPtr primitive = m_builder.GetPrimitive();

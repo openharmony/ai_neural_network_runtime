@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 1;
 static const int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "LeakyRelu";
 
@@ -67,23 +68,28 @@ OH_NN_ReturnCode LeakyReluBuilder::Build(const std::vector<uint32_t>& paramsInde
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
-    
-    OH_NN_ReturnCode returnCode;
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[LeakyRelu] Build failed, passed invalid param index.");
+        return ret;
+    }
+
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
         switch (tensor->GetType()) {
             case OH_NN_LEAKY_RELU_NEGATIVE_SLOPE:
-                returnCode = SetNegativeSlope(tensor);
+                ret = SetNegativeSlope(tensor);
                 break;
             default:
                 LOGE("[LeakyRelu] Build failed, param invalid, type=%d", tensor->GetType());
                 return OH_NN_INVALID_PARAMETER;
         }
 
-        if (returnCode != OH_NN_SUCCESS) {
+        if (ret != OH_NN_SUCCESS) {
             LOGE("[LeakyRelu] Build failed, passed invalid param.");
-            return returnCode;
+            return ret;
         }
     }
 

@@ -31,13 +31,17 @@ public:
 
     void SetPadMode(OH_NN_DataType dataType,
         const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetRoundMode(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SetGlobal(OH_NN_DataType dataType,
+        const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
     void SetParam();
 
 public:
     MaxPoolBuilder m_builder;
     std::vector<uint32_t> m_inputs{0};
     std::vector<uint32_t> m_outputs{1};
-    std::vector<uint32_t> m_params{2, 3, 4, 5};
+    std::vector<uint32_t> m_params{2, 3, 4, 5, 6, 7};
     std::vector<int32_t> m_input_dim{1, 3, 3, 1};
     std::vector<int32_t> m_output_dim{1, 2, 2, 1};
     std::vector<int32_t> m_kenelsize_dim{2};
@@ -48,6 +52,26 @@ public:
 void MaxPoolBuilderTest::SetUp() {}
 
 void MaxPoolBuilderTest::TearDown() {}
+
+void MaxPoolBuilderTest::SetRoundMode(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
+    int32_t* roundModeValue = new (std::nothrow) int32_t(0);
+    EXPECT_NE(nullptr, roundModeValue);
+    tensor->SetBuffer(roundModeValue, sizeof(int32_t));
+    m_allTensors.emplace_back(tensor);
+}
+
+void MaxPoolBuilderTest::SetGlobal(OH_NN_DataType dataType,
+    const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(dataType, dim, quantParam, type);
+    bool* globalValue = new (std::nothrow) bool(false);
+    EXPECT_NE(nullptr, globalValue);
+    tensor->SetBuffer(globalValue, sizeof(bool));
+    m_allTensors.emplace_back(tensor);
+}
 
 void MaxPoolBuilderTest::SetPadMode(OH_NN_DataType dataType,
     const std::vector<int32_t> &dim,  const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
@@ -65,6 +89,8 @@ void MaxPoolBuilderTest::SetParam()
     SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_MAX_POOL_STRIDE);
     SetPadMode(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_PAD_MODE);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_MAX_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_MAX_POOL_GLOBAL);
 }
 
 /**
@@ -105,7 +131,7 @@ HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_003, TestSize.Level1)
 {
     m_inputs = {};
     m_outputs = {0};
-    m_params = {1, 2, 3, 4};
+    m_params = {1, 2, 3, 4, 5, 6};
     m_paramsIndex = m_params;
 
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -123,7 +149,7 @@ HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_004, TestSize.Level1)
 {
     m_inputs = {0};
     m_outputs = {};
-    m_params = {1, 2, 3, 4};
+    m_params = {1, 2, 3, 4, 5, 6};
     m_paramsIndex = m_params;
 
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -139,9 +165,9 @@ HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_004, TestSize.Level1)
  */
 HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_005, TestSize.Level1)
 {
-    m_inputs = {6};
+    m_inputs = {8};
     m_outputs = {1};
-    m_params = {2, 3, 4, 5};
+    m_params = {2, 3, 4, 5, 6, 7};
     m_paramsIndex = m_params;
 
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -158,8 +184,8 @@ HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_005, TestSize.Level1)
 HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_006, TestSize.Level1)
 {
     m_inputs = {0};
-    m_outputs = {6};
-    m_params = {2, 3, 4, 5};
+    m_outputs = {8};
+    m_params = {2, 3, 4, 5, 6, 7};
     m_paramsIndex = m_params;
 
     SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
@@ -190,6 +216,8 @@ HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_007, TestSize.Level1)
     SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_MAX_POOL_STRIDE);
     SetPadMode(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_PAD_MODE);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_MAX_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_MAX_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -214,6 +242,8 @@ HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_008, TestSize.Level1)
     m_allTensors.emplace_back(tensor);
     SetPadMode(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_PAD_MODE);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_MAX_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_MAX_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -237,6 +267,8 @@ HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_009, TestSize.Level1)
     tensor->SetBuffer(padValueTest, sizeof(int32_t));
     m_allTensors.emplace_back(tensor);
     SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_MAX_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_MAX_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -262,15 +294,71 @@ HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_010, TestSize.Level1)
 
     tensor->SetBuffer(activationValue, sizeof(int32_t));
     m_allTensors.emplace_back(tensor);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_MAX_POOL_ROUND_MODE);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_MAX_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
 /**
  * @tc.name: maxpool_build_pad_mode_011
- * @tc.desc: Verify the scalar length of the build function
+ * @tc.desc: Verify the invalid roundMode of the build function
  * @tc.type: FUNC
  */
 HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_011, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetKernelSize(OH_NN_INT64, m_kenelsize_dim, nullptr, OH_NN_MAX_POOL_KERNEL_SIZE);
+    SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_MAX_POOL_STRIDE);
+    SetPadMode(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_PAD_MODE);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_ACTIVATION_TYPE);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT64, m_param_dim, nullptr,
+        OH_NN_MAX_POOL_ROUND_MODE);
+    int64_t* roundModeValue = new (std::nothrow) int64_t(0);
+    EXPECT_NE(nullptr, roundModeValue);
+
+    tensor->SetBuffer(roundModeValue, sizeof(int64_t));
+    m_allTensors.emplace_back(tensor);
+    SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_MAX_POOL_GLOBAL);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+    tensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: maxpool_build_pad_mode_012
+ * @tc.desc: Verify the invalid activation of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_012, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetKernelSize(OH_NN_INT64, m_kenelsize_dim, nullptr, OH_NN_MAX_POOL_KERNEL_SIZE);
+    SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_MAX_POOL_STRIDE);
+    SetPadMode(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_PAD_MODE);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_ACTIVATION_TYPE);
+    SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_MAX_POOL_ROUND_MODE);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT32, m_param_dim, nullptr,
+        OH_NN_MAX_POOL_GLOBAL);
+    int32_t* globalValue = new (std::nothrow) int32_t(0);
+    EXPECT_NE(nullptr, globalValue);
+
+    tensor->SetBuffer(globalValue, sizeof(int32_t));
+    m_allTensors.emplace_back(tensor);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+    tensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: maxpool_build_pad_mode_013
+ * @tc.desc: Verify the scalar length of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_013, TestSize.Level1)
 {
     m_param_dim = {2};
     m_paramsIndex = m_params;
@@ -287,6 +375,79 @@ HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_011, TestSize.Level1)
         OH_NN_MAX_POOL_ACTIVATION_TYPE);
     tensor->SetBuffer(activationValue, 2 * sizeof(int8_t));
     m_allTensors.emplace_back(tensor);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: maxpool_build_pad_mode_014
+ * @tc.desc: Verify the param invalid to avgpool of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_014, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetKernelSize(OH_NN_INT64, m_kenelsize_dim, nullptr, OH_NN_MAX_POOL_KERNEL_SIZE);
+    SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_MAX_POOL_STRIDE);
+    SetPadMode(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_PAD_MODE);
+    int8_t* activationValue = new (std::nothrow) int8_t(0);
+    EXPECT_NE(nullptr, activationValue);
+
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT8, m_param_dim, nullptr,
+        OH_NN_DIV_ACTIVATIONTYPE);
+    tensor->SetBuffer(activationValue, sizeof(int8_t));
+    m_allTensors.emplace_back(tensor);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: maxpool_build_pad_mode_015
+ * @tc.desc: Verify the invalid padmode of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_015, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetKernelSize(OH_NN_INT64, m_kenelsize_dim, nullptr, OH_NN_MAX_POOL_KERNEL_SIZE);
+    SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_MAX_POOL_STRIDE);
+    int8_t *padValueTest = new (std::nothrow) int8_t(6);
+    EXPECT_NE(nullptr, padValueTest);
+
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_PAD_MODE);
+    tensor->SetBuffer(padValueTest, sizeof(int8_t));
+    m_allTensors.emplace_back(tensor);
+    SetActivation(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_ACTIVATION_TYPE);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+}
+
+/**
+ * @tc.name: maxpool_build_pad_mode_016
+ * @tc.desc: Verify the invalid activation value of the build function
+ * @tc.type: FUNC
+ */
+HWTEST_F(MaxPoolBuilderTest, maxpool_build_pad_mode_016, TestSize.Level1)
+{
+    m_paramsIndex = m_params;
+    SaveInputTensor(m_inputs, OH_NN_FLOAT32, m_input_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_FLOAT32, m_output_dim, nullptr);
+
+    SetKernelSize(OH_NN_INT64, m_kenelsize_dim, nullptr, OH_NN_MAX_POOL_KERNEL_SIZE);
+    SetStride(OH_NN_INT64, m_stride_dim, nullptr, OH_NN_MAX_POOL_STRIDE);
+    SetPadMode(OH_NN_INT8, m_param_dim, nullptr, OH_NN_MAX_POOL_PAD_MODE);
+
+    int8_t* activationValue = new (std::nothrow) int8_t(6);
+    EXPECT_NE(nullptr, activationValue);
+    std::shared_ptr<NNTensor> tensor = TransToNNTensor(OH_NN_INT8, m_param_dim, nullptr,
+        OH_NN_MAX_POOL_ACTIVATION_TYPE);
+    tensor->SetBuffer(activationValue, sizeof(int8_t));
+    m_allTensors.emplace_back(tensor);
+
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
 }
 
@@ -315,9 +476,15 @@ HWTEST_F(MaxPoolBuilderTest, maxpool_getprimitive_pad_mode_001, TestSize.Level1)
     std::vector<int64_t> strideValueTest{1, 1};
     int returnPadMode = mindspore::lite::MindIR_MaxPoolFusion_GetPadMode(primitive.get());
     EXPECT_EQ(1, returnPadMode);
-
     int returnActivation = mindspore::lite::MindIR_MaxPoolFusion_GetActivationType(primitive.get());
     EXPECT_EQ(0, returnActivation);
+
+    mindspore::lite::RoundMode roundModeValue = mindspore::lite::ROUND_MODE_FLOOR;
+    auto expectRoundMode = mindspore::lite::MindIR_MaxPoolFusion_GetRoundMode(primitive.get());
+    EXPECT_EQ(roundModeValue, expectRoundMode);
+    bool globalValue = false;
+    bool expectGlobal = mindspore::lite::MindIR_MaxPoolFusion_GetGlobal(primitive.get());
+    EXPECT_EQ(globalValue, expectGlobal);
 }
 
 /**

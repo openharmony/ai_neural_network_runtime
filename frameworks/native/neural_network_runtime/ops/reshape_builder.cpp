@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "Reshape";
 
 ReshapeBuilder::ReshapeBuilder() {}
@@ -46,13 +47,14 @@ OH_NN_ReturnCode ReshapeBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return returnCode;
     }
 
-    if (!paramsIndex.empty()) {
-        LOGW("[Reshape] Build failed, the Reshape expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[Reshape] Build failed, passed invalid param index of Reshape operation index.");
+        return returnCode;
+    }
 
     SetQuantType(outputsIndex, allTensors);
 

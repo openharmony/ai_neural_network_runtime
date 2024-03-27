@@ -49,15 +49,15 @@ private:
     OH_NN_ReturnCode SetActavitation(std::shared_ptr<NNTensor> tensor);
 
 private:
-    int64_t m_group{1};
-    int64_t m_inChannel{0};
-    int64_t m_outChannel{0};
+    int64_t m_group {1};
+    int64_t m_inChannel {0};
+    int64_t m_outChannel {0};
     std::vector<int64_t> m_kernelSize;
     std::vector<int64_t> m_strides;
     std::vector<int64_t> m_pad;
     std::vector<int64_t> m_dilation;
-    mindspore::lite::PadMode m_padMode{mindspore::lite::PAD_MODE_PAD};
-    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    mindspore::lite::PadMode m_padMode {mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

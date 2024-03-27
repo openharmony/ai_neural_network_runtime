@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 2;
 static const int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "Pow";
 
@@ -95,7 +96,12 @@ OH_NN_ReturnCode PowBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     m_outputsIndex = outputsIndex;
 
     SetQuantType(outputsIndex, allTensors);
-    
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[Pow] Build failed, passed invalid param index of Pow operation index.");
+        return returnCode;
+    }
+
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();

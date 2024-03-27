@@ -34,6 +34,9 @@ public:
     LiteGraphTensorPtr GetPrimitive() override;
 
 private:
+    OH_NN_ReturnCode SetAxes(std::shared_ptr<NNTensor> tensor);
+
+private:
     std::vector<int64_t> m_axes;
 };
 } // namespace Ops

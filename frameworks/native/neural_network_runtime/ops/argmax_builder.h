@@ -37,6 +37,8 @@ public:
 private:
     OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode SetKeepdims(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetTopK(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetOutMaxValue(std::shared_ptr<NNTensor> tensor);
 
 private:
     int64_t m_axis {-1};

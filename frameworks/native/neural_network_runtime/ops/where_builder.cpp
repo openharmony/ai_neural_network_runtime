@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 3;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "Where";
 
 WhereBuilder::WhereBuilder() {}
@@ -41,14 +42,15 @@ OH_NN_ReturnCode WhereBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         LOGE("[Where] Build failed, passed invalid input or output index.");
         return ret;
     }
-    
-    if (!paramsIndex.empty()) {
-        LOGW("[Where] Build failed, the where expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Where] Build failed, passed invalid param index.");
+        return ret;
+    }
 
     m_name = OP_NAME;
     m_isBuild = true;

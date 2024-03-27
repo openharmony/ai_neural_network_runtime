@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_NUM = 0;
 static const std::string OP_NAME = "Equal";
 
 EqualBuilder::EqualBuilder() {}
@@ -42,9 +43,10 @@ OH_NN_ReturnCode EqualBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return ret;
     }
     
-    if (!paramsIndex.empty()) {
-        LOGW("[Equal] Build failed, the equal expects no parameters, but receive %zu", paramsIndex.size());
-        return OH_NN_INVALID_PARAMETER;
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Equal] Build failed, passed invalid param index.");
+        return ret;
     }
 
     m_inputsIndex = inputsIndex;

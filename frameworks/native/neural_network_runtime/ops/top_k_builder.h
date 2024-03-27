@@ -34,8 +34,10 @@ public:
 
 private:
     OH_NN_ReturnCode SetSorted(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
 
 private:
+    int64_t m_axis {0};
     bool m_sorted {true}; // true means sorting in the descending order.
 };
 } // namespace Ops

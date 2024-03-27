@@ -24,6 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 4;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 5;
 static const std::string OP_NAME = "StridedSlice";
 
 StridedSliceBuilder::StridedSliceBuilder() {}
@@ -150,6 +151,12 @@ OH_NN_ReturnCode StridedSliceBuilder::Build(const std::vector<uint32_t>& paramsI
     OH_NN_ReturnCode returnCode = SetInputOutput(inputsIndex, outputsIndex, allTensors);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("[StridedSliceBuilder] Set index of inputs or outputs failed.");
+        return returnCode;
+    }
+
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[StridedSliceBuilder] Passed invalid param index.");
         return returnCode;
     }
 

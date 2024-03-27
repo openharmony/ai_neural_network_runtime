@@ -15,21 +15,60 @@
 
 #include "pad_builder.h"
 
-#include "mindir.h"
-
 #include "ops_registry.h"
+#include "transform.h"
+#include "validation.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 2;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 2;
 static const int SCALE_LENGTH = 1;
 static const std::string OP_NAME = "Pad";
+static const std::unordered_map<int, mindspore::lite::PaddingMode> paddingList = {
+    {0, mindspore::lite::PADDING_MODE_CONSTANT},
+    {1, mindspore::lite::PADDING_MODE_REFLECT},
+    {2, mindspore::lite::PADDING_MODE_SYMMETRIC},
+    {3, mindspore::lite::PADDING_MODE_RESERVED}};
 
 PadBuilder::PadBuilder() {}
 
 PadBuilder::~PadBuilder() {}
+
+OH_NN_ReturnCode PadBuilder::SetPaddingMode(std::shared_ptr<NNTensor> tensor)
+{
+    tensor->IdentifyOpParameter();
+    if (tensor->GetElementCount() != SCALE_LENGTH) {
+        LOGE("[Pad] SetPaddingMode failed, the paddingMode shoule be a scalar");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (tensor->GetDataType() != OH_NN_INT32) {
+        LOGE("[Pad] SetPaddingMode failed, the paddingMode should be type OH_NN_INT32.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[Pad] SetPaddingMode GetBuffer return nullptr");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    int paddingModeKey = *(static_cast<int*>(buffer));
+    auto it = paddingList.find(paddingModeKey);
+    if (it != paddingList.end()) {
+        m_paddingMode = it->second;
+    } else {
+        LOGE("[DepthToSpace] The padding mode value should between [0, 3], but get %d.", paddingModeKey);
+        LOGE("[DepthToSpace] paddingMode value:");
+        LOGE(" 0-PADDING_MODE_CONSTANT, 1-PADDING_MODE_REFLECT, 2-PADDING_MODE_SYMMETRIC, 3-PADDING_MODE_RESERVED");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    return OH_NN_SUCCESS;
+}
 
 OH_NN_ReturnCode PadBuilder::SetConstantValue(std::shared_ptr<NNTensor> tensor)
 {
@@ -73,11 +112,20 @@ OH_NN_ReturnCode PadBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
 
+    returnCode = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("[Pad] Pad Build failed. Passed invalid param index of Pad operation index.");
+        return returnCode;
+    }
+
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         switch (tensor->GetType()) {
             case OH_NN_PAD_CONSTANT_VALUE:
                 returnCode = SetConstantValue(tensor);
+                break;
+            case OH_NN_PAD_PADDING_MODE:
+                returnCode = SetPaddingMode(tensor);
                 break;
             default:
                 LOGE("[Pad] Parameter Type is invalid, type=%d", tensor->GetType());
@@ -104,8 +152,9 @@ LiteGraphPrimitvePtr PadBuilder::GetPrimitive()
         return {nullptr, DestroyLiteGraphPrimitive};
     }
 
-    mindspore::lite::PaddingMode padding_mode = mindspore::lite::PADDING_MODE_CONSTANT;
-    void* primitive = MindIR_PadFusion_CreatePrimitive(paddings, padding_mode, m_constantValue);
+    std::vector<std::vector<int64_t>> paddings;
+
+    void* primitive = MindIR_PadFusion_CreatePrimitive(paddings, m_paddingMode, m_constantValue);
     LiteGraphPrimitvePtr graphPrimitivePtr(primitive, DestroyLiteGraphPrimitive);
     return graphPrimitivePtr;
 }

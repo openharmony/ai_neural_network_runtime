@@ -40,17 +40,19 @@ public:
     OH_NN_ReturnCode SetKernel(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode SetStrides(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode SetPadModeOrPaddings(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetRoundMode(std::shared_ptr<NNTensor> tensor);
     OH_NN_ReturnCode SetActivation(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetGlobal(std::shared_ptr<NNTensor> tensor);
 
 protected:
     std::vector<int64_t> m_kernelSize;
     std::vector<int64_t> m_pad;
     std::vector<int64_t> m_strides;
-    mindspore::lite::PadMode m_padMode{mindspore::lite::PAD_MODE_PAD};
-    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    mindspore::lite::RoundMode m_roundMode = mindspore::lite::ROUND_MODE_FLOOR;
-    mindspore::lite::Format m_format = mindspore::lite::FORMAT_NCHW;
-    bool m_global = false;
+    mindspore::lite::PadMode m_padMode {mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    mindspore::lite::RoundMode m_roundMode {mindspore::lite::ROUND_MODE_FLOOR};
+    mindspore::lite::Format m_format {mindspore::lite::FORMAT_NCHW};
+    bool m_global {false};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

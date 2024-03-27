@@ -34,6 +34,9 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
+    OH_NN_ReturnCode SetDims(std::shared_ptr<NNTensor> tensor);
+
+private:
     std::vector<int64_t> m_dims {0};
 };
 } // namespace Ops

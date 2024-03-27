@@ -20,6 +20,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
+static const int PARAM_MAX_NUM = 2;
 static constexpr int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "Clip";
 
@@ -89,7 +90,13 @@ OH_NN_ReturnCode ClipBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     m_inputsIndex = inputsIndex;
     m_outputsIndex = outputsIndex;
-    
+
+    ret = CheckParamIndex(paramsIndex, allTensors, PARAM_MAX_NUM);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[Clip] Build failed, passed invalid param index.");
+        return ret;
+    }
+
     OH_NN_ReturnCode returnCode;
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];

@@ -92,6 +92,28 @@ OH_NN_ReturnCode OpsBuilder::CheckIOIndex(const std::vector<uint32_t>& inputsInd
     return OH_NN_SUCCESS;
 }
 
+OH_NN_ReturnCode OpsBuilder::CheckParamIndex(const std::vector<uint32_t>& paramsIndex,
+                                             const std::vector<std::shared_ptr<NNTensor>>& allTensors,
+                                             const size_t paramNum) const
+{
+    size_t paramsIndexSize = paramsIndex.size();
+    if (paramsIndexSize > paramNum) {
+        LOGE("The number of index of params is %{public}zu larger than %{public}zu.", paramsIndexSize, paramNum);
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    size_t allTensorsSize = allTensors.size();
+    bool isParamsOutOfRange = std::any_of(paramsIndex.begin(), paramsIndex.end(), [allTensorsSize](uint32_t index) {
+        return index >= allTensorsSize;
+    });
+    if (isParamsOutOfRange) {
+        LOGE("The index of params is out of range.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
 void OpsBuilder::SetQuantType(const std::vector<uint32_t>& outputsIndex,
                               const std::vector<std::shared_ptr<NNTensor>>& allTensors)
 {
