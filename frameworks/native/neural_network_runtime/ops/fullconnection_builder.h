@@ -50,8 +50,8 @@ private:
     int64_t m_axis {0};
     mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
 
-    bool m_isSetAxis {false};
-    bool m_isSetUseAxis {false};
+    bool m_axisIsSet {false};
+    bool m_useAxisIsSet {false};
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime
