@@ -93,13 +93,13 @@ OH_NN_ReturnCode FullConnectionBuilder::SetUseAxis(std::shared_ptr<NNTensor> ten
     }
 
     bool useAxis = *(static_cast<bool*>(buffer));
-    if (m_isSetAxis && !useAxis) {
-        LOGE("[FullConnection] SetAxis but set useAxis false.");
+    if (m_axisIsSet && !useAxis) {
+        LOGE("[FullConnection] m_useAxis is not allowed to be set to false when m_axis is already set.");
         return OH_NN_INVALID_PARAMETER;
     }
 
     m_useAxis = useAxis;
-    m_isSetUseAxis = true;
+    m_useAxisIsSet = true;
     return OH_NN_SUCCESS;
 }
 
@@ -153,14 +153,14 @@ OH_NN_ReturnCode FullConnectionBuilder::SetAxis(std::shared_ptr<NNTensor> tensor
         return OH_NN_INVALID_PARAMETER;
     }
 
-    if (m_isSetUseAxis && !m_useAxis) {
-        LOGE("[FullConnection] SetUseAxis false but set useAxis.");
+    if (m_useAxisIsSet && !m_useAxis) {
+        LOGE("[FullConnection] m_useAxis has been set to false, axis is not allowed.");
         return OH_NN_INVALID_PARAMETER;
     }
 
     m_axis = *static_cast<int64_t*>(buffer);
     m_useAxis = true;
-    m_isSetAxis = true;
+    m_axisIsSet = true;
     return OH_NN_SUCCESS;
 }
 
