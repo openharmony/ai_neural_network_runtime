@@ -872,8 +872,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used,
-     *   the quantization parameters of the output cannot be omitted.
-     *   However, values of the quantization parameters do not affect the result.
+     *       the quantization parameters of the output cannot be omitted.
+     *       However, values of the quantization parameters do not affect the result.
      */
     OH_NN_OPS_LESS_EQUAL = 18,
 
@@ -1664,7 +1664,7 @@ typedef enum {
      * * <b>keepDims</b>: indicates whether to maintain the input tensor dimension. The value is a Boolean value.
      * * <b>topK</b>: Whether to keep the output dimensions the same as the input dimensions.
      * * <b>outMaxValue</b>: Return the index if the value is <b>false</b>.
-     *   Return the value if the value is <b>true</b>. The default value is <b>false</b>.
+     *       Return the value if the value is <b>true</b>. The default value is <b>false</b>.
      *
      * Outputs:
      * * <b>output</b>: index of the maximum input tensor on the axis. The value is a tensor.
