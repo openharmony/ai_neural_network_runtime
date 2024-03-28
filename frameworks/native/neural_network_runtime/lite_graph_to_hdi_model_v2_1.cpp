@@ -601,6 +601,21 @@ std::vector<int8_t> ConvertGather(PrimitivePtr primitive)
     return ret;
 }
 
+std::vector<int8_t> ConvertGatherNd(PrimitivePtr primitive)
+{
+    if (primitive == nullptr) {
+        LOGE("ConvertGatherNd v2_1 failed, primitive is nullptr.");
+        return {};
+    }
+
+    GatherNd gatherNd{};
+    OHOS::MessageParcel data;
+    (void)GatherNdBlockMarshalling(data, gatherNd);
+    std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
+                            reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
+    return ret;
+}
+
 std::vector<int8_t> ConvertGreater(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
@@ -651,7 +666,7 @@ std::vector<int8_t> ConvertInstanceNorm(PrimitivePtr primitive)
 std::vector<int8_t> ConvertLayerNormFusion(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
-        LOGE("ConvertGather v2_1 failed, primitive is nullptr.");
+        LOGE("ConvertLayerNorm v2_1 failed, primitive is nullptr.");
         return {};
     }
 
@@ -1718,6 +1733,9 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_GATHER:
             return ConvertGather(primitive);
+            break;
+        case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_GATHER_ND:
+            return ConvertGatherNd(primitive);
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_GREATER:
             return ConvertGreater(primitive);
