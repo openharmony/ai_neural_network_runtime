@@ -2626,7 +2626,7 @@ typedef enum {
      * Inputs:
      *
      * * <b>input</b>: input tensor.
-     * * <b>axis</b>: Dimensions to perform protocol calculations.
+     * * <b>axis</b>: Dimensions to perform L2-Normalization calculations.
      *
      * Parameters:
      *
