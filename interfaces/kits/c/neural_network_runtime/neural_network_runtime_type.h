@@ -353,10 +353,10 @@ typedef enum {
      * Parameters:
      *
      * * <b>kernelSize</b> indicates the kernel size used to obtain the average value.
-     *       It is an int array [kernel_height, kernel_width].
+     *       It is an int array [kernelHeight, kernelWidth].
      *       The first number indicates the kernel height, and the second number indicates the kernel width.
      * * <b>strides</b> indicates the distance of kernel moving. The value is an int array
-     *       [stride_height, stride_width]. The first number indicates the moving step in height,
+     *       [strideHeight, strideWidth]. The first number indicates the moving step in height,
      *       and the second number indicates the moving step in width.
      * * <b>padMode</b>: padding mode, which is optional. The value is of the int type and can be <b>0</b> (same)
      *       or <b>1</b> (valid). The nearest neighbor value is used for padding.
@@ -381,10 +381,10 @@ typedef enum {
      * Parameters:
      *
      * * <b>kernelSize</b> indicates the kernel size used to obtain the average value.
-     *       It is an int array [kernel_height, kernel_width].
+     *       It is an int array [kernelHeight, kernelWidth].
      *       The first number indicates the kernel height, and the second number indicates the kernel width.
      * * <b>strides</b> indicates the distance of kernel moving. The value is an int array
-     *       [stride_height, stride_width]. The first number indicates the moving step in height,
+     *       [strideHeight, strideWidth]. The first number indicates the moving step in height,
      *       and the second number indicates the moving step in width.
      * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right],
      *       and the nearest neighbor values are used for padding.
@@ -427,7 +427,7 @@ typedef enum {
     OH_NN_OPS_BATCH_NORM = 3,
 
     /**
-     * Divides the batch dimension of a 4D tensor into small blocks by <b>block_shape</b>,
+     * Divides the batch dimension of a 4D tensor into small blocks by <b>blockShape</b>,
      * and interleaves these blocks back into the spatial dimension.
      *
      * Parameters:
@@ -438,18 +438,18 @@ typedef enum {
      * Outputs:
      *
      * * <b>blockSize</b>: size of each block to be interleaved into the spatial dimension.
-     *       The value is an array [height_block, width_block].
+     *       The value is an array [heightBlock, widthBlock].
      * * <b>crops</b>: elements truncated from the spatial dimension of the output. The value is a 2D array
-     *       [[crop0_start, crop0_end], [crop1_start, crop1_end]] with the shape of (2, 2).
+     *       [[crop0Start, crop0End], [crop1Start, crop1End]] with the shape of (2, 2).
      *
      *
      * Outputs:
      *
      * * <b>output</b>. Assume that the shape of <b>input</b> is (n,h,w,c) and
      *       the shape of <b>output</b> is (n',h',w',c'):
-     *       n' = n / (block_shape[0] * block_shape[1])
-     *       h' = h * block_shape[0] - crops[0][0] - crops[0][1]
-     *       w' = w * block_shape[1] - crops[1][0] - crops[1][1]
+     *       n' = n / (blockShape[0] * blockShape[1])
+     *       h' = h * blockShape[0] - crops[0][0] - crops[0][1]
+     *       w' = w * blockShape[1] - crops[1][0] - crops[1][1]
      *       c'= c
      */
     OH_NN_OPS_BATCH_TO_SPACE_ND = 4,
@@ -532,9 +532,9 @@ typedef enum {
      *
      *       <b>1</b> (valid): The possible maximum height and width of the output will be returned
      *       in case of no padding. The excessive pixels will be discarded.
-     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>. The value is of the
+     * * <b>group</b>: number of groups in which the input is divided by <b>inChannel</b>. The value is of the
      *       int type. If <b>group</b> is <b>1</b>, it is a conventional convolution. If <b>group</b> is greater
-     *       than <b>1</b> and less than or equal to <b>in_channel</b>, it is a group convolution.
+     *       than <b>1</b> and less than or equal to <b>inChannel</b>, it is a group convolution.
      * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
      *       The specified activation function is called before output.
      *
@@ -559,11 +559,11 @@ typedef enum {
      *       It is an int array [dilationHeight, dilationWidth]. The value must be greater than
      *       or equal to <b>1</b> and cannot exceed the height and width of <b>input</b>.
      * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right].
-     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>.
+     * * <b>group</b>: number of groups in which the input is divided by <b>inChannel</b>.
      *       The value is of the int type. If <b>group</b> is <b>1</b>, it is a conventional convolution.
-     *       If <b>group</b> is <b>in_channel</b>, it is depthwiseConv2d. In this case, group==in_channel==out_channel.
-     *       If <b>group</b> is greater than <b>1</b> and less than <b>in_channel</b>, it is a group convolution.
-     *       In this case, out_channel==group.
+     *       If <b>group</b> is <b>inChannel</b>, it is depthwiseConv2d. In this case, group==inChannel==outChannel.
+     *       If <b>group</b> is greater than <b>1</b> and less than <b>inChannel</b>, it is a group convolution.
+     *       In this case, outChannel==group.
      * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
      *       The specified activation function is called before output.
      *
@@ -604,9 +604,9 @@ typedef enum {
      *       Otherwise, the last additional padding will be completed from the bottom and right.
      *       <b>1</b> (valid): The possible maximum height and width of the output will be returned in case of
      *       no padding. The excessive pixels will be discarded.
-     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>. The value is of the int
+     * * <b>group</b>: number of groups in which the input is divided by <b>inChannel</b>. The value is of the int
      *       type. If <b>group</b> is <b>1</b>, it is a conventional convolution. If <b>group</b> is greater than
-     *       <b>1</b> and less than or equal to <b>in_channel</b>, it is a group convolution.
+     *       <b>1</b> and less than or equal to <b>inChannel</b>, it is a group convolution.
      * * <b>outputPads</b>: padding along the height and width of the output tensor. The value is an int or a tuple.
      *       It can be a single integer to specify the same value for all spatial dimensions. The amount of output
      *       padding along a dimension must be less than the stride along this dimension.
@@ -634,9 +634,9 @@ typedef enum {
      *       It is an int array [dilationHeight, dilationWidth]. The value must be greater than
      *       or equal to <b>1</b> and cannot exceed the height and width of <b>input</b>.
      * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right].
-     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>. The value is of the int
+     * * <b>group</b>: number of groups in which the input is divided by <b>inChannel</b>. The value is of the int
      *       type. If <b>group</b> is <b>1</b>, it is a conventional convolution. If <b>group</b> is greater than
-     *       <b>1</b> and less than or equal to <b>in_channel</b>, it is a group convolution.
+     *       <b>1</b> and less than or equal to <b>inChannel</b>, it is a group convolution.
      * * <b>outputPads</b>: padding along the height and width of the output tensor. The value is an int or a tuple.
      *       It can be a single integer to specify the same value for all spatial dimensions. The amount of output
      *       padding along a dimension must be less than the stride along this dimension.
@@ -932,10 +932,10 @@ typedef enum {
      *
      * Parameters:
      *
-     * * <b>kernelSize</b>: kernel size used to obtain the maximum. It is an int array [kernel_height, kernel_width].
+     * * <b>kernelSize</b>: kernel size used to obtain the maximum. It is an int array [kernelHeight, kernelWidth].
      *       The first number indicates the kernel height, and the second number indicates the kernel width.
      * * <b>strides</b> indicates the distance of kernel moving. The value is an int array
-     *       [stride_height, stride_width]. The first number indicates the moving step in height,
+     *       [strideHeight, strideWidth]. The first number indicates the moving step in height,
      *       and the second number indicates the moving step in width.
      * * <b>padMode</b>: padding mode, which is optional. The value is of the int type and can be <b>0</b> (same)
      *       or <b>1</b> (valid). The nearest neighbor value is used for padding.
@@ -958,10 +958,10 @@ typedef enum {
      *
      * Parameters:
      *
-     * * <b>kernelSize</b>: kernel size used to obtain the maximum. It is an int array [kernel_height, kernel_width].
+     * * <b>kernelSize</b>: kernel size used to obtain the maximum. It is an int array [kernelHeight, kernelWidth].
      *       The first number indicates the kernel height, and the second number indicates the kernel width.
      * * <b>strides</b> indicates the distance of kernel moving. The value is an int array
-     *       [stride_height, stride_width]. The first number indicates the moving step in height,
+     *       [strideHeight, strideWidth]. The first number indicates the moving step in height,
      *       and the second number indicates the moving step in width.
      * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right], 
      *       and the nearest neighbor values are used for padding.
@@ -1000,16 +1000,16 @@ typedef enum {
 
     /**
      * Generates a one-hot tensor based on the positions specified by <b>indices</b>. The positions specified by
-     * <b>indices</b> are determined by <b>on_value</b>, and other positions are determined by <b>off_value</b>.
+     * <b>indices</b> are determined by <b>onValue</b>, and other positions are determined by <b>offValue</b>.
      *
      * Inputs:
      *
      * * <b>indices</b>: <i>n</i>-dimensional tensor. Each element in <b>indices</b> determines the position of
-     *       <b>on_value</b> in each one-hot vector.
+     *       <b>onValue</b> in each one-hot vector.
      * * <b>depth</b>: integer scalar that determines the depth of the one-hot vector. The value of <b>depth</b>
      *       must be greater than <b>0</b>.
-     * * <b>on_value</b>: scalar that specifies a valid value in the one-hot vector.
-     * * <b>off_value</b>: scalar that specifies the values of other posistions in the one-hot vector except
+     * * <b>onValue</b>: scalar that specifies a valid value in the one-hot vector.
+     * * <b>offValue</b>: scalar that specifies the values of other posistions in the one-hot vector except
      *       the valid value.
      *
      * Parameters:
@@ -1204,10 +1204,10 @@ typedef enum {
      * Parameters:
      *
      * * <b>outputNum</b>: number of output tensors. The data type is long.
-     * * <b>size_splits</b>: size of each tensor split from the input. The value is a 1D tensor of the int type. If
-     *       <b>size_splits</b> is empty, the input will be evenly split into tensors of the same size. In this case,
+     * * <b>sizeSplits</b>: size of each tensor split from the input. The value is a 1D tensor of the int type. If
+     *       <b>sizeSplits</b> is empty, the input will be evenly split into tensors of the same size. In this case,
      *       <b>input.shape[axis]</b> can be exactly divisible by <b>outputNum</b>.
-     *       If <b>size_splits</b> is not empty, the sum of all its elements must be equal to <b>input.shape[axis]</b>.
+     *       If <b>sizeSplits</b> is not empty, the sum of all its elements must be equal to <b>input.shape[axis]</b>.
      * * <b>axis</b>: splitting dimension of the int type.
      *
      * Outputs:
@@ -2354,7 +2354,7 @@ typedef enum {
      * * <b>anchors</b>: Information of boxes, includes box, variance and coordinates.
      *
      * Parameters:
-     * * <b>input_size</b>: The size of the input tensor.
+     * * <b>inputSize</b>: The size of the input tensor.
      * * <b>scale</b>: The scaling factor used to convert the output from
      *       the normalized form to the original image coordinates.
      * * <b>nmsIoUThreshold</b>: The threshold of overlapping region during NMS.
@@ -2573,8 +2573,8 @@ typedef enum {
      * Inputs:
      *
      * * <b>indices</b>: The index of scattering in the new tensor with int32 or int64 data type.
-     *       The rank of indices must be at least 2 and indices_shape[-1] <= len(shape).
-     * * <b>updates</b>: The source tensor to be scattered. It has shape indices_shape[:-1]+shape[indices_shape[-1]:].
+     *       The rank of indices must be at least 2 and indicesShape[-1] <= len(shape).
+     * * <b>updates</b>: The source tensor to be scattered. It has shape indicesShape[:-1]+shape[indicesShape[-1]:].
      * * <b>shape</b>: The shape of the output tensor, has the same data type as <b>indices</b>.
      *
      * Outputs:
@@ -2600,7 +2600,7 @@ typedef enum {
      *
      * Outputs:
      *
-     * * <b>output</b>: Result tensor with the same data_type as the input.
+     * * <b>output</b>: Result tensor with the same dataType as the input.
      */
     OH_NN_OPS_SPACE_TO_DEPTH = 104,
 
@@ -2621,7 +2621,7 @@ typedef enum {
      * Calculates the L2 normalization of the input tensor along the specified axis,
      * replacing other elements of the dimension with the L2 normalization value of the specified dimension to
      * remove the dimension, or to reduce the dimension size to 1. Control whether the dimensions of the
-     * output and input are the same by specifying the keep_dims parameter.
+     * output and input are the same by specifying the keepDims parameter.
      *
      * Inputs:
      *

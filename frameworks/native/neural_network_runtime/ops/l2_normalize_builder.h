@@ -17,9 +17,7 @@
 #define NEURAL_NETWORK_RUNTIME_L2_NORMALIZE_BUILDER_H
 
 #include "mindir.h"
-
 #include "ops_builder.h"
-#include "ops_registry.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

@@ -17,6 +17,7 @@
 
 #include "transform.h"
 #include "validation.h"
+#include "ops_registry.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
