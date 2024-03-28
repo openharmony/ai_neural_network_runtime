@@ -15,8 +15,6 @@
 
 #include "reduceall_builder.h"
 
-#include "ops_registry.h"
-
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {

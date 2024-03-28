@@ -19,6 +19,7 @@
 #include "mindir.h"
 
 #include "ops_builder.h"
+#include "ops_registry.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
