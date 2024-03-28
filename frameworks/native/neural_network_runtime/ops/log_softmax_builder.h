@@ -16,10 +16,7 @@
 #ifndef NEURAL_NETWORK_RUNTIME_LOG_SOFTMAX_BUILDER_H
 #define NEURAL_NETWORK_RUNTIME_LOG_SOFTMAX_BUILDER_H
 
-#include "mindir.h"
-
 #include "ops_builder.h"
-#include "ops_registry.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

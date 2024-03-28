@@ -15,6 +15,9 @@
 
 #include "reduceL2_builder.h"
 
+#include "mindir.h"
+#include "ops_registry.h"
+
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {
