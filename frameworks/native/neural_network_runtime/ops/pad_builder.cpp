@@ -15,7 +15,6 @@
 
 #include "pad_builder.h"
 
-#include "ops_registry.h"
 #include "transform.h"
 #include "validation.h"
 

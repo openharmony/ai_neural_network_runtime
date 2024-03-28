@@ -15,10 +15,6 @@
 
 #include "gather_nd_builder.h"
 
-#include "mindir.h"
-
-#include "ops_registry.h"
-
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {
@@ -32,9 +28,9 @@ GatherNDBuilder::GatherNDBuilder() {}
 GatherNDBuilder::~GatherNDBuilder() {}
 
 OH_NN_ReturnCode GatherNDBuilder::Build(const std::vector<uint32_t>& paramsIndex,
-                                      const std::vector<uint32_t>& inputsIndex,
-                                      const std::vector<uint32_t>& outputsIndex,
-                                      const std::vector<std::shared_ptr<NNTensor>>& allTensors)
+                                        const std::vector<uint32_t>& inputsIndex,
+                                        const std::vector<uint32_t>& outputsIndex,
+                                        const std::vector<std::shared_ptr<NNTensor>>& allTensors)
 {
     if (m_isBuild) {
         LOGE("[GatherND] GatherND Build failed, gather operation has been build, cannot build again.");
