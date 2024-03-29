@@ -784,15 +784,15 @@ std::vector<int8_t> ConvertLRN(PrimitivePtr primitive)
         return {};
     }
 
-    LRN LRN{};
-    LRN.depthRadius = mindspore::lite::MindIR_LRN_GetDepthRadius(primitive);
-    LRN.bias = mindspore::lite::MindIR_LRN_GetBias(primitive);
-    LRN.alpha = mindspore::lite::MindIR_LRN_GetAlpha(primitive);
-    LRN.beta = mindspore::lite::MindIR_LRN_GetBeta(primitive);
-    LRN.normRegion = mindspore::lite::MindIR_LRN_GetNormRegion(primitive);
+    LRN lRN{};
+    lRN.depthRadius = mindspore::lite::MindIR_LRN_GetDepthRadius(primitive);
+    lRN.bias = mindspore::lite::MindIR_LRN_GetBias(primitive);
+    lRN.alpha = mindspore::lite::MindIR_LRN_GetAlpha(primitive);
+    lRN.beta = mindspore::lite::MindIR_LRN_GetBeta(primitive);
+    lRN.normRegion = mindspore::lite::MindIR_LRN_GetNormRegion(primitive);
 
     OHOS::MessageParcel data;
-    (void)LRNBlockMarshalling(data, LRN);
+    (void)LRNBlockMarshalling(data, lRN);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
