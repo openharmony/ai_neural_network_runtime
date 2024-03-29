@@ -777,31 +777,31 @@ std::vector<int8_t> ConvertLogicalOr(PrimitivePtr primitive)
     return ret;
 }
 
-std::vector<int8_t> ConvertLrn(PrimitivePtr primitive)
+std::vector<int8_t> ConvertLRN(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
-        LOGE("ConvertLrn v2_1 failed, primitive is nullptr.");
+        LOGE("ConvertLRN v2_1 failed, primitive is nullptr.");
         return {};
     }
 
-    LRN lRN{};
-    lRN.depthRadius = mindspore::lite::MindIR_LRN_GetDepthRadius(primitive);
-    lRN.bias = mindspore::lite::MindIR_LRN_GetBias(primitive);
-    lRN.alpha = mindspore::lite::MindIR_LRN_GetAlpha(primitive);
-    lRN.beta = mindspore::lite::MindIR_LRN_GetBeta(primitive);
-    lRN.normRegion = mindspore::lite::MindIR_LRN_GetNormRegion(primitive);
+    LRN LRN{};
+    LRN.depthRadius = mindspore::lite::MindIR_LRN_GetDepthRadius(primitive);
+    LRN.bias = mindspore::lite::MindIR_LRN_GetBias(primitive);
+    LRN.alpha = mindspore::lite::MindIR_LRN_GetAlpha(primitive);
+    LRN.beta = mindspore::lite::MindIR_LRN_GetBeta(primitive);
+    LRN.normRegion = mindspore::lite::MindIR_LRN_GetNormRegion(primitive);
 
     OHOS::MessageParcel data;
-    (void)LRNBlockMarshalling(data, lRN);
+    (void)LRNBlockMarshalling(data, LRN);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
 }
 
-std::vector<int8_t> ConvertLstm(PrimitivePtr primitive)
+std::vector<int8_t> ConvertLSTM(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
-        LOGE("ConvertLstm v2_1 failed, primitive is nullptr.");
+        LOGE("ConvertLSTM v2_1 failed, primitive is nullptr.");
         return {};
     }
 
@@ -1055,7 +1055,7 @@ std::vector<int8_t> ConvertPReLUFusion(PrimitivePtr primitive)
 std::vector<int8_t> ConvertQuantDTypeCast(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
-        LOGE("ConvertQuantDTypeCastV2 v2_1 failed, primitive is nullptr.");
+        LOGE("ConvertQuantDTypeCast v2_1 failed, primitive is nullptr.");
         return {};
     }
 
@@ -1768,10 +1768,10 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
             return ConvertLogicalOr(primitive);
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LRN:
-            return ConvertLrn(primitive);
+            return ConvertLRN(primitive);
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_LSTM:
-            return ConvertLstm(primitive);
+            return ConvertLSTM(primitive);
             break;
         case OHOS::HDI::Nnrt::V2_1::NODE_TYPE_L2_NORMALIZE_FUSION:
             return ConvertL2NormalizeFusion(primitive);
