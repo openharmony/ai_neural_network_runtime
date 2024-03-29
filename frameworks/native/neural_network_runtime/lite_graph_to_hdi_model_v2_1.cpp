@@ -784,15 +784,15 @@ std::vector<int8_t> ConvertLRN(PrimitivePtr primitive)
         return {};
     }
 
-    LRN lRN{};
-    lRN.depthRadius = mindspore::lite::MindIR_LRN_GetDepthRadius(primitive);
-    lRN.bias = mindspore::lite::MindIR_LRN_GetBias(primitive);
-    lRN.alpha = mindspore::lite::MindIR_LRN_GetAlpha(primitive);
-    lRN.beta = mindspore::lite::MindIR_LRN_GetBeta(primitive);
-    lRN.normRegion = mindspore::lite::MindIR_LRN_GetNormRegion(primitive);
+    LRN lrn{};
+    lrn.depthRadius = mindspore::lite::MindIR_LRN_GetDepthRadius(primitive);
+    lrn.bias = mindspore::lite::MindIR_LRN_GetBias(primitive);
+    lrn.alpha = mindspore::lite::MindIR_LRN_GetAlpha(primitive);
+    lrn.beta = mindspore::lite::MindIR_LRN_GetBeta(primitive);
+    lrn.normRegion = mindspore::lite::MindIR_LRN_GetNormRegion(primitive);
 
     OHOS::MessageParcel data;
-    (void)LRNBlockMarshalling(data, lRN);
+    (void)LRNBlockMarshalling(data, lrn);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -805,20 +805,20 @@ std::vector<int8_t> ConvertLSTM(PrimitivePtr primitive)
         return {};
     }
 
-    LSTM lSTM{};
-    lSTM.bidirectional = mindspore::lite::MindIR_LSTM_GetBidirectional(primitive);
-    lSTM.hasBias = mindspore::lite::MindIR_LSTM_GetHasBias(primitive);
-    lSTM.inputSize = mindspore::lite::MindIR_LSTM_GetInputSize(primitive);
-    lSTM.hiddenSize = mindspore::lite::MindIR_LSTM_GetHiddenSize(primitive);
-    lSTM.numLayers = mindspore::lite::MindIR_LSTM_GetNumLayers(primitive);
-    lSTM.numDirections = mindspore::lite::MindIR_LSTM_GetNumDirections(primitive);
-    lSTM.dropout = mindspore::lite::MindIR_LSTM_GetDropout(primitive);
-    lSTM.zoneoutCell = mindspore::lite::MindIR_LSTM_GetZoneoutCell(primitive);
-    lSTM.zoneoutHidden = mindspore::lite::MindIR_LSTM_GetZoneoutHidden(primitive);
-    lSTM.projSize = mindspore::lite::MindIR_LSTM_GetProjSize(primitive);
+    LSTM lstm{};
+    lstm.bidirectional = mindspore::lite::MindIR_LSTM_GetBidirectional(primitive);
+    lstm.hasBias = mindspore::lite::MindIR_LSTM_GetHasBias(primitive);
+    lstm.inputSize = mindspore::lite::MindIR_LSTM_GetInputSize(primitive);
+    lstm.hiddenSize = mindspore::lite::MindIR_LSTM_GetHiddenSize(primitive);
+    lstm.numLayers = mindspore::lite::MindIR_LSTM_GetNumLayers(primitive);
+    lstm.numDirections = mindspore::lite::MindIR_LSTM_GetNumDirections(primitive);
+    lstm.dropout = mindspore::lite::MindIR_LSTM_GetDropout(primitive);
+    lstm.zoneoutCell = mindspore::lite::MindIR_LSTM_GetZoneoutCell(primitive);
+    lstm.zoneoutHidden = mindspore::lite::MindIR_LSTM_GetZoneoutHidden(primitive);
+    lstm.projSize = mindspore::lite::MindIR_LSTM_GetProjSize(primitive);
 
     OHOS::MessageParcel data;
-    (void)LSTMBlockMarshalling(data, lSTM);
+    (void)LSTMBlockMarshalling(data, lstm);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
