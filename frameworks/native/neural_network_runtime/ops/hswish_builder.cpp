@@ -16,7 +16,6 @@
 #include "hswish_builder.h"
 
 #include "mindir.h"
-
 #include "ops_registry.h"
 
 namespace OHOS {

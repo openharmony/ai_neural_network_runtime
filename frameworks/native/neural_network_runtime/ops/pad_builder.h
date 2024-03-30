@@ -16,9 +16,8 @@
 #ifndef NEURAL_NETWORK_RUNTIME_PAD_BUILDER_H
 #define NEURAL_NETWORK_RUNTIME_PAD_BUILDER_H
 
-#include "ops_builder.h"
-
 #include "mindir.h"
+#include "ops_builder.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
