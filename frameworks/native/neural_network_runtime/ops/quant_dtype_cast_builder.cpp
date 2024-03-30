@@ -16,7 +16,6 @@
 #include "quant_dtype_cast_builder.h"
 
 #include "mindir.h"
-
 #include "ops_registry.h"
 
 namespace OHOS {
@@ -24,7 +23,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 static const int INPUT_NUM = 1;
 static const int OUTPUT_NUM = 1;
-static const int PARAM_MAX_NUM = 2;
+static const int PARAM_MAX_NUM = 3;
 static const std::string OP_NAME = "QuantDTypeCast";
 
 QuantDTypeCastBuilder::QuantDTypeCastBuilder() {}
@@ -67,6 +66,24 @@ OH_NN_ReturnCode QuantDTypeCastBuilder::SetDstT(std::shared_ptr<NNTensor> tensor
     return OH_NN_SUCCESS;
 }
 
+OH_NN_ReturnCode QuantDTypeCastBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+{
+    tensor->IdentifyOpParameter();
+    if (tensor->GetDataType() != OH_NN_INT64) {
+        LOGE("[QuantDTypeCast] SetAxis failed, the dst_t should be type OH_NN_INT64.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    void* buffer = tensor->GetBuffer();
+    if (buffer == nullptr) {
+        LOGE("[QuantDTypeCast] SetAxis failed, the dst_t passed buffer is empty.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    m_axis = *(static_cast<int64_t*>(buffer));
+    return OH_NN_SUCCESS;
+}
+
 OH_NN_ReturnCode QuantDTypeCastBuilder::Build(const std::vector<uint32_t>& paramsIndex,
                                               const std::vector<uint32_t>& inputsIndex,
                                               const std::vector<uint32_t>& outputsIndex,
@@ -101,6 +118,9 @@ OH_NN_ReturnCode QuantDTypeCastBuilder::Build(const std::vector<uint32_t>& param
             case OH_NN_QUANT_DTYPE_CAST_DST_T:
                 returnCode = SetDstT(tensor);
                 break;
+            case OH_NN_QUANT_DTYPE_CAST_AXIS:
+                returnCode = SetAxis(tensor);
+                break;
             default:
                 LOGE("[QuantDTypeCast] Build failed, parameter type is invalid. type=%d", tensor->GetType());
                 return OH_NN_INVALID_PARAMETER;
@@ -124,7 +144,7 @@ LiteGraphPrimitvePtr QuantDTypeCastBuilder::GetPrimitive()
         return {nullptr, DestroyLiteGraphPrimitive};
     }
 
-    void* primitive = mindspore::lite::MindIR_QuantDTypeCast_CreatePrimitive(*m_src_t, *m_dst_t);
+    void* primitive = mindspore::lite::MindIR_QuantDTypeCast_CreatePrimitive(*m_src_t, *m_dst_t, m_axis);
     LiteGraphPrimitvePtr graphPrimitivePtr(primitive, DestroyLiteGraphPrimitive);
     return graphPrimitivePtr;
 }

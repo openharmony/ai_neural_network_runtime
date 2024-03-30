@@ -34,12 +34,14 @@ protected:
         const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
     void SaveDstTensor(OH_NN_DataType dataType, const std::vector<int32_t> &dim,
         const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
+    void SaveAxisTensor(OH_NN_DataType dataType, const std::vector<int32_t> &dim,
+        const OH_NN_QuantParam* quantParam, OH_NN_TensorType type);
 
 protected:
     QuantDTypeCastBuilder m_builder;
     std::vector<uint32_t> m_inputs {0};
     std::vector<uint32_t> m_outputs {1};
-    std::vector<uint32_t> m_params {2, 3};
+    std::vector<uint32_t> m_params {2, 3, 4};
     std::vector<int32_t> m_dim {3, 3};
     std::vector<int32_t> m_paramDim {};
 };
@@ -68,6 +70,16 @@ void QuantDTypeCastBuilderTest::SaveDstTensor(OH_NN_DataType dataType, const std
     m_allTensors.emplace_back(dstTensor);
 }
 
+void QuantDTypeCastBuilderTest::SaveAxisTensor(OH_NN_DataType dataType, const std::vector<int32_t> &dim,
+    const OH_NN_QuantParam* quantParam, OH_NN_TensorType type)
+{
+    std::shared_ptr<NNTensor> axisTensor = TransToNNTensor(dataType, dim, quantParam, type);
+    int64_t *axisValue = new (std::nothrow) int64_t(1);
+    EXPECT_NE(nullptr, axisValue);
+    axisTensor->SetBuffer(axisValue, sizeof(int64_t));
+    m_allTensors.emplace_back(axisTensor);
+}
+
 /**
  * @tc.name: quantdtypecast_build_001
  * @tc.desc: Provide normal input, output, and parameters to verify the normal behavior of the Build function
@@ -79,6 +91,7 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_001, TestSize.Level0)
     SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
     SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
     SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
@@ -95,6 +108,7 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_002, TestSize.Level0)
     SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
     SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
     SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
 
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors));
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
@@ -110,12 +124,13 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_003, TestSize.Level0)
 {
     m_inputs = {0, 1};
     m_outputs = {2};
-    m_params = {3, 4};
+    m_params = {3, 4, 5};
 
     SaveInputTensor(m_inputs, OH_NN_INT8, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
     SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
     SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -129,12 +144,13 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_003, TestSize.Level0)
 HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_004, TestSize.Level0)
 {
     m_outputs = {1, 2};
-    m_params = {3, 4};
+    m_params = {3, 4, 5};
 
     SaveInputTensor(m_inputs, OH_NN_INT8, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
     SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
     SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -173,13 +189,14 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_007, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_INT8, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
-    SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
 
     std::shared_ptr<NNTensor> srcTensor = TransToNNTensor(OH_NN_INT32, m_paramDim,
         nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
     int32_t srcValue = 1;
     srcTensor->SetBuffer(&srcValue, sizeof(srcValue));
     m_allTensors.emplace_back(srcTensor);
+    SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -195,14 +212,14 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_008, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_INT8, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
+
     SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
-
-
     std::shared_ptr<NNTensor> dstTensor = TransToNNTensor(OH_NN_INT32, m_paramDim,
         nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
     int32_t dstValue = 1;
     dstTensor->SetBuffer(&dstValue, sizeof(dstValue));
     m_allTensors.emplace_back(dstTensor);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -211,34 +228,96 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_008, TestSize.Level0)
 
 /**
  * @tc.name: quantdtypecast_build_009
- * @tc.desc: Verify that the build function return a failed message with invalided parameter
+ * @tc.desc: Verify that the build function return a failed message with invalided axis's dataType
  * @tc.type: FUNC
  */
 HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_009, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_INT8, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
-    SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
-    SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_REDUCE_ALL_KEEP_DIMS);
 
-    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
+    SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
+    std::shared_ptr<NNTensor> axisTensor = TransToNNTensor(OH_NN_INT32, m_paramDim,
+        nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
+    int32_t axisValue = 1;
+    axisTensor->SetBuffer(&axisValue, sizeof(axisValue));
+    m_allTensors.emplace_back(axisTensor);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    axisTensor->SetBuffer(nullptr, 0);
 }
 
 /**
  * @tc.name: quantdtypecast_build_010
- * @tc.desc: Verify that the build function return a failed message with empty src's buffer
+ * @tc.desc: Verify that the build function return a failed message with invalided src
  * @tc.type: FUNC
  */
 HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_010, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_INT8, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
+
+    SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
     SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/**
+ * @tc.name: quantdtypecast_build_011
+ * @tc.desc: Verify that the build function return a failed message with invalided dst
+ * @tc.type: FUNC
+ */
+HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_011, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_INT8, m_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
+
+    SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
+    SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/**
+ * @tc.name: quantdtypecast_build_012
+ * @tc.desc: Verify that the build function return a failed message with invalided axis
+ * @tc.type: FUNC
+ */
+HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_012, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_INT8, m_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
+
+    SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
+    SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/**
+ * @tc.name: quantdtypecast_build_013
+ * @tc.desc: Verify that the build function return a failed message with empty src's buffer
+ * @tc.type: FUNC
+ */
+HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_013, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_INT8, m_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
 
     std::shared_ptr<NNTensor> srcTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
         nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
     m_allTensors.emplace_back(srcTensor);
+    SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -246,24 +325,45 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_010, TestSize.Level0)
 }
 
 /**
- * @tc.name: quantdtypecast_build_011
+ * @tc.name: quantdtypecast_build_014
  * @tc.desc: Verify that the build function return a failed message with empty dst's buffer
  * @tc.type: FUNC
  */
-HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_011, TestSize.Level0)
+HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_014, TestSize.Level0)
 {
     SaveInputTensor(m_inputs, OH_NN_INT8, m_dim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
+
     SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
-
-
     std::shared_ptr<NNTensor> dstTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
         nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
     m_allTensors.emplace_back(dstTensor);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
     dstTensor->SetBuffer(nullptr, 0);
+}
+
+/**
+ * @tc.name: quantdtypecast_build_015
+ * @tc.desc: Verify that the build function return a failed message with empty axis's buffer
+ * @tc.type: FUNC
+ */
+HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_015, TestSize.Level0)
+{
+    SaveInputTensor(m_inputs, OH_NN_INT8, m_dim, nullptr);
+    SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
+
+    SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
+    SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
+    std::shared_ptr<NNTensor> axisTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
+        nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
+    m_allTensors.emplace_back(axisTensor);
+
+    OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputs, m_allTensors);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    axisTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -289,6 +389,7 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_get_primitive_002, TestSize.L
     SaveOutputTensor(m_outputs, OH_NN_INT8, m_dim, nullptr);
     SaveSrcTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_SRC_T);
     SaveDstTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_DST_T);
+    SaveAxisTensor(OH_NN_INT64, m_paramDim, nullptr, OH_NN_QUANT_DTYPE_CAST_AXIS);
 
     EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors));
     LiteGraphTensorPtr primitive = m_builder.GetPrimitive();
@@ -297,10 +398,13 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_get_primitive_002, TestSize.L
 
     int64_t srcValue = 1;
     int64_t dstValue = 1;
+    int64_t axisValue = 1;
     auto srcReturn = mindspore::lite::MindIR_QuantDTypeCast_GetSrcT(primitive.get());
     EXPECT_EQ(srcReturn, srcValue);
     auto dstReturn = mindspore::lite::MindIR_QuantDTypeCast_GetDstT(primitive.get());
     EXPECT_EQ(dstReturn, dstValue);
+    auto axisReturn = mindspore::lite::MindIR_QuantDTypeCast_GetAxis(primitive.get());
+    EXPECT_EQ(axisReturn, axisValue);
 }
 } // namespace UnitTest
 } // namespace NeuralNetworkRuntime

@@ -15,9 +15,9 @@
 
 #include "pad_builder.h"
 
-#include "ops_registry.h"
 #include "transform.h"
 #include "validation.h"
+#include "ops_registry.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

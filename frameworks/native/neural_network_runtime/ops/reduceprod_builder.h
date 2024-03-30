@@ -16,8 +16,6 @@
 #ifndef NEURAL_NETWORK_RUNTIME_REDUCEPROD_BUILDER_H
 #define NEURAL_NETWORK_RUNTIME_REDUCEPROD_BUILDER_H
 
-#include "mindir.h"
-
 #include "ops_builder.h"
 
 namespace OHOS {

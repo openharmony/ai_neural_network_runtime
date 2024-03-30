@@ -353,10 +353,10 @@ typedef enum {
      * Parameters:
      *
      * * <b>kernelSize</b> indicates the kernel size used to obtain the average value.
-     *       It is an int array [kernel_height, kernel_width].
+     *       It is an int array [kernelHeight, kernelWidth].
      *       The first number indicates the kernel height, and the second number indicates the kernel width.
      * * <b>strides</b> indicates the distance of kernel moving. The value is an int array
-     *       [stride_height, stride_width]. The first number indicates the moving step in height,
+     *       [strideHeight, strideWidth]. The first number indicates the moving step in height,
      *       and the second number indicates the moving step in width.
      * * <b>padMode</b>: padding mode, which is optional. The value is of the int type and can be <b>0</b> (same)
      *       or <b>1</b> (valid). The nearest neighbor value is used for padding.
@@ -381,10 +381,10 @@ typedef enum {
      * Parameters:
      *
      * * <b>kernelSize</b> indicates the kernel size used to obtain the average value.
-     *       It is an int array [kernel_height, kernel_width].
+     *       It is an int array [kernelHeight, kernelWidth].
      *       The first number indicates the kernel height, and the second number indicates the kernel width.
      * * <b>strides</b> indicates the distance of kernel moving. The value is an int array
-     *       [stride_height, stride_width]. The first number indicates the moving step in height,
+     *       [strideHeight, strideWidth]. The first number indicates the moving step in height,
      *       and the second number indicates the moving step in width.
      * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right],
      *       and the nearest neighbor values are used for padding.
@@ -427,7 +427,7 @@ typedef enum {
     OH_NN_OPS_BATCH_NORM = 3,
 
     /**
-     * Divides the batch dimension of a 4D tensor into small blocks by <b>block_shape</b>,
+     * Divides the batch dimension of a 4D tensor into small blocks by <b>blockShape</b>,
      * and interleaves these blocks back into the spatial dimension.
      *
      * Parameters:
@@ -438,18 +438,18 @@ typedef enum {
      * Outputs:
      *
      * * <b>blockSize</b>: size of each block to be interleaved into the spatial dimension.
-     *       The value is an array [height_block, width_block].
+     *       The value is an array [heightBlock, widthBlock].
      * * <b>crops</b>: elements truncated from the spatial dimension of the output. The value is a 2D array
-     *       [[crop0_start, crop0_end], [crop1_start, crop1_end]] with the shape of (2, 2).
+     *       [[crop0Start, crop0End], [crop1Start, crop1End]] with the shape of (2, 2).
      *
      *
      * Outputs:
      *
      * * <b>output</b>. Assume that the shape of <b>input</b> is (n,h,w,c) and
      *       the shape of <b>output</b> is (n',h',w',c'):
-     *       n' = n / (block_shape[0] * block_shape[1])
-     *       h' = h * block_shape[0] - crops[0][0] - crops[0][1]
-     *       w' = w * block_shape[1] - crops[1][0] - crops[1][1]
+     *       n' = n / (blockShape[0] * blockShape[1])
+     *       h' = h * blockShape[0] - crops[0][0] - crops[0][1]
+     *       w' = w * blockShape[1] - crops[1][0] - crops[1][1]
      *       c'= c
      */
     OH_NN_OPS_BATCH_TO_SPACE_ND = 4,
@@ -532,9 +532,9 @@ typedef enum {
      *
      *       <b>1</b> (valid): The possible maximum height and width of the output will be returned
      *       in case of no padding. The excessive pixels will be discarded.
-     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>. The value is of the
+     * * <b>group</b>: number of groups in which the input is divided by <b>inChannel</b>. The value is of the
      *       int type. If <b>group</b> is <b>1</b>, it is a conventional convolution. If <b>group</b> is greater
-     *       than <b>1</b> and less than or equal to <b>in_channel</b>, it is a group convolution.
+     *       than <b>1</b> and less than or equal to <b>inChannel</b>, it is a group convolution.
      * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
      *       The specified activation function is called before output.
      *
@@ -559,11 +559,11 @@ typedef enum {
      *       It is an int array [dilationHeight, dilationWidth]. The value must be greater than
      *       or equal to <b>1</b> and cannot exceed the height and width of <b>input</b>.
      * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right].
-     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>.
+     * * <b>group</b>: number of groups in which the input is divided by <b>inChannel</b>.
      *       The value is of the int type. If <b>group</b> is <b>1</b>, it is a conventional convolution.
-     *       If <b>group</b> is <b>in_channel</b>, it is depthwiseConv2d. In this case, group==in_channel==out_channel.
-     *       If <b>group</b> is greater than <b>1</b> and less than <b>in_channel</b>, it is a group convolution.
-     *       In this case, out_channel==group.
+     *       If <b>group</b> is <b>inChannel</b>, it is depthwiseConv2d. In this case, group==inChannel==outChannel.
+     *       If <b>group</b> is greater than <b>1</b> and less than <b>inChannel</b>, it is a group convolution.
+     *       In this case, outChannel==group.
      * * <b>activationType</b> is an integer constant which is contained in <b>FuseType</b>.
      *       The specified activation function is called before output.
      *
@@ -604,9 +604,9 @@ typedef enum {
      *       Otherwise, the last additional padding will be completed from the bottom and right.
      *       <b>1</b> (valid): The possible maximum height and width of the output will be returned in case of
      *       no padding. The excessive pixels will be discarded.
-     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>. The value is of the int
+     * * <b>group</b>: number of groups in which the input is divided by <b>inChannel</b>. The value is of the int
      *       type. If <b>group</b> is <b>1</b>, it is a conventional convolution. If <b>group</b> is greater than
-     *       <b>1</b> and less than or equal to <b>in_channel</b>, it is a group convolution.
+     *       <b>1</b> and less than or equal to <b>inChannel</b>, it is a group convolution.
      * * <b>outputPads</b>: padding along the height and width of the output tensor. The value is an int or a tuple.
      *       It can be a single integer to specify the same value for all spatial dimensions. The amount of output
      *       padding along a dimension must be less than the stride along this dimension.
@@ -634,9 +634,9 @@ typedef enum {
      *       It is an int array [dilationHeight, dilationWidth]. The value must be greater than
      *       or equal to <b>1</b> and cannot exceed the height and width of <b>input</b>.
      * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right].
-     * * <b>group</b>: number of groups in which the input is divided by <b>in_channel</b>. The value is of the int
+     * * <b>group</b>: number of groups in which the input is divided by <b>inChannel</b>. The value is of the int
      *       type. If <b>group</b> is <b>1</b>, it is a conventional convolution. If <b>group</b> is greater than
-     *       <b>1</b> and less than or equal to <b>in_channel</b>, it is a group convolution.
+     *       <b>1</b> and less than or equal to <b>inChannel</b>, it is a group convolution.
      * * <b>outputPads</b>: padding along the height and width of the output tensor. The value is an int or a tuple.
      *       It can be a single integer to specify the same value for all spatial dimensions. The amount of output
      *       padding along a dimension must be less than the stride along this dimension.
@@ -932,10 +932,10 @@ typedef enum {
      *
      * Parameters:
      *
-     * * <b>kernelSize</b>: kernel size used to obtain the maximum. It is an int array [kernel_height, kernel_width].
+     * * <b>kernelSize</b>: kernel size used to obtain the maximum. It is an int array [kernelHeight, kernelWidth].
      *       The first number indicates the kernel height, and the second number indicates the kernel width.
      * * <b>strides</b> indicates the distance of kernel moving. The value is an int array
-     *       [stride_height, stride_width]. The first number indicates the moving step in height,
+     *       [strideHeight, strideWidth]. The first number indicates the moving step in height,
      *       and the second number indicates the moving step in width.
      * * <b>padMode</b>: padding mode, which is optional. The value is of the int type and can be <b>0</b> (same)
      *       or <b>1</b> (valid). The nearest neighbor value is used for padding.
@@ -958,10 +958,10 @@ typedef enum {
      *
      * Parameters:
      *
-     * * <b>kernelSize</b>: kernel size used to obtain the maximum. It is an int array [kernel_height, kernel_width].
+     * * <b>kernelSize</b>: kernel size used to obtain the maximum. It is an int array [kernelHeight, kernelWidth].
      *       The first number indicates the kernel height, and the second number indicates the kernel width.
      * * <b>strides</b> indicates the distance of kernel moving. The value is an int array
-     *       [stride_height, stride_width]. The first number indicates the moving step in height,
+     *       [strideHeight, strideWidth]. The first number indicates the moving step in height,
      *       and the second number indicates the moving step in width.
      * * <b>padList</b>: padding around <b>input</b>. It is an int array [top, bottom, left, right], 
      *       and the nearest neighbor values are used for padding.
@@ -1000,16 +1000,16 @@ typedef enum {
 
     /**
      * Generates a one-hot tensor based on the positions specified by <b>indices</b>. The positions specified by
-     * <b>indices</b> are determined by <b>on_value</b>, and other positions are determined by <b>off_value</b>.
+     * <b>indices</b> are determined by <b>onValue</b>, and other positions are determined by <b>offValue</b>.
      *
      * Inputs:
      *
      * * <b>indices</b>: <i>n</i>-dimensional tensor. Each element in <b>indices</b> determines the position of
-     *       <b>on_value</b> in each one-hot vector.
+     *       <b>onValue</b> in each one-hot vector.
      * * <b>depth</b>: integer scalar that determines the depth of the one-hot vector. The value of <b>depth</b>
      *       must be greater than <b>0</b>.
-     * * <b>on_value</b>: scalar that specifies a valid value in the one-hot vector.
-     * * <b>off_value</b>: scalar that specifies the values of other posistions in the one-hot vector except
+     * * <b>onValue</b>: scalar that specifies a valid value in the one-hot vector.
+     * * <b>offValue</b>: scalar that specifies the values of other posistions in the one-hot vector except
      *       the valid value.
      *
      * Parameters:
@@ -1204,10 +1204,10 @@ typedef enum {
      * Parameters:
      *
      * * <b>outputNum</b>: number of output tensors. The data type is long.
-     * * <b>size_splits</b>: size of each tensor split from the input. The value is a 1D tensor of the int type. If
-     *       <b>size_splits</b> is empty, the input will be evenly split into tensors of the same size. In this case,
+     * * <b>sizeSplits</b>: size of each tensor split from the input. The value is a 1D tensor of the int type. If
+     *       <b>sizeSplits</b> is empty, the input will be evenly split into tensors of the same size. In this case,
      *       <b>input.shape[axis]</b> can be exactly divisible by <b>outputNum</b>.
-     *       If <b>size_splits</b> is not empty, the sum of all its elements must be equal to <b>input.shape[axis]</b>.
+     *       If <b>sizeSplits</b> is not empty, the sum of all its elements must be equal to <b>input.shape[axis]</b>.
      * * <b>axis</b>: splitting dimension of the int type.
      *
      * Outputs:
@@ -2309,6 +2309,364 @@ typedef enum {
      *       and the numeric type is OH_NN_BOOL.
      */
     OH_NN_OPS_LOGICAL_OR = 89,
+    
+    /**
+     * Returns element-wise smallest integer in not less than input.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: A tensor after ceiled.
+     */
+    OH_NN_OPS_CEIL = 90,
+    
+    /**
+     * Crop given tensor acrodding to axis and offset.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     * * <b>shape</b>: <i>1</i>-dimensional tensor, indices cropped windows dimension.
+     *
+     * Parameters:
+     *
+     * * <b>axis</b>: Cropped dimension.
+     * * <b>offset</b>: Cropped offset per dimension.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Cropped output tensor.
+     */
+    OH_NN_OPS_CROP = 91,
+    
+    /**
+     * The output of the object detection model is post-processed, including decoding the bounding box,
+     * class probability and score of the model output, and then performing non-maximum suppression (NMS)
+     * to remove the overlapping bounding box, and finally outputting the detection result.
+     *
+     * Inputs:
+     *
+     * * <b>bbox</b>: Boxes to be predicted.
+     * * <b>scores</b>: Socres of all boxes.
+     * * <b>anchors</b>: Information of boxes, includes box, variance and coordinates.
+     *
+     * Parameters:
+     * * <b>inputSize</b>: The size of the input tensor.
+     * * <b>scale</b>: The scaling factor used to convert the output from
+     *       the normalized form to the original image coordinates.
+     * * <b>nmsIoUThreshold</b>: The threshold of overlapping region during NMS.
+     * * <b>nmsScoreThreshold</b>: The socre threshold used to select target bbox duing NMS.
+     * * <b>maxDetections</b>: Maximum of bboxes per image.
+     * * <b>detectionsPerClass</b>: Maximum of bboxes per class.
+     * * <b>maxClassesPerDetection</b>: Maximum of reserved classes per bboxes.
+     * * <b>numClasses</b>: Number of target classes to be detected.
+     * * <b>useRegularNms</b>: Whether use NMS based on IoU threshold.
+     * * <b>outQuantized</b>: Whether need to quantize.
+     *
+     * Outputs:
+     *
+     * * <b>bboxes</b>: The corrdinates of target detected bboxes.
+     * * <b>classes</b>: The target class index of target detected bboxes.
+     * * <b>confidences</b>: The score of target detected bboxes.
+     * * <b>numDetections</b>: The number of target detected bboxes.
+     */
+    OH_NN_OPS_DETECTION_POST_PROCESS = 92,
+    
+    /**
+     * Returns element-wise largest integer not greater than x.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: A tensor after floored.
+     */
+    OH_NN_OPS_FLOOR = 93,
+    
+    /**
+     * Calculate the L2-normalize of the input using the given axis.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: Input to compute the L2-normalization.
+     *
+     * Parameters:
+     *
+     * * <b>axis</b>: The axis on which to apply normalization, -1 means last axis, default: 0.
+     * * <b>epsilon</b>: Value added for numerical stability. default: 1e-6;
+     * * <b>activationType</b>: Activation function type.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Result tensor with the same type and shape as input <b>input</b>.
+     */
+    OH_NN_OPS_L2_NORMALIZE = 94,
+    
+    /**
+     * Computes the log-softmax function to n-dimensional input tensor.
+     * The input is transformed by the Softmax function and then by the log function to lie in range[-inf,0).
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     *
+     * Parameters:
+     *
+     * * <b>axis</b>: The axis to apply LogSoftmax operation, -1 means the last dimension.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Tensor output. Has the same data type and shape as input.
+     */
+    OH_NN_OPS_LOG_SOFTMAX = 95,
+    
+    /**
+     * Normalize over local input regions.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     *
+     * Parameters:
+     *
+     * * <b>depthRadius</b>: Half-width of the 1-dimension normalization window.
+     * * <b>bias</b>: Offset.
+     * * <b>alpha</b>: Scale factor.
+     * * <b>beta</b>: Exponent.
+     * * <b>normRegion</b>: Specifies normalization region. Options: "ACROSS_CHNNEL".
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Result output tensor.
+     */
+    OH_NN_OPS_LRN = 96,
+    
+    /**
+     * Calculates the minimum of <b>input1</b> and <b>input2</b> element-wise. The inputs of <b>input1</b> and
+     * <b>input2</b> comply with the implicit type conversion rules to make the data types are consistent.
+     *
+     * The input must be two tensors or one tensor and one scalar. When the input is two tensors, the data types
+     * cannot be Boolean at the same time, and their shapes can be broadcast to the same size. When the inputs are
+     * one tensor and one scalar, the scalar must be a constant.
+     *
+     * Inputs:
+     *
+     * * <b>input1</b>: <i>n</i>-dimensional tensor, whose data type can be number or Boolean.
+     * * <b>input2</b>: <i>n</i>-dimensional tensor, whose data type can be number or Boolean.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Minimum value of the elements of the two tensors.
+     */
+    OH_NN_OPS_MINIMUM = 97,
+    
+    /**
+     * Calculate the rank of a tensor.
+     * The rank of a tensor is the number of indices required to uniquely select each element of the tensor.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Result tensor. 0-D int32 Tensor representing the rank of input.
+     */
+    OH_NN_OPS_RANK = 98,
+    
+    /**
+     * Calculates the maximum value for input tensor along the specified dimension. If <b>keepDims</b> is set to
+     * <b>false</b>, the number of dimensions is reduced for the input; if <b>keepDims</b> is set to <b>true</b>,
+     * the number of dimensions is retained.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional input tensor, where <i>n</i> is less than 8.
+     * * <b>axis</b>: dimension used to calculate the maximum value. The value is a 1D tensor.
+     *       The value range of each element in <b>axis</b> is [–n, n).
+     *
+     * Parameters:
+     *
+     * * <b>keepDims</b>: indicates whether to retain the dimension. The value is a Boolean value.
+     * * <b>reduceToEnd</b>: boolean value, indicates whether the reduce operation needs to be performed
+     *       until the last axis.
+     * * <b>coeff</b>: A OH_NN_FLOAT32 scalar that represents the scale factor of the output.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: <i>m</i>-dimensional output tensor whose data type is the same as that of the input.
+     *       If <b>keepDims</b> is <b>false</b>, m<n. If <b>keepDims</b> is <b>true</b>, m==n.
+     */
+    OH_NN_OPS_REDUCE_MAX = 99,
+
+    /**
+     * Calculates the minimum value for input tensor along the specified dimension. If <b>keepDims</b> is set to
+     * <b>false</b>, the number of dimensions is reduced for the input; if <b>keepDims</b> is set to <b>true</b>,
+     * the number of dimensions is retained.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional input tensor, where <i>n</i> is less than 8.
+     * * <b>axis</b>: dimension used to calculate the minimum value. The value is a 1D tensor.
+     *       The value range of each element in <b>axis</b> is [–n, n).
+     *
+     * Parameters:
+     *
+     * * <b>keepDims</b>: indicates whether to retain the dimension. The value is a Boolean value.
+     * * <b>reduceToEnd</b>: boolean value, indicates whether the reduce operation needs to be performed
+     *       until the last axis.
+     * * <b>coeff</b>: A OH_NN_FLOAT32 scalar that represents the scale factor of the output.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: <i>m</i>-dimensional output tensor whose data type is the same as that of the input.
+     *       If <b>keepDims</b> is <b>false</b>, m<n. If <b>keepDims</b> is <b>true</b>, m==n.
+     */
+    OH_NN_OPS_REDUCE_MIN = 100,
+
+    /**
+     * Calculates the numerical sum value for input tensor along the specified dimension. If <b>keepDims</b> is set to
+     * <b>false</b>, the number of dimensions is reduced for the input; if <b>keepDims</b> is set to <b>true</b>,
+     * the number of dimensions is retained.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional input tensor, where <i>n</i> is less than 8.
+     * * <b>axis</b>: dimension used to calculate the sum value. The value is a 1D tensor.
+     *       The value range of each element in <b>axis</b> is [–n, n).
+     *
+     * Parameters:
+     *
+     * * <b>keepDims</b>: indicates whether to retain the dimension. The value is a Boolean value.
+     * * <b>reduceToEnd</b>: boolean value, indicates whether the reduce operation needs to be performed
+     *       until the last axis.
+     * * <b>coeff</b>: A OH_NN_FLOAT32 scalar that represents the scale factor of the output.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: <i>m</i>-dimensional output tensor whose data type is the same as that of the input.
+     *       If <b>keepDims</b> is <b>false</b>, m<n. If <b>keepDims</b> is <b>true</b>, m==n.
+     */
+    OH_NN_OPS_REDUCE_SUM = 101,
+
+    /**
+     * Calculate half to even of a tensor element-wise.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Result tensor with the same shape as the input.
+     */
+    OH_NN_OPS_ROUND = 102,
+
+    /**
+     * Scatters a tensor into a new tensor depending on the specified indices.
+     *
+     * Inputs:
+     *
+     * * <b>indices</b>: The index of scattering in the new tensor with int32 or int64 data type.
+     *       The rank of indices must be at least 2 and indicesShape[-1] <= len(shape).
+     * * <b>updates</b>: The source tensor to be scattered. It has shape indicesShape[:-1]+shape[indicesShape[-1]:].
+     * * <b>shape</b>: The shape of the output tensor, has the same data type as <b>indices</b>.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Result tensor with the same type as <b>update</b> and the same shape as <b>shape</b>.
+     */
+    OH_NN_OPS_SCATTER_ND = 103,
+
+    /**
+     * Rearrange blocks of spatial data into depth.
+     * The output tensor’s height dimension is height / blocksize;
+     * The output tensor’s weight dimension is weight / blocksize;
+     * The depth of output tensor is blocksize * blocksize * inputDepth;
+     * The input tensor’s height and width must be divisible by blocksize.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>4</i>-dimensional tensor.
+     *
+     * Parameters:
+     *
+     * * <b>blocksize</b>: The block size used to divide spatial data. It must be >= 2.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Result tensor with the same dataType as the input.
+     */
+    OH_NN_OPS_SPACE_TO_DEPTH = 104,
+
+    /**
+     * Swish activation function
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Output tensor.
+     */
+    OH_NN_OPS_SWISH = 105,
+
+    /**
+     * Calculates the L2 normalization of the input tensor along the specified axis,
+     * replacing other elements of the dimension with the L2 normalization value of the specified dimension to
+     * remove the dimension, or to reduce the dimension size to 1. Control whether the dimensions of the
+     * output and input are the same by specifying the keepDims parameter.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: input tensor.
+     * * <b>axis</b>: Dimensions to perform L2-Normalization calculations.
+     *
+     * Parameters:
+     *
+     * * <b>keepDims</b>: indicates whether to retain the dimension. The value is a Boolean value.
+     * * <b>reduceToEnd</b>: boolean value, indicates whether the reduce operation needs to be performed
+     *       until the last axis.
+     * * <b>coeff</b>: A OH_NN_FLOAT32 scalar that represents the scale factor of the output.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Result tensor with the same dataType as the input.
+     */
+    OH_NN_OPS_REDUCE_L2 = 106,
+
+    /**
+     * HardSigmoid activation function. Calculate the output by element.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Result tensor with the same shape and dataType as the input.
+     */
+    OH_NN_OPS_HARD_SIGMOID = 107,
+
+    /**
+     * Gets the element at the location specified by the input tensor according to the index.
+     *
+     * Inputs:
+     *
+     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     * * <b>indices</b>: index tensor.
+     *
+     * Outputs:
+     *
+     * * <b>output</b>: Result tensor with the same shape as the input.
+     */
+    OH_NN_OPS_GATHER_ND = 108,
 } OH_NN_OperationType;
 
 /**
@@ -2743,6 +3101,112 @@ typedef enum {
 
     /** This enumerated value is used when the tensor is used as the <b>dims</b> parameter of the Tile operator. */
     OH_NN_TILE_DIMS = 128,
+
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the crop operator. */
+    OH_NN_CROP_AXIS = 129,
+    /** This enumerated value is used when the tensor is used as the <b>offset</b> parameter of the crop operator. */
+    OH_NN_CROP_OFFSET = 130,
+
+    /** This enumerated value is used when the tensor is used as the <b>inputSize</b> parameter
+     *  of the detectionPostProcess operator. */
+    OH_NN_DETECTION_POST_PROCESS_INPUT_SIZE = 131,
+    /** This enumerated value is used when the tensor is used as the <b>scale</b> parameter
+     *  of the detectionPostProcess operator. */
+    OH_NN_DETECTION_POST_PROCESS_SCALE = 132,
+    /** This enumerated value is used when the tensor is used as the <b>nmsIoUThreshold</b>
+     *  parameter of the detectionPostProcess operator. */
+    OH_NN_DETECTION_POST_PROCESS_NMS_IOU_THRESHOLD = 133,
+    /** This enumerated value is used when the tensor is used as the <b>nmsScoreThreshold</b> parameter
+     *  of the detectionPostProcess operator. */
+    OH_NN_DETECTION_POST_PROCESS_NMS_SCORE_THRESHOLD = 134,
+    /** This enumerated value is used when the tensor is used as the <b>maxDetections</b> parameter
+     *  of the detectionPostProcess operator. */
+    OH_NN_DETECTION_POST_PROCESS_MAX_DETECTIONS = 135,
+    /** This enumerated value is used when the tensor is used as the <b>detectionsPerClass</b> parameter
+     *  of the detectionPostProcess operator. */
+    OH_NN_DETECTION_POST_PROCESS_DETECTIONS_PER_CLASS = 136,
+    /** This enumerated value is used when the tensor is used as the <b>maxClassesPerDetection</b> parameter
+     *  of the detectionPostProcess operator. */
+    OH_NN_DETECTION_POST_PROCESS_MAX_CLASSES_PER_DETECTION = 137,
+    /** This enumerated value is used when the tensor is used as the <b>numClasses</b> parameter
+     *  of the detectionPostProcess operator. */
+    OH_NN_DETECTION_POST_PROCESS_NUM_CLASSES = 138,
+    /** This enumerated value is used when the tensor is used as the <b>useRegularNms</b> parameter
+     *  of the detectionPostProcess operator. */
+    OH_NN_DETECTION_POST_PROCESS_USE_REGULAR_NMS = 139,
+    /** This enumerated value is used when the tensor is used as the <b>outQuantized</b> parameter
+     *  of the detectionPostProcess operator. */
+    OH_NN_DETECTION_POST_PROCESS_OUT_QUANTIZED = 140,
+
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter
+     *  of the L2Normalize operator. */
+    OH_NN_L2_NORMALIZE_AXIS = 141,
+    /** This enumerated value is used when the tensor is used as the <b>epsilon</b> parameter
+     *  of the L2Normalize operator. */
+    OH_NN_L2_NORMALIZE_EPSILON = 142,
+    /** This enumerated value is used when the tensor is used as the <b>activationType</b> parameter
+     *  of the L2Normalize operator. */
+    OH_NN_L2_NORMALIZE_ACTIVATION_TYPE = 143,
+
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the softmax operator. */
+    OH_NN_LOG_SOFTMAX_AXIS = 144,
+
+    /** This enumerated value is used when the tensor is used as the <b>depthRedius</b>
+     *  parameter of the LRN operator. */
+    OH_NN_LRN_DEPTH_RADIUS = 145,
+    /** This enumerated value is used when the tensor is used as the <b>bias</b> parameter of the LRN operator. */
+    OH_NN_LRN_BIAS = 146,
+    /** This enumerated value is used when the tensor is used as the <b>alpha</b> parameter of the LRN operator. */
+    OH_NN_LRN_ALPHA = 147,
+    /** This enumerated value is used when the tensor is used as the <b>beta</b> parameter of the LRN operator. */
+    OH_NN_LRN_BETA = 148,
+    /** This enumerated value is used when the tensor is used as the <b>normRegion</b> parameter
+     *  of the LRN operator. */
+    OH_NN_LRN_NORM_REGION = 149,
+
+    /** This enumerated value is used when the tensor is used as the <b>blockSize</b> parameter
+     *  of the spaceToDepth operator. */
+    OH_NN_SPACE_TO_DEPTH_BLOCK_SIZE = 150,
+
+    /** This enumerated value is used when the tensor is used as the <b>keepDims</b> parameter
+     *  of the ReduceMax operator. */
+    OH_NN_REDUCE_MAX_KEEP_DIMS = 151,
+    /** This enumerated value is used when the tensor is used as the <b>reduceToEnd</b> parameter
+     *  of the ReduceMax operator. */
+    OH_NN_REDUCE_MAX_REDUCE_TO_END = 152,
+    /** This enumerated value is used when the tensor is used as the <b>coeff</b> parameter
+     *  of the ReduceMax operator. */
+    OH_NN_REDUCE_MAX_COEFF = 153,
+
+    /** This enumerated value is used when the tensor is used as the <b>keepDims</b> parameter
+     *  of the ReduceMin operator. */
+    OH_NN_REDUCE_MIN_KEEP_DIMS = 154,
+    /** This enumerated value is used when the tensor is used as the <b>reduceToEnd</b> parameter
+     *  of the ReduceMin operator. */
+    OH_NN_REDUCE_MIN_REDUCE_TO_END = 155,
+    /** This enumerated value is used when the tensor is used as the <b>coeff</b> parameter
+     *  of the ReduceMin operator. */
+    OH_NN_REDUCE_MIN_COEFF = 156,
+
+    /** This enumerated value is used when the tensor is used as the <b>keepDims</b> parameter
+     *  of the ReduceSum operator. */
+    OH_NN_REDUCE_SUM_KEEP_DIMS = 157,
+    /** This enumerated value is used when the tensor is used as the <b>reduceToEnd</b> parameter
+     *  of the ReduceSum operator. */
+    OH_NN_REDUCE_SUM_REDUCE_TO_END = 158,
+    /** This enumerated value is used when the tensor is used as the <b>coeff</b> parameter
+     *  of the ReduceSum operator. */
+    OH_NN_REDUCE_SUM_COEFF = 159,
+
+    /** This enumerated value is used when the tensor is used as the <b>keepDims</b> parameter
+     *  of the ReduceL2 operator. */
+    OH_NN_REDUCE_L2_KEEP_DIMS = 160,
+    /** This enumerated value is used when the tensor is used as the <b>reduceToEnd</b> parameter
+     *  of the ReduceL2 operator. */
+    OH_NN_REDUCE_L2_REDUCE_TO_END = 161,
+    /** This enumerated value is used when the tensor is used as the <b>coeff</b> parameter
+     *  of the ReduceL2 operator. */
+    OH_NN_REDUCE_L2_COEFF = 162,
 } OH_NN_TensorType;
 
 /**
