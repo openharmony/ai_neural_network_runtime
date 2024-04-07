@@ -31,7 +31,7 @@
  * include "neural_network_runtime/neural_network_runtime_type.h"
  * @library libneural_network_runtime.so
  * @kit Neural Network Runtime Kit
- * @Syscap SystemCapability.Ai.NeuralNetworkRuntime
+ * @syscap SystemCapability.Ai.NeuralNetworkRuntime
  * @since 9
  * @version 2.0
  */
@@ -1727,6 +1727,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: A tuple of tensors, the shape of each objects is same.
+     *
+     * @since 12
      */
     OH_NN_OPS_UNSTACK = 57,
 
@@ -1741,6 +1743,8 @@ typedef enum {
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor. The absolute value of the input tensor.
      *       The shape and data type is the same as inputs'.
+     *
+     * @since 12
      */
     OH_NN_OPS_ABS = 58,
 
@@ -1755,6 +1759,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor. The shape and data type is the same as inputs'.
+     *
+     * @since 12
      */
     OH_NN_OPS_ERF = 59,
 
@@ -1778,6 +1784,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor. The element-wise exponential result of the input tensor.
+     *
+     * @since 12
      */
     OH_NN_OPS_EXP = 60,
 
@@ -1796,6 +1804,8 @@ typedef enum {
      * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used, the quantization
      *       parameters of the output cannot be omitted. However, values of the quantization parameters do not
      *       affect the result.
+     *
+     * @since 12
      */
     OH_NN_OPS_LESS = 61,
 
@@ -1816,6 +1826,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: A tensor, has the same shape and data type as the input.
+     *
+     * @since 12
      */
     OH_NN_OPS_SELECT = 62,
 
@@ -1829,6 +1841,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor, has the same shape and dtype as the input.
+     *
+     * @since 12
      */
     OH_NN_OPS_SQUARE = 63,
 
@@ -1850,6 +1864,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: 2-dimensional tensor after flattened.
+     *
+     * @since 12
      */
     OH_NN_OPS_FLATTEN = 64,
 
@@ -1874,6 +1890,8 @@ typedef enum {
      *
      * * <b>output</b>: Output tensor of [N, H * blocksize, W * blocksize, C/(blocksize * blocksize)] for NHWC format
      *       or [N, C/(blocksize * blocksize), H * blocksize, W * blocksize] for NCHW format.
+     *
+     * @since 12
      */
     OH_NN_OPS_DEPTH_TO_SPACE = 65,
 
@@ -1894,6 +1912,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: <i>1</i>-dimensional tensor with specific data type containing generated range of values.
+     *
+     * @since 12
      */
     OH_NN_OPS_RANGE = 66,
 
@@ -1916,6 +1936,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: The output tensor of the same shape as input.
+     *
+     * @since 12
      */
     OH_NN_OPS_INSTANCE_NORM = 67,
 
@@ -1935,6 +1957,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: A tensor, has the same shape as the input.
+     *
+     * @since 12
      */
     OH_NN_OPS_CONSTANT_OF_SHAPE = 68,
 
@@ -1952,6 +1976,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: A tensor after broadcasted.
+     *
+     * @since 12
      */
     OH_NN_OPS_BROADCAST_TO = 69,
 
@@ -1970,6 +1996,8 @@ typedef enum {
      * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used,
      *       the quantization output cannot be omitted. However, values of the quantization
      *       parameters do not affect the result.
+     *
+     * @since 12
      */
     OH_NN_OPS_EQUAL = 70,
 
@@ -1988,6 +2016,8 @@ typedef enum {
      * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used,
      *       the quantization parameters of the output cannot be omitted. However,
      *       values of the quantization parameters do not affect the result.
+     *
+     * @since 12
      */
     OH_NN_OPS_GREATER = 71,
 
@@ -2006,6 +2036,8 @@ typedef enum {
      * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used,
      *       the quantization parameters of the output cannot be omitted. However,
      *       values of the quantization parameters do not affect the result.
+     *
+     * @since 12
      */
     OH_NN_OPS_NOT_EQUAL = 72,
 
@@ -2024,6 +2056,8 @@ typedef enum {
      * * <b>output</b>: A tensor of the data type OH_NN_BOOL. When a quantization model is used,
      *       the quantization parameters of the output cannot be omitted. However,
      *       values of the quantization parameters do not affect the result.
+     *
+     * @since 12
      */
     OH_NN_OPS_GREATER_EQUAL = 73,
 
@@ -2043,6 +2077,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: A tensor, with the same data type and shape as the input tensor.
+     *
+     * @since 12
      */
     OH_NN_OPS_LEAKY_RELU = 74,
 
@@ -2082,6 +2118,8 @@ typedef enum {
      *       shape is [numDirections * numLayers, batchSize, realHiddenSize].
      * * <b>cy</b>: The last output tensor of the cell,
      *       shape is [numDirections * numLayers, batchSize, hiddenSize].
+     *
+     * @since 12
      */
     OH_NN_OPS_LSTM = 75,
 
@@ -2101,6 +2139,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor., with the same data type and shape as the input tensor.
+     *
+     * @since 12
      */
     OH_NN_OPS_CLIP = 76,
 
@@ -2121,6 +2161,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: 1-dimension or n-dimension tensor with boolean data type.
+     *
+     * @since 12
      */
     OH_NN_OPS_ALL = 77,
 
@@ -2141,6 +2183,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Result value judged by condition. If the condition is not true, an Error is returned.
+     *
+     * @since 12
      */
     OH_NN_OPS_ASSERT = 78,
 
@@ -2154,6 +2198,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor. The cosine of the input tensor computed element-wise.
+     *
+     * @since 12
      */
     OH_NN_OPS_COS = 79,
 
@@ -2167,6 +2213,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor with the same shape as the input tensor.
+     *
+     * @since 12
      */
     OH_NN_OPS_LOG = 80,
 
@@ -2182,6 +2230,8 @@ typedef enum {
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor. The calculation result of logical-and
      *       and the numeric type is OH_NN_BOOL.
+     *
+     * @since 12
      */
     OH_NN_OPS_LOGICAL_AND = 81,
 
@@ -2196,6 +2246,8 @@ typedef enum {
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor. The calculation result of logical-not
      *       and the numeric type is OH_NN_BOOL.
+     *
+     * @since 12
      */
     OH_NN_OPS_LOGICAL_NOT = 82,
 
@@ -2219,6 +2271,8 @@ typedef enum {
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor. The shape is the same as the input after broadcasting,
      *       and the data type is the data type with the highest accuracy of the two inputs.
+     *
+     * @since 12
      */
     OH_NN_OPS_MOD = 83,
 
@@ -2232,6 +2286,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor with the same shape and data type as the input tensor.
+     *
+     * @since 12
      */
     OH_NN_OPS_NEG = 84,
 
@@ -2245,6 +2301,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor with the same shape and data type as the input tensor.
+     *
+     * @since 12
      */
     OH_NN_OPS_RECIPROCAL = 85,
 
@@ -2258,6 +2316,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor the same data type and shape as the input tensor.
+     *
+     * @since 12
      */
     OH_NN_OPS_SIN = 86,
 
@@ -2275,6 +2335,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: <i>n</i>-dimensional tensor with the same shape and data type as the input1 and input2.
+     *
+     * @since 12
      */
     OH_NN_OPS_WHERE = 87,
 
@@ -2292,6 +2354,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: A tensor. The data type is the same as values, and the shape is specified by sparseShape.
+     *
+     * @since 12
      */
     OH_NN_OPS_SPARSE_TO_DENSE = 88,
 
@@ -2307,6 +2371,8 @@ typedef enum {
      *
      * * <b>output</b>: <i>n</i>--dimensional tensor. The calculation result of logical-or
      *       and the numeric type is OH_NN_BOOL.
+     *
+     * @since 12
      */
     OH_NN_OPS_LOGICAL_OR = 89,
     
@@ -2320,6 +2386,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: A tensor after ceiled.
+     *
+     * @since 12
      */
     OH_NN_OPS_CEIL = 90,
     
@@ -2339,6 +2407,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Cropped output tensor.
+     *
+     * @since 12
      */
     OH_NN_OPS_CROP = 91,
     
@@ -2372,6 +2442,8 @@ typedef enum {
      * * <b>classes</b>: The target class index of target detected bboxes.
      * * <b>confidences</b>: The score of target detected bboxes.
      * * <b>numDetections</b>: The number of target detected bboxes.
+     *
+     * @since 12
      */
     OH_NN_OPS_DETECTION_POST_PROCESS = 92,
     
@@ -2385,6 +2457,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: A tensor after floored.
+     *
+     * @since 12
      */
     OH_NN_OPS_FLOOR = 93,
     
@@ -2404,6 +2478,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Result tensor with the same type and shape as input <b>input</b>.
+     *
+     * @since 12
      */
     OH_NN_OPS_L2_NORMALIZE = 94,
     
@@ -2422,6 +2498,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Tensor output. Has the same data type and shape as input.
+     *
+     * @since 12
      */
     OH_NN_OPS_LOG_SOFTMAX = 95,
     
@@ -2443,6 +2521,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Result output tensor.
+     *
+     * @since 12
      */
     OH_NN_OPS_LRN = 96,
     
@@ -2462,6 +2542,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Minimum value of the elements of the two tensors.
+     *
+     * @since 12
      */
     OH_NN_OPS_MINIMUM = 97,
     
@@ -2476,6 +2558,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Result tensor. 0-D int32 Tensor representing the rank of input.
+     *
+     * @since 12
      */
     OH_NN_OPS_RANK = 98,
     
@@ -2501,6 +2585,8 @@ typedef enum {
      *
      * * <b>output</b>: <i>m</i>-dimensional output tensor whose data type is the same as that of the input.
      *       If <b>keepDims</b> is <b>false</b>, m<n. If <b>keepDims</b> is <b>true</b>, m==n.
+     *
+     * @since 12
      */
     OH_NN_OPS_REDUCE_MAX = 99,
 
@@ -2526,6 +2612,8 @@ typedef enum {
      *
      * * <b>output</b>: <i>m</i>-dimensional output tensor whose data type is the same as that of the input.
      *       If <b>keepDims</b> is <b>false</b>, m<n. If <b>keepDims</b> is <b>true</b>, m==n.
+     *
+     * @since 12
      */
     OH_NN_OPS_REDUCE_MIN = 100,
 
@@ -2551,6 +2639,8 @@ typedef enum {
      *
      * * <b>output</b>: <i>m</i>-dimensional output tensor whose data type is the same as that of the input.
      *       If <b>keepDims</b> is <b>false</b>, m<n. If <b>keepDims</b> is <b>true</b>, m==n.
+     *
+     * @since 12
      */
     OH_NN_OPS_REDUCE_SUM = 101,
 
@@ -2564,6 +2654,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Result tensor with the same shape as the input.
+     *
+     * @since 12
      */
     OH_NN_OPS_ROUND = 102,
 
@@ -2580,6 +2672,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Result tensor with the same type as <b>update</b> and the same shape as <b>shape</b>.
+     *
+     * @since 12
      */
     OH_NN_OPS_SCATTER_ND = 103,
 
@@ -2601,6 +2695,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Result tensor with the same dataType as the input.
+     *
+     * @since 12
      */
     OH_NN_OPS_SPACE_TO_DEPTH = 104,
 
@@ -2614,6 +2710,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Output tensor.
+     *
+     * @since 12
      */
     OH_NN_OPS_SWISH = 105,
 
@@ -2638,6 +2736,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Result tensor with the same dataType as the input.
+     *
+     * @since 12
      */
     OH_NN_OPS_REDUCE_L2 = 106,
 
@@ -2651,6 +2751,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Result tensor with the same shape and dataType as the input.
+     *
+     * @since 12
      */
     OH_NN_OPS_HARD_SIGMOID = 107,
 
@@ -2665,6 +2767,8 @@ typedef enum {
      * Outputs:
      *
      * * <b>output</b>: Result tensor with the same shape as the input.
+     *
+     * @since 12
      */
     OH_NN_OPS_GATHER_ND = 108,
 } OH_NN_OperationType;
@@ -2939,273 +3043,443 @@ typedef enum {
      *  of the Unsqueeze operator. */
     OH_NN_UNSQUEEZE_AXIS = 77,
 
-    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the Unstack operator. */
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the Unstack operator.
+     * @since 12
+     */
     OH_NN_UNSTACK_AXIS = 78,
 
-    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the Flatten operator. */
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the Flatten operator.
+     * @since 12
+     */
     OH_NN_FLATTEN_AXIS = 79,
 
     /** This enumerated value is used when the tensor is used as the <b>blockSize</b> parameter
-     *  of the DepthToSpace operator. */
+     *  of the DepthToSpace operator.
+     * @since 12
+     */
     OH_NN_DEPTH_TO_SPACE_BLOCK_SIZE = 80,
     /** This enumerated value is used when the tensor is used as the <b>mode</b> parameter
-     *  of the DepthToSpace operator. */
+     *  of the DepthToSpace operator.
+     * @since 12
+     */
     OH_NN_DEPTH_TO_SPACE_MODE = 81,
 
-    /** This enumerated value is used when the tensor is used as the <b>start</b> parameter of the Range operator. */
+    /** This enumerated value is used when the tensor is used as the <b>start</b> parameter of the Range operator.
+     * @since 12
+     */
     OH_NN_RANGE_START = 82,
-    /** This enumerated value is used when the tensor is used as the <b>limit</b> parameter of the Range operator. */
+    /** This enumerated value is used when the tensor is used as the <b>limit</b> parameter of the Range operator.
+     * @since 12
+     */
     OH_NN_RANGE_LIMIT = 83,
-    /** This enumerated value is used when the tensor is used as the <b>delta</b> parameter of the Range operator. */
+    /** This enumerated value is used when the tensor is used as the <b>delta</b> parameter of the Range operator.
+     * @since 12
+     */
     OH_NN_RANGE_DELTA = 84,
 
     /** This enumerated value is used when the tensor is used as the <b>dataType</b> parameter
-     *  of the ConstantOfShape operator. */
+     *  of the ConstantOfShape operator.
+     * @since 12
+     */
     OH_NN_CONSTANT_OF_SHAPE_DATA_TYPE = 85,
     /** This enumerated value is used when the tensor is used as the <b>value</b> parameter
-     *  of the ConstantOfShape operator. */
+     *  of the ConstantOfShape operator.
+     * @since 12
+     */
     OH_NN_CONSTANT_OF_SHAPE_VALUE = 86,
 
     /** This enumerated value is used when the tensor is used as the <b>shape</b> parameter
-     *  of the BroadcastTo operator. */
+     *  of the BroadcastTo operator.
+     * @since 12
+     */
     OH_NN_BROADCAST_TO_SHAPE = 87,
 
     /** This enumerated value is used when the tensor is used as the <b>epsilon</b> parameter
-     *  of the InstanceNorm operator. */
+     *  of the InstanceNorm operator.
+     * @since 12
+     */
     OH_NN_INSTANCE_NORM_EPSILON = 88,
 
-    /** This enumerated value is used when the tensor is used as the <b>base</b> parameter of the Exp operator. */
+    /** This enumerated value is used when the tensor is used as the <b>base</b> parameter of the Exp operator.
+     * @since 12
+     */
     OH_NN_EXP_BASE = 89,
-    /** This enumerated value is used when the tensor is used as the <b>scale</b> parameter of the Exp operator. */
+    /** This enumerated value is used when the tensor is used as the <b>scale</b> parameter of the Exp operator.
+     * @since 12
+     */
     OH_NN_EXP_SCALE = 90,
-    /** This enumerated value is used when the tensor is used as the <b>shift</b> parameter of the Exp operator. */
+    /** This enumerated value is used when the tensor is used as the <b>shift</b> parameter of the Exp operator.
+     * @since 12
+     */
     OH_NN_EXP_SHIFT = 91,
 
     /** This enumerated value is used when the tensor is used as the <b>negativeSlope</b> parameter
-     *  of the LeakyRelu operator. */
+     *  of the LeakyRelu operator.
+     * @since 12
+     */
     OH_NN_LEAKY_RELU_NEGATIVE_SLOPE = 92,
 
     /** This enumerated value is used when the tensor is used as the <b>bidirectional</b> parameter
-     *  of the LSTM operator. */
+     *  of the LSTM operator.
+     * @since 12
+     */
     OH_NN_LSTM_BIDIRECTIONAL = 93,
-    /** This enumerated value is used when the tensor is used as the <b>hasBias</b> parameter of the LSTM operator. */
+    /** This enumerated value is used when the tensor is used as the <b>hasBias</b> parameter of the LSTM operator.
+     * @since 12
+     */
     OH_NN_LSTM_HAS_BIAS = 94,
     /** This enumerated value is used when the tensor is used as the <b>inputSize</b> parameter
-     *  of the LSTM operator. */
+     *  of the LSTM operator.
+     * @since 12
+     */
     OH_NN_LSTM_INPUT_SIZE = 95,
     /** This enumerated value is used when the tensor is used as the <b>hiddenSize</b> parameter
-     *  of the LSTM operator. */
+     *  of the LSTM operator.
+     * @since 12
+     */
     OH_NN_LSTM_HIDDEN_SIZE = 96,
     /** This enumerated value is used when the tensor is used as the <b>numLayers</b> parameter
-     *  of the LSTM operator. */
+     *  of the LSTM operator.
+     * @since 12
+     */
     OH_NN_LSTM_NUM_LAYERS = 97,
     /** This enumerated value is used when the tensor is used as the <b>numDirections</b> parameter
-     *  of the LSTM operator. */
+     *  of the LSTM operator.
+     * @since 12
+     */
     OH_NN_LSTM_NUM_DIRECTIONS = 98,
-    /** This enumerated value is used when the tensor is used as the <b>dropout</b> parameter of the LSTM operator. */
+    /** This enumerated value is used when the tensor is used as the <b>dropout</b> parameter of the LSTM operator.
+     * @since 12
+     */
     OH_NN_LSTM_DROPOUT = 99,
     /** This enumerated value is used when the tensor is used as the <b>zoneoutCell</b> parameter
-     *  of the LSTM operator. */
+     *  of the LSTM operator.
+     * @since 12
+     */
     OH_NN_LSTM_ZONEOUT_CELL = 100,
     /** This enumerated value is used when the tensor is used as the <b>zoneoutHidden</b> parameter
-     *  of the LSTM operator. */
+     *  of the LSTM operator.
+     * @since 12
+     */
     OH_NN_LSTM_ZONEOUT_HIDDEN = 101,
     /** This enumerated value is used when the tensor is used as the <b>projSize</b> parameter
-     *  of the LSTM operator. */
+     *  of the LSTM operator.
+     * @since 12
+     */
     OH_NN_LSTM_PROJ_SIZE = 102,
 
-    /** This enumerated value is used when the tensor is used as the <b>max</b> parameter of the Clip operator. */
+    /** This enumerated value is used when the tensor is used as the <b>max</b> parameter of the Clip operator.
+     * @since 12
+     */
     OH_NN_CLIP_MAX = 103,
-    /** This enumerated value is used when the tensor is used as the <b>min</b> parameter of the Clip operator. */
+    /** This enumerated value is used when the tensor is used as the <b>min</b> parameter of the Clip operator.
+     * @since 12
+     */
     OH_NN_CLIP_MIN = 104,
 
-    /** This enumerated value is used when the tensor is used as the <b>keepDims</b> parameter of the All operator. */
+    /** This enumerated value is used when the tensor is used as the <b>keepDims</b> parameter of the All operator.
+     * @since 12
+     */
     OH_NN_ALL_KEEP_DIMS = 105,
 
     /** This enumerated value is used when the tensor is used as the <b>summarize</b> parameter
-     *  of the Assert operator. */
+     *  of the Assert operator.
+     * @since 12
+     */
     OH_NN_ASSERT_SUMMARIZE = 106,
 
-    /** This enumerated value is used when the tensor is used as the <b>scale</b> parameter of the pow operator. */
+    /** This enumerated value is used when the tensor is used as the <b>scale</b> parameter of the pow operator.
+     * @since 12
+     */
     OH_NN_POW_SCALE = 107,
-    /** This enumerated value is used when the tensor is used as the <b>shift</b> parameter of the pow operator. */
+    /** This enumerated value is used when the tensor is used as the <b>shift</b> parameter of the pow operator.
+     * @since 12
+     */
     OH_NN_POW_SHIFT = 108,
 
     /** This enumerated value is used when the tensor is used as the <b>roundMode</b> parameter
-     *  of the AvgPool operator. */
+     *  of the AvgPool operator.
+     * @since 12
+     */
     OH_NN_AVG_POOL_ROUND_MODE = 109,
     /** This enumerated value is used when the tensor is used as the <b>global</b> parameter
-     *  of the AvgPool operator. */
+     *  of the AvgPool operator.
+     * @since 12
+     */
     OH_NN_AVG_POOL_GLOBAL = 110,
 
     /** This enumerated value is used when the tensor is used as the <b>hasBias</b> parameter
-     *  of the FullConnection operator. */
+     *  of the FullConnection operator.
+     * @since 12
+     */
     OH_NN_FULL_CONNECTION_HAS_BIAS = 111,
     /** This enumerated value is used when the tensor is used as the <b>useAxis</b> parameter
-     *  of the FullConnection operator. */
+     *  of the FullConnection operator.
+     * @since 12
+     */
     OH_NN_FULL_CONNECTION_USE_AXIS = 112,
 
     /** This enumerated value is used when the tensor is used as the <b>approximate</b> parameter
-     *  of the GeLU operator. */
+     *  of the GeLU operator.
+     * @since 12
+     */
     OH_NN_GELU_APPROXIMATE = 113,
 
     /** This enumerated value is used when the tensor is used as the <b>roundMode</b> parameter
-     *  of the MaxPool operator. */
+     *  of the MaxPool operator.
+     * @since 12
+     */
     OH_NN_MAX_POOL_ROUND_MODE = 114,
     /** This enumerated value is used when the tensor is used as the <b>global</b> parameter
-     *  of the MaxPool operator. */
+     *  of the MaxPool operator.
+     * @since 12
+     */
     OH_NN_MAX_POOL_GLOBAL = 115,
 
     /** This enumerated value is used when the tensor is used as the <b>paddingMode</b> parameter
-     *  of the Pad operator. */
+     *  of the Pad operator.
+     * @since 12
+     */
     OH_NN_PAD_PADDING_MODE = 116,
 
     /** This enumerated value is used when the tensor is used as the <b>reduceToEnd</b> parameter
-     *  of the ReduceMean operator. */
+     *  of the ReduceMean operator.
+     * @since 12
+     */
     OH_NN_REDUCE_MEAN_REDUCE_TO_END = 117,
     /** This enumerated value is used when the tensor is used as the <b>coeff</b> parameter
-     *  of the ReduceMean operator. */
+     *  of the ReduceMean operator.
+     * @since 12
+     */
     OH_NN_REDUCE_MEAN_COEFF = 118,
 
     /** This enumerated value is used when the tensor is used as the <b>reduceToEnd</b> parameter
-     *  of the ReduceProd operator. */
+     *  of the ReduceProd operator.
+     * @since 12
+     */
     OH_NN_REDUCE_PROD_REDUCE_TO_END = 119,
     /** This enumerated value is used when the tensor is used as the <b>coeff</b> parameter
-     *  of the ReduceProd operator. */
+     *  of the ReduceProd operator.
+     * @since 12
+     */
     OH_NN_REDUCE_PROD_COEFF = 120,
 
     /** This enumerated value is used when the tensor is used as the <b>reduceToEnd</b> parameter
-     *  of the ReduceAll operator. */
+     *  of the ReduceAll operator.
+     * @since 12
+     */
     OH_NN_REDUCE_ALL_REDUCE_TO_END = 121,
     /** This enumerated value is used when the tensor is used as the <b>coeff</b> parameter
-     *  of the ReduceAll operator. */
+     *  of the ReduceAll operator.
+     * @since 12
+     */
     OH_NN_REDUCE_ALL_COEFF = 122,
 
     /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter
-     *  of the Topk operator. */
+     *  of the Topk operator.
+     * @since 12
+     */
     OH_NN_TOP_K_AXIS = 123,
 
     /** This enumerated value is used when the tensor is used as the <b>topK</b> parameter
-     *  of the ArgMax operator. */
+     *  of the ArgMax operator.
+     * @since 12
+     */
     OH_NN_ARG_MAX_TOP_K = 124,
     /** This enumerated value is used when the tensor is used as the <b>outMaxValue</b> parameter
-     *  of the ArgMax operator. */
+     *  of the ArgMax operator.
+     * @since 12
+     */
     OH_NN_ARG_MAX_OUT_MAX_VALUE = 125,
 
     /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter
-     *  of the QuantDTypeCast operator. */
+     *  of the QuantDTypeCast operator.
+     * @since 12
+     */
     OH_NN_QUANT_DTYPE_CAST_AXIS = 126,
 
-    /** This enumerated value is used when the tensor is used as the <b>axes</b> parameter of the Slice operator. */
+    /** This enumerated value is used when the tensor is used as the <b>axes</b> parameter of the Slice operator.
+     * @since 12
+     */
     OH_NN_SLICE_AXES = 127,
 
-    /** This enumerated value is used when the tensor is used as the <b>dims</b> parameter of the Tile operator. */
+    /** This enumerated value is used when the tensor is used as the <b>dims</b> parameter of the Tile operator.
+     * @since 12
+     */
     OH_NN_TILE_DIMS = 128,
 
-    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the crop operator. */
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the crop operator.
+     * @since 12
+     */
     OH_NN_CROP_AXIS = 129,
-    /** This enumerated value is used when the tensor is used as the <b>offset</b> parameter of the crop operator. */
+    /** This enumerated value is used when the tensor is used as the <b>offset</b> parameter of the crop operator.
+     * @since 12
+     */
     OH_NN_CROP_OFFSET = 130,
 
     /** This enumerated value is used when the tensor is used as the <b>inputSize</b> parameter
-     *  of the detectionPostProcess operator. */
+     *  of the detectionPostProcess operator.
+     * @since 12
+     */
     OH_NN_DETECTION_POST_PROCESS_INPUT_SIZE = 131,
     /** This enumerated value is used when the tensor is used as the <b>scale</b> parameter
-     *  of the detectionPostProcess operator. */
+     *  of the detectionPostProcess operator.
+     * @since 12
+     */
     OH_NN_DETECTION_POST_PROCESS_SCALE = 132,
     /** This enumerated value is used when the tensor is used as the <b>nmsIoUThreshold</b>
-     *  parameter of the detectionPostProcess operator. */
+     *  parameter of the detectionPostProcess operator.
+     * @since 12
+     */
     OH_NN_DETECTION_POST_PROCESS_NMS_IOU_THRESHOLD = 133,
     /** This enumerated value is used when the tensor is used as the <b>nmsScoreThreshold</b> parameter
-     *  of the detectionPostProcess operator. */
+     *  of the detectionPostProcess operator.
+     * @since 12
+     */
     OH_NN_DETECTION_POST_PROCESS_NMS_SCORE_THRESHOLD = 134,
     /** This enumerated value is used when the tensor is used as the <b>maxDetections</b> parameter
-     *  of the detectionPostProcess operator. */
+     *  of the detectionPostProcess operator.
+     * @since 12
+     */
     OH_NN_DETECTION_POST_PROCESS_MAX_DETECTIONS = 135,
     /** This enumerated value is used when the tensor is used as the <b>detectionsPerClass</b> parameter
-     *  of the detectionPostProcess operator. */
+     *  of the detectionPostProcess operator.
+     * @since 12
+     */
     OH_NN_DETECTION_POST_PROCESS_DETECTIONS_PER_CLASS = 136,
     /** This enumerated value is used when the tensor is used as the <b>maxClassesPerDetection</b> parameter
-     *  of the detectionPostProcess operator. */
+     *  of the detectionPostProcess operator.
+     * @since 12
+     */
     OH_NN_DETECTION_POST_PROCESS_MAX_CLASSES_PER_DETECTION = 137,
     /** This enumerated value is used when the tensor is used as the <b>numClasses</b> parameter
-     *  of the detectionPostProcess operator. */
+     *  of the detectionPostProcess operator.
+     * @since 12
+     */
     OH_NN_DETECTION_POST_PROCESS_NUM_CLASSES = 138,
     /** This enumerated value is used when the tensor is used as the <b>useRegularNms</b> parameter
-     *  of the detectionPostProcess operator. */
+     *  of the detectionPostProcess operator.
+     * @since 12
+     */
     OH_NN_DETECTION_POST_PROCESS_USE_REGULAR_NMS = 139,
     /** This enumerated value is used when the tensor is used as the <b>outQuantized</b> parameter
-     *  of the detectionPostProcess operator. */
+     *  of the detectionPostProcess operator.
+     * @since 12
+     */
     OH_NN_DETECTION_POST_PROCESS_OUT_QUANTIZED = 140,
 
     /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter
-     *  of the L2Normalize operator. */
+     *  of the L2Normalize operator.
+     * @since 12
+     */
     OH_NN_L2_NORMALIZE_AXIS = 141,
     /** This enumerated value is used when the tensor is used as the <b>epsilon</b> parameter
-     *  of the L2Normalize operator. */
+     *  of the L2Normalize operator.
+     * @since 12
+     */
     OH_NN_L2_NORMALIZE_EPSILON = 142,
     /** This enumerated value is used when the tensor is used as the <b>activationType</b> parameter
-     *  of the L2Normalize operator. */
+     *  of the L2Normalize operator.
+     * @since 12
+     */
     OH_NN_L2_NORMALIZE_ACTIVATION_TYPE = 143,
 
-    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the softmax operator. */
+    /** This enumerated value is used when the tensor is used as the <b>axis</b> parameter of the softmax operator.
+     * @since 12
+     */
     OH_NN_LOG_SOFTMAX_AXIS = 144,
 
     /** This enumerated value is used when the tensor is used as the <b>depthRedius</b>
-     *  parameter of the LRN operator. */
+     *  parameter of the LRN operator.
+     * @since 12
+     */
     OH_NN_LRN_DEPTH_RADIUS = 145,
-    /** This enumerated value is used when the tensor is used as the <b>bias</b> parameter of the LRN operator. */
+    /** This enumerated value is used when the tensor is used as the <b>bias</b> parameter of the LRN operator.
+     * @since 12
+     */
     OH_NN_LRN_BIAS = 146,
-    /** This enumerated value is used when the tensor is used as the <b>alpha</b> parameter of the LRN operator. */
+    /** This enumerated value is used when the tensor is used as the <b>alpha</b> parameter of the LRN operator.
+     * @since 12
+     */
     OH_NN_LRN_ALPHA = 147,
-    /** This enumerated value is used when the tensor is used as the <b>beta</b> parameter of the LRN operator. */
+    /** This enumerated value is used when the tensor is used as the <b>beta</b> parameter of the LRN operator.
+     * @since 12
+     */
     OH_NN_LRN_BETA = 148,
     /** This enumerated value is used when the tensor is used as the <b>normRegion</b> parameter
-     *  of the LRN operator. */
+     *  of the LRN operator.
+     * @since 12
+     */
     OH_NN_LRN_NORM_REGION = 149,
 
     /** This enumerated value is used when the tensor is used as the <b>blockSize</b> parameter
-     *  of the spaceToDepth operator. */
+     *  of the spaceToDepth operator.
+     * @since 12
+     */
     OH_NN_SPACE_TO_DEPTH_BLOCK_SIZE = 150,
 
     /** This enumerated value is used when the tensor is used as the <b>keepDims</b> parameter
-     *  of the ReduceMax operator. */
+     *  of the ReduceMax operator.
+     * @since 12
+     */
     OH_NN_REDUCE_MAX_KEEP_DIMS = 151,
     /** This enumerated value is used when the tensor is used as the <b>reduceToEnd</b> parameter
-     *  of the ReduceMax operator. */
+     *  of the ReduceMax operator.
+     * @since 12
+     */
     OH_NN_REDUCE_MAX_REDUCE_TO_END = 152,
     /** This enumerated value is used when the tensor is used as the <b>coeff</b> parameter
-     *  of the ReduceMax operator. */
+     *  of the ReduceMax operator.
+     * @since 12
+     */
     OH_NN_REDUCE_MAX_COEFF = 153,
 
     /** This enumerated value is used when the tensor is used as the <b>keepDims</b> parameter
-     *  of the ReduceMin operator. */
+     *  of the ReduceMin operator.
+     * @since 12
+     */
     OH_NN_REDUCE_MIN_KEEP_DIMS = 154,
     /** This enumerated value is used when the tensor is used as the <b>reduceToEnd</b> parameter
-     *  of the ReduceMin operator. */
+     *  of the ReduceMin operator.
+     * @since 12
+     */
     OH_NN_REDUCE_MIN_REDUCE_TO_END = 155,
     /** This enumerated value is used when the tensor is used as the <b>coeff</b> parameter
-     *  of the ReduceMin operator. */
+     *  of the ReduceMin operator.
+     * @since 12
+     */
     OH_NN_REDUCE_MIN_COEFF = 156,
 
     /** This enumerated value is used when the tensor is used as the <b>keepDims</b> parameter
-     *  of the ReduceSum operator. */
+     *  of the ReduceSum operator.
+     * @since 12
+     */
     OH_NN_REDUCE_SUM_KEEP_DIMS = 157,
     /** This enumerated value is used when the tensor is used as the <b>reduceToEnd</b> parameter
-     *  of the ReduceSum operator. */
+     *  of the ReduceSum operator.
+     * @since 12
+     */
     OH_NN_REDUCE_SUM_REDUCE_TO_END = 158,
     /** This enumerated value is used when the tensor is used as the <b>coeff</b> parameter
-     *  of the ReduceSum operator. */
+     *  of the ReduceSum operator.
+     * @since 12
+     */
     OH_NN_REDUCE_SUM_COEFF = 159,
 
     /** This enumerated value is used when the tensor is used as the <b>keepDims</b> parameter
-     *  of the ReduceL2 operator. */
+     *  of the ReduceL2 operator.
+     * @since 12
+     */
     OH_NN_REDUCE_L2_KEEP_DIMS = 160,
     /** This enumerated value is used when the tensor is used as the <b>reduceToEnd</b> parameter
-     *  of the ReduceL2 operator. */
+     *  of the ReduceL2 operator.
+     * @since 12
+     */
     OH_NN_REDUCE_L2_REDUCE_TO_END = 161,
     /** This enumerated value is used when the tensor is used as the <b>coeff</b> parameter
-     *  of the ReduceL2 operator. */
+     *  of the ReduceL2 operator.
+     * @since 12
+     */
     OH_NN_REDUCE_L2_COEFF = 162,
 } OH_NN_TensorType;
 
