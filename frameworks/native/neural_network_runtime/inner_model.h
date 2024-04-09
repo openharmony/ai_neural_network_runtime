@@ -32,7 +32,9 @@ public:
     InnerModel();
 
     bool IsBuild() const;
-    OH_NN_ReturnCode BuildFromLiteGraph(const mindspore::lite::LiteGraph* liteGraph);
+    OH_NN_ReturnCode BuildFromLiteGraph(const mindspore::lite::LiteGraph* liteGraph, const Buffer& quantBuffer,
+                                        const std::string& modelName, const std::string& isProfiling,
+                                        std::map<std::string, std::string>& opLayouts);
     OH_NN_ReturnCode BuildFromMetaGraph(const void* metaGraph, const Buffer& quantBuffer,
                                         const std::string& modelName, const std::string& isProfiling,
                                         std::map<std::string, std::string>& opLayouts);

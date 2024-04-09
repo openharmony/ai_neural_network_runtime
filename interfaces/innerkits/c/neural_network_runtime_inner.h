@@ -72,7 +72,8 @@ typedef struct OH_NN_Extension {
  * @since 9
  * @version 1.0
  */
-OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const void *liteGraph);
+OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const void *liteGraph,
+    const OH_NN_Extension *extensions, size_t extensionSize);
 
 /**
  * @brief 设置MetaGraph的输入输出信息。

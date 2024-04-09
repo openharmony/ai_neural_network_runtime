@@ -294,7 +294,8 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_Finish(OH_NNModel *model)
     return innerModel->Build();
 }
 
-NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const void *liteGraph)
+NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const void *liteGraph,
+    const OH_NN_Extension *extensions, size_t extensionSize)
 {
     if (model == nullptr) {
         LOGE("OH_NNModel_BuildFromLiteGraph failed, passed nullptr to model.");
@@ -306,13 +307,35 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
         return OH_NN_INVALID_PARAMETER;
     }
 
+    Buffer buffer;
+    std::string modelName;
+    std::string isProfiling;
+    std::string opLayout;
+    std::map<std::string, std::string> opLayouts;
+    for (size_t i = 0; i < extensionSize; ++i) {
+        std::string name = extensions[i].name;
+        if (name == "QuantBuffer") {
+            buffer.data = extensions[i].value;
+            buffer.length = extensions[i].valueSize;
+        } else if (name == "ModelName") {
+            modelName.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
+        } else if (name == "Profiling") {
+            isProfiling.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
+            LOGI("OH_NNModel_BuildFromLiteGraph isProfiling enable.");
+        } else if (name == "opLayout") {
+            opLayout.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
+            opLayouts.insert({opLayout, "hiai::ExecuteDevice::CPU"});
+            LOGI("OH_NNModel_BuildFromLiteGraph opLayout:%{public}s.", opLayout.c_str());
+        }
+    }
+
     auto *pLiteGraph = static_cast<const mindspore::lite::LiteGraph*>(liteGraph);
     InnerModel *innerModel = reinterpret_cast<InnerModel*>(model);
 
     // Once the innerModel built from the liteGraph successfully, the innerModel
     // owns the liteGraph, in which case, the invoker should not delete
     // the liteGraph actively. Otherwise, the invoker still has the ownership.
-    return innerModel->BuildFromLiteGraph(pLiteGraph);
+    return innerModel->BuildFromLiteGraph(pLiteGraph, buffer, modelName, isProfiling, opLayouts);
 }
 
 NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromMetaGraph(OH_NNModel *model, const void *metaGraph,
