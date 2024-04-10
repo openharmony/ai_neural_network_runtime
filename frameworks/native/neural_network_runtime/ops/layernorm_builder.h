@@ -41,7 +41,7 @@ private:
 private:
     int64_t m_beginNormAxis {1};
     float m_epsilon {1e-7};
-    bool m_elementwiseAffine {false};
+    bool m_elementwiseAffine {true};
     int64_t m_beginParamsAxis {1};
 };
 } // namespace Ops
