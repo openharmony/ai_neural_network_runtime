@@ -316,7 +316,7 @@ typedef enum {
  * @brief Defines operator types.
  *
  * @since 9
- * @version 1.0
+ * @version 2.0
  */
 typedef enum {
     /**
@@ -2785,7 +2785,7 @@ typedef enum {
  * in the format OH_NN_{<i>Operator name</i>}_{<i>Attribute name</i>}.
  *
  * @since 9
- * @version 1.0
+ * @version 2.0
  */
 typedef enum {
     /** This enumerated value is used when the tensor is used as the input or output of a model (or operator). */
