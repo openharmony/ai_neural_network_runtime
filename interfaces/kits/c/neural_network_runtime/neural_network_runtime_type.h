@@ -2716,15 +2716,15 @@ typedef enum {
     OH_NN_OPS_SWISH = 105,
 
     /**
-     * Calculates the L2 normalization of the input tensor along the specified axis,
-     * replacing other elements of the dimension with the L2 normalization value of the specified dimension to
+     * Calculates the L2 norm of the input tensor along the specified axis,
+     * replacing other elements of the dimension with the L2 norm value of the specified dimension to
      * remove the dimension, or to reduce the dimension size to 1. Control whether the dimensions of the
      * output and input are the same by specifying the keepDims parameter.
      *
      * Inputs:
      *
      * * <b>input</b>: input tensor.
-     * * <b>axis</b>: Dimensions to perform L2-Normalization calculations.
+     * * <b>axis</b>: Dimensions to perform L2-Norm calculations.
      *
      * Parameters:
      *
