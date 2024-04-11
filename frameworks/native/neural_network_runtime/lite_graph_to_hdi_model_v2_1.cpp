@@ -17,7 +17,6 @@
 #include <vector>
 #include <algorithm>
 #include <sys/mman.h>
-#include <unordered_map>
 #include "common/log.h"
 #include "message_parcel.h"
 #include "nnrt/v2_1/nnrt_types.h"
@@ -30,7 +29,6 @@ typedef void *TensorPtr;
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace NNRt_V2_1 {
-//std::unordered_map<NodeType, std::vector<int8_t>(*)(PrimitivePtr)> convertOpMap = {{NODE_TYPE_ACTIVATION, &ConvertActivation}};
 std::vector<int8_t> ConvertActivation(PrimitivePtr primitive)
 {
     if (primitive == nullptr) {
