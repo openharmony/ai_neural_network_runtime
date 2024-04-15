@@ -39,6 +39,10 @@ private:
 private:
     float m_scale {1.0f};
     float m_shift {0.0f};
+    std::unordered_map<OH_NN_TensorType, OH_NN_ReturnCode(PowBuilder::*)(std::shared_ptr<NNTensor>)> ParamHashMap = {
+        {OH_NN_POW_SCALE, &PowBuilder::SetScale},
+        {OH_NN_POW_SHIFT, &PowBuilder::SetShift}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime
