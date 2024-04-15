@@ -1737,6 +1737,7 @@ std::vector<int8_t> Convert(OHOS::HDI::Nnrt::V2_1::NodeType type, PrimitivePtr p
     if (convertOpMap.find(type) != convertOpMap.end()) {
         return convertOpMap[type](primitive);
     }
+    LOGE("MindIR_LiteGraph_To_Model v2_1 failed, nodeType invalid, type =%d", type);
     return {};
 }
 

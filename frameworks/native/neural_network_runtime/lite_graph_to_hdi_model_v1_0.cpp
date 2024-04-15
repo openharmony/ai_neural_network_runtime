@@ -877,156 +877,63 @@ std::vector<int8_t> ConvertUnsqueeze(PrimitivePtr primitive)
     return ret;
 }
 
+std::unordered_map<NodeType, std::vector<int8_t>(*)(PrimitivePtr)> convertOpMap = {
+    {NODE_TYPE_ACTIVATION, &ConvertActivation},
+    {NODE_TYPE_ADD_FUSION, &ConvertAddFusion},
+    {NODE_TYPE_ARGMAX_FUSION, &ConvertArgMaxFusion},
+    {NODE_TYPE_AVGPOOL_FUSION, &ConvertAvgPoolFusion},
+    {NODE_TYPE_BATCH_TO_SPACE_ND, &ConvertBatchToSpaceND},
+    {NODE_TYPE_BIAS_ADD, &ConvertBiasAdd},
+    {NODE_TYPE_CAST, &ConvertCast},
+    {NODE_TYPE_CONCAT, &ConvertConcat},
+    {NODE_TYPE_CONV2D_FUSION, &ConvertConv2DFusion},
+    {NODE_TYPE_CONV2D_TRANSPOSE_FUSION, &ConvertConv2dTransposeFusion},
+    {NODE_TYPE_DIV_FUSION, &ConvertDivFusion},
+    {NODE_TYPE_ELTWISE, &ConvertEltwise},
+    {NODE_TYPE_EXPAND_DIMS, &ConvertExpandDims},
+    {NODE_TYPE_FILL, &ConvertFill},
+    {NODE_TYPE_FULL_CONNECTION, &ConvertFullConnection},
+    {NODE_TYPE_FUSED_BATCH_NORM, &ConvertFusedBatchNorm},
+    {NODE_TYPE_GATHER, &ConvertGather},
+    {NODE_TYPE_LAYER_NORM_FUSION, &ConvertLayerNormFusion},
+    {NODE_TYPE_LESS_EQUAL, &ConvertLessEqual},
+    {NODE_TYPE_MATMUL_FUSION, &ConvertMatMulFusion},
+    {NODE_TYPE_MAXIMUM, &ConvertMaximum},
+    {NODE_TYPE_MAX_POOL_FUSION, &ConvertMaxPoolFusion},
+    {NODE_TYPE_MUL_FUSION, &ConvertMulFusion},
+    {NODE_TYPE_ONE_HOT, &ConvertOneHot},
+    {NODE_TYPE_PAD_FUSION, &ConvertPadFusion},
+    {NODE_TYPE_POW_FUSION, &ConvertPowFusion},
+    {NODE_TYPE_PRELU_FUSION, &ConvertPReLUFusion},
+    {NODE_TYPE_QUANT_DTYPE_CAST, &ConvertQuantDTypeCast},
+    {NODE_TYPE_REDUCE_FUSION, &ConvertReduceFusion},
+    {NODE_TYPE_RESHAPE, &ConvertReshape},
+    {NODE_TYPE_RESIZE, &ConvertResize},
+    {NODE_TYPE_RSQRT, &ConvertRsqrt},
+    {NODE_TYPE_SCALE_FUSION, &ConvertScaleFusion},
+    {NODE_TYPE_SHAPE, &ConvertShape},
+    {NODE_TYPE_SLICE_FUSION, &ConvertSliceFusion},
+    {NODE_TYPE_SOFTMAX, &ConvertSoftmax},
+    {NODE_TYPE_SPACE_TO_BATCH_ND, &ConvertSpaceToBatchND},
+    {NODE_TYPE_SPLIT, &ConvertSplit},
+    {NODE_TYPE_SQRT, &ConvertSqrt},
+    {NODE_TYPE_SQUARED_DIFFERENCE, &ConvertSquaredDifference},
+    {NODE_TYPE_SQUEEZE, &ConvertSqueeze},
+    {NODE_TYPE_STACK, &ConvertStack},
+    {NODE_TYPE_STRIDED_SLICE, &ConvertStridedSlice},
+    {NODE_TYPE_SUB_FUSION, &ConvertSubFusion},
+    {NODE_TYPE_TILE_FUSION, &ConvertTileFusion},
+    {NODE_TYPE_TOPK_FUSION, &ConvertTopKFusion},
+    {NODE_TYPE_TRANSPOSE, &ConvertTranspose},
+    {NODE_TYPE_UNSQUEEZE, &ConvertUnsqueeze}};
+
 std::vector<int8_t> Convert(NodeType type, PrimitivePtr primitive)
 {
-    switch (type) {
-        case NODE_TYPE_ACTIVATION:
-            return ConvertActivation(primitive);
-            break;
-        case NODE_TYPE_ADD_FUSION:
-            return ConvertAddFusion(primitive);
-            break;
-        case NODE_TYPE_ARGMAX_FUSION:
-            return ConvertArgMaxFusion(primitive);
-            break;
-        case NODE_TYPE_AVGPOOL_FUSION:
-            return ConvertAvgPoolFusion(primitive);
-            break;
-        case NODE_TYPE_BATCH_TO_SPACE_ND:
-            return ConvertBatchToSpaceND(primitive);
-            break;
-        case NODE_TYPE_BIAS_ADD:
-            return ConvertBiasAdd(primitive);
-            break;
-        case NODE_TYPE_CAST:
-            return ConvertCast(primitive);
-            break;
-        case NODE_TYPE_CONCAT:
-            return ConvertConcat(primitive);
-            break;
-        case NODE_TYPE_CONV2D_FUSION:
-            return ConvertConv2DFusion(primitive);
-            break;
-        case NODE_TYPE_CONV2D_TRANSPOSE_FUSION:
-            return ConvertConv2dTransposeFusion(primitive);
-            break;
-        case NODE_TYPE_DIV_FUSION:
-            return ConvertDivFusion(primitive);
-            break;
-        case NODE_TYPE_ELTWISE:
-            return ConvertEltwise(primitive);
-            break;
-        case NODE_TYPE_EXPAND_DIMS:
-            return ConvertExpandDims(primitive);
-            break;
-        case NODE_TYPE_FILL:
-            return ConvertFill(primitive);
-            break;
-        case NODE_TYPE_FULL_CONNECTION:
-            return ConvertFullConnection(primitive);
-            break;
-        case NODE_TYPE_FUSED_BATCH_NORM:
-            return ConvertFusedBatchNorm(primitive);
-            break;
-        case NODE_TYPE_GATHER:
-            return ConvertGather(primitive);
-            break;
-        case NODE_TYPE_LAYER_NORM_FUSION:
-            return ConvertLayerNormFusion(primitive);
-            break;
-        case NODE_TYPE_LESS_EQUAL:
-            return ConvertLessEqual(primitive);
-            break;
-        case NODE_TYPE_MATMUL_FUSION:
-            return ConvertMatMulFusion(primitive);
-            break;
-        case NODE_TYPE_MAXIMUM:
-            return ConvertMaximum(primitive);
-            break;
-        case NODE_TYPE_MAX_POOL_FUSION:
-            return ConvertMaxPoolFusion(primitive);
-            break;
-        case NODE_TYPE_MUL_FUSION:
-            return ConvertMulFusion(primitive);
-            break;
-        case NODE_TYPE_ONE_HOT:
-            return ConvertOneHot(primitive);
-            break;
-        case NODE_TYPE_PAD_FUSION:
-            return ConvertPadFusion(primitive);
-            break;
-        case NODE_TYPE_POW_FUSION:
-            return ConvertPowFusion(primitive);
-            break;
-        case NODE_TYPE_PRELU_FUSION:
-            return ConvertPReLUFusion(primitive);
-            break;
-        case NODE_TYPE_QUANT_DTYPE_CAST:
-            return ConvertQuantDTypeCast(primitive);
-            break;
-        case NODE_TYPE_REDUCE_FUSION:
-            return ConvertReduceFusion(primitive);
-            break;
-        case NODE_TYPE_RESHAPE:
-            return ConvertReshape(primitive);
-            break;
-        case NODE_TYPE_RESIZE:
-            return ConvertResize(primitive);
-            break;
-        case NODE_TYPE_RSQRT:
-            return ConvertRsqrt(primitive);
-            break;
-        case NODE_TYPE_SCALE_FUSION:
-            return ConvertScaleFusion(primitive);
-            break;
-        case NODE_TYPE_SHAPE:
-            return ConvertShape(primitive);
-            break;
-        case NODE_TYPE_SLICE_FUSION:
-            return ConvertSliceFusion(primitive);
-            break;
-        case NODE_TYPE_SOFTMAX:
-            return ConvertSoftmax(primitive);
-            break;
-        case NODE_TYPE_SPACE_TO_BATCH_ND:
-            return ConvertSpaceToBatchND(primitive);
-            break;
-        case NODE_TYPE_SPLIT:
-            return ConvertSplit(primitive);
-            break;
-        case NODE_TYPE_SQRT:
-            return ConvertSqrt(primitive);
-            break;
-        case NODE_TYPE_SQUARED_DIFFERENCE:
-            return ConvertSquaredDifference(primitive);
-            break;
-        case NODE_TYPE_SQUEEZE:
-            return ConvertSqueeze(primitive);
-            break;
-        case NODE_TYPE_STACK:
-            return ConvertStack(primitive);
-            break;
-        case NODE_TYPE_STRIDED_SLICE:
-            return ConvertStridedSlice(primitive);
-            break;
-        case NODE_TYPE_SUB_FUSION:
-            return ConvertSubFusion(primitive);
-            break;
-        case NODE_TYPE_TILE_FUSION:
-            return ConvertTileFusion(primitive);
-            break;
-        case NODE_TYPE_TOPK_FUSION:
-            return ConvertTopKFusion(primitive);
-            break;
-        case NODE_TYPE_TRANSPOSE:
-            return ConvertTranspose(primitive);
-            break;
-        case NODE_TYPE_UNSQUEEZE:
-            return ConvertUnsqueeze(primitive);
-            break;
-        default:
-            return {};
+    if (convertOpMap.find(type) != convertOpMap.end()) {
+        return convertOpMap[type](primitive);
     }
+    LOGE("MindIR_LiteGraph_To_Model v1_0 failed, nodeType invalid, type =%d", type);
+    return {};
 }
 
 inline std::vector<OHOS::HDI::Nnrt::V1_0::QuantParam> MindIR_Tensor_GetQuantParams_OHOS(TensorPtr tensor)
