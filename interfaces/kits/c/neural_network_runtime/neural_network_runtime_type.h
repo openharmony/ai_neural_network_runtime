@@ -401,8 +401,8 @@ typedef enum {
     OH_NN_OPS_AVG_POOL = 2,
 
     /**
-     * Batch normalization is performed on a tensor to scale and shift tensor elements,
-     * relieving potential covariate shift in a batch of data.
+     * Performs batch normalization on the input tensors. Apply a transformation to keep the average output
+     * close to 0 and the output standard deviation close to 1.
      *
      * Inputs:
      *
@@ -1615,17 +1615,22 @@ typedef enum {
      *
      * Inputs:
      *
-     * * <b>input</b>: <i>n</i>-dimensional tensor.
+     * * <b>input</b>: <i>n</i>-dimensional tensor. If it is a conversion between a quantized type and
+     *       a floating-point type, the input tensor should contain quantized parameters.
      *
      * Parameters:
      *
      * * <b>src_t</b>: data type of the input.
      * * <b>dst_t</b>: data type of the output.
-     * * <b>axis</b>: dimensional of the input to convert.
+     * * <b>axis</b>: appoint the dimensions from which the quantization parameters are extracted.
+     *       If the size of the input tensor quantization parameter is 1, the operator function is
+     *       layer quantization conversion, and this parameter does not take effect. If the size of
+     *       the input tensor quantization parameter is greater than 1, the operator function is the
+     *       quantization conversion along the specific channels, and this parameter takes effect.
      *
      * Outputs:
      *
-     * * <b>output</b>: <i>n</i>-dimensional tensor. The data type is determined by <b>input2</b>.
+     * * <b>output</b>: <i>n</i>-dimensional tensor. The data type is determined by <b>dstT</b>.
      *       The output shape is the same as the input shape.
      */
     OH_NN_OPS_QUANT_DTYPE_CAST = 52,
