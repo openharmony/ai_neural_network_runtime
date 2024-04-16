@@ -83,7 +83,7 @@ void Conv2DBuilder::SetKernelSize(const std::vector<uint32_t>& inputsIndex,
     m_kernelSize.emplace_back(weightShape[KERNEL_WEIGHT_INDEX]);
 }
 
-OH_NN_ReturnCode Conv2DBuilder::SetStrides(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DBuilder::SetStrides(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set Strides
@@ -104,7 +104,7 @@ OH_NN_ReturnCode Conv2DBuilder::SetStrides(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DBuilder::SetDilation(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DBuilder::SetDilation(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set Dilation
@@ -125,7 +125,7 @@ OH_NN_ReturnCode Conv2DBuilder::SetDilation(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DBuilder::SetPad(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DBuilder::SetPad(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -170,7 +170,7 @@ OH_NN_ReturnCode Conv2DBuilder::SetPad(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DBuilder::SetGroup(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DBuilder::SetGroup(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set Group
@@ -194,7 +194,7 @@ OH_NN_ReturnCode Conv2DBuilder::SetGroup(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DBuilder::SetActavitation(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DBuilder::SetActavitation(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 

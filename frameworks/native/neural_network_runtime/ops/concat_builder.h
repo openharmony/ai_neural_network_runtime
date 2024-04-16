@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ConcatBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(ConcatBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (ConcatBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     ConcatBuilder();
     ~ConcatBuilder() override;
@@ -38,7 +38,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
     OH_NN_ReturnCode SetInputsAndOutputs(const std::vector<uint32_t>& inputsIndex,
                                          const std::vector<uint32_t>& outputsIndex,
                                          const std::vector<std::shared_ptr<NNTensor>>& allTensors);

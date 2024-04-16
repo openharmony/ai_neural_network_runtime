@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class LSTMBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(LSTMBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (LSTMBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     LSTMBuilder();
     ~LSTMBuilder() override;
@@ -37,16 +37,16 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetBidirectional(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetHasBias(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetInputSize(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetHiddenSize(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetNumLayers(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetNumDirections(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetDropout(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetZoneoutCell(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetZoneoutHidden(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetProjSize(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetBidirectional(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetHasBias(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetInputSize(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetHiddenSize(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetNumLayers(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetNumDirections(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetDropout(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetZoneoutCell(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetZoneoutHidden(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetProjSize(const std::shared_ptr<NNTensor>& tensor);
     OH_NN_ReturnCode ParseParam(const std::vector<uint32_t>& paramsIndex,
                                 const std::vector<std::shared_ptr<NNTensor>>& allTensors);
 

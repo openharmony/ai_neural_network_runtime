@@ -28,7 +28,7 @@ AllBuilder::AllBuilder() {}
 
 AllBuilder::~AllBuilder() {}
 
-OH_NN_ReturnCode AllBuilder::SetKeepDims(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode AllBuilder::SetKeepDims(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[All] The keep_dims should be type OH_NN_INT64.");

@@ -28,7 +28,7 @@ ConcatBuilder::ConcatBuilder() {}
 
 ConcatBuilder::~ConcatBuilder() {}
 
-OH_NN_ReturnCode ConcatBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ConcatBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 

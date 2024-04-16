@@ -24,7 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class TopKBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(TopKBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (TopKBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     TopKBuilder();
     ~TopKBuilder() override;
@@ -35,8 +35,8 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetSorted(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetSorted(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_axis {0};

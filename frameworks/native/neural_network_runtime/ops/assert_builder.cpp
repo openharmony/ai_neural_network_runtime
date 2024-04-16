@@ -28,7 +28,7 @@ AssertBuilder::AssertBuilder() {}
 
 AssertBuilder::~AssertBuilder() {}
 
-OH_NN_ReturnCode AssertBuilder::SetSummarize(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode AssertBuilder::SetSummarize(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Assert] The summarize should be type OH_NN_INT64.");

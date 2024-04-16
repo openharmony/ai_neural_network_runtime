@@ -24,7 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class UnsqueezeBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(UnsqueezeBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (UnsqueezeBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     UnsqueezeBuilder();
     ~UnsqueezeBuilder() override;
@@ -36,7 +36,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     std::vector<int64_t> m_axis;

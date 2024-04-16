@@ -29,7 +29,7 @@ TileBuilder::TileBuilder() {}
 
 TileBuilder::~TileBuilder() {}
 
-OH_NN_ReturnCode TileBuilder::SetDims(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode TileBuilder::SetDims(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[TileBuilder] The dims should be type OH_NN_INT64.");

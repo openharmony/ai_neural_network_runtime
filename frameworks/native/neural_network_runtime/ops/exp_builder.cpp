@@ -28,7 +28,7 @@ ExpBuilder::ExpBuilder() {}
 
 ExpBuilder::~ExpBuilder() {}
 
-OH_NN_ReturnCode ExpBuilder::SetBase(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ExpBuilder::SetBase(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Exp] The base should be type OH_NN_FLOAT32.");
@@ -50,7 +50,7 @@ OH_NN_ReturnCode ExpBuilder::SetBase(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ExpBuilder::SetScale(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ExpBuilder::SetScale(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Exp] The scale should be type OH_NN_FLOAT32.");
@@ -72,7 +72,7 @@ OH_NN_ReturnCode ExpBuilder::SetScale(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ExpBuilder::SetShift(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ExpBuilder::SetShift(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Exp] The shift should be type OH_NN_FLOAT32.");

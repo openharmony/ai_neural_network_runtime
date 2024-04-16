@@ -61,7 +61,7 @@ OH_NN_ReturnCode SplitBuilder::SetInputAndOutput(const std::vector<uint32_t> &in
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode SplitBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SplitBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SplitBuilder] The 4th input axis should be type OH_NN_INT64.");
@@ -83,7 +83,7 @@ OH_NN_ReturnCode SplitBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode SplitBuilder::SetOutputNum(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SplitBuilder::SetOutputNum(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SplitBuilder] The 2nd input outputNum should be type OH_NN_INT64.");
@@ -100,7 +100,7 @@ OH_NN_ReturnCode SplitBuilder::SetOutputNum(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode SplitBuilder::SetSizeSplits(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SplitBuilder::SetSizeSplits(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SplitBuilder] The 3rd input sizeSplit should be type OH_NN_INT64.");

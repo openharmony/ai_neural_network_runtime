@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class SubBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(SubBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (SubBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     SubBuilder();
     ~SubBuilder() override;
@@ -38,7 +38,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetActivationType(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetActivationType(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     mindspore::lite::ActivationType  m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};

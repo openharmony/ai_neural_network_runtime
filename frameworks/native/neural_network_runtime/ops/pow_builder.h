@@ -23,7 +23,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class PowBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(PowBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (PowBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     PowBuilder();
     ~PowBuilder() override;
@@ -35,8 +35,8 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetScale(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetShift(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetScale(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetShift(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     float m_scale {1.0f};

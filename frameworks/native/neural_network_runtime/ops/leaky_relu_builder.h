@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class LeakyReluBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(LeakyReluBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (LeakyReluBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     LeakyReluBuilder();
     ~LeakyReluBuilder() override;
@@ -38,7 +38,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetNegativeSlope(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetNegativeSlope(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     float m_negativeSlope {0.0f};

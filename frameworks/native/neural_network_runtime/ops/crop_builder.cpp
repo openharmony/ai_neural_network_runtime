@@ -31,7 +31,7 @@ CropBuilder::CropBuilder() {}
 
 CropBuilder::~CropBuilder() {}
 
-OH_NN_ReturnCode CropBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode CropBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Crop] The axis should be type OH_NN_INT64.");
@@ -53,7 +53,7 @@ OH_NN_ReturnCode CropBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode CropBuilder::SetOffset(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode CropBuilder::SetOffset(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Crop] The offset should be type OH_NN_INT64.");

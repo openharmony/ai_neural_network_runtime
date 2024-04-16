@@ -29,7 +29,7 @@ SubBuilder::SubBuilder() {}
 
 SubBuilder::~SubBuilder() {}
 
-OH_NN_ReturnCode SubBuilder::SetActivationType(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SubBuilder::SetActivationType(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT8) {
         LOGE("[SubBuilder] The 3rd input activation should be type OH_NN_INT8.");

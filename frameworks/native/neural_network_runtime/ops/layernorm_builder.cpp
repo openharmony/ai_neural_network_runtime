@@ -33,7 +33,7 @@ LayerNormBuilder::LayerNormBuilder() {}
 
 LayerNormBuilder::~LayerNormBuilder() {}
 
-OH_NN_ReturnCode LayerNormBuilder::SetBeginNormAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LayerNormBuilder::SetBeginNormAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT64) {
@@ -56,7 +56,7 @@ OH_NN_ReturnCode LayerNormBuilder::SetBeginNormAxis(std::shared_ptr<NNTensor> te
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LayerNormBuilder::SetEpsilon(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LayerNormBuilder::SetEpsilon(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
@@ -79,7 +79,7 @@ OH_NN_ReturnCode LayerNormBuilder::SetEpsilon(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LayerNormBuilder::SetBeginParamsAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LayerNormBuilder::SetBeginParamsAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT64) {

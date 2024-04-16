@@ -29,7 +29,7 @@ UnsqueezeBuilder::UnsqueezeBuilder() {}
 
 UnsqueezeBuilder::~UnsqueezeBuilder() {}
 
-OH_NN_ReturnCode UnsqueezeBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode UnsqueezeBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     // Set Axis
     if (tensor->GetDataType() != OH_NN_INT64) {

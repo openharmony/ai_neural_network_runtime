@@ -32,7 +32,7 @@ L2NormalizeBuilder::L2NormalizeBuilder() {}
 
 L2NormalizeBuilder::~L2NormalizeBuilder() {}
 
-OH_NN_ReturnCode L2NormalizeBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode L2NormalizeBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[L2Normalize] The axis should be type OH_NN_INT64.");
@@ -58,7 +58,7 @@ OH_NN_ReturnCode L2NormalizeBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode L2NormalizeBuilder::SetEpsilon(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode L2NormalizeBuilder::SetEpsilon(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[L2Normalize] The epsilon should be type OH_NN_FLOAT32.");
@@ -80,7 +80,7 @@ OH_NN_ReturnCode L2NormalizeBuilder::SetEpsilon(std::shared_ptr<NNTensor> tensor
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode L2NormalizeBuilder::SetActivationType(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode L2NormalizeBuilder::SetActivationType(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT8) {
         LOGE("[L2Normalize] SetActivationType failed, the activationType should have type OH_NN_INT8.");

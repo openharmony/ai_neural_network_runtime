@@ -24,7 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class TileBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(TileBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (TileBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     TileBuilder();
     ~TileBuilder() override;
@@ -36,7 +36,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetDims(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetDims(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     std::vector<int64_t> m_dims {0};

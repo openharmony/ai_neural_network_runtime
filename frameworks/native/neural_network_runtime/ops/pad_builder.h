@@ -24,7 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class PadBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(PadBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (PadBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     PadBuilder();
     ~PadBuilder() override;
@@ -35,8 +35,8 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetConstantValue(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetPaddingMode(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetConstantValue(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetPaddingMode(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     float m_constantValue {0.0f};

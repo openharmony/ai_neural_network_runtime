@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ExpBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(ExpBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (ExpBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     ExpBuilder();
     ~ExpBuilder() override;
@@ -38,9 +38,9 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetBase(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetScale(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetShift(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetBase(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetScale(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetShift(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     float m_base {-1.0f};

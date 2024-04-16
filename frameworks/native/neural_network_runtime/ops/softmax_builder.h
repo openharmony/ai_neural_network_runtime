@@ -24,7 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class SoftmaxBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(SoftmaxBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (SoftmaxBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     SoftmaxBuilder();
     ~SoftmaxBuilder() override;
@@ -36,7 +36,7 @@ public:
     LiteGraphTensorPtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     std::vector<int64_t> m_axis;

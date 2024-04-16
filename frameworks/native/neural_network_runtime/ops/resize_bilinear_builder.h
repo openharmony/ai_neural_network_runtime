@@ -25,7 +25,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ResizeBilinearBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(ResizeBilinearBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (ResizeBilinearBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     ResizeBilinearBuilder();
     ~ResizeBilinearBuilder() override;
@@ -37,11 +37,11 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetNewHeight(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetNewWidth(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetPreserveAspectRatio(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetCoordinateTransformMode(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetExcludeOutside(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetNewHeight(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetNewWidth(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetPreserveAspectRatio(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetCoordinateTransformMode(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetExcludeOutside(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     mindspore::lite::ResizeMethod m_method {mindspore::lite::RESIZE_METHOD_LINEAR};

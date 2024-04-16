@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class EltwiseBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(EltwiseBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (EltwiseBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     EltwiseBuilder();
     ~EltwiseBuilder() override;
@@ -38,7 +38,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetMode(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetMode(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     mindspore::lite::EltwiseMode m_mode {mindspore::lite::ELTWISE_MODE_PROD};

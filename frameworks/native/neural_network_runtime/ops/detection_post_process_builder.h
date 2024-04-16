@@ -24,7 +24,7 @@ namespace Ops {
 class DetectionPostProcessBuilder : public OpsBuilder {
 public:
     typedef DetectionPostProcessBuilder DPPBuilder;
-    typedef OH_NN_ReturnCode(DPPBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (DPPBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     DetectionPostProcessBuilder();
     ~DetectionPostProcessBuilder() override;
@@ -36,16 +36,16 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetInputSize(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetScale(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetNmsIoUThreshold(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetNmsScoreThreshold(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetMaxDetections(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetDetectionsPerClass(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetMaxClassesPerDetection(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetNumClasses(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetUseRegularNms(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetOutQuantized(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetInputSize(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetScale(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetNmsIoUThreshold(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetNmsScoreThreshold(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetMaxDetections(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetDetectionsPerClass(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetMaxClassesPerDetection(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetNumClasses(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetUseRegularNms(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetOutQuantized(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_inputSize {0};

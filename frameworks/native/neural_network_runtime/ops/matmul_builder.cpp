@@ -32,7 +32,7 @@ MatmulBuilder::MatmulBuilder() {}
 
 MatmulBuilder::~MatmulBuilder() {}
 
-OH_NN_ReturnCode MatmulBuilder::SetTransposeA(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode MatmulBuilder::SetTransposeA(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -55,7 +55,7 @@ OH_NN_ReturnCode MatmulBuilder::SetTransposeA(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode MatmulBuilder::SetTransposeB(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode MatmulBuilder::SetTransposeB(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -78,7 +78,7 @@ OH_NN_ReturnCode MatmulBuilder::SetTransposeB(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode MatmulBuilder::SetActivationType(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode MatmulBuilder::SetActivationType(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {

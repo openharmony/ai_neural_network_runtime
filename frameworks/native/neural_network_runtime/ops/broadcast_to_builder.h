@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class BroadcastToBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(BroadcastToBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (BroadcastToBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     BroadcastToBuilder();
     ~BroadcastToBuilder() override;
@@ -38,7 +38,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetShape(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetShape(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     std::vector<int64_t> m_shape;

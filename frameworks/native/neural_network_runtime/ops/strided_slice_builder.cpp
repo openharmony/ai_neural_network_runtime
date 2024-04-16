@@ -47,7 +47,7 @@ OH_NN_ReturnCode StridedSliceBuilder::SetInputOutput(const std::vector<uint32_t>
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode StridedSliceBuilder::SetBeginMask(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode StridedSliceBuilder::SetBeginMask(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[StridedSliceBuilder] The 5th input beginMask should be type HNN_INT64.");
@@ -64,7 +64,7 @@ OH_NN_ReturnCode StridedSliceBuilder::SetBeginMask(std::shared_ptr<NNTensor> ten
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode StridedSliceBuilder::SetEndMask(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode StridedSliceBuilder::SetEndMask(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[StridedSliceBuilder] The 6th input endMask should be type HNN_INT64.");
@@ -81,7 +81,7 @@ OH_NN_ReturnCode StridedSliceBuilder::SetEndMask(std::shared_ptr<NNTensor> tenso
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode StridedSliceBuilder::SetEllipsisMask(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode StridedSliceBuilder::SetEllipsisMask(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[StridedSliceBuilder] The 7th input ellipsisMask should be type HNN_INT64.");
@@ -98,7 +98,7 @@ OH_NN_ReturnCode StridedSliceBuilder::SetEllipsisMask(std::shared_ptr<NNTensor> 
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode StridedSliceBuilder::SetNewAxisMask(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode StridedSliceBuilder::SetNewAxisMask(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[StridedSliceBuilder] The 8th input newAxisMask should be type HNN_INT64.");
@@ -115,7 +115,7 @@ OH_NN_ReturnCode StridedSliceBuilder::SetNewAxisMask(std::shared_ptr<NNTensor> t
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode StridedSliceBuilder::SetShrinkAxisMask(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode StridedSliceBuilder::SetShrinkAxisMask(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[StridedSliceBuilder] The 9th input shrinkAxisMAsk should be type HNN_INT64.");

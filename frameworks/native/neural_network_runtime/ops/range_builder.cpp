@@ -28,7 +28,7 @@ RangeBuilder::RangeBuilder() {}
 
 RangeBuilder::~RangeBuilder() {}
 
-OH_NN_ReturnCode RangeBuilder::SetStart(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode RangeBuilder::SetStart(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Range] The start should be type OH_NN_INT64.");
@@ -50,7 +50,7 @@ OH_NN_ReturnCode RangeBuilder::SetStart(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode RangeBuilder::SetLimit(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode RangeBuilder::SetLimit(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Range] The limit should be type OH_NN_INT64.");
@@ -72,7 +72,7 @@ OH_NN_ReturnCode RangeBuilder::SetLimit(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode RangeBuilder::SetDelta(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode RangeBuilder::SetDelta(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Range] The delta should be type OH_NN_INT64.");

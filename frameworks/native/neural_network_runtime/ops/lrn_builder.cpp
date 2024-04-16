@@ -32,7 +32,7 @@ LRNBuilder::LRNBuilder() {}
 
 LRNBuilder::~LRNBuilder() {}
 
-OH_NN_ReturnCode LRNBuilder::SetDepthRadius(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LRNBuilder::SetDepthRadius(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[LRN] The depthRadius should be type OH_NN_INT64.");
@@ -54,7 +54,7 @@ OH_NN_ReturnCode LRNBuilder::SetDepthRadius(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LRNBuilder::SetBias(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LRNBuilder::SetBias(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[LRN] The bias should be type OH_NN_FLOAT32.");
@@ -76,7 +76,7 @@ OH_NN_ReturnCode LRNBuilder::SetBias(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LRNBuilder::SetAlpha(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LRNBuilder::SetAlpha(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[LRN] The alpha should be type OH_NN_FLOAT32.");
@@ -98,7 +98,7 @@ OH_NN_ReturnCode LRNBuilder::SetAlpha(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LRNBuilder::SetBeta(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LRNBuilder::SetBeta(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[LRN] The beta should be type OH_NN_FLOAT32.");
@@ -120,7 +120,7 @@ OH_NN_ReturnCode LRNBuilder::SetBeta(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LRNBuilder::SetNormRegion(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LRNBuilder::SetNormRegion(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT32) {
         LOGE("[LRN] The normRegion should be type OH_NN_INT32.");

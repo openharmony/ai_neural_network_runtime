@@ -23,7 +23,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class QuantDTypeCastBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(QuantDTypeCastBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (QuantDTypeCastBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     QuantDTypeCastBuilder();
     ~QuantDTypeCastBuilder() override;
@@ -35,9 +35,9 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetSrcT(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetDstT(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetSrcT(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetDstT(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     const uint64_t* m_src_t{nullptr};

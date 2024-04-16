@@ -28,7 +28,7 @@ ClipBuilder::ClipBuilder() {}
 
 ClipBuilder::~ClipBuilder() {}
 
-OH_NN_ReturnCode ClipBuilder::SetMax(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ClipBuilder::SetMax(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Clip] The max should be type OH_NN_FLOAT32.");
@@ -50,7 +50,7 @@ OH_NN_ReturnCode ClipBuilder::SetMax(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ClipBuilder::SetMin(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ClipBuilder::SetMin(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Clip] The min should be type OH_NN_FLOAT32.");

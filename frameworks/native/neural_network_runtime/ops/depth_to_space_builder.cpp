@@ -32,7 +32,7 @@ DepthToSpaceBuilder::DepthToSpaceBuilder() {}
 
 DepthToSpaceBuilder::~DepthToSpaceBuilder() {}
 
-OH_NN_ReturnCode DepthToSpaceBuilder::SetBlockSize(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DepthToSpaceBuilder::SetBlockSize(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[DepthToSpace] The blockSize should be type OH_NN_INT64.");
@@ -54,7 +54,7 @@ OH_NN_ReturnCode DepthToSpaceBuilder::SetBlockSize(std::shared_ptr<NNTensor> ten
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DepthToSpaceBuilder::SetMode(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DepthToSpaceBuilder::SetMode(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT32) {
         LOGE("[DepthToSpace] The mode should be type OH_NN_INT32.");

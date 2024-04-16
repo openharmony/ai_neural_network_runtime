@@ -20,12 +20,13 @@
 
 #include "ops_builder.h"
 #include "ops_registry.h"
+
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 namespace Ops {
 class AddBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(AddBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (AddBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     AddBuilder();
     ~AddBuilder() override;
@@ -37,7 +38,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetActivation(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetActivation(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};

@@ -33,7 +33,7 @@ SpaceToDepthBuilder::SpaceToDepthBuilder() {}
 
 SpaceToDepthBuilder::~SpaceToDepthBuilder() {}
 
-OH_NN_ReturnCode SpaceToDepthBuilder::SetBlockSize(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SpaceToDepthBuilder::SetBlockSize(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SpaceToDepth] The blockSize should be type OH_NN_INT64.");

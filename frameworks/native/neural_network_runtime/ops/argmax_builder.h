@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ArgMaxBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(ArgMaxBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (ArgMaxBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     ArgMaxBuilder();
     ~ArgMaxBuilder() override;
@@ -37,10 +37,10 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetKeepdims(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetTopK(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetOutMaxValue(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetKeepdims(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetTopK(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetOutMaxValue(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_axis {-1};

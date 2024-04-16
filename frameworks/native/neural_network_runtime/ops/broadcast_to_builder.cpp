@@ -27,7 +27,7 @@ BroadcastToBuilder::BroadcastToBuilder() {}
 
 BroadcastToBuilder::~BroadcastToBuilder() {}
 
-OH_NN_ReturnCode BroadcastToBuilder::SetShape(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode BroadcastToBuilder::SetShape(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[BroadcastTo] The shape should be type OH_NN_INT64.");

@@ -92,7 +92,7 @@ OH_NN_ReturnCode PoolingBuilder::SetInputAndOutput(const std::vector<uint32_t>& 
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode PoolingBuilder::SetKernel(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PoolingBuilder::SetKernel(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set kernelSize
@@ -114,7 +114,7 @@ OH_NN_ReturnCode PoolingBuilder::SetKernel(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode PoolingBuilder::SetStrides(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PoolingBuilder::SetStrides(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set Strides
@@ -136,7 +136,7 @@ OH_NN_ReturnCode PoolingBuilder::SetStrides(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode PoolingBuilder::SetPadModeOrPaddings(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PoolingBuilder::SetPadModeOrPaddings(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -180,7 +180,7 @@ OH_NN_ReturnCode PoolingBuilder::SetPadModeOrPaddings(std::shared_ptr<NNTensor> 
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode PoolingBuilder::SetRoundMode(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PoolingBuilder::SetRoundMode(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -213,7 +213,7 @@ OH_NN_ReturnCode PoolingBuilder::SetRoundMode(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode PoolingBuilder::SetActivation(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PoolingBuilder::SetActivation(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -244,7 +244,7 @@ OH_NN_ReturnCode PoolingBuilder::SetActivation(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode PoolingBuilder::SetGlobal(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PoolingBuilder::SetGlobal(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[PoolingBuilder] The global should be type OH_NN_BOOL.");

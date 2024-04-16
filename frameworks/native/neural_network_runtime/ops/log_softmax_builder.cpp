@@ -31,7 +31,7 @@ LogSoftmaxBuilder::LogSoftmaxBuilder() {}
 
 LogSoftmaxBuilder::~LogSoftmaxBuilder() {}
 
-OH_NN_ReturnCode LogSoftmaxBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LogSoftmaxBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[LogSoftmax] The axis should be type OH_NN_INT64.");

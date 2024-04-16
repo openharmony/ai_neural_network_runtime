@@ -28,7 +28,7 @@ FlattenBuilder::FlattenBuilder() {}
 
 FlattenBuilder::~FlattenBuilder() {}
 
-OH_NN_ReturnCode FlattenBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode FlattenBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Flatten] The axis should be type OH_NN_INT64.");

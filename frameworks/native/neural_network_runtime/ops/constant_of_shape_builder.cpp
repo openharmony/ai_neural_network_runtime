@@ -28,7 +28,7 @@ ConstantOfShapeBuilder::ConstantOfShapeBuilder() {}
 
 ConstantOfShapeBuilder::~ConstantOfShapeBuilder() {}
 
-OH_NN_ReturnCode ConstantOfShapeBuilder::SetDataType(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ConstantOfShapeBuilder::SetDataType(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[ConstantOfShape] The dataType should be type OH_NN_INT64.");
@@ -50,7 +50,7 @@ OH_NN_ReturnCode ConstantOfShapeBuilder::SetDataType(std::shared_ptr<NNTensor> t
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ConstantOfShapeBuilder::SetValue(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ConstantOfShapeBuilder::SetValue(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[ConstantOfShape] The value should be type OH_NN_FLOAT32.");
