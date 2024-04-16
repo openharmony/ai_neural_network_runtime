@@ -87,14 +87,13 @@ OH_NN_ReturnCode DivBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_DIV_ACTIVATIONTYPE:
-                returnCode = SetActicationType(tensor);
-                break;
-            default:
-                LOGE("[Div] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Div] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[Div] Build failed, passed invalid param.");
             return returnCode;

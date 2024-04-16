@@ -23,6 +23,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class GeluBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(GeluBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     GeluBuilder();
     ~GeluBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -36,6 +38,9 @@ private:
 
 private:
     bool m_approximate {false};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_GELU_APPROXIMATE, &GeluBuilder::SetApproximate}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

@@ -57,37 +57,13 @@ OH_NN_ReturnCode PoolingBuilder::PoolingBuild(const std::vector<uint32_t>& param
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_AVG_POOL_KERNEL_SIZE:
-            case OH_NN_MAX_POOL_KERNEL_SIZE:
-                returnCode = SetKernel(tensor);
-                break;
-            case OH_NN_AVG_POOL_STRIDE:
-            case OH_NN_MAX_POOL_STRIDE:
-                returnCode = SetStrides(tensor);
-                break;
-            case OH_NN_AVG_POOL_PAD_MODE:
-            case OH_NN_MAX_POOL_PAD_MODE:
-            case OH_NN_MAX_POOL_PAD:
-            case OH_NN_AVG_POOL_PAD:
-                returnCode = SetPadModeOrPaddings(tensor);
-                break;
-            case OH_NN_AVG_POOL_ROUND_MODE:
-            case OH_NN_MAX_POOL_ROUND_MODE:
-                returnCode = SetRoundMode(tensor);
-                break;
-            case OH_NN_AVG_POOL_ACTIVATION_TYPE:
-            case OH_NN_MAX_POOL_ACTIVATION_TYPE:
-                returnCode = SetActivation(tensor);
-                break;
-            case OH_NN_AVG_POOL_GLOBAL:
-            case OH_NN_MAX_POOL_GLOBAL:
-                returnCode = SetGlobal(tensor);
-                break;
-            default:
-                LOGE("[PoolingBuilder] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[PoolingBuilder] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[PoolingBuilder] PoolingBuild failed, passed invalid param.");
             return returnCode;

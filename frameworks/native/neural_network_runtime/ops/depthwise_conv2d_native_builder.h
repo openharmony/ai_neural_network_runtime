@@ -25,6 +25,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class DepthwiseConv2DNativeBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(DepthwiseConv2DNativeBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     DepthwiseConv2DNativeBuilder();
     ~DepthwiseConv2DNativeBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -54,6 +56,13 @@ private:
     std::vector<int64_t> m_dilation;
     mindspore::lite::PadMode m_padMode{mindspore::lite::PAD_MODE_PAD};
     mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_DEPTHWISE_CONV2D_NATIVE_STRIDES, &DepthwiseConv2DNativeBuilder::SetStrides},
+        {OH_NN_DEPTHWISE_CONV2D_NATIVE_PAD, &DepthwiseConv2DNativeBuilder::SetPadModeOrPaddings},
+        {OH_NN_DEPTHWISE_CONV2D_NATIVE_DILATION, &DepthwiseConv2DNativeBuilder::SetDilation},
+        {OH_NN_DEPTHWISE_CONV2D_NATIVE_PAD_MODE, &DepthwiseConv2DNativeBuilder::SetPadModeOrPaddings},
+        {OH_NN_DEPTHWISE_CONV2D_NATIVE_ACTIVATION_TYPE, &DepthwiseConv2DNativeBuilder::SetActivation}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

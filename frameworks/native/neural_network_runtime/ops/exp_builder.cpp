@@ -122,19 +122,11 @@ OH_NN_ReturnCode ExpBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_EXP_BASE:
-                ret = SetBase(tensor);
-                break;
-            case OH_NN_EXP_SCALE:
-                ret = SetScale(tensor);
-                break;
-            case OH_NN_EXP_SHIFT:
-                ret = SetShift(tensor);
-                break;
-            default:
-                LOGE("[Exp] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Exp] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

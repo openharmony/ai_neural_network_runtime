@@ -23,6 +23,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class PowBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(PowBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     PowBuilder();
     ~PowBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -39,7 +41,7 @@ private:
 private:
     float m_scale {1.0f};
     float m_shift {0.0f};
-    std::unordered_map<OH_NN_TensorType, OH_NN_ReturnCode(PowBuilder::*)(std::shared_ptr<NNTensor>)> ParamHashMap = {
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
         {OH_NN_POW_SCALE, &PowBuilder::SetScale},
         {OH_NN_POW_SHIFT, &PowBuilder::SetShift}
     };

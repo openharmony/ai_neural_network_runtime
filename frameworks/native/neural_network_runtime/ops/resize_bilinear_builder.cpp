@@ -175,25 +175,11 @@ OH_NN_ReturnCode ResizeBilinearBuilder::Build(const std::vector<uint32_t>& param
 
     for (uint32_t i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_RESIZE_BILINEAR_NEW_HEIGHT:
-                returnCode = SetNewHeight(tensor);
-                break;
-            case OH_NN_RESIZE_BILINEAR_NEW_WIDTH:
-                returnCode = SetNewWidth(tensor);
-                break;
-            case OH_NN_RESIZE_BILINEAR_PRESERVE_ASPECT_RATIO:
-                returnCode = SetPreserveAspectRatio(tensor);
-                break;
-            case OH_NN_RESIZE_BILINEAR_COORDINATE_TRANSFORM_MODE:
-                returnCode = SetCoordinateTransformMode(tensor);
-                break;
-            case OH_NN_RESIZE_BILINEAR_EXCLUDE_OUTSIDE:
-                returnCode = SetExcludeOutside(tensor);
-                break;
-            default:
-                LOGE("[ResizeBilinear] Build failed, parameter type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[ResizeBilinear] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class DepthToSpaceBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(DepthToSpaceBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     DepthToSpaceBuilder();
     ~DepthToSpaceBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -42,6 +44,10 @@ private:
 private:
     int64_t m_blockSize {0};
     std::string m_mode;
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_DEPTH_TO_SPACE_BLOCK_SIZE, &DepthToSpaceBuilder::SetBlockSize},
+        {OH_NN_DEPTH_TO_SPACE_MODE, &DepthToSpaceBuilder::SetMode}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

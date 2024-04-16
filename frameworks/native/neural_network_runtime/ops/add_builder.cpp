@@ -30,7 +30,7 @@ AddBuilder::AddBuilder() {}
 
 AddBuilder::~AddBuilder() {}
 
-OH_NN_ReturnCode AddBuilder::SetActivation(std::shared_ptr<NNTensor>& tensor)
+OH_NN_ReturnCode AddBuilder::SetActivation(std::shared_ptr<NNTensor> tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -81,13 +81,11 @@ OH_NN_ReturnCode AddBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     for (uint32_t i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_ADD_ACTIVATIONTYPE:
-                ret = SetActivation(tensor);
-                break;
-            default:
-                LOGE("[Add] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Add] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

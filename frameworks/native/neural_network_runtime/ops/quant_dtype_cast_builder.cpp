@@ -111,19 +111,11 @@ OH_NN_ReturnCode QuantDTypeCastBuilder::Build(const std::vector<uint32_t>& param
 
     for (uint32_t i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_QUANT_DTYPE_CAST_SRC_T:
-                returnCode = SetSrcT(tensor);
-                break;
-            case OH_NN_QUANT_DTYPE_CAST_DST_T:
-                returnCode = SetDstT(tensor);
-                break;
-            case OH_NN_QUANT_DTYPE_CAST_AXIS:
-                returnCode = SetAxis(tensor);
-                break;
-            default:
-                LOGE("[QuantDTypeCast] Build failed, parameter type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[QunatDTypeCast] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

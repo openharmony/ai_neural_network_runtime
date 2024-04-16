@@ -136,19 +136,11 @@ OH_NN_ReturnCode L2NormalizeBuilder::Build(const std::vector<uint32_t>& paramsIn
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_L2_NORMALIZE_AXIS:
-                ret = SetAxis(tensor);
-                break;
-            case OH_NN_L2_NORMALIZE_EPSILON:
-                ret = SetEpsilon(tensor);
-                break;
-            case OH_NN_L2_NORMALIZE_ACTIVATION_TYPE:
-                ret = SetActivationType(tensor);
-                break;
-            default:
-                LOGE("[L2Normalize] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[L2Normalize] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

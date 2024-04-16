@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class UnstackBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(UnstackBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     UnstackBuilder();
     ~UnstackBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -40,6 +42,9 @@ private:
 
 private:
     int64_t m_axis {0};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_UNSTACK_AXIS, &UnstackBuilder::SetAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

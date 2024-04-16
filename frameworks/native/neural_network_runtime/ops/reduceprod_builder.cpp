@@ -126,19 +126,11 @@ OH_NN_ReturnCode ReduceProdBuilder::Build(const std::vector<uint32_t>& paramsInd
 
     for (uint32_t i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_REDUCE_PROD_KEEP_DIMS:
-                returnCode = SetKeepDims(tensor);
-                break;
-            case OH_NN_REDUCE_PROD_REDUCE_TO_END:
-                returnCode = SetReduceToEnd(tensor);
-                break;
-            case OH_NN_REDUCE_PROD_COEFF:
-                returnCode = SetCoeff(tensor);
-                break;
-            default:
-                LOGE("[ReduceProd] Build failed, parameter type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[ReduceProd] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

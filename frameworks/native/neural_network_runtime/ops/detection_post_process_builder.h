@@ -23,6 +23,9 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class DetectionPostProcessBuilder : public OpsBuilder {
 public:
+    typedef DetectionPostProcessBuilder DPPBuilder;
+    typedef OH_NN_ReturnCode(DPPBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     DetectionPostProcessBuilder();
     ~DetectionPostProcessBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -55,6 +58,18 @@ private:
     int64_t m_numClasses {0};
     bool m_useRegularNms {false};
     bool m_outQuantized {false};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_DETECTION_POST_PROCESS_INPUT_SIZE, &DPPBuilder::SetInputSize},
+        {OH_NN_DETECTION_POST_PROCESS_SCALE, &DPPBuilder::SetScale},
+        {OH_NN_DETECTION_POST_PROCESS_NMS_IOU_THRESHOLD, &DPPBuilder::SetNmsIoUThreshold},
+        {OH_NN_DETECTION_POST_PROCESS_NMS_SCORE_THRESHOLD, &DPPBuilder::SetNmsScoreThreshold},
+        {OH_NN_DETECTION_POST_PROCESS_MAX_DETECTIONS, &DPPBuilder::SetMaxDetections},
+        {OH_NN_DETECTION_POST_PROCESS_DETECTIONS_PER_CLASS, &DPPBuilder::SetDetectionsPerClass},
+        {OH_NN_DETECTION_POST_PROCESS_MAX_CLASSES_PER_DETECTION, &DPPBuilder::SetMaxClassesPerDetection},
+        {OH_NN_DETECTION_POST_PROCESS_NUM_CLASSES, &DPPBuilder::SetNumClasses},
+        {OH_NN_DETECTION_POST_PROCESS_USE_REGULAR_NMS, &DPPBuilder::SetUseRegularNms},
+        {OH_NN_DETECTION_POST_PROCESS_OUT_QUANTIZED, &DPPBuilder::SetOutQuantized}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class EltwiseBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(EltwiseBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     EltwiseBuilder();
     ~EltwiseBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -40,6 +42,9 @@ private:
 
 private:
     mindspore::lite::EltwiseMode m_mode {mindspore::lite::ELTWISE_MODE_PROD};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_ELTWISE_MODE, &EltwiseBuilder::SetMode}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

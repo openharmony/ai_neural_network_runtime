@@ -178,25 +178,11 @@ OH_NN_ReturnCode LRNBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_LRN_DEPTH_RADIUS:
-                ret = SetDepthRadius(tensor);
-                break;
-            case OH_NN_LRN_BIAS:
-                ret = SetBias(tensor);
-                break;
-            case OH_NN_LRN_ALPHA:
-                ret = SetAlpha(tensor);
-                break;
-            case OH_NN_LRN_BETA:
-                ret = SetBeta(tensor);
-                break;
-            case OH_NN_LRN_NORM_REGION:
-                ret = SetNormRegion(tensor);
-                break;
-            default:
-                LOGE("[LRN] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[LRN] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

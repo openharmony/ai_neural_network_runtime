@@ -23,6 +23,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class QuantDTypeCastBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(QuantDTypeCastBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     QuantDTypeCastBuilder();
     ~QuantDTypeCastBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -41,6 +43,11 @@ private:
     const uint64_t* m_src_t{nullptr};
     const uint64_t* m_dst_t{nullptr};
     int64_t m_axis {0};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_QUANT_DTYPE_CAST_SRC_T, &QuantDTypeCastBuilder::SetSrcT},
+        {OH_NN_QUANT_DTYPE_CAST_DST_T, &QuantDTypeCastBuilder::SetDstT},
+        {OH_NN_QUANT_DTYPE_CAST_AXIS, &QuantDTypeCastBuilder::SetAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

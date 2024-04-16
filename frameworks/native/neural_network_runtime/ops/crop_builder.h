@@ -23,6 +23,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class CropBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(CropBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     CropBuilder();
     ~CropBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -39,6 +41,10 @@ private:
 private:
     int64_t m_axis {0};
     std::vector<int64_t> m_offset;
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_CROP_AXIS, &CropBuilder::SetAxis},
+        {OH_NN_CROP_OFFSET, &CropBuilder::SetOffset}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

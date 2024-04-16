@@ -163,25 +163,11 @@ OH_NN_ReturnCode StridedSliceBuilder::Build(const std::vector<uint32_t>& paramsI
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_STRIDED_SLICE_BEGIN_MASK:
-                returnCode = SetBeginMask(tensor);
-                break;
-            case OH_NN_STRIDED_SLICE_END_MASK:
-                returnCode = SetEndMask(tensor);
-                break;
-            case OH_NN_STRIDED_SLICE_ELLIPSIS_MASK:
-                returnCode = SetEllipsisMask(tensor);
-                break;
-            case OH_NN_STRIDED_SLICE_NEW_AXIS_MASK:
-                returnCode = SetNewAxisMask(tensor);
-                break;
-            case OH_NN_STRIDED_SLICE_SHRINK_AXIS_MASK:
-                returnCode = SetShrinkAxisMask(tensor);
-                break;
-            default:
-                LOGE("[StridedSliceBuilder] Parameter Type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[StridedSliceBuilder] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

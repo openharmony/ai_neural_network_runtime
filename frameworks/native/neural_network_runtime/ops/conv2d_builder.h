@@ -25,6 +25,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class Conv2DBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(Conv2DBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     Conv2DBuilder();
     ~Conv2DBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -58,6 +60,14 @@ private:
     std::vector<int64_t> m_dilation;
     mindspore::lite::PadMode m_padMode {mindspore::lite::PAD_MODE_PAD};
     mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_CONV2D_STRIDES, &Conv2DBuilder::SetStrides},
+        {OH_NN_CONV2D_PAD, &Conv2DBuilder::SetPad},
+        {OH_NN_CONV2D_DILATION, &Conv2DBuilder::SetDilation},
+        {OH_NN_CONV2D_PAD_MODE, &Conv2DBuilder::SetPad},
+        {OH_NN_CONV2D_ACTIVATION_TYPE, &Conv2DBuilder::SetActavitation},
+        {OH_NN_CONV2D_GROUP, &Conv2DBuilder::SetGroup}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

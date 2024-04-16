@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ClipBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(ClipBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     ClipBuilder();
     ~ClipBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -42,6 +44,10 @@ private:
 private:
     float m_max {0.0f};
     float m_min {0.0f};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_CLIP_MAX, &ClipBuilder::SetMax},
+        {OH_NN_CLIP_MIN, &ClipBuilder::SetMin}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

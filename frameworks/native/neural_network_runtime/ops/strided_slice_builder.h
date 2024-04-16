@@ -24,6 +24,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class StridedSliceBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(StridedSliceBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     StridedSliceBuilder();
     ~StridedSliceBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -49,6 +51,13 @@ private:
     int64_t m_ellipsis_mask = {0};
     int64_t m_new_axis_mask = {0};
     int64_t m_shrink_axis_mask = {0};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_STRIDED_SLICE_BEGIN_MASK, &StridedSliceBuilder::SetBeginMask},
+        {OH_NN_STRIDED_SLICE_END_MASK, &StridedSliceBuilder::SetEndMask},
+        {OH_NN_STRIDED_SLICE_ELLIPSIS_MASK, &StridedSliceBuilder::SetEllipsisMask},
+        {OH_NN_STRIDED_SLICE_NEW_AXIS_MASK, &StridedSliceBuilder::SetNewAxisMask},
+        {OH_NN_STRIDED_SLICE_SHRINK_AXIS_MASK, &StridedSliceBuilder::SetShrinkAxisMask}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

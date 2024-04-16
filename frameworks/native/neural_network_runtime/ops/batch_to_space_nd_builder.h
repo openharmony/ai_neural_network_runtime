@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class BatchToSpaceNDBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(BatchToSpaceNDBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     BatchToSpaceNDBuilder();
     ~BatchToSpaceNDBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -45,6 +47,10 @@ private:
 private:
     std::vector<int64_t> m_blockSize;
     std::vector<std::vector<int64_t>> m_crops;
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_BATCH_TO_SPACE_ND_BLOCKSIZE, &BatchToSpaceNDBuilder::SetInputBlock},
+        {OH_NN_BATCH_TO_SPACE_ND_CROPS, &BatchToSpaceNDBuilder::SetInputCrops}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

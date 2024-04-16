@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class LeakyReluBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(LeakyReluBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     LeakyReluBuilder();
     ~LeakyReluBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -40,6 +42,9 @@ private:
 
 private:
     float m_negativeSlope {0.0f};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_LEAKY_RELU_NEGATIVE_SLOPE, &LeakyReluBuilder::SetNegativeSlope}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

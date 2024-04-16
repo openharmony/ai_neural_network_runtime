@@ -126,19 +126,11 @@ OH_NN_ReturnCode ReduceAllBuilder::Build(const std::vector<uint32_t>& paramsInde
 
     for (uint32_t i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_REDUCE_ALL_KEEP_DIMS:
-                returnCode = SetKeepDims(tensor);
-                break;
-            case OH_NN_REDUCE_ALL_REDUCE_TO_END:
-                returnCode = SetReduceToEnd(tensor);
-                break;
-            case OH_NN_REDUCE_ALL_COEFF:
-                returnCode = SetCoeff(tensor);
-                break;
-            default:
-                LOGE("[ReduceAll] Build failed, parameter type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[ReduceAll] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

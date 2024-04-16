@@ -23,6 +23,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class LayerNormBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(LayerNormBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     LayerNormBuilder();
     ~LayerNormBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -43,6 +45,11 @@ private:
     float m_epsilon {1e-7};
     bool m_elementwiseAffine {true};
     int64_t m_beginParamsAxis {1};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_LAYER_NORM_BEGIN_NORM_AXIS, &LayerNormBuilder::SetBeginNormAxis},
+        {OH_NN_LAYER_NORM_EPSILON, &LayerNormBuilder::SetEpsilon},
+        {OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS, &LayerNormBuilder::SetBeginParamsAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime
