@@ -25,6 +25,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class PoolingBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(PoolingBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     PoolingBuilder() = default;
     virtual ~PoolingBuilder() = default;
 
@@ -53,6 +55,24 @@ protected:
     mindspore::lite::RoundMode m_roundMode {mindspore::lite::ROUND_MODE_FLOOR};
     mindspore::lite::Format m_format {mindspore::lite::FORMAT_NCHW};
     bool m_global {false};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_MAX_POOL_KERNEL_SIZE, &PoolingBuilder::SetKernel},
+        {OH_NN_MAX_POOL_STRIDE, &PoolingBuilder::SetStrides},
+        {OH_NN_MAX_POOL_PAD_MODE, &PoolingBuilder::SetPadModeOrPaddings},
+        {OH_NN_MAX_POOL_PAD, &PoolingBuilder::SetPadModeOrPaddings},
+        {OH_NN_MAX_POOL_ACTIVATION_TYPE, &PoolingBuilder::SetActivation},
+        {OH_NN_MAX_POOL_ROUND_MODE, &PoolingBuilder::SetRoundMode},
+        {OH_NN_MAX_POOL_GLOBAL, &PoolingBuilder::SetGlobal},
+        
+
+        {OH_NN_AVG_POOL_KERNEL_SIZE, &PoolingBuilder::SetKernel},
+        {OH_NN_AVG_POOL_STRIDE, &PoolingBuilder::SetStrides},
+        {OH_NN_AVG_POOL_PAD_MODE, &PoolingBuilder::SetPadModeOrPaddings},
+        {OH_NN_AVG_POOL_PAD, &PoolingBuilder::SetPadModeOrPaddings},
+        {OH_NN_AVG_POOL_ACTIVATION_TYPE, &PoolingBuilder::SetActivation},
+        {OH_NN_AVG_POOL_ROUND_MODE, &PoolingBuilder::SetRoundMode},
+        {OH_NN_AVG_POOL_GLOBAL, &PoolingBuilder::SetGlobal}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

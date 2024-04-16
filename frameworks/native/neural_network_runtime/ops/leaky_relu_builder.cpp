@@ -78,13 +78,11 @@ OH_NN_ReturnCode LeakyReluBuilder::Build(const std::vector<uint32_t>& paramsInde
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_LEAKY_RELU_NEGATIVE_SLOPE:
-                ret = SetNegativeSlope(tensor);
-                break;
-            default:
-                LOGE("[LeakyRelu] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[LeakyRelu] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

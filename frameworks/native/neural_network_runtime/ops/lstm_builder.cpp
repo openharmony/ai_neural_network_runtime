@@ -255,41 +255,13 @@ OH_NN_ReturnCode LSTMBuilder::ParseParam(const std::vector<uint32_t>& paramsInde
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_LSTM_BIDIRECTIONAL:
-                returnCode = SetBidirectional(tensor);
-                break;
-            case OH_NN_LSTM_HAS_BIAS:
-                returnCode = SetHasBias(tensor);
-                break;
-            case OH_NN_LSTM_INPUT_SIZE:
-                returnCode = SetInputSize(tensor);
-                break;
-            case OH_NN_LSTM_HIDDEN_SIZE:
-                returnCode = SetHiddenSize(tensor);
-                break;
-            case OH_NN_LSTM_NUM_LAYERS:
-                returnCode = SetNumLayers(tensor);
-                break;
-            case OH_NN_LSTM_NUM_DIRECTIONS:
-                returnCode = SetNumDirections(tensor);
-                break;
-            case OH_NN_LSTM_DROPOUT:
-                returnCode = SetDropout(tensor);
-                break;
-            case OH_NN_LSTM_ZONEOUT_CELL:
-                returnCode = SetZoneoutCell(tensor);
-                break;
-            case OH_NN_LSTM_ZONEOUT_HIDDEN:
-                returnCode = SetZoneoutHidden(tensor);
-                break;
-            case OH_NN_LSTM_PROJ_SIZE:
-                returnCode = SetProjSize(tensor);
-                break;
-            default:
-                LOGE("[LSTM] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[lSTM] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[LSTM] Build failed, passed invalid param.");
             return returnCode;

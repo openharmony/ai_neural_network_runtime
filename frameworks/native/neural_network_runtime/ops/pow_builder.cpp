@@ -27,10 +27,7 @@ static const int PARAM_MAX_NUM = 2;
 static const int SCALAR_LENGTH = 1;
 static const std::string OP_NAME = "Pow";
 
-PowBuilder::PowBuilder() {
-    //ParamHashMap[OH_NN_POW_SCALE] = &PowBuilder::SetScale;
-    //ParamHashMap[OH_NN_POW_SHIFT] = &PowBuilder::SetShift;
-}
+PowBuilder::PowBuilder() {}
 
 PowBuilder::~PowBuilder() {}
 
@@ -107,8 +104,8 @@ OH_NN_ReturnCode PowBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        if (ParamHashMap.find(tensor->GetType()) != ParamHashMap.end()) {
-            returnCode = (this->*(ParamHashMap[tensor->GetType()]))(tensor);
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
         } else {
             LOGE("[Pow] Build failed, param invalid, type=%d", tensor->GetType());
             return OH_NN_INVALID_PARAMETER;

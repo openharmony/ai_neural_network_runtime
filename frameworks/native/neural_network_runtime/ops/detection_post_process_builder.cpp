@@ -287,40 +287,11 @@ OH_NN_ReturnCode DetectionPostProcessBuilder::Build(const std::vector<uint32_t>&
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_DETECTION_POST_PROCESS_INPUT_SIZE:
-                ret = SetInputSize(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_SCALE:
-                ret = SetScale(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_NMS_IOU_THRESHOLD:
-                ret = SetNmsIoUThreshold(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_NMS_SCORE_THRESHOLD:
-                ret = SetNmsScoreThreshold(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_MAX_DETECTIONS:
-                ret = SetMaxDetections(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_DETECTIONS_PER_CLASS:
-                ret = SetDetectionsPerClass(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_MAX_CLASSES_PER_DETECTION:
-                ret = SetMaxClassesPerDetection(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_NUM_CLASSES:
-                ret = SetNumClasses(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_USE_REGULAR_NMS:
-                ret = SetUseRegularNms(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_OUT_QUANTIZED:
-                ret = SetOutQuantized(tensor);
-                break;
-            default:
-                LOGE("[DetectionPostProcess] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[DetectionPostProcess] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

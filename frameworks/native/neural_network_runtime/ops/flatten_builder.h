@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class FlattenBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(FlattenBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     FlattenBuilder();
     ~FlattenBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -40,6 +42,9 @@ private:
 
 private:
     int64_t m_axis {1};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_FLATTEN_AXIS, &FlattenBuilder::SetAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

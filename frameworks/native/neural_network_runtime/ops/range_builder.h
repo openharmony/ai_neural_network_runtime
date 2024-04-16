@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class RangeBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(RangeBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     RangeBuilder();
     ~RangeBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -44,6 +46,11 @@ private:
     int64_t m_start {0};
     int64_t m_limit {0};
     int64_t m_delta {1};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_RANGE_START, &RangeBuilder::SetStart},
+        {OH_NN_RANGE_LIMIT, &RangeBuilder::SetLimit},
+        {OH_NN_RANGE_DELTA, &RangeBuilder::SetDelta}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

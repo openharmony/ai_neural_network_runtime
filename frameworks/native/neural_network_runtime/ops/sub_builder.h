@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class SubBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(SubBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     SubBuilder();
     ~SubBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -40,6 +42,9 @@ private:
 
 private:
     mindspore::lite::ActivationType  m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_SUB_ACTIVATIONTYPE, &SubBuilder::SetActivationType}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

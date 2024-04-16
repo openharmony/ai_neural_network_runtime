@@ -129,19 +129,11 @@ OH_NN_ReturnCode LayerNormBuilder::Build(const std::vector<uint32_t>& paramsInde
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_LAYER_NORM_BEGIN_NORM_AXIS:
-                returnCode = SetBeginNormAxis(tensor);
-                break;
-            case OH_NN_LAYER_NORM_EPSILON:
-                returnCode = SetEpsilon(tensor);
-                break;
-            case OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS:
-                returnCode = SetBeginParamsAxis(tensor);
-                break;
-            default:
-                LOGE("[LayerNormBuilder] Parameter Type is invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[LayerNormBuilder] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

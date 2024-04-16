@@ -24,6 +24,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class StackBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(StackBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     StackBuilder();
     ~StackBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -38,6 +40,9 @@ private:
 
 private:
     int64_t m_axis = {0};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_STACK_AXIS, &StackBuilder::SetAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

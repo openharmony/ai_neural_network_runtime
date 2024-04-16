@@ -23,6 +23,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ReduceL2Builder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(ReduceL2Builder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     ReduceL2Builder();
     ~ReduceL2Builder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -41,6 +43,11 @@ private:
     float m_coeff {0.0f};
     bool m_reduceToEnd {false};
     bool m_keepDims {false};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_REDUCE_L2_COEFF, &ReduceL2Builder::SetCoeff},
+        {OH_NN_REDUCE_L2_REDUCE_TO_END, &ReduceL2Builder::SetReduceToEnd},
+        {OH_NN_REDUCE_L2_KEEP_DIMS, &ReduceL2Builder::SetKeepDims}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

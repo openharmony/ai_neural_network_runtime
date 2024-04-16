@@ -262,29 +262,11 @@ OH_NN_ReturnCode Conv2DTransposeBuilder::Build(const std::vector<uint32_t>& para
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor =  allTensors[i]; // 参数 tensor
-        switch (tensor->GetType()) {
-            case OH_NN_CONV2D_TRANSPOSE_STRIDES:
-                returnCode = SetStrides(tensor);
-                break;
-            case OH_NN_CONV2D_TRANSPOSE_DILATION:
-                returnCode = SetDilation(tensor);
-                break;
-            case OH_NN_CONV2D_TRANSPOSE_PAD_MODE:
-            case OH_NN_CONV2D_TRANSPOSE_PAD:
-                returnCode = SetPad(tensor);
-                break;
-            case OH_NN_CONV2D_TRANSPOSE_GROUP:
-                returnCode = SetGroup(tensor);
-                break;
-            case OH_NN_CONV2D_TRANSPOSE_OUTPUT_PADDINGS:
-                returnCode = SetOutPadding(tensor);
-                break;
-            case OH_NN_CONV2D_TRANSPOSE_ACTIVATION_TYPE:
-                returnCode = SetActivation(tensor);
-                break;
-            default:
-                LOGE("[Conv2DTranspose] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Conv2DTranspose] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

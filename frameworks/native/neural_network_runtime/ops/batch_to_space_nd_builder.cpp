@@ -109,17 +109,13 @@ OH_NN_ReturnCode BatchToSpaceNDBuilder::Build(const std::vector<uint32_t>& param
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_BATCH_TO_SPACE_ND_BLOCKSIZE:
-                returnCode = SetInputBlock(tensor);
-                break;
-            case OH_NN_BATCH_TO_SPACE_ND_CROPS:
-                returnCode = SetInputCrops(tensor);
-                break;
-            default:
-                LOGE("[BatchToSpaceND] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[BatchToSpaceND] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[BatchToSpaceND] Build failed, passed invalid param.");
             return returnCode;

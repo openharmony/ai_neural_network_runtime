@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ArgMaxBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(ArgMaxBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     ArgMaxBuilder();
     ~ArgMaxBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -45,6 +47,12 @@ private:
     int64_t m_topK {1};
     bool m_keepDims {false};
     bool m_outMaxValue {false};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_ARG_MAX_AXIS, &ArgMaxBuilder::SetAxis},
+        {OH_NN_ARG_MAX_KEEPDIMS, &ArgMaxBuilder::SetKeepdims},
+        {OH_NN_ARG_MAX_TOP_K, &ArgMaxBuilder::SetTopK},
+        {OH_NN_ARG_MAX_OUT_MAX_VALUE, &ArgMaxBuilder::SetOutMaxValue}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

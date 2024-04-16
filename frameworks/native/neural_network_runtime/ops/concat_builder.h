@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ConcatBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(ConcatBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     ConcatBuilder();
     ~ConcatBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -42,6 +44,9 @@ private:
                                          const std::vector<std::shared_ptr<NNTensor>>& allTensors);
 private:
     int64_t m_axis{0};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_CONCAT_AXIS, &ConcatBuilder::SetAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

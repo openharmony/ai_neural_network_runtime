@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ExpBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(ExpBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     ExpBuilder();
     ~ExpBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -44,6 +46,11 @@ private:
     float m_base {-1.0f};
     float m_scale {1.0f};
     float m_shift {0.0f};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_EXP_BASE, &ExpBuilder::SetBase},
+        {OH_NN_EXP_SCALE, &ExpBuilder::SetScale},
+        {OH_NN_EXP_SHIFT, &ExpBuilder::SetShift}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

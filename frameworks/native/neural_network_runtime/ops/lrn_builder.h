@@ -23,6 +23,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class LRNBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(LRNBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     LRNBuilder();
     ~LRNBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -45,6 +47,13 @@ private:
     float m_alpha {0.0f};
     float m_beta {0.0f};
     std::string m_normRegion {"ACROSS_CHANNELS"};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_LRN_ALPHA, &LRNBuilder::SetAlpha},
+        {OH_NN_LRN_DEPTH_RADIUS, &LRNBuilder::SetDepthRadius},
+        {OH_NN_LRN_BIAS, &LRNBuilder::SetBias},
+        {OH_NN_LRN_BETA, &LRNBuilder::SetBeta},
+        {OH_NN_LRN_NORM_REGION, &LRNBuilder::SetNormRegion}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

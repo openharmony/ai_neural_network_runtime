@@ -24,6 +24,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class SqueezeBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(SqueezeBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     SqueezeBuilder();
     ~SqueezeBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -38,6 +40,9 @@ private:
 
 private:
     std::vector<int64_t> m_axis;
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_SQUEEZE_AXIS, &SqueezeBuilder::SetAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

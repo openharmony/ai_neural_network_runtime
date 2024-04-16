@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class AssertBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(AssertBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     AssertBuilder();
     ~AssertBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -36,10 +38,13 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetSummarize(std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetSummarize(std::shared_ptr<NNTensor> tensor);
 
 private:
     int64_t m_summarize {0};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_ASSERT_SUMMARIZE, &AssertBuilder::SetSummarize}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

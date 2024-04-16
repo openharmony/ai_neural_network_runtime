@@ -23,6 +23,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class OnehotBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(OnehotBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     OnehotBuilder();
     ~OnehotBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -36,6 +38,9 @@ private:
 
 private:
     int64_t m_axis {-1};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_ONE_HOT_AXIS, &OnehotBuilder::SetAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

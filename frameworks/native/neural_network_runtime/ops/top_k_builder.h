@@ -24,6 +24,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class TopKBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(TopKBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     TopKBuilder();
     ~TopKBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -39,6 +41,10 @@ private:
 private:
     int64_t m_axis {0};
     bool m_sorted {true}; // true means sorting in the descending order.
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_TOP_K_SORTED, &TopKBuilder::SetSorted},
+        {OH_NN_TOP_K_AXIS, &TopKBuilder::SetAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

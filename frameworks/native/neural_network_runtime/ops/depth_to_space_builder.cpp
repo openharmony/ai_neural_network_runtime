@@ -108,16 +108,11 @@ OH_NN_ReturnCode DepthToSpaceBuilder::Build(const std::vector<uint32_t>& paramsI
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_DEPTH_TO_SPACE_BLOCK_SIZE:
-                ret = SetBlockSize(tensor);
-                break;
-            case OH_NN_DEPTH_TO_SPACE_MODE:
-                ret = SetMode(tensor);
-                break;
-            default:
-                LOGE("[DepthToSpace] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[DepthToSpace] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

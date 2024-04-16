@@ -25,6 +25,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class Conv2DTransposeBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(Conv2DTransposeBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     Conv2DTransposeBuilder();
     ~Conv2DTransposeBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -58,6 +60,15 @@ private:
     std::vector<int64_t> m_outputPaddings;
     mindspore::lite::PadMode m_padMode{mindspore::lite::PAD_MODE_PAD};
     mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_CONV2D_TRANSPOSE_STRIDES, &Conv2DTransposeBuilder::SetStrides},
+        {OH_NN_CONV2D_TRANSPOSE_PAD, &Conv2DTransposeBuilder::SetPad},
+        {OH_NN_CONV2D_TRANSPOSE_DILATION, &Conv2DTransposeBuilder::SetDilation},
+        {OH_NN_CONV2D_TRANSPOSE_OUTPUT_PADDINGS, &Conv2DTransposeBuilder::SetOutPadding},
+        {OH_NN_CONV2D_TRANSPOSE_PAD_MODE, &Conv2DTransposeBuilder::SetPad},
+        {OH_NN_CONV2D_TRANSPOSE_ACTIVATION_TYPE, &Conv2DTransposeBuilder::SetActivation},
+        {OH_NN_CONV2D_TRANSPOSE_GROUP, &Conv2DTransposeBuilder::SetGroup}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

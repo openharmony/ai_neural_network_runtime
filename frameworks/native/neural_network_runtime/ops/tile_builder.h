@@ -24,6 +24,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class TileBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(TileBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     TileBuilder();
     ~TileBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -38,6 +40,9 @@ private:
 
 private:
     std::vector<int64_t> m_dims {0};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_TILE_DIMS, &TileBuilder::SetDims}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class FullConnectionBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode(FullConnectionBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+
     FullConnectionBuilder();
     ~FullConnectionBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -49,6 +51,12 @@ private:
     bool m_useAxis {false};
     int64_t m_axis {0};
     mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_FULL_CONNECTION_ACTIVATIONTYPE, &FullConnectionBuilder::SetFullConnectionActivation},
+        {OH_NN_FULL_CONNECTION_HAS_BIAS, &FullConnectionBuilder::SetHasBias},
+        {OH_NN_FULL_CONNECTION_USE_AXIS, &FullConnectionBuilder::SetUseAxis},
+        {OH_NN_FULL_CONNECTION_AXIS, &FullConnectionBuilder::SetAxis}
+    };
 
     bool m_axisIsSet {false};
     bool m_useAxisIsSet {false};
