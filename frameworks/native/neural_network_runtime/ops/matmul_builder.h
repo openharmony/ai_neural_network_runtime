@@ -25,7 +25,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class MatmulBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(MatmulBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (MatmulBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     MatmulBuilder();
     ~MatmulBuilder() override;
@@ -36,9 +36,9 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetTransposeA(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetTransposeB(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetActivationType(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetTransposeA(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetTransposeB(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetActivationType(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};

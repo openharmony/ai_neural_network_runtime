@@ -28,7 +28,7 @@ EltwiseBuilder::EltwiseBuilder() {}
 
 EltwiseBuilder::~EltwiseBuilder() {}
 
-OH_NN_ReturnCode EltwiseBuilder::SetMode(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode EltwiseBuilder::SetMode(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 

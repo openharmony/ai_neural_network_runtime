@@ -31,7 +31,7 @@ ReduceMinBuilder::ReduceMinBuilder() {}
 
 ReduceMinBuilder::~ReduceMinBuilder() {}
 
-OH_NN_ReturnCode ReduceMinBuilder::SetCoeff(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceMinBuilder::SetCoeff(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[ReduceMin] The coeff should be type OH_NN_FLOAT32.");
@@ -53,7 +53,7 @@ OH_NN_ReturnCode ReduceMinBuilder::SetCoeff(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ReduceMinBuilder::SetReduceToEnd(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceMinBuilder::SetReduceToEnd(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[ReduceMin] SetReduceToEnd failed, the reduceToEnd should be type OH_NN_BOOL.");
@@ -76,7 +76,7 @@ OH_NN_ReturnCode ReduceMinBuilder::SetReduceToEnd(std::shared_ptr<NNTensor> tens
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ReduceMinBuilder::SetKeepDims(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceMinBuilder::SetKeepDims(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[ReduceMin] SetKeepDims failed, the keep_dims should be type OH_NN_BOOL.");

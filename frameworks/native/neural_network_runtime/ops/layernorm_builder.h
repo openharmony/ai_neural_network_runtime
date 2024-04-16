@@ -23,7 +23,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class LayerNormBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(LayerNormBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (LayerNormBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     LayerNormBuilder();
     ~LayerNormBuilder() override;
@@ -34,9 +34,9 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetBeginNormAxis(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetEpsilon(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetBeginParamsAxis(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetBeginNormAxis(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetEpsilon(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetBeginParamsAxis(const std::shared_ptr<NNTensor>& tensor);
     OH_NN_ReturnCode ValidateGammaAndBetaShape(const std::vector<uint32_t>& inputsIndex,
         int64_t beginAxis, const std::vector<std::shared_ptr<NNTensor>>& allTensors) const;
 

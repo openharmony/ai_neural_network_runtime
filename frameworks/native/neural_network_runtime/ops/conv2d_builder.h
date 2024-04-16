@@ -25,7 +25,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class Conv2DBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(Conv2DBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (Conv2DBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     Conv2DBuilder();
     ~Conv2DBuilder() override;
@@ -44,11 +44,11 @@ private:
                                 const std::vector<std::shared_ptr<NNTensor>>& allTensors);
     void SetKernelSize(const std::vector<uint32_t>& inputsIndex,
                        const std::vector<std::shared_ptr<NNTensor>>& allTensors);
-    OH_NN_ReturnCode SetStrides(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetDilation(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetPad(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetGroup(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetActavitation(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetStrides(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetDilation(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetPad(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetGroup(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetActavitation(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_group {1};

@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class FullConnectionBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(FullConnectionBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (FullConnectionBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     FullConnectionBuilder();
     ~FullConnectionBuilder() override;
@@ -41,10 +41,10 @@ private:
     OH_NN_ReturnCode SetFullConnectionInput(const std::vector<uint32_t>& inputsIndex,
                                             const std::vector<uint32_t>& outputsIndex,
                                             const std::vector<std::shared_ptr<NNTensor>>& allTensors);
-    OH_NN_ReturnCode SetHasBias(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetUseAxis(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetFullConnectionActivation(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetHasBias(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetUseAxis(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetFullConnectionActivation(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     bool m_hasBias {false};

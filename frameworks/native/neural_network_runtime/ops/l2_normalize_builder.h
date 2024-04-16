@@ -24,7 +24,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class L2NormalizeBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(L2NormalizeBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (L2NormalizeBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     L2NormalizeBuilder();
     ~L2NormalizeBuilder() override;
@@ -36,9 +36,9 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetEpsilon(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetActivationType(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetEpsilon(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetActivationType(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     std::vector<int64_t> m_axis;

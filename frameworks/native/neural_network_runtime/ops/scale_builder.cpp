@@ -32,7 +32,7 @@ ScaleBuilder::ScaleBuilder() {}
 
 ScaleBuilder::~ScaleBuilder() {}
 
-OH_NN_ReturnCode ScaleBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ScaleBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT64) {
@@ -55,7 +55,7 @@ OH_NN_ReturnCode ScaleBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ScaleBuilder::SetActivationType(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ScaleBuilder::SetActivationType(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT8) {

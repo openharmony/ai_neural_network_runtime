@@ -29,7 +29,7 @@ SqueezeBuilder::SqueezeBuilder() {}
 
 SqueezeBuilder::~SqueezeBuilder() {}
 
-OH_NN_ReturnCode SqueezeBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SqueezeBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SqueezeBuilder] The 2nd input axis should be type OH_NN_INT64.");

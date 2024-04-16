@@ -23,7 +23,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class SpaceToDepthBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(SpaceToDepthBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (SpaceToDepthBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     SpaceToDepthBuilder();
     ~SpaceToDepthBuilder() override;
@@ -35,7 +35,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetBlockSize(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetBlockSize(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_blockSize {0};

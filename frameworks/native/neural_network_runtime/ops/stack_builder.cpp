@@ -29,7 +29,7 @@ StackBuilder::StackBuilder() {}
 
 StackBuilder::~StackBuilder() {}
 
-OH_NN_ReturnCode StackBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode StackBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[StackBuilder] The last input axis should be type OH_NN_INT64.");

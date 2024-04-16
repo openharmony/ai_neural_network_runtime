@@ -31,7 +31,7 @@ DivBuilder::DivBuilder() {}
 
 DivBuilder::~DivBuilder() {}
 
-OH_NN_ReturnCode DivBuilder::SetActicationType(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DivBuilder::SetActicationType(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 

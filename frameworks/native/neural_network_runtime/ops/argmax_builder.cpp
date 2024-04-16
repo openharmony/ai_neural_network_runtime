@@ -27,7 +27,7 @@ ArgMaxBuilder::ArgMaxBuilder() {}
 
 ArgMaxBuilder::~ArgMaxBuilder() {}
 
-OH_NN_ReturnCode ArgMaxBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ArgMaxBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -46,7 +46,7 @@ OH_NN_ReturnCode ArgMaxBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ArgMaxBuilder::SetTopK(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ArgMaxBuilder::SetTopK(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -65,7 +65,7 @@ OH_NN_ReturnCode ArgMaxBuilder::SetTopK(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ArgMaxBuilder::SetKeepdims(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ArgMaxBuilder::SetKeepdims(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -84,7 +84,7 @@ OH_NN_ReturnCode ArgMaxBuilder::SetKeepdims(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ArgMaxBuilder::SetOutMaxValue(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ArgMaxBuilder::SetOutMaxValue(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 

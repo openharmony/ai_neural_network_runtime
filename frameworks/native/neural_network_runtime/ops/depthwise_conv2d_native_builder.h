@@ -25,7 +25,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class DepthwiseConv2DNativeBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(DepthwiseConv2DNativeBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (DepthwiseConv2DNativeBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     DepthwiseConv2DNativeBuilder();
     ~DepthwiseConv2DNativeBuilder() override;
@@ -38,14 +38,14 @@ public:
 private:
     OH_NN_ReturnCode SetInputAndOutput(const std::vector<uint32_t>& inputsIndex,
         const std::vector<uint32_t>& outputsIndex, const std::vector<std::shared_ptr<NNTensor>>& allTensors);
-    OH_NN_ReturnCode SetIsPadMode(std::shared_ptr<NNTensor> tensor,
+    OH_NN_ReturnCode SetIsPadMode(const std::shared_ptr<NNTensor>& tensor,
         bool &isPadMode);
-    OH_NN_ReturnCode SetPadModeOrPaddings(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetPadModeOrPaddings(const std::shared_ptr<NNTensor>& tensor);
     OH_NN_ReturnCode SetKernelSize(const std::vector<uint32_t>& inputsIndex,
         const std::vector<std::shared_ptr<NNTensor>>& allTensors);
-    OH_NN_ReturnCode SetDilation(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetStrides(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetActivation(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetDilation(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetStrides(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetActivation(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_inChannel{0};

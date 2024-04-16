@@ -29,7 +29,7 @@ BatchToSpaceNDBuilder::BatchToSpaceNDBuilder() {}
 
 BatchToSpaceNDBuilder::~BatchToSpaceNDBuilder() {}
 
-OH_NN_ReturnCode BatchToSpaceNDBuilder::SetInputBlock(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode BatchToSpaceNDBuilder::SetInputBlock(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -53,7 +53,7 @@ OH_NN_ReturnCode BatchToSpaceNDBuilder::SetInputBlock(std::shared_ptr<NNTensor> 
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode BatchToSpaceNDBuilder::SetInputCrops(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode BatchToSpaceNDBuilder::SetInputCrops(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 

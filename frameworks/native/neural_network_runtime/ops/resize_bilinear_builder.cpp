@@ -30,7 +30,7 @@ ResizeBilinearBuilder::ResizeBilinearBuilder() {}
 
 ResizeBilinearBuilder::~ResizeBilinearBuilder() {}
 
-OH_NN_ReturnCode ResizeBilinearBuilder::SetNewHeight(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ResizeBilinearBuilder::SetNewHeight(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -53,7 +53,7 @@ OH_NN_ReturnCode ResizeBilinearBuilder::SetNewHeight(std::shared_ptr<NNTensor> t
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ResizeBilinearBuilder::SetNewWidth(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ResizeBilinearBuilder::SetNewWidth(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -76,7 +76,7 @@ OH_NN_ReturnCode ResizeBilinearBuilder::SetNewWidth(std::shared_ptr<NNTensor> te
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ResizeBilinearBuilder::SetPreserveAspectRatio(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ResizeBilinearBuilder::SetPreserveAspectRatio(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -99,7 +99,7 @@ OH_NN_ReturnCode ResizeBilinearBuilder::SetPreserveAspectRatio(std::shared_ptr<N
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ResizeBilinearBuilder::SetCoordinateTransformMode(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ResizeBilinearBuilder::SetCoordinateTransformMode(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -125,7 +125,7 @@ OH_NN_ReturnCode ResizeBilinearBuilder::SetCoordinateTransformMode(std::shared_p
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ResizeBilinearBuilder::SetExcludeOutside(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ResizeBilinearBuilder::SetExcludeOutside(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {

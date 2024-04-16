@@ -28,7 +28,7 @@ InstanceNormBuilder::InstanceNormBuilder() {}
 
 InstanceNormBuilder::~InstanceNormBuilder() {}
 
-OH_NN_ReturnCode InstanceNormBuilder::SetEpsilon(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode InstanceNormBuilder::SetEpsilon(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[InstanceNorm] The epsilon should be type OH_NN_FLOAT32.");

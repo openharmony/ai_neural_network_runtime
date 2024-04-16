@@ -28,7 +28,7 @@ LeakyReluBuilder::LeakyReluBuilder() {}
 
 LeakyReluBuilder::~LeakyReluBuilder() {}
 
-OH_NN_ReturnCode LeakyReluBuilder::SetNegativeSlope(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LeakyReluBuilder::SetNegativeSlope(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[LeakyRelu] The negativeSlope should be type OH_NN_FLOAT32.");

@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class RangeBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(RangeBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (RangeBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     RangeBuilder();
     ~RangeBuilder() override;
@@ -38,9 +38,9 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetStart(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetLimit(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetDelta(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetStart(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetLimit(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetDelta(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_start {0};

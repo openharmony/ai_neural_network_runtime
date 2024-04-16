@@ -76,7 +76,7 @@ void Conv2DTransposeBuilder::SetKernelSize(const std::vector<uint32_t>& inputsIn
     m_kernelSize.emplace_back(weightShape[KERNEL_WEIGHT_INDEX]);
 }
 
-OH_NN_ReturnCode Conv2DTransposeBuilder::SetStrides(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DTransposeBuilder::SetStrides(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set Strides
@@ -97,7 +97,7 @@ OH_NN_ReturnCode Conv2DTransposeBuilder::SetStrides(std::shared_ptr<NNTensor> te
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DTransposeBuilder::SetDilation(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DTransposeBuilder::SetDilation(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set Dilation
@@ -118,7 +118,7 @@ OH_NN_ReturnCode Conv2DTransposeBuilder::SetDilation(std::shared_ptr<NNTensor> t
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DTransposeBuilder::SetPad(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DTransposeBuilder::SetPad(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -163,7 +163,7 @@ OH_NN_ReturnCode Conv2DTransposeBuilder::SetPad(std::shared_ptr<NNTensor> tensor
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DTransposeBuilder::SetGroup(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DTransposeBuilder::SetGroup(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set Group
@@ -187,7 +187,7 @@ OH_NN_ReturnCode Conv2DTransposeBuilder::SetGroup(std::shared_ptr<NNTensor> tens
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DTransposeBuilder::SetOutPadding(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DTransposeBuilder::SetOutPadding(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set outputPadding
@@ -208,7 +208,7 @@ OH_NN_ReturnCode Conv2DTransposeBuilder::SetOutPadding(std::shared_ptr<NNTensor>
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DTransposeBuilder::SetActivation(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DTransposeBuilder::SetActivation(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 

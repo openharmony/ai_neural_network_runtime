@@ -31,7 +31,7 @@ GeluBuilder::GeluBuilder() {}
 
 GeluBuilder::~GeluBuilder() {}
 
-OH_NN_ReturnCode GeluBuilder::SetApproximate(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode GeluBuilder::SetApproximate(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[GeLU] The approximate should be type OH_NN_BOOL.");

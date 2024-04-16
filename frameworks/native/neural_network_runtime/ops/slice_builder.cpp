@@ -29,7 +29,7 @@ SliceBuilder::SliceBuilder() {}
 
 SliceBuilder::~SliceBuilder() {}
 
-OH_NN_ReturnCode SliceBuilder::SetAxes(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SliceBuilder::SetAxes(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SliceBuilder] The axes should be type OH_NN_INT64.");

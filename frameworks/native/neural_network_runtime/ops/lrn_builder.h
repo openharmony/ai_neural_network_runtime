@@ -23,7 +23,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class LRNBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(LRNBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (LRNBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     LRNBuilder();
     ~LRNBuilder() override;
@@ -35,11 +35,11 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetDepthRadius(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetBias(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetAlpha(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetBeta(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetNormRegion(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetDepthRadius(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetBias(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetAlpha(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetBeta(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetNormRegion(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_depthRadius {0};

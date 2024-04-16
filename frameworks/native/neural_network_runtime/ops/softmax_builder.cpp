@@ -29,7 +29,7 @@ SoftmaxBuilder::SoftmaxBuilder() {}
 
 SoftmaxBuilder::~SoftmaxBuilder() {}
 
-OH_NN_ReturnCode SoftmaxBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SoftmaxBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     // Set Axis
     if (tensor->GetDataType() != OH_NN_INT64) {

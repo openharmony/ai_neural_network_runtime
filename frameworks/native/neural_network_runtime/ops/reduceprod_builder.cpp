@@ -31,7 +31,7 @@ ReduceProdBuilder::ReduceProdBuilder() {}
 
 ReduceProdBuilder:: ~ReduceProdBuilder() {}
 
-OH_NN_ReturnCode ReduceProdBuilder::SetCoeff(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceProdBuilder::SetCoeff(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[ReduceAll] The coeff should be type OH_NN_FLOAT32.");
@@ -53,7 +53,7 @@ OH_NN_ReturnCode ReduceProdBuilder::SetCoeff(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ReduceProdBuilder::SetReduceToEnd(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceProdBuilder::SetReduceToEnd(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[ReduceAll] SetReduceToEnd failed, the reduceToEnd should be type OH_NN_BOOL.");
@@ -76,7 +76,7 @@ OH_NN_ReturnCode ReduceProdBuilder::SetReduceToEnd(std::shared_ptr<NNTensor> ten
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ReduceProdBuilder::SetKeepDims(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceProdBuilder::SetKeepDims(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {

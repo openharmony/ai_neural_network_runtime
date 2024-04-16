@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ClipBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(ClipBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (ClipBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     ClipBuilder();
     ~ClipBuilder() override;
@@ -38,8 +38,8 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetMax(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetMin(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetMax(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetMin(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     float m_max {0.0f};

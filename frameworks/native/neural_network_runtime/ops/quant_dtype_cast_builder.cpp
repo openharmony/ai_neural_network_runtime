@@ -30,7 +30,7 @@ QuantDTypeCastBuilder::QuantDTypeCastBuilder() {}
 
 QuantDTypeCastBuilder::~QuantDTypeCastBuilder() {}
 
-OH_NN_ReturnCode QuantDTypeCastBuilder::SetSrcT(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode QuantDTypeCastBuilder::SetSrcT(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT64) {
@@ -48,7 +48,7 @@ OH_NN_ReturnCode QuantDTypeCastBuilder::SetSrcT(std::shared_ptr<NNTensor> tensor
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode QuantDTypeCastBuilder::SetDstT(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode QuantDTypeCastBuilder::SetDstT(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT64) {
@@ -66,7 +66,7 @@ OH_NN_ReturnCode QuantDTypeCastBuilder::SetDstT(std::shared_ptr<NNTensor> tensor
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode QuantDTypeCastBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode QuantDTypeCastBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT64) {

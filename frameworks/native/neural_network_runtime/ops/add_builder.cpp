@@ -30,7 +30,7 @@ AddBuilder::AddBuilder() {}
 
 AddBuilder::~AddBuilder() {}
 
-OH_NN_ReturnCode AddBuilder::SetActivation(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode AddBuilder::SetActivation(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 

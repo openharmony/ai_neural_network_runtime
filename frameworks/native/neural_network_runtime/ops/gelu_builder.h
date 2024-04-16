@@ -23,7 +23,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class GeluBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(GeluBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (GeluBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     GeluBuilder();
     ~GeluBuilder() override;
@@ -34,7 +34,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetApproximate(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetApproximate(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     bool m_approximate {false};

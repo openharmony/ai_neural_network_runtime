@@ -32,7 +32,7 @@ BatchNormBuilder::BatchNormBuilder() {}
 
 BatchNormBuilder::~BatchNormBuilder() {}
 
-OH_NN_ReturnCode BatchNormBuilder::SetEpsilon(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode BatchNormBuilder::SetEpsilon(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_FLOAT32) {

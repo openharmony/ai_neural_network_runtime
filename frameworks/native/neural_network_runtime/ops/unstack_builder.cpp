@@ -28,7 +28,7 @@ UnstackBuilder::UnstackBuilder() {}
 
 UnstackBuilder::~UnstackBuilder() {}
 
-OH_NN_ReturnCode UnstackBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode UnstackBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Unstack] The axis should be type OH_NN_INT64.");

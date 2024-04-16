@@ -23,7 +23,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class CropBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(CropBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (CropBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     CropBuilder();
     ~CropBuilder() override;
@@ -35,8 +35,8 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetOffset(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetOffset(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_axis {0};

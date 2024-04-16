@@ -23,7 +23,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class BatchNormBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(BatchNormBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (BatchNormBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     BatchNormBuilder();
     ~BatchNormBuilder() override;
@@ -34,7 +34,7 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetEpsilon(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetEpsilon(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     float m_epsilon {0.0001f};

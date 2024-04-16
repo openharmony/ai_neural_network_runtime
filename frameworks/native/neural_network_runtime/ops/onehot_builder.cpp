@@ -31,7 +31,7 @@ OnehotBuilder::OnehotBuilder() {}
 
 OnehotBuilder::~OnehotBuilder() {}
 
-OH_NN_ReturnCode OnehotBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode OnehotBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT64) {

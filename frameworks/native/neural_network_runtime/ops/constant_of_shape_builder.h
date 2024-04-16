@@ -26,7 +26,7 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ConstantOfShapeBuilder : public OpsBuilder {
 public:
-    typedef OH_NN_ReturnCode(ConstantOfShapeBuilder::*FuncPtr)(std::shared_ptr<NNTensor>);
+    typedef OH_NN_ReturnCode (ConstantOfShapeBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
 
     ConstantOfShapeBuilder();
     ~ConstantOfShapeBuilder() override;
@@ -38,8 +38,8 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetDataType(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetValue(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetDataType(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetValue(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_dataType {0};

@@ -37,7 +37,7 @@ PadBuilder::PadBuilder() {}
 
 PadBuilder::~PadBuilder() {}
 
-OH_NN_ReturnCode PadBuilder::SetPaddingMode(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PadBuilder::SetPaddingMode(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -70,7 +70,7 @@ OH_NN_ReturnCode PadBuilder::SetPaddingMode(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode PadBuilder::SetConstantValue(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PadBuilder::SetConstantValue(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
