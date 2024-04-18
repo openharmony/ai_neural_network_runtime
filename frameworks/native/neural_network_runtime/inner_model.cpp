@@ -109,7 +109,8 @@ bool InnerModel::IsBuild() const
     return ((m_liteGraph != nullptr) || (m_metaGraph != nullptr));
 }
 
-OH_NN_ReturnCode InnerModel::BuildFromLiteGraph(const MSLITE::LiteGraph* liteGraph)
+OH_NN_ReturnCode InnerModel::BuildFromLiteGraph(const MSLITE::LiteGraph* liteGraph, const Buffer& quantBuffer,
+    const std::string& modelName, const std::string& isProfiling, std::map<std::string, std::string>& opLayouts)
 {
     NNRT_TRACE_NAME("Build model from lite graph");
     if (liteGraph == nullptr) {
@@ -143,6 +144,11 @@ OH_NN_ReturnCode InnerModel::BuildFromLiteGraph(const MSLITE::LiteGraph* liteGra
 
     m_liteGraph.reset(const_cast<MSLITE::LiteGraph*>(liteGraph), LiteGraphDeleter());
     m_liteGraph->name_ = LOADED_NNR_MODEL;
+
+    m_quantBuffer = quantBuffer;
+    m_modelName = modelName;
+    m_isProfiling = isProfiling;
+    m_opLayouts = opLayouts;
 
     return OH_NN_SUCCESS;
 }

@@ -436,7 +436,8 @@ LiteGraphTensorPtr NNTensor::ConvertToLiteGraphTensor() const
     }
 
     mindspore::lite::TensorPtr tensor = mindspore::lite::MindIR_Tensor_Create(
-        m_name, dataType, m_dimensions, format, data, quantParams);
+        m_name.c_str(), dataType, m_dimensions.data(), m_dimensions.size(), format,
+        data.data(), data.size(), quantParams.data(), quantParams.size());
     if (tensor == nullptr) {
         LOGE("ConvertToLiteGraphTensor failed, please check attributes of NNTensor.");
         return {nullptr, DestroyLiteGraphTensor};
