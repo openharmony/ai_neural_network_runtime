@@ -24,6 +24,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class SliceBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (SliceBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     SliceBuilder();
     ~SliceBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -34,10 +36,13 @@ public:
     LiteGraphTensorPtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetAxes(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxes(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     std::vector<int64_t> m_axes;
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_SLICE_AXES, &SliceBuilder::SetAxes}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

@@ -24,6 +24,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class SpaceToBatchNDBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (SpaceToBatchNDBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     SpaceToBatchNDBuilder();
     ~SpaceToBatchNDBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -34,13 +36,17 @@ public:
     LiteGraphTensorPtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetPadData(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetBlockShape(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetPaddings(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetPadData(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetBlockShape(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetPaddings(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     std::vector<std::vector<int64_t>> paddings;
     std::vector<int64_t> block_shape {};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_SPACE_TO_BATCH_ND_BLOCK_SHAPE, &SpaceToBatchNDBuilder::SetBlockShape},
+        {OH_NN_SPACE_TO_BATCH_ND_PADDINGS, &SpaceToBatchNDBuilder::SetPaddings}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

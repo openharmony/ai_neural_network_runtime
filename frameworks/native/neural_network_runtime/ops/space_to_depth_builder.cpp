@@ -33,7 +33,7 @@ SpaceToDepthBuilder::SpaceToDepthBuilder() {}
 
 SpaceToDepthBuilder::~SpaceToDepthBuilder() {}
 
-OH_NN_ReturnCode SpaceToDepthBuilder::SetBlockSize(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SpaceToDepthBuilder::SetBlockSize(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SpaceToDepth] The blockSize should be type OH_NN_INT64.");
@@ -83,13 +83,11 @@ OH_NN_ReturnCode SpaceToDepthBuilder::Build(const std::vector<uint32_t>& paramsI
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_SPACE_TO_DEPTH_BLOCK_SIZE:
-                ret = SetBlockSize(tensor);
-                break;
-            default:
-                LOGE("[SpaceToDepth] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[SpaceToDepth] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

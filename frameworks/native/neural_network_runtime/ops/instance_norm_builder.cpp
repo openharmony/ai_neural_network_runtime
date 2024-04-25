@@ -28,7 +28,7 @@ InstanceNormBuilder::InstanceNormBuilder() {}
 
 InstanceNormBuilder::~InstanceNormBuilder() {}
 
-OH_NN_ReturnCode InstanceNormBuilder::SetEpsilon(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode InstanceNormBuilder::SetEpsilon(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[InstanceNorm] The epsilon should be type OH_NN_FLOAT32.");
@@ -78,13 +78,11 @@ OH_NN_ReturnCode InstanceNormBuilder::Build(const std::vector<uint32_t>& paramsI
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_INSTANCE_NORM_EPSILON:
-                ret = SetEpsilon(tensor);
-                break;
-            default:
-                LOGE("[InstanceNorm] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[InstanceNorm] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

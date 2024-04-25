@@ -37,7 +37,7 @@ PadBuilder::PadBuilder() {}
 
 PadBuilder::~PadBuilder() {}
 
-OH_NN_ReturnCode PadBuilder::SetPaddingMode(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PadBuilder::SetPaddingMode(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -70,7 +70,7 @@ OH_NN_ReturnCode PadBuilder::SetPaddingMode(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode PadBuilder::SetConstantValue(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PadBuilder::SetConstantValue(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -120,16 +120,11 @@ OH_NN_ReturnCode PadBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_PAD_CONSTANT_VALUE:
-                returnCode = SetConstantValue(tensor);
-                break;
-            case OH_NN_PAD_PADDING_MODE:
-                returnCode = SetPaddingMode(tensor);
-                break;
-            default:
-                LOGE("[Pad] Parameter Type is invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Pad] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

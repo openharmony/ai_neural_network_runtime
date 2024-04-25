@@ -28,7 +28,7 @@ ConcatBuilder::ConcatBuilder() {}
 
 ConcatBuilder::~ConcatBuilder() {}
 
-OH_NN_ReturnCode ConcatBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ConcatBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -85,14 +85,13 @@ OH_NN_ReturnCode ConcatBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_CONCAT_AXIS:
-                returnCode = SetAxis(tensor);
-                break;
-            default:
-                LOGE("[Concat] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Concat] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[Concat] Build failed, passed invalid param.");
             return returnCode;

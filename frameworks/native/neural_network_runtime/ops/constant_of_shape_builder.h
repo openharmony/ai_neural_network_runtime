@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ConstantOfShapeBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (ConstantOfShapeBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     ConstantOfShapeBuilder();
     ~ConstantOfShapeBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -36,12 +38,16 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetDataType(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetValue(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetDataType(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetValue(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_dataType {0};
     std::vector<float> m_value;
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_CONSTANT_OF_SHAPE_DATA_TYPE, &ConstantOfShapeBuilder::SetDataType},
+        {OH_NN_CONSTANT_OF_SHAPE_VALUE, &ConstantOfShapeBuilder::SetValue}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

@@ -32,7 +32,7 @@ LRNBuilder::LRNBuilder() {}
 
 LRNBuilder::~LRNBuilder() {}
 
-OH_NN_ReturnCode LRNBuilder::SetDepthRadius(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LRNBuilder::SetDepthRadius(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[LRN] The depthRadius should be type OH_NN_INT64.");
@@ -54,7 +54,7 @@ OH_NN_ReturnCode LRNBuilder::SetDepthRadius(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LRNBuilder::SetBias(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LRNBuilder::SetBias(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[LRN] The bias should be type OH_NN_FLOAT32.");
@@ -76,7 +76,7 @@ OH_NN_ReturnCode LRNBuilder::SetBias(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LRNBuilder::SetAlpha(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LRNBuilder::SetAlpha(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[LRN] The alpha should be type OH_NN_FLOAT32.");
@@ -98,7 +98,7 @@ OH_NN_ReturnCode LRNBuilder::SetAlpha(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LRNBuilder::SetBeta(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LRNBuilder::SetBeta(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[LRN] The beta should be type OH_NN_FLOAT32.");
@@ -120,7 +120,7 @@ OH_NN_ReturnCode LRNBuilder::SetBeta(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LRNBuilder::SetNormRegion(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LRNBuilder::SetNormRegion(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT32) {
         LOGE("[LRN] The normRegion should be type OH_NN_INT32.");
@@ -178,25 +178,11 @@ OH_NN_ReturnCode LRNBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_LRN_DEPTH_RADIUS:
-                ret = SetDepthRadius(tensor);
-                break;
-            case OH_NN_LRN_BIAS:
-                ret = SetBias(tensor);
-                break;
-            case OH_NN_LRN_ALPHA:
-                ret = SetAlpha(tensor);
-                break;
-            case OH_NN_LRN_BETA:
-                ret = SetBeta(tensor);
-                break;
-            case OH_NN_LRN_NORM_REGION:
-                ret = SetNormRegion(tensor);
-                break;
-            default:
-                LOGE("[LRN] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[LRN] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

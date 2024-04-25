@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class InstanceNormBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (InstanceNormBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     InstanceNormBuilder();
     ~InstanceNormBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -36,10 +38,13 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetEpsilon(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetEpsilon(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     float m_epsilon {0.0f};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_INSTANCE_NORM_EPSILON, &InstanceNormBuilder::SetEpsilon}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

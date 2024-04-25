@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class DivBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (DivBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     DivBuilder();
     ~DivBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -36,10 +38,13 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetActicationType(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetActicationType(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_DIV_ACTIVATIONTYPE, &DivBuilder::SetActicationType}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

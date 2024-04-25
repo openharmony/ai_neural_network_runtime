@@ -29,7 +29,7 @@ SubBuilder::SubBuilder() {}
 
 SubBuilder::~SubBuilder() {}
 
-OH_NN_ReturnCode SubBuilder::SetActivationType(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SubBuilder::SetActivationType(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT8) {
         LOGE("[SubBuilder] The 3rd input activation should be type OH_NN_INT8.");
@@ -92,13 +92,11 @@ OH_NN_ReturnCode SubBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_SUB_ACTIVATIONTYPE:
-                returnCode = SetActivationType(tensor);
-                break;
-            default:
-                LOGE("[SubBuilder] Parameter Type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[SubBuilder] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

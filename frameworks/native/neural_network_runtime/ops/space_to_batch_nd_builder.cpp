@@ -35,7 +35,7 @@ SpaceToBatchNDBuilder::SpaceToBatchNDBuilder() {}
 
 SpaceToBatchNDBuilder::~SpaceToBatchNDBuilder() {}
 
-OH_NN_ReturnCode SpaceToBatchNDBuilder::SetBlockShape(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SpaceToBatchNDBuilder::SetBlockShape(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SpaceToBatchNDBuilder] The 2nd input blockShape should be type OH_NN_INT64.");
@@ -68,7 +68,7 @@ OH_NN_ReturnCode SpaceToBatchNDBuilder::SetBlockShape(std::shared_ptr<NNTensor> 
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode SpaceToBatchNDBuilder::SetPaddings(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SpaceToBatchNDBuilder::SetPaddings(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SpaceToBatchNDBuilder] The 3rd input paddings should be type OH_NN_INT64.");
@@ -128,16 +128,11 @@ OH_NN_ReturnCode SpaceToBatchNDBuilder::Build(const std::vector<uint32_t>& param
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_SPACE_TO_BATCH_ND_BLOCK_SHAPE:
-                returnCode = SetBlockShape(tensor);
-                break;
-            case OH_NN_SPACE_TO_BATCH_ND_PADDINGS:
-                returnCode = SetPaddings(tensor);
-                break;
-            default:
-                LOGE("[SpaceToBatchNDBuilder] Parameter Type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[SpaceToBatchNDBuilder] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {
@@ -154,7 +149,7 @@ OH_NN_ReturnCode SpaceToBatchNDBuilder::Build(const std::vector<uint32_t>& param
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode SpaceToBatchNDBuilder::SetPadData(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SpaceToBatchNDBuilder::SetPadData(const std::shared_ptr<NNTensor>& tensor)
 {
     paddings.clear();
 

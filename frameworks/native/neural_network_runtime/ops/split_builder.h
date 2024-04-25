@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class SplitBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (SplitBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     SplitBuilder();
     ~SplitBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -39,14 +41,19 @@ private:
     OH_NN_ReturnCode SetInputAndOutput(const std::vector<uint32_t>& inputsIndex,
                                        const std::vector<uint32_t>& outputsIndex,
                                        const std::vector<std::shared_ptr<NNTensor>>& allTensors);
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetOutputNum(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetSizeSplits(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetOutputNum(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetSizeSplits(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_output_num {0};
     std::vector<int64_t> m_size_splits;
     int64_t m_axis {0};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_SPLIT_AXIS, &SplitBuilder::SetAxis},
+        {OH_NN_SPLIT_OUTPUT_NUM, &SplitBuilder::SetOutputNum},
+        {OH_NN_SPLIT_SIZE_SPLITS, &SplitBuilder::SetSizeSplits}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

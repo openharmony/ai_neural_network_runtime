@@ -29,7 +29,7 @@ UnsqueezeBuilder::UnsqueezeBuilder() {}
 
 UnsqueezeBuilder::~UnsqueezeBuilder() {}
 
-OH_NN_ReturnCode UnsqueezeBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode UnsqueezeBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     // Set Axis
     if (tensor->GetDataType() != OH_NN_INT64) {
@@ -81,13 +81,11 @@ OH_NN_ReturnCode UnsqueezeBuilder::Build(const std::vector<uint32_t>& paramsInde
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_UNSQUEEZE_AXIS:
-                 returnCode = SetAxis(tensor);
-                break;
-            default:
-                LOGE("[UnsqueezeBuilder] Parameter Type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[UnsqueezeBuilder] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

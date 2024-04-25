@@ -23,6 +23,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ReduceProdBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (ReduceProdBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     ReduceProdBuilder();
     ~ReduceProdBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -33,14 +35,19 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetCoeff(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetReduceToEnd(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetKeepDims(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetCoeff(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetReduceToEnd(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetKeepDims(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     bool m_keepDims{false};
     float m_coeff {0.0f};
     bool m_reduceToEnd {false};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_REDUCE_PROD_COEFF, &ReduceProdBuilder::SetCoeff},
+        {OH_NN_REDUCE_PROD_REDUCE_TO_END, &ReduceProdBuilder::SetReduceToEnd},
+        {OH_NN_REDUCE_PROD_KEEP_DIMS, &ReduceProdBuilder::SetKeepDims}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

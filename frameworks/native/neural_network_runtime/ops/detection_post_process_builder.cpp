@@ -33,7 +33,7 @@ DetectionPostProcessBuilder::DetectionPostProcessBuilder() {}
 
 DetectionPostProcessBuilder::~DetectionPostProcessBuilder() {}
 
-OH_NN_ReturnCode DetectionPostProcessBuilder::SetInputSize(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DetectionPostProcessBuilder::SetInputSize(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[DetectionPostProcess] The inputSize should be type OH_NN_INT64.");
@@ -55,7 +55,7 @@ OH_NN_ReturnCode DetectionPostProcessBuilder::SetInputSize(std::shared_ptr<NNTen
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DetectionPostProcessBuilder::SetScale(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DetectionPostProcessBuilder::SetScale(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[DetectionPostProcess] The scale should be type OH_NN_FLOAT32.");
@@ -81,7 +81,7 @@ OH_NN_ReturnCode DetectionPostProcessBuilder::SetScale(std::shared_ptr<NNTensor>
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DetectionPostProcessBuilder::SetNmsIoUThreshold(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DetectionPostProcessBuilder::SetNmsIoUThreshold(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[DetectionPostProcess] The nmsIoUThreshold should be type OH_NN_FLOAT32.");
@@ -103,7 +103,7 @@ OH_NN_ReturnCode DetectionPostProcessBuilder::SetNmsIoUThreshold(std::shared_ptr
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DetectionPostProcessBuilder::SetNmsScoreThreshold(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DetectionPostProcessBuilder::SetNmsScoreThreshold(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[DetectionPostProcess] The scoreThreshold should be type OH_NN_FLOAT32.");
@@ -125,7 +125,7 @@ OH_NN_ReturnCode DetectionPostProcessBuilder::SetNmsScoreThreshold(std::shared_p
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DetectionPostProcessBuilder::SetMaxDetections(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DetectionPostProcessBuilder::SetMaxDetections(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[DetectionPostProcess] The maxDetections should be type OH_NN_INT64.");
@@ -147,7 +147,7 @@ OH_NN_ReturnCode DetectionPostProcessBuilder::SetMaxDetections(std::shared_ptr<N
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DetectionPostProcessBuilder::SetDetectionsPerClass(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DetectionPostProcessBuilder::SetDetectionsPerClass(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[DetectionPostProcess] The detectionsPerClass should be type OH_NN_INT64.");
@@ -169,7 +169,7 @@ OH_NN_ReturnCode DetectionPostProcessBuilder::SetDetectionsPerClass(std::shared_
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DetectionPostProcessBuilder::SetMaxClassesPerDetection(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DetectionPostProcessBuilder::SetMaxClassesPerDetection(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[DetectionPostProcess] The maxClassesPerDetection should be type OH_NN_INT64.");
@@ -191,7 +191,7 @@ OH_NN_ReturnCode DetectionPostProcessBuilder::SetMaxClassesPerDetection(std::sha
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DetectionPostProcessBuilder::SetNumClasses(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DetectionPostProcessBuilder::SetNumClasses(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[DetectionPostProcess] The numClasses should be type OH_NN_INT64.");
@@ -213,7 +213,7 @@ OH_NN_ReturnCode DetectionPostProcessBuilder::SetNumClasses(std::shared_ptr<NNTe
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DetectionPostProcessBuilder::SetUseRegularNms(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DetectionPostProcessBuilder::SetUseRegularNms(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[DetectionPostProcess] The useRegularNms should be type OH_NN_BOOL.");
@@ -235,7 +235,7 @@ OH_NN_ReturnCode DetectionPostProcessBuilder::SetUseRegularNms(std::shared_ptr<N
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DetectionPostProcessBuilder::SetOutQuantized(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DetectionPostProcessBuilder::SetOutQuantized(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[DetectionPostProcess] The outQuantized should be type OH_NN_BOOL.");
@@ -287,40 +287,11 @@ OH_NN_ReturnCode DetectionPostProcessBuilder::Build(const std::vector<uint32_t>&
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_DETECTION_POST_PROCESS_INPUT_SIZE:
-                ret = SetInputSize(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_SCALE:
-                ret = SetScale(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_NMS_IOU_THRESHOLD:
-                ret = SetNmsIoUThreshold(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_NMS_SCORE_THRESHOLD:
-                ret = SetNmsScoreThreshold(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_MAX_DETECTIONS:
-                ret = SetMaxDetections(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_DETECTIONS_PER_CLASS:
-                ret = SetDetectionsPerClass(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_MAX_CLASSES_PER_DETECTION:
-                ret = SetMaxClassesPerDetection(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_NUM_CLASSES:
-                ret = SetNumClasses(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_USE_REGULAR_NMS:
-                ret = SetUseRegularNms(tensor);
-                break;
-            case OH_NN_DETECTION_POST_PROCESS_OUT_QUANTIZED:
-                ret = SetOutQuantized(tensor);
-                break;
-            default:
-                LOGE("[DetectionPostProcess] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[DetectionPostProcess] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

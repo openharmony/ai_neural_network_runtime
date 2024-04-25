@@ -25,6 +25,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ResizeBilinearBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (ResizeBilinearBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     ResizeBilinearBuilder();
     ~ResizeBilinearBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -35,11 +37,11 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetNewHeight(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetNewWidth(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetPreserveAspectRatio(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetCoordinateTransformMode(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetExcludeOutside(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetNewHeight(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetNewWidth(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetPreserveAspectRatio(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetCoordinateTransformMode(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetExcludeOutside(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     mindspore::lite::ResizeMethod m_method {mindspore::lite::RESIZE_METHOD_LINEAR};
@@ -49,6 +51,13 @@ private:
     mindspore::lite::CoordinateTransformMode m_coordinateTransformMode {
         mindspore::lite::COORDINATE_TRANSFORM_MODE_ASYMMETRIC};
     uint64_t m_excludeOutside{0};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_RESIZE_BILINEAR_NEW_HEIGHT, &ResizeBilinearBuilder::SetNewHeight},
+        {OH_NN_RESIZE_BILINEAR_NEW_WIDTH, &ResizeBilinearBuilder::SetNewWidth},
+        {OH_NN_RESIZE_BILINEAR_PRESERVE_ASPECT_RATIO, &ResizeBilinearBuilder::SetPreserveAspectRatio},
+        {OH_NN_RESIZE_BILINEAR_COORDINATE_TRANSFORM_MODE, &ResizeBilinearBuilder::SetCoordinateTransformMode},
+        {OH_NN_RESIZE_BILINEAR_EXCLUDE_OUTSIDE, &ResizeBilinearBuilder::SetExcludeOutside}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime
