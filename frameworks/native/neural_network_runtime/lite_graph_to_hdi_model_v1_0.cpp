@@ -986,7 +986,7 @@ OHOS::HDI::Nnrt::V1_0::SharedBuffer Copy_MindIR_Tensor_Data_To_HDIBuffer(const T
         return result;
     }
     result.fd = bufferTemplete.fd;
-    result.bufferSize = buffer_templete.bufferSize;
+    result.bufferSize = bufferTemplete.bufferSize;
     auto ret = memcpy_s(mmapPtr + offset, data.size(), data.data(), data.size());
     if (ret != EOK) {
         LOGE("Tensor memcpy failed.");
