@@ -134,7 +134,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
 
 OH_NN_ReturnCode NNCompiledCache::SetBackend(size_t backendID)
 {
-    const BackendManager& backendManager = BackendManager::GetInstance();
+    BackendManager& backendManager = BackendManager::GetInstance();
     std::shared_ptr<Backend> backend = backendManager.GetBackend(backendID);
     if (backend == nullptr) {
         LOGE("[NNCompiledCache] SetBackend failed, backend with backendID %{public}zu is not exist.", backendID);
