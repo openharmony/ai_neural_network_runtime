@@ -1006,7 +1006,7 @@ OHOS::HDI::Nnrt::V2_0::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteG
         return nullptr;
     }
 
-    LOGI("MindIR_LiteGraph_To_Model begin"); // todo 改称hitrace
+    LOGI("MindIR_LiteGraph_To_Model begin");
 
     std::vector<OHOS::HDI::Nnrt::V2_0::Node> nodes;
     std::vector<OHOS::HDI::Nnrt::V2_0::Tensor> allTensors;
@@ -1049,7 +1049,7 @@ OHOS::HDI::Nnrt::V2_0::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteG
         tmp.dataType = static_cast<DataType>(mindspore::lite::MindIR_Tensor_GetDataType(tensor));
         tmp.dims = mindspore::lite::MindIR_Tensor_GetDims(tensor);
         tmp.format = static_cast<Format>(mindspore::lite::MindIR_Tensor_GetFormat(tensor));
-        tmp.data = Copy_MindIR_Tensor_Data_To_HDIBuffer(tensor, buffer, mmapPtr, tensorBufferOffset); // todo 实现
+        tmp.data = Copy_MindIR_Tensor_Data_To_HDIBuffer(tensor, buffer, mmapPtr, tensorBufferOffset);
         tmp.quantParams = MindIR_Tensor_GetQuantParams_OHOS(tensor);
         allTensors.emplace_back(tmp);
         tensorBufferOffset = tmp.data.offset + tmp.data.dataSize;

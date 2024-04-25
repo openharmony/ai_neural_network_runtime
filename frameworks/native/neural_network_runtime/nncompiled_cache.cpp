@@ -78,7 +78,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
     if (realpath(cacheInfoPath.c_str(), path) == nullptr) {
         LOGE("[NNCompiledCache] Restore failed, fail to get the real path of cacheInfoPath.");
         return OH_NN_INVALID_PARAMETER;
-    }
+    } 
     if (access(cacheInfoPath.c_str(), F_OK) != 0) {
         LOGE("[NNCompiledCache] Restore failed, cacheInfoPath is not exist.");
         return OH_NN_INVALID_PARAMETER;
@@ -199,6 +199,12 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
 
     for (size_t i = 0; i < cacheNumber; ++i) {
         std::string cacheModelFile = cacheDir + "/" + m_modelName + std::to_string(i) + ".nncache";
+        char path[PATH_MAX];
+        if (realpath(cacheModelFile.c_str(), path) == nullptr) {
+            LOGE("[NNCompiledCache] GenerateCacheModel failed, fail to get the real path of cacheModelFile.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+
         std::ofstream cacheModelStream(cacheModelFile, std::ios::binary | std::ios::out | std::ios::trunc);
         if (cacheModelStream.fail()) {
             LOGE("[NNCompiledCache] GenerateCacheModel failed, model cache file is invalid.");
@@ -225,6 +231,12 @@ OH_NN_ReturnCode NNCompiledCache::WriteCacheInfo(uint32_t cacheSize,
                                                  const std::string& cacheDir) const
 {
     std::string cacheInfoPath = cacheDir + "/" + m_modelName + "cache_info.nncache";
+    char path[PATH_MAX];
+    if (realpath(cacheInfoPath.c_str(), path) == nullptr) {
+        LOGE("[NNCompiledCache] WriteCacheInfo failed, fail to get the real path of cacheInfoPath.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
     std::ofstream cacheInfoStream(cacheInfoPath, std::ios::binary | std::ios::out | std::ios::trunc);
     if (cacheInfoStream.fail()) {
         LOGE("[NNCompiledCache] WriteCacheInfo failed, model cache info file is invalid.");
