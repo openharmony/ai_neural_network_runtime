@@ -28,7 +28,7 @@ AssertBuilder::AssertBuilder() {}
 
 AssertBuilder::~AssertBuilder() {}
 
-OH_NN_ReturnCode AssertBuilder::SetSummarize(std::shared_ptr<NNTensor>& tensor)
+OH_NN_ReturnCode AssertBuilder::SetSummarize(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Assert] The summarize should be type OH_NN_INT64.");
@@ -75,22 +75,19 @@ OH_NN_ReturnCode AssertBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return ret;
     }
 
-    OH_NN_ReturnCode returnCode;
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_ASSERT_SUMMARIZE:
-                returnCode = SetSummarize(tensor);
-                break;
-            default:
-                LOGE("[Assert] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Assert] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
-        if (returnCode != OH_NN_SUCCESS) {
+        if (ret != OH_NN_SUCCESS) {
             LOGE("[Assert] Build failed, passed invalid param.");
-            return returnCode;
+            return ret;
         }
     }
 

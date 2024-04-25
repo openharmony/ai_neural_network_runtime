@@ -32,7 +32,7 @@ L2NormalizeBuilder::L2NormalizeBuilder() {}
 
 L2NormalizeBuilder::~L2NormalizeBuilder() {}
 
-OH_NN_ReturnCode L2NormalizeBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode L2NormalizeBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[L2Normalize] The axis should be type OH_NN_INT64.");
@@ -58,7 +58,7 @@ OH_NN_ReturnCode L2NormalizeBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode L2NormalizeBuilder::SetEpsilon(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode L2NormalizeBuilder::SetEpsilon(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[L2Normalize] The epsilon should be type OH_NN_FLOAT32.");
@@ -80,7 +80,7 @@ OH_NN_ReturnCode L2NormalizeBuilder::SetEpsilon(std::shared_ptr<NNTensor> tensor
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode L2NormalizeBuilder::SetActivationType(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode L2NormalizeBuilder::SetActivationType(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT8) {
         LOGE("[L2Normalize] SetActivationType failed, the activationType should have type OH_NN_INT8.");
@@ -136,19 +136,11 @@ OH_NN_ReturnCode L2NormalizeBuilder::Build(const std::vector<uint32_t>& paramsIn
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_L2_NORMALIZE_AXIS:
-                ret = SetAxis(tensor);
-                break;
-            case OH_NN_L2_NORMALIZE_EPSILON:
-                ret = SetEpsilon(tensor);
-                break;
-            case OH_NN_L2_NORMALIZE_ACTIVATION_TYPE:
-                ret = SetActivationType(tensor);
-                break;
-            default:
-                LOGE("[L2Normalize] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[L2Normalize] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

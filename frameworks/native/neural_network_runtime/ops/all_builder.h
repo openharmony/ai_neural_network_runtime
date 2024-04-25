@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class AllBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (AllBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     AllBuilder();
     ~AllBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -36,10 +38,13 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetKeepDims(std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetKeepDims(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_keepDims {0};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_ALL_KEEP_DIMS, &AllBuilder::SetKeepDims}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

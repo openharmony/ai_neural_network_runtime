@@ -28,7 +28,7 @@ ClipBuilder::ClipBuilder() {}
 
 ClipBuilder::~ClipBuilder() {}
 
-OH_NN_ReturnCode ClipBuilder::SetMax(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ClipBuilder::SetMax(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Clip] The max should be type OH_NN_FLOAT32.");
@@ -50,7 +50,7 @@ OH_NN_ReturnCode ClipBuilder::SetMax(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ClipBuilder::SetMin(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ClipBuilder::SetMin(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Clip] The min should be type OH_NN_FLOAT32.");
@@ -97,25 +97,19 @@ OH_NN_ReturnCode ClipBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return ret;
     }
 
-    OH_NN_ReturnCode returnCode;
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_CLIP_MAX:
-                returnCode = SetMax(tensor);
-                break;
-            case OH_NN_CLIP_MIN:
-                returnCode = SetMin(tensor);
-                break;
-            default:
-                LOGE("[Clip] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Clip] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
-        if (returnCode != OH_NN_SUCCESS) {
+        if (ret != OH_NN_SUCCESS) {
             LOGE("[Clip] Build failed, passed invalid param.");
-            return returnCode;
+            return ret;
         }
     }
 

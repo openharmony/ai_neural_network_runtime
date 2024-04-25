@@ -28,7 +28,7 @@ LSTMBuilder::LSTMBuilder() {}
 
 LSTMBuilder::~LSTMBuilder() {}
 
-OH_NN_ReturnCode LSTMBuilder::SetBidirectional(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LSTMBuilder::SetBidirectional(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[LSTM] The bidirectional should be type OH_NN_BOOL.");
@@ -50,7 +50,7 @@ OH_NN_ReturnCode LSTMBuilder::SetBidirectional(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LSTMBuilder::SetHasBias(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LSTMBuilder::SetHasBias(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[LSTM] The hasBias should be type OH_NN_BOOL.");
@@ -72,7 +72,7 @@ OH_NN_ReturnCode LSTMBuilder::SetHasBias(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LSTMBuilder::SetInputSize(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LSTMBuilder::SetInputSize(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[LSTM] The inputSize should be type OH_NN_INT64.");
@@ -94,7 +94,7 @@ OH_NN_ReturnCode LSTMBuilder::SetInputSize(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LSTMBuilder::SetHiddenSize(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LSTMBuilder::SetHiddenSize(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[LSTM] The hiddenSize should be type OH_NN_INT64.");
@@ -116,7 +116,7 @@ OH_NN_ReturnCode LSTMBuilder::SetHiddenSize(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LSTMBuilder::SetNumLayers(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LSTMBuilder::SetNumLayers(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[LSTM] The numLayers should be type OH_NN_INT64.");
@@ -138,7 +138,7 @@ OH_NN_ReturnCode LSTMBuilder::SetNumLayers(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LSTMBuilder::SetNumDirections(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LSTMBuilder::SetNumDirections(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[LSTM] The numDirections should be type OH_NN_INT64.");
@@ -160,7 +160,7 @@ OH_NN_ReturnCode LSTMBuilder::SetNumDirections(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LSTMBuilder::SetDropout(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LSTMBuilder::SetDropout(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[LSTM] The dropout should be type OH_NN_FLOAT32.");
@@ -182,7 +182,7 @@ OH_NN_ReturnCode LSTMBuilder::SetDropout(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LSTMBuilder::SetZoneoutCell(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LSTMBuilder::SetZoneoutCell(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[LSTM] The zoneoutCell should be type OH_NN_FLOAT32.");
@@ -204,7 +204,7 @@ OH_NN_ReturnCode LSTMBuilder::SetZoneoutCell(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LSTMBuilder::SetZoneoutHidden(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LSTMBuilder::SetZoneoutHidden(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[LSTM] The zoneoutHidden should be type OH_NN_FLOAT32.");
@@ -226,7 +226,7 @@ OH_NN_ReturnCode LSTMBuilder::SetZoneoutHidden(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode LSTMBuilder::SetProjSize(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LSTMBuilder::SetProjSize(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[LSTM] The projSize should be type OH_NN_INT64.");
@@ -255,41 +255,13 @@ OH_NN_ReturnCode LSTMBuilder::ParseParam(const std::vector<uint32_t>& paramsInde
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_LSTM_BIDIRECTIONAL:
-                returnCode = SetBidirectional(tensor);
-                break;
-            case OH_NN_LSTM_HAS_BIAS:
-                returnCode = SetHasBias(tensor);
-                break;
-            case OH_NN_LSTM_INPUT_SIZE:
-                returnCode = SetInputSize(tensor);
-                break;
-            case OH_NN_LSTM_HIDDEN_SIZE:
-                returnCode = SetHiddenSize(tensor);
-                break;
-            case OH_NN_LSTM_NUM_LAYERS:
-                returnCode = SetNumLayers(tensor);
-                break;
-            case OH_NN_LSTM_NUM_DIRECTIONS:
-                returnCode = SetNumDirections(tensor);
-                break;
-            case OH_NN_LSTM_DROPOUT:
-                returnCode = SetDropout(tensor);
-                break;
-            case OH_NN_LSTM_ZONEOUT_CELL:
-                returnCode = SetZoneoutCell(tensor);
-                break;
-            case OH_NN_LSTM_ZONEOUT_HIDDEN:
-                returnCode = SetZoneoutHidden(tensor);
-                break;
-            case OH_NN_LSTM_PROJ_SIZE:
-                returnCode = SetProjSize(tensor);
-                break;
-            default:
-                LOGE("[LSTM] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[lSTM] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[LSTM] Build failed, passed invalid param.");
             return returnCode;

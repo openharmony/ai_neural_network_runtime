@@ -31,7 +31,7 @@ ReduceMaxBuilder::ReduceMaxBuilder() {}
 
 ReduceMaxBuilder::~ReduceMaxBuilder() {}
 
-OH_NN_ReturnCode ReduceMaxBuilder::SetCoeff(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceMaxBuilder::SetCoeff(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[ReduceMax] The coeff should be type OH_NN_FLOAT32.");
@@ -53,7 +53,7 @@ OH_NN_ReturnCode ReduceMaxBuilder::SetCoeff(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ReduceMaxBuilder::SetReduceToEnd(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceMaxBuilder::SetReduceToEnd(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[ReduceMax] SetReduceToEnd failed, the reduceToEnd should be type OH_NN_BOOL.");
@@ -76,7 +76,7 @@ OH_NN_ReturnCode ReduceMaxBuilder::SetReduceToEnd(std::shared_ptr<NNTensor> tens
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ReduceMaxBuilder::SetKeepDims(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceMaxBuilder::SetKeepDims(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[ReduceMax] SetKeepDims failed, the keep_dims should be type OH_NN_BOOL.");
@@ -126,19 +126,11 @@ OH_NN_ReturnCode ReduceMaxBuilder::Build(const std::vector<uint32_t>& paramsInde
 
     for (uint32_t i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_REDUCE_MAX_KEEP_DIMS:
-                returnCode = SetKeepDims(tensor);
-                break;
-            case OH_NN_REDUCE_MAX_REDUCE_TO_END:
-                returnCode = SetReduceToEnd(tensor);
-                break;
-            case OH_NN_REDUCE_MAX_COEFF:
-                returnCode = SetCoeff(tensor);
-                break;
-            default:
-                LOGE("[ReduceMax] Build failed, parameter type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[ReduceMax] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

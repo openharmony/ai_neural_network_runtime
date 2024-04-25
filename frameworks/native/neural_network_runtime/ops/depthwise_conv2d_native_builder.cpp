@@ -41,7 +41,7 @@ DepthwiseConv2DNativeBuilder::DepthwiseConv2DNativeBuilder() {}
 
 DepthwiseConv2DNativeBuilder::~DepthwiseConv2DNativeBuilder() {}
 
-OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetIsPadMode(std::shared_ptr<NNTensor> tensor,
+OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetIsPadMode(const std::shared_ptr<NNTensor>& tensor,
     bool &isPadMode)
 {
     if (tensor->GetElementCount() == PAD_MODE_SIZE) {
@@ -55,7 +55,7 @@ OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetIsPadMode(std::shared_ptr<NNTe
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetActivation(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetActivation(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set ActivationType
@@ -101,7 +101,7 @@ OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetKernelSize(const std::vector<u
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetStrides(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetStrides(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT64) {
@@ -120,7 +120,7 @@ OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetStrides(std::shared_ptr<NNTens
 
     return OH_NN_SUCCESS;
 }
-OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetDilation(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetDilation(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT64) {
@@ -140,8 +140,7 @@ OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetDilation(std::shared_ptr<NNTen
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetPadModeOrPaddings(
-    std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::SetPadModeOrPaddings(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -233,24 +232,13 @@ OH_NN_ReturnCode DepthwiseConv2DNativeBuilder::Build(const std::vector<uint32_t>
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];  // 参数 tensor
-        switch (tensor->GetType()) {
-            case OH_NN_DEPTHWISE_CONV2D_NATIVE_STRIDES:
-                ret = SetStrides(tensor);
-                break;
-            case OH_NN_DEPTHWISE_CONV2D_NATIVE_DILATION:
-                ret = SetDilation(tensor);
-                break;
-            case OH_NN_DEPTHWISE_CONV2D_NATIVE_PAD_MODE:
-            case OH_NN_DEPTHWISE_CONV2D_NATIVE_PAD:
-                ret = SetPadModeOrPaddings(tensor);
-                break;
-            case OH_NN_DEPTHWISE_CONV2D_NATIVE_ACTIVATION_TYPE:
-                ret = SetActivation(tensor);
-                break;
-            default:
-                LOGE("[DepthwiseConv2DNative] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[DepthwiseConv2DNative] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (ret != OH_NN_SUCCESS) {
             LOGE("[DepthwiseConv2DNative] Build failed, passed invalid param.");
             return ret;

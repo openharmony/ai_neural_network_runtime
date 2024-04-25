@@ -31,7 +31,7 @@ ReduceMeanBuilder::ReduceMeanBuilder() {}
 
 ReduceMeanBuilder:: ~ReduceMeanBuilder() {}
 
-OH_NN_ReturnCode ReduceMeanBuilder::SetCoeff(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceMeanBuilder::SetCoeff(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[ReduceAll] The coeff should be type OH_NN_FLOAT32.");
@@ -53,7 +53,7 @@ OH_NN_ReturnCode ReduceMeanBuilder::SetCoeff(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ReduceMeanBuilder::SetReduceToEnd(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceMeanBuilder::SetReduceToEnd(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[ReduceAll] SetReduceToEnd failed, the reduceToEnd should be type OH_NN_BOOL.");
@@ -76,7 +76,7 @@ OH_NN_ReturnCode ReduceMeanBuilder::SetReduceToEnd(std::shared_ptr<NNTensor> ten
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ReduceMeanBuilder::SetKeepDims(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ReduceMeanBuilder::SetKeepDims(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -126,19 +126,11 @@ OH_NN_ReturnCode ReduceMeanBuilder::Build(const std::vector<uint32_t>& paramsInd
 
     for (uint32_t i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_REDUCE_MEAN_KEEP_DIMS:
-                returnCode = SetKeepDims(tensor);
-                break;
-            case OH_NN_REDUCE_MEAN_REDUCE_TO_END:
-                returnCode = SetReduceToEnd(tensor);
-                break;
-            case OH_NN_REDUCE_MEAN_COEFF:
-                returnCode = SetCoeff(tensor);
-                break;
-            default:
-                LOGE("[ReduceMean] Build failed, parameter type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[ReduceMean] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

@@ -28,7 +28,7 @@ AllBuilder::AllBuilder() {}
 
 AllBuilder::~AllBuilder() {}
 
-OH_NN_ReturnCode AllBuilder::SetKeepDims(std::shared_ptr<NNTensor>& tensor)
+OH_NN_ReturnCode AllBuilder::SetKeepDims(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[All] The keep_dims should be type OH_NN_INT64.");
@@ -75,22 +75,19 @@ OH_NN_ReturnCode AllBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return ret;
     }
 
-    OH_NN_ReturnCode returnCode;
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_ALL_KEEP_DIMS:
-                returnCode = SetKeepDims(tensor);
-                break;
-            default:
-                LOGE("[All] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[All] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
-        if (returnCode != OH_NN_SUCCESS) {
+        if (ret != OH_NN_SUCCESS) {
             LOGE("[All] Build failed, passed invalid param.");
-            return returnCode;
+            return ret;
         }
     }
 

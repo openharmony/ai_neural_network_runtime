@@ -25,6 +25,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ScaleBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (ScaleBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     ScaleBuilder();
     ~ScaleBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -35,12 +37,16 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetActivationType(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetActivationType(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
     const uint64_t* m_axis{nullptr};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_SCALE_ACTIVATIONTYPE, &ScaleBuilder::SetActivationType},
+        {OH_NN_SCALE_AXIS, &ScaleBuilder::SetAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

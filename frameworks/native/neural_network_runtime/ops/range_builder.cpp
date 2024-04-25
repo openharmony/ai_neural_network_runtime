@@ -28,7 +28,7 @@ RangeBuilder::RangeBuilder() {}
 
 RangeBuilder::~RangeBuilder() {}
 
-OH_NN_ReturnCode RangeBuilder::SetStart(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode RangeBuilder::SetStart(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Range] The start should be type OH_NN_INT64.");
@@ -50,7 +50,7 @@ OH_NN_ReturnCode RangeBuilder::SetStart(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode RangeBuilder::SetLimit(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode RangeBuilder::SetLimit(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Range] The limit should be type OH_NN_INT64.");
@@ -72,7 +72,7 @@ OH_NN_ReturnCode RangeBuilder::SetLimit(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode RangeBuilder::SetDelta(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode RangeBuilder::SetDelta(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Range] The delta should be type OH_NN_INT64.");
@@ -122,19 +122,11 @@ OH_NN_ReturnCode RangeBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_RANGE_START:
-                ret = SetStart(tensor);
-                break;
-            case OH_NN_RANGE_LIMIT:
-                ret = SetLimit(tensor);
-                break;
-            case OH_NN_RANGE_DELTA:
-                ret = SetDelta(tensor);
-                break;
-            default:
-                LOGE("[Range] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Range] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

@@ -28,7 +28,7 @@ ExpBuilder::ExpBuilder() {}
 
 ExpBuilder::~ExpBuilder() {}
 
-OH_NN_ReturnCode ExpBuilder::SetBase(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ExpBuilder::SetBase(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Exp] The base should be type OH_NN_FLOAT32.");
@@ -50,7 +50,7 @@ OH_NN_ReturnCode ExpBuilder::SetBase(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ExpBuilder::SetScale(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ExpBuilder::SetScale(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Exp] The scale should be type OH_NN_FLOAT32.");
@@ -72,7 +72,7 @@ OH_NN_ReturnCode ExpBuilder::SetScale(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ExpBuilder::SetShift(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ExpBuilder::SetShift(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Exp] The shift should be type OH_NN_FLOAT32.");
@@ -122,19 +122,11 @@ OH_NN_ReturnCode ExpBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_EXP_BASE:
-                ret = SetBase(tensor);
-                break;
-            case OH_NN_EXP_SCALE:
-                ret = SetScale(tensor);
-                break;
-            case OH_NN_EXP_SHIFT:
-                ret = SetShift(tensor);
-                break;
-            default:
-                LOGE("[Exp] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Exp] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class ArgMaxBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (ArgMaxBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     ArgMaxBuilder();
     ~ArgMaxBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -35,16 +37,22 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetKeepdims(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetTopK(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetOutMaxValue(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetKeepdims(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetTopK(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetOutMaxValue(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_axis {-1};
     int64_t m_topK {1};
     bool m_keepDims {false};
     bool m_outMaxValue {false};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_ARG_MAX_AXIS, &ArgMaxBuilder::SetAxis},
+        {OH_NN_ARG_MAX_KEEPDIMS, &ArgMaxBuilder::SetKeepdims},
+        {OH_NN_ARG_MAX_TOP_K, &ArgMaxBuilder::SetTopK},
+        {OH_NN_ARG_MAX_OUT_MAX_VALUE, &ArgMaxBuilder::SetOutMaxValue}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

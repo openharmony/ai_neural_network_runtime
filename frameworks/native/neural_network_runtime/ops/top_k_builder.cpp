@@ -30,7 +30,7 @@ TopKBuilder::TopKBuilder() {}
 
 TopKBuilder::~TopKBuilder() {}
 
-OH_NN_ReturnCode TopKBuilder::SetSorted(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode TopKBuilder::SetSorted(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[TopK] The sorted should be type OH_NN_BOOL.");
@@ -47,7 +47,7 @@ OH_NN_ReturnCode TopKBuilder::SetSorted(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode TopKBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode TopKBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[TopK] The axis should be type OH_NN_INT64.");
@@ -103,16 +103,11 @@ OH_NN_ReturnCode TopKBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_TOP_K_SORTED:
-                returnCode = SetSorted(tensor);
-                break;
-            case OH_NN_TOP_K_AXIS:
-                returnCode = SetAxis(tensor);
-                break;
-            default:
-                LOGE("[TopK] Parameter Type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[TopK] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

@@ -28,7 +28,7 @@ UnstackBuilder::UnstackBuilder() {}
 
 UnstackBuilder::~UnstackBuilder() {}
 
-OH_NN_ReturnCode UnstackBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode UnstackBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[Unstack] The axis should be type OH_NN_INT64.");
@@ -97,13 +97,11 @@ OH_NN_ReturnCode UnstackBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_UNSTACK_AXIS:
-                returnCode = SetAxis(tensor);
-                break;
-            default:
-                LOGE("[Unstack] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Unstack] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

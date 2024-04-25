@@ -23,6 +23,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class LogSoftmaxBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (LogSoftmaxBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     LogSoftmaxBuilder();
     ~LogSoftmaxBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -33,10 +35,13 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     int64_t m_axis {0};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_LOG_SOFTMAX_AXIS, &LogSoftmaxBuilder::SetAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

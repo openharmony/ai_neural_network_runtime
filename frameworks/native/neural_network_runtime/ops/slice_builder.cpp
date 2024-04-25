@@ -29,7 +29,7 @@ SliceBuilder::SliceBuilder() {}
 
 SliceBuilder::~SliceBuilder() {}
 
-OH_NN_ReturnCode SliceBuilder::SetAxes(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SliceBuilder::SetAxes(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SliceBuilder] The axes should be type OH_NN_INT64.");
@@ -85,14 +85,13 @@ OH_NN_ReturnCode SliceBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_SLICE_AXES:
-                returnCode = SetAxes(tensor);
-                break;
-            default:
-                LOGE("[SliceBuilder] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[SliceBuilder] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[SliceBuilder] Build failed, passed invalid param.");
             return returnCode;

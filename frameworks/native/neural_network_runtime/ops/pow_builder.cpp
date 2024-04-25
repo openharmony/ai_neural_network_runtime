@@ -31,7 +31,7 @@ PowBuilder::PowBuilder() {}
 
 PowBuilder::~PowBuilder() {}
 
-OH_NN_ReturnCode PowBuilder::SetScale(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PowBuilder::SetScale(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Pow] The scale should be type OH_NN_FLOAT32.");
@@ -53,7 +53,7 @@ OH_NN_ReturnCode PowBuilder::SetScale(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode PowBuilder::SetShift(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode PowBuilder::SetShift(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[Pow] The shift should be type OH_NN_FLOAT32.");
@@ -104,16 +104,11 @@ OH_NN_ReturnCode PowBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_POW_SCALE:
-                returnCode = SetScale(tensor);
-                break;
-            case OH_NN_POW_SHIFT:
-                returnCode = SetShift(tensor);
-                break;
-            default:
-                LOGE("[Pow] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Pow] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

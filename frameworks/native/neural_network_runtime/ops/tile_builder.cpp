@@ -29,7 +29,7 @@ TileBuilder::TileBuilder() {}
 
 TileBuilder::~TileBuilder() {}
 
-OH_NN_ReturnCode TileBuilder::SetDims(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode TileBuilder::SetDims(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[TileBuilder] The dims should be type OH_NN_INT64.");
@@ -85,14 +85,13 @@ OH_NN_ReturnCode TileBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_TILE_DIMS:
-                returnCode = SetDims(tensor);
-                break;
-            default:
-                LOGE("[TileBuilder] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[TileBuilder] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[TileBuilder] Build failed, passed invalid param.");
             return returnCode;

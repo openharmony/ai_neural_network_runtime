@@ -83,7 +83,7 @@ void Conv2DBuilder::SetKernelSize(const std::vector<uint32_t>& inputsIndex,
     m_kernelSize.emplace_back(weightShape[KERNEL_WEIGHT_INDEX]);
 }
 
-OH_NN_ReturnCode Conv2DBuilder::SetStrides(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DBuilder::SetStrides(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set Strides
@@ -104,7 +104,7 @@ OH_NN_ReturnCode Conv2DBuilder::SetStrides(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DBuilder::SetDilation(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DBuilder::SetDilation(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set Dilation
@@ -125,7 +125,7 @@ OH_NN_ReturnCode Conv2DBuilder::SetDilation(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DBuilder::SetPad(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DBuilder::SetPad(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -170,7 +170,7 @@ OH_NN_ReturnCode Conv2DBuilder::SetPad(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DBuilder::SetGroup(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DBuilder::SetGroup(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set Group
@@ -194,7 +194,7 @@ OH_NN_ReturnCode Conv2DBuilder::SetGroup(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Conv2DBuilder::SetActavitation(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode Conv2DBuilder::SetActavitation(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -252,27 +252,13 @@ OH_NN_ReturnCode Conv2DBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_CONV2D_STRIDES:
-                returnCode = SetStrides(tensor);
-                break;
-            case OH_NN_CONV2D_DILATION:
-                returnCode = SetDilation(tensor);
-                break;
-            case OH_NN_CONV2D_PAD_MODE:
-            case OH_NN_CONV2D_PAD:
-                returnCode = SetPad(tensor);
-                break;
-            case OH_NN_CONV2D_GROUP:
-                returnCode = SetGroup(tensor);
-                break;
-            case OH_NN_CONV2D_ACTIVATION_TYPE:
-                returnCode = SetActavitation(tensor);
-                break;
-            default:
-                LOGE("[Conv2D] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Conv2D] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[Conv2D] Build failed, Passed invalid param.");
             return returnCode;

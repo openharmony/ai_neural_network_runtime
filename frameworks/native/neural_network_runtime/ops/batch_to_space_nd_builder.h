@@ -26,6 +26,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class BatchToSpaceNDBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (BatchToSpaceNDBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     BatchToSpaceNDBuilder();
     ~BatchToSpaceNDBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -39,12 +41,16 @@ private:
     OH_NN_ReturnCode SetBatchToSpaceInput(const std::vector<uint32_t>& inputsIndex,
                                           const std::vector<uint32_t>& outputsIndex,
                                           const std::vector<std::shared_ptr<NNTensor>>& allTensors);
-    OH_NN_ReturnCode SetInputBlock(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetInputCrops(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetInputBlock(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetInputCrops(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     std::vector<int64_t> m_blockSize;
     std::vector<std::vector<int64_t>> m_crops;
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_BATCH_TO_SPACE_ND_BLOCKSIZE, &BatchToSpaceNDBuilder::SetInputBlock},
+        {OH_NN_BATCH_TO_SPACE_ND_CROPS, &BatchToSpaceNDBuilder::SetInputCrops}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

@@ -32,7 +32,7 @@ MatmulBuilder::MatmulBuilder() {}
 
 MatmulBuilder::~MatmulBuilder() {}
 
-OH_NN_ReturnCode MatmulBuilder::SetTransposeA(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode MatmulBuilder::SetTransposeA(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -55,7 +55,7 @@ OH_NN_ReturnCode MatmulBuilder::SetTransposeA(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode MatmulBuilder::SetTransposeB(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode MatmulBuilder::SetTransposeB(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -78,7 +78,7 @@ OH_NN_ReturnCode MatmulBuilder::SetTransposeB(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode MatmulBuilder::SetActivationType(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode MatmulBuilder::SetActivationType(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {
@@ -135,19 +135,11 @@ OH_NN_ReturnCode MatmulBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_MATMUL_TRANSPOSE_A:
-                returnCode = SetTransposeA(tensor);
-                break;
-            case OH_NN_MATMUL_TRANSPOSE_B:
-                returnCode = SetTransposeB(tensor);
-                break;
-            case OH_NN_MATMUL_ACTIVATION_TYPE:
-                returnCode = SetActivationType(tensor);
-                break;
-            default:
-                LOGE("[Matmul] Parameter Type is invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Matmul] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

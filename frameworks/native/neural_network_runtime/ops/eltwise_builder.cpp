@@ -28,7 +28,7 @@ EltwiseBuilder::EltwiseBuilder() {}
 
 EltwiseBuilder::~EltwiseBuilder() {}
 
-OH_NN_ReturnCode EltwiseBuilder::SetMode(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode EltwiseBuilder::SetMode(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -86,14 +86,13 @@ OH_NN_ReturnCode EltwiseBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_ELTWISE_MODE:
-                returnCode = SetMode(tensor);
-                break;
-            default:
-                LOGE("[Eltwise] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[Eltwise] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[Eltwise] Build failed, passed invalid param.");
             return returnCode;

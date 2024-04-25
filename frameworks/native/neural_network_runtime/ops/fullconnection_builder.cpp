@@ -52,7 +52,7 @@ OH_NN_ReturnCode FullConnectionBuilder::SetFullConnectionInput(const std::vector
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode FullConnectionBuilder::SetHasBias(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode FullConnectionBuilder::SetHasBias(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[FullConnection] The hasBias should be type OH_NN_BOOL.");
@@ -74,7 +74,7 @@ OH_NN_ReturnCode FullConnectionBuilder::SetHasBias(std::shared_ptr<NNTensor> ten
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode FullConnectionBuilder::SetUseAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode FullConnectionBuilder::SetUseAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_BOOL) {
         LOGE("[FullConnection] The useAxis should be type OH_NN_BOOL.");
@@ -103,7 +103,7 @@ OH_NN_ReturnCode FullConnectionBuilder::SetUseAxis(std::shared_ptr<NNTensor> ten
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode FullConnectionBuilder::SetFullConnectionActivation(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode FullConnectionBuilder::SetFullConnectionActivation(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     // Set Activation
@@ -133,7 +133,7 @@ OH_NN_ReturnCode FullConnectionBuilder::SetFullConnectionActivation(std::shared_
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode FullConnectionBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode FullConnectionBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -189,23 +189,13 @@ OH_NN_ReturnCode FullConnectionBuilder::Build(const std::vector<uint32_t>& param
 
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i]; // 参数 tensor
-        switch (tensor->GetType()) {
-            case OH_NN_FULL_CONNECTION_AXIS:
-                returnCode = SetAxis(tensor);
-                break;
-            case OH_NN_FULL_CONNECTION_HAS_BIAS:
-                returnCode = SetHasBias(tensor);
-                break;
-            case OH_NN_FULL_CONNECTION_USE_AXIS:
-                returnCode = SetUseAxis(tensor);
-                break;
-            case OH_NN_FULL_CONNECTION_ACTIVATIONTYPE:
-                returnCode = SetFullConnectionActivation(tensor);
-                break;
-            default:
-                LOGE("[FullConnection] Build failed, param invalid, type = %{public}d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[FullConnection] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[FullConnection] Build failed, passed invalid param.");
             return returnCode;

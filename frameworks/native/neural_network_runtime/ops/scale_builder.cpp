@@ -32,7 +32,7 @@ ScaleBuilder::ScaleBuilder() {}
 
 ScaleBuilder::~ScaleBuilder() {}
 
-OH_NN_ReturnCode ScaleBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ScaleBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT64) {
@@ -55,7 +55,7 @@ OH_NN_ReturnCode ScaleBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ScaleBuilder::SetActivationType(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ScaleBuilder::SetActivationType(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetDataType() != OH_NN_INT8) {
@@ -112,16 +112,11 @@ OH_NN_ReturnCode ScaleBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     for (uint32_t i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_SCALE_AXIS:
-                returnCode = SetAxis(tensor);
-                break;
-            case OH_NN_SCALE_ACTIVATIONTYPE:
-                returnCode = SetActivationType(tensor);
-                break;
-            default:
-                LOGE("[ResizeBilinear] Build failed, parameter type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[ScaleBuilder] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {

@@ -27,7 +27,7 @@ ArgMaxBuilder::ArgMaxBuilder() {}
 
 ArgMaxBuilder::~ArgMaxBuilder() {}
 
-OH_NN_ReturnCode ArgMaxBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ArgMaxBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -46,7 +46,7 @@ OH_NN_ReturnCode ArgMaxBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ArgMaxBuilder::SetTopK(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ArgMaxBuilder::SetTopK(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -65,7 +65,7 @@ OH_NN_ReturnCode ArgMaxBuilder::SetTopK(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ArgMaxBuilder::SetKeepdims(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ArgMaxBuilder::SetKeepdims(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -84,7 +84,7 @@ OH_NN_ReturnCode ArgMaxBuilder::SetKeepdims(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ArgMaxBuilder::SetOutMaxValue(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode ArgMaxBuilder::SetOutMaxValue(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
 
@@ -134,23 +134,13 @@ OH_NN_ReturnCode ArgMaxBuilder::Build(const std::vector<uint32_t>& paramsIndex,
 
     for (int i : paramsIndex) {
         const std::shared_ptr<NNTensor> tensor = allTensors[i];
-        switch (tensor->GetType()) {
-            case OH_NN_ARG_MAX_AXIS:
-                returnCode = SetAxis(tensor);
-                break;
-            case OH_NN_ARG_MAX_TOP_K:
-                returnCode = SetTopK(tensor);
-                break;
-            case OH_NN_ARG_MAX_KEEPDIMS:
-                returnCode = SetKeepdims(tensor);
-                break;
-            case OH_NN_ARG_MAX_OUT_MAX_VALUE:
-                returnCode = SetOutMaxValue(tensor);
-                break;
-            default:
-                LOGE("[ArgMax] Build failed, param invalid, type = %d.", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[ArgMax] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
+
         if (returnCode != OH_NN_SUCCESS) {
             LOGE("[ArgMax] Build failed, passed invalid param.");
             return returnCode;

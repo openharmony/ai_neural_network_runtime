@@ -28,7 +28,7 @@ LeakyReluBuilder::LeakyReluBuilder() {}
 
 LeakyReluBuilder::~LeakyReluBuilder() {}
 
-OH_NN_ReturnCode LeakyReluBuilder::SetNegativeSlope(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode LeakyReluBuilder::SetNegativeSlope(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_FLOAT32) {
         LOGE("[LeakyRelu] The negativeSlope should be type OH_NN_FLOAT32.");
@@ -78,13 +78,11 @@ OH_NN_ReturnCode LeakyReluBuilder::Build(const std::vector<uint32_t>& paramsInde
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_LEAKY_RELU_NEGATIVE_SLOPE:
-                ret = SetNegativeSlope(tensor);
-                break;
-            default:
-                LOGE("[LeakyRelu] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[LeakyRelu] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (ret != OH_NN_SUCCESS) {

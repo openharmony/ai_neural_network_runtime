@@ -32,7 +32,7 @@ MulBuilder::MulBuilder() {}
 
 MulBuilder::~MulBuilder() {}
 
-OH_NN_ReturnCode MulBuilder::SetActivationType(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode MulBuilder::SetActivationType(const std::shared_ptr<NNTensor>& tensor)
 {
     tensor->IdentifyOpParameter();
     if (tensor->GetElementCount() != SCALE_LENGTH) {

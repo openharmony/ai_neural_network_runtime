@@ -23,6 +23,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class LayerNormBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (LayerNormBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     LayerNormBuilder();
     ~LayerNormBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -32,9 +34,9 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetBeginNormAxis(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetEpsilon(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetBeginParamsAxis(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetBeginNormAxis(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetEpsilon(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetBeginParamsAxis(const std::shared_ptr<NNTensor>& tensor);
     OH_NN_ReturnCode ValidateGammaAndBetaShape(const std::vector<uint32_t>& inputsIndex,
         int64_t beginAxis, const std::vector<std::shared_ptr<NNTensor>>& allTensors) const;
 
@@ -43,6 +45,11 @@ private:
     float m_epsilon {1e-7};
     bool m_elementwiseAffine {true};
     int64_t m_beginParamsAxis {1};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_LAYER_NORM_BEGIN_NORM_AXIS, &LayerNormBuilder::SetBeginNormAxis},
+        {OH_NN_LAYER_NORM_EPSILON, &LayerNormBuilder::SetEpsilon},
+        {OH_NN_LAYER_NORM_BEGIN_PARAM_AXIS, &LayerNormBuilder::SetBeginParamsAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

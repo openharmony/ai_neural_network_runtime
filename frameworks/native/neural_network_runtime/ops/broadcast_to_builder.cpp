@@ -27,7 +27,7 @@ BroadcastToBuilder::BroadcastToBuilder() {}
 
 BroadcastToBuilder::~BroadcastToBuilder() {}
 
-OH_NN_ReturnCode BroadcastToBuilder::SetShape(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode BroadcastToBuilder::SetShape(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[BroadcastTo] The shape should be type OH_NN_INT64.");
@@ -77,22 +77,19 @@ OH_NN_ReturnCode BroadcastToBuilder::Build(const std::vector<uint32_t>& paramsIn
         return ret;
     }
 
-    OH_NN_ReturnCode returnCode;
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_BROADCAST_TO_SHAPE:
-                returnCode = SetShape(tensor);
-                break;
-            default:
-                LOGE("[BroadcastTo] Build failed, param invalid, type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            ret = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[BroadcastTo] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
-        if (returnCode != OH_NN_SUCCESS) {
+        if (ret != OH_NN_SUCCESS) {
             LOGE("[BroadcastTo] Build failed, passed invalid param.");
-            return returnCode;
+            return ret;
         }
     }
 

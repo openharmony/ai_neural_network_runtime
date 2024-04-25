@@ -24,6 +24,8 @@ namespace NeuralNetworkRuntime {
 namespace Ops {
 class L2NormalizeBuilder : public OpsBuilder {
 public:
+    typedef OH_NN_ReturnCode (L2NormalizeBuilder::*FuncPtr)(const std::shared_ptr<NNTensor>&);
+
     L2NormalizeBuilder();
     ~L2NormalizeBuilder() override;
     OH_NN_ReturnCode Build(const std::vector<uint32_t>& paramsIndex,
@@ -34,14 +36,19 @@ public:
     LiteGraphPrimitvePtr GetPrimitive() override;
 
 private:
-    OH_NN_ReturnCode SetAxis(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetEpsilon(std::shared_ptr<NNTensor> tensor);
-    OH_NN_ReturnCode SetActivationType(std::shared_ptr<NNTensor> tensor);
+    OH_NN_ReturnCode SetAxis(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetEpsilon(const std::shared_ptr<NNTensor>& tensor);
+    OH_NN_ReturnCode SetActivationType(const std::shared_ptr<NNTensor>& tensor);
 
 private:
     std::vector<int64_t> m_axis;
     float m_epsilon {1e-6};
     mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    std::unordered_map<OH_NN_TensorType, FuncPtr> m_paramMap = {
+        {OH_NN_L2_NORMALIZE_ACTIVATION_TYPE, &L2NormalizeBuilder::SetActivationType},
+        {OH_NN_L2_NORMALIZE_EPSILON, &L2NormalizeBuilder::SetEpsilon},
+        {OH_NN_L2_NORMALIZE_AXIS, &L2NormalizeBuilder::SetAxis}
+    };
 };
 } // namespace Ops
 } // namespace NeuralNetworkRuntime

@@ -61,7 +61,7 @@ OH_NN_ReturnCode SplitBuilder::SetInputAndOutput(const std::vector<uint32_t> &in
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode SplitBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SplitBuilder::SetAxis(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SplitBuilder] The 4th input axis should be type OH_NN_INT64.");
@@ -83,7 +83,7 @@ OH_NN_ReturnCode SplitBuilder::SetAxis(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode SplitBuilder::SetOutputNum(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SplitBuilder::SetOutputNum(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SplitBuilder] The 2nd input outputNum should be type OH_NN_INT64.");
@@ -100,7 +100,7 @@ OH_NN_ReturnCode SplitBuilder::SetOutputNum(std::shared_ptr<NNTensor> tensor)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode SplitBuilder::SetSizeSplits(std::shared_ptr<NNTensor> tensor)
+OH_NN_ReturnCode SplitBuilder::SetSizeSplits(const std::shared_ptr<NNTensor>& tensor)
 {
     if (tensor->GetDataType() != OH_NN_INT64) {
         LOGE("[SplitBuilder] The 3rd input sizeSplit should be type OH_NN_INT64.");
@@ -146,19 +146,11 @@ OH_NN_ReturnCode SplitBuilder::Build(const std::vector<uint32_t> &paramsIndex,
     for (int i : paramsIndex) {
         std::shared_ptr<NNTensor> tensor = allTensors[i];
         tensor->IdentifyOpParameter();
-        switch (tensor->GetType()) {
-            case OH_NN_SPLIT_AXIS:
-                returnCode = SetAxis(tensor);
-                break;
-            case OH_NN_SPLIT_OUTPUT_NUM:
-                returnCode = SetOutputNum(tensor);
-                break;
-            case OH_NN_SPLIT_SIZE_SPLITS:
-                returnCode = SetSizeSplits(tensor);
-                break;
-            default:
-                LOGE("[SplitBuilder] Parameter Type is invalid. type=%d", tensor->GetType());
-                return OH_NN_INVALID_PARAMETER;
+        if (m_paramMap.find(tensor->GetType()) != m_paramMap.end()) {
+            returnCode = (this->*(m_paramMap[tensor->GetType()]))(tensor);
+        } else {
+            LOGE("[SplitBuilder] Build failed, param invalid, type=%d", tensor->GetType());
+            return OH_NN_INVALID_PARAMETER;
         }
 
         if (returnCode != OH_NN_SUCCESS) {
