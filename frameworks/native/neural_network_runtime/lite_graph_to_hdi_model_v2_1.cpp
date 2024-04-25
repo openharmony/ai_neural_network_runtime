@@ -58,12 +58,12 @@ std::vector<int8_t> ConvertAddFusion(PrimitivePtr primitive)
         return {};
     }
 
-    AddFusion add_fusion{};
-    add_fusion.activationType = static_cast<HDI::Nnrt::V2_1::ActivationType>(
+    AddFusion addFusion{};
+    addFusion.activationType = static_cast<HDI::Nnrt::V2_1::ActivationType>(
         mindspore::lite::MindIR_Activation_GetActivationType(primitive));
 
     OHOS::MessageParcel data;
-    (void)AddFusionBlockMarshalling(data, add_fusion);
+    (void)AddFusionBlockMarshalling(data, addFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -93,14 +93,14 @@ std::vector<int8_t> ConvertArgMaxFusion(PrimitivePtr primitive)
         return {};
     }
 
-    ArgMaxFusion arg_max_fusion{};
-    arg_max_fusion.axis = mindspore::lite::MindIR_ArgMaxFusion_GetAxis(primitive);
-    arg_max_fusion.topK = mindspore::lite::MindIR_ArgMaxFusion_GetTopK(primitive);
-    arg_max_fusion.keepDims = mindspore::lite::MindIR_ArgMaxFusion_GetKeepDims(primitive);
-    arg_max_fusion.outMaxValue = mindspore::lite::MindIR_ArgMaxFusion_GetOutMaxValue(primitive);
+    ArgMaxFusion argMaxFusion{};
+    argMaxFusion.axis = mindspore::lite::MindIR_ArgMaxFusion_GetAxis(primitive);
+    argMaxFusion.topK = mindspore::lite::MindIR_ArgMaxFusion_GetTopK(primitive);
+    argMaxFusion.keepDims = mindspore::lite::MindIR_ArgMaxFusion_GetKeepDims(primitive);
+    argMaxFusion.outMaxValue = mindspore::lite::MindIR_ArgMaxFusion_GetOutMaxValue(primitive);
 
     OHOS::MessageParcel data;
-    (void)ArgMaxFusionBlockMarshalling(data, arg_max_fusion);
+    (void)ArgMaxFusionBlockMarshalling(data, argMaxFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -130,19 +130,19 @@ std::vector<int8_t> ConvertAvgPoolFusion(PrimitivePtr primitive)
         return {};
     }
 
-    AvgPoolFusion avg_pool_fusion{};
-    avg_pool_fusion.kernelSize = mindspore::lite::MindIR_AvgPoolFusion_GetKernelSize(primitive);
-    avg_pool_fusion.strides = mindspore::lite::MindIR_AvgPoolFusion_GetStrides(primitive);
-    avg_pool_fusion.pad = mindspore::lite::MindIR_AvgPoolFusion_GetPad(primitive);
-    avg_pool_fusion.padMode = static_cast<PadMode>(mindspore::lite::MindIR_AvgPoolFusion_GetPadMode(primitive));
-    avg_pool_fusion.roundMode = static_cast<RoundMode>(mindspore::lite::MindIR_AvgPoolFusion_GetRoundMode(primitive));
-    avg_pool_fusion.format = static_cast<Format>(mindspore::lite::MindIR_AvgPoolFusion_GetFormat(primitive));
-    avg_pool_fusion.global = mindspore::lite::MindIR_AvgPoolFusion_GetGlobal(primitive);
-    avg_pool_fusion.activationType =
+    AvgPoolFusion avgPoolFusion{};
+    avgPoolFusion.kernelSize = mindspore::lite::MindIR_AvgPoolFusion_GetKernelSize(primitive);
+    avgPoolFusion.strides = mindspore::lite::MindIR_AvgPoolFusion_GetStrides(primitive);
+    avgPoolFusion.pad = mindspore::lite::MindIR_AvgPoolFusion_GetPad(primitive);
+    avgPoolFusion.padMode = static_cast<PadMode>(mindspore::lite::MindIR_AvgPoolFusion_GetPadMode(primitive));
+    avgPoolFusion.roundMode = static_cast<RoundMode>(mindspore::lite::MindIR_AvgPoolFusion_GetRoundMode(primitive));
+    avgPoolFusion.format = static_cast<Format>(mindspore::lite::MindIR_AvgPoolFusion_GetFormat(primitive));
+    avgPoolFusion.global = mindspore::lite::MindIR_AvgPoolFusion_GetGlobal(primitive);
+    avgPoolFusion.activationType =
         static_cast<ActivationType>(mindspore::lite::MindIR_AvgPoolFusion_GetActivationType(primitive));
 
     OHOS::MessageParcel data;
-    (void)AvgPoolFusionBlockMarshalling(data, avg_pool_fusion);
+    (void)AvgPoolFusionBlockMarshalling(data, avgPoolFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -155,12 +155,12 @@ std::vector<int8_t> ConvertBatchToSpaceND(PrimitivePtr primitive)
         return {};
     }
 
-    BatchToSpaceND batch_to_space_n_d{};
-    batch_to_space_n_d.blockShape = mindspore::lite::MindIR_BatchToSpaceND_GetBlockShape(primitive);
-    batch_to_space_n_d.crops = mindspore::lite::MindIR_BatchToSpaceND_GetCrops(primitive);
+    BatchToSpaceND batchToSpaceND{};
+    batchToSpaceND.blockShape = mindspore::lite::MindIR_BatchToSpaceND_GetBlockShape(primitive);
+    batchToSpaceND.crops = mindspore::lite::MindIR_BatchToSpaceND_GetCrops(primitive);
 
     OHOS::MessageParcel data;
-    (void)BatchToSpaceNDBlockMarshalling(data, batch_to_space_n_d);
+    (void)BatchToSpaceNDBlockMarshalling(data, batchToSpaceND);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -173,9 +173,9 @@ std::vector<int8_t> ConvertBiasAdd(PrimitivePtr primitive)
         return {};
     }
 
-    BiasAdd bias_add{};
+    BiasAdd biasAdd{};
     OHOS::MessageParcel data;
-    (void)BiasAddBlockMarshalling(data, bias_add);
+    (void)BiasAddBlockMarshalling(data, biasAdd);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -269,20 +269,20 @@ std::vector<int8_t> ConvertConv2DFusion(PrimitivePtr primitive)
         return {};
     }
 
-    Conv2DFusion conv2_d_fusion{};
-    conv2_d_fusion.kernelSize = mindspore::lite::MindIR_Conv2DFusion_GetKernelSize(primitive);
-    conv2_d_fusion.stride = mindspore::lite::MindIR_Conv2DFusion_GetStride(primitive);
-    conv2_d_fusion.dilation = mindspore::lite::MindIR_Conv2DFusion_GetDilation(primitive);
-    conv2_d_fusion.padMode = static_cast<PadMode>(mindspore::lite::MindIR_Conv2DFusion_GetPadMode(primitive));
-    conv2_d_fusion.padList = mindspore::lite::MindIR_Conv2DFusion_GetPadList(primitive);
-    conv2_d_fusion.group = mindspore::lite::MindIR_Conv2DFusion_GetGroup(primitive);
-    conv2_d_fusion.inChannel = mindspore::lite::MindIR_Conv2DFusion_GetInChannel(primitive);
-    conv2_d_fusion.outChannel = mindspore::lite::MindIR_Conv2DFusion_GetOutChannel(primitive);
-    conv2_d_fusion.activationType = static_cast<ActivationType>(
+    Conv2DFusion conv2DFusion{};
+    conv2DFusion.kernelSize = mindspore::lite::MindIR_Conv2DFusion_GetKernelSize(primitive);
+    conv2DFusion.stride = mindspore::lite::MindIR_Conv2DFusion_GetStride(primitive);
+    conv2DFusion.dilation = mindspore::lite::MindIR_Conv2DFusion_GetDilation(primitive);
+    conv2DFusion.padMode = static_cast<PadMode>(mindspore::lite::MindIR_Conv2DFusion_GetPadMode(primitive));
+    conv2DFusion.padList = mindspore::lite::MindIR_Conv2DFusion_GetPadList(primitive);
+    conv2DFusion.group = mindspore::lite::MindIR_Conv2DFusion_GetGroup(primitive);
+    conv2DFusion.inChannel = mindspore::lite::MindIR_Conv2DFusion_GetInChannel(primitive);
+    conv2DFusion.outChannel = mindspore::lite::MindIR_Conv2DFusion_GetOutChannel(primitive);
+    conv2DFusion.activationType = static_cast<ActivationType>(
         mindspore::lite::MindIR_Conv2DFusion_GetActivationType(primitive));
 
     OHOS::MessageParcel data;
-    (void)Conv2DFusionBlockMarshalling(data, conv2_d_fusion);
+    (void)Conv2DFusionBlockMarshalling(data, conv2DFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -295,22 +295,22 @@ std::vector<int8_t> ConvertConv2dTransposeFusion(PrimitivePtr primitive)
         return {};
     }
 
-    Conv2dTransposeFusion conv2d_transpose_fusion{};
-    conv2d_transpose_fusion.kernelSize = mindspore::lite::MindIR_Conv2dTransposeFusion_GetKernelSize(primitive);
-    conv2d_transpose_fusion.stride = mindspore::lite::MindIR_Conv2dTransposeFusion_GetStride(primitive);
-    conv2d_transpose_fusion.dilation = mindspore::lite::MindIR_Conv2dTransposeFusion_GetDilation(primitive);
-    conv2d_transpose_fusion.padMode = static_cast<PadMode>(
+    Conv2dTransposeFusion conv2dTransposeFusion{};
+    conv2dTransposeFusion.kernelSize = mindspore::lite::MindIR_Conv2dTransposeFusion_GetKernelSize(primitive);
+    conv2dTransposeFusion.stride = mindspore::lite::MindIR_Conv2dTransposeFusion_GetStride(primitive);
+    conv2dTransposeFusion.dilation = mindspore::lite::MindIR_Conv2dTransposeFusion_GetDilation(primitive);
+    conv2dTransposeFusion.padMode = static_cast<PadMode>(
         mindspore::lite::MindIR_Conv2dTransposeFusion_GetPadMode(primitive));
-    conv2d_transpose_fusion.padList = mindspore::lite::MindIR_Conv2dTransposeFusion_GetPadList(primitive);
-    conv2d_transpose_fusion.group = mindspore::lite::MindIR_Conv2dTransposeFusion_GetGroup(primitive);
-    conv2d_transpose_fusion.inChannel = mindspore::lite::MindIR_Conv2dTransposeFusion_GetInChannel(primitive);
-    conv2d_transpose_fusion.outChannel = mindspore::lite::MindIR_Conv2dTransposeFusion_GetOutChannel(primitive);
-    conv2d_transpose_fusion.activationType = static_cast<ActivationType>(
+    conv2dTransposeFusion.padList = mindspore::lite::MindIR_Conv2dTransposeFusion_GetPadList(primitive);
+    conv2dTransposeFusion.group = mindspore::lite::MindIR_Conv2dTransposeFusion_GetGroup(primitive);
+    conv2dTransposeFusion.inChannel = mindspore::lite::MindIR_Conv2dTransposeFusion_GetInChannel(primitive);
+    conv2dTransposeFusion.outChannel = mindspore::lite::MindIR_Conv2dTransposeFusion_GetOutChannel(primitive);
+    conv2dTransposeFusion.activationType = static_cast<ActivationType>(
         mindspore::lite::MindIR_Conv2dTransposeFusion_GetActivationType(primitive));
-    conv2d_transpose_fusion.outputPaddings = mindspore::lite::MindIR_Conv2dTransposeFusion_GetOutputPaddings(primitive);
+    conv2dTransposeFusion.outputPaddings = mindspore::lite::MindIR_Conv2dTransposeFusion_GetOutputPaddings(primitive);
 
     OHOS::MessageParcel data;
-    (void)Conv2dTransposeFusionBlockMarshalling(data, conv2d_transpose_fusion);
+    (void)Conv2dTransposeFusionBlockMarshalling(data, conv2dTransposeFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -426,11 +426,11 @@ std::vector<int8_t> ConvertDivFusion(PrimitivePtr primitive)
         return {};
     }
 
-    DivFusion div_fusion{};
-    div_fusion.activationType = static_cast<ActivationType>(
+    DivFusion divFusion{};
+    divFusion.activationType = static_cast<ActivationType>(
         mindspore::lite::MindIR_DivFusion_GetActivationType(primitive));
     OHOS::MessageParcel data;
-    (void)DivFusionBlockMarshalling(data, div_fusion);
+    (void)DivFusionBlockMarshalling(data, divFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -493,9 +493,9 @@ std::vector<int8_t> ConvertExpandDims(PrimitivePtr primitive)
         return {};
     }
 
-    ExpandDims expand_dims{};
+    ExpandDims expandDims{};
     OHOS::MessageParcel data;
-    (void)ExpandDimsBlockMarshalling(data, expand_dims);
+    (void)ExpandDimsBlockMarshalling(data, expandDims);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -556,15 +556,15 @@ std::vector<int8_t> ConvertFullConnection(PrimitivePtr primitive)
         return {};
     }
 
-    FullConnection full_connection{};
-    full_connection.hasBias = mindspore::lite::MindIR_FullConnection_GetHasBias(primitive);
-    full_connection.useAxis = mindspore::lite::MindIR_FullConnection_GetUseAxis(primitive);
-    full_connection.axis = mindspore::lite::MindIR_FullConnection_GetAxis(primitive);
-    full_connection.activationType = static_cast<ActivationType>(
+    FullConnection fullConnection{};
+    fullConnection.hasBias = mindspore::lite::MindIR_FullConnection_GetHasBias(primitive);
+    fullConnection.useAxis = mindspore::lite::MindIR_FullConnection_GetUseAxis(primitive);
+    fullConnection.axis = mindspore::lite::MindIR_FullConnection_GetAxis(primitive);
+    fullConnection.activationType = static_cast<ActivationType>(
         mindspore::lite::MindIR_FullConnection_GetActivationType(primitive));
 
     OHOS::MessageParcel data;
-    (void)FullConnectionBlockMarshalling(data, full_connection);
+    (void)FullConnectionBlockMarshalling(data, fullConnection);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -577,10 +577,10 @@ std::vector<int8_t> ConvertFusedBatchNorm(PrimitivePtr primitive)
         return {};
     }
 
-    FusedBatchNorm fused_batch_norm{};
-    fused_batch_norm.epsilon = mindspore::lite::MindIR_FusedBatchNorm_GetEpsilon(primitive);
+    FusedBatchNorm fusedBatchNorm{};
+    fusedBatchNorm.epsilon = mindspore::lite::MindIR_FusedBatchNorm_GetEpsilon(primitive);
     OHOS::MessageParcel data;
-    (void)FusedBatchNormBlockMarshalling(data, fused_batch_norm);
+    (void)FusedBatchNormBlockMarshalling(data, fusedBatchNorm);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -670,14 +670,14 @@ std::vector<int8_t> ConvertLayerNormFusion(PrimitivePtr primitive)
         return {};
     }
 
-    LayerNormFusion layer_norm_fusion{};
-    layer_norm_fusion.beginNormAxis = mindspore::lite::MindIR_LayerNormFusion_GetBeginNormAxis(primitive);
-    layer_norm_fusion.epsilon = mindspore::lite::MindIR_LayerNormFusion_GetEpsilon(primitive);
-    layer_norm_fusion.elementwiseAffine = mindspore::lite::MindIR_LayerNormFusion_GetElementwiseAffine(primitive);
-    layer_norm_fusion.beginParamsAxis = mindspore::lite::MindIR_LayerNormFusion_GetBeginParamsAxis(primitive);
+    LayerNormFusion layerNormFusion{};
+    layerNormFusion.beginNormAxis = mindspore::lite::MindIR_LayerNormFusion_GetBeginNormAxis(primitive);
+    layerNormFusion.epsilon = mindspore::lite::MindIR_LayerNormFusion_GetEpsilon(primitive);
+    layerNormFusion.elementwiseAffine = mindspore::lite::MindIR_LayerNormFusion_GetElementwiseAffine(primitive);
+    layerNormFusion.beginParamsAxis = mindspore::lite::MindIR_LayerNormFusion_GetBeginParamsAxis(primitive);
 
     OHOS::MessageParcel data;
-    (void)LayerNormFusionBlockMarshalling(data, layer_norm_fusion);
+    (void)LayerNormFusionBlockMarshalling(data, layerNormFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -705,9 +705,9 @@ std::vector<int8_t> ConvertLessEqual(PrimitivePtr primitive)
         return {};
     }
 
-    LessEqual less_equal{};
+    LessEqual lessEqual{};
     OHOS::MessageParcel data;
-    (void)LessEqualBlockMarshalling(data, less_equal);
+    (void)LessEqualBlockMarshalling(data, lessEqual);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -851,14 +851,14 @@ std::vector<int8_t> ConvertMatMulFusion(PrimitivePtr primitive)
         return {};
     }
 
-    MatMulFusion mat_mul_fusion{};
-    mat_mul_fusion.transposeA = mindspore::lite::MindIR_MatMulFusion_GetTransposeA(primitive);
-    mat_mul_fusion.transposeB = mindspore::lite::MindIR_MatMulFusion_GetTransposeB(primitive);
-    mat_mul_fusion.activationType = static_cast<ActivationType>(
+    MatMulFusion matMulFusion{};
+    matMulFusion.transposeA = mindspore::lite::MindIR_MatMulFusion_GetTransposeA(primitive);
+    matMulFusion.transposeB = mindspore::lite::MindIR_MatMulFusion_GetTransposeB(primitive);
+    matMulFusion.activationType = static_cast<ActivationType>(
         mindspore::lite::MindIR_MatMulFusion_GetActivationType(primitive));
 
     OHOS::MessageParcel data;
-    (void)MatMulFusionBlockMarshalling(data, mat_mul_fusion);
+    (void)MatMulFusionBlockMarshalling(data, matMulFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -886,19 +886,19 @@ std::vector<int8_t> ConvertMaxPoolFusion(PrimitivePtr primitive)
         return {};
     }
 
-    MaxPoolFusion max_pool_fusion{};
-    max_pool_fusion.kernelSize = mindspore::lite::MindIR_MaxPoolFusion_GetKernelSize(primitive);
-    max_pool_fusion.strides = mindspore::lite::MindIR_MaxPoolFusion_GetStrides(primitive);
-    max_pool_fusion.pad = mindspore::lite::MindIR_MaxPoolFusion_GetPad(primitive);
-    max_pool_fusion.padMode = static_cast<PadMode>(mindspore::lite::MindIR_MaxPoolFusion_GetPadMode(primitive));
-    max_pool_fusion.format = static_cast<Format>(mindspore::lite::MindIR_MaxPoolFusion_GetFormat(primitive));
-    max_pool_fusion.roundMode = static_cast<RoundMode>(mindspore::lite::MindIR_MaxPoolFusion_GetRoundMode(primitive));
-    max_pool_fusion.global = mindspore::lite::MindIR_MaxPoolFusion_GetGlobal(primitive);
-    max_pool_fusion.activationType = static_cast<ActivationType>(
+    MaxPoolFusion maxPoolFusion{};
+    maxPoolFusion.kernelSize = mindspore::lite::MindIR_MaxPoolFusion_GetKernelSize(primitive);
+    maxPoolFusion.strides = mindspore::lite::MindIR_MaxPoolFusion_GetStrides(primitive);
+    maxPoolFusion.pad = mindspore::lite::MindIR_MaxPoolFusion_GetPad(primitive);
+    maxPoolFusion.padMode = static_cast<PadMode>(mindspore::lite::MindIR_MaxPoolFusion_GetPadMode(primitive));
+    maxPoolFusion.format = static_cast<Format>(mindspore::lite::MindIR_MaxPoolFusion_GetFormat(primitive));
+    maxPoolFusion.roundMode = static_cast<RoundMode>(mindspore::lite::MindIR_MaxPoolFusion_GetRoundMode(primitive));
+    maxPoolFusion.global = mindspore::lite::MindIR_MaxPoolFusion_GetGlobal(primitive);
+    maxPoolFusion.activationType = static_cast<ActivationType>(
         mindspore::lite::MindIR_MaxPoolFusion_GetActivationType(primitive));
 
     OHOS::MessageParcel data;
-    (void)MaxPoolFusionBlockMarshalling(data, max_pool_fusion);
+    (void)MaxPoolFusionBlockMarshalling(data, maxPoolFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -943,11 +943,11 @@ std::vector<int8_t> ConvertMulFusion(PrimitivePtr primitive)
         return {};
     }
 
-    MulFusion mul_fusion{};
-    mul_fusion.activationType = static_cast<ActivationType>(
+    MulFusion mulFusion{};
+    mulFusion.activationType = static_cast<ActivationType>(
         mindspore::lite::MindIR_MulFusion_GetActivationType(primitive));
     OHOS::MessageParcel data;
-    (void)MulFusionBlockMarshalling(data, mul_fusion);
+    (void)MulFusionBlockMarshalling(data, mulFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -992,10 +992,10 @@ std::vector<int8_t> ConvertOneHot(PrimitivePtr primitive)
         return {};
     }
 
-    OneHot one_hot{};
-    one_hot.axis = mindspore::lite::MindIR_OneHot_GetAxis(primitive);
+    OneHot oneHot{};
+    oneHot.axis = mindspore::lite::MindIR_OneHot_GetAxis(primitive);
     OHOS::MessageParcel data;
-    (void)OneHotBlockMarshalling(data, one_hot);
+    (void)OneHotBlockMarshalling(data, oneHot);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1008,12 +1008,12 @@ std::vector<int8_t> ConvertPadFusion(PrimitivePtr primitive)
         return {};
     }
 
-    PadFusion pad_fusion{};
-    pad_fusion.paddings = mindspore::lite::MindIR_PadFusion_GetPaddings(primitive);
-    pad_fusion.paddingMode = static_cast<PaddingMode>(mindspore::lite::MindIR_PadFusion_GetPaddingMode(primitive));
-    pad_fusion.constantValue = mindspore::lite::MindIR_PadFusion_GetConstantValue(primitive);
+    PadFusion padFusion{};
+    padFusion.paddings = mindspore::lite::MindIR_PadFusion_GetPaddings(primitive);
+    padFusion.paddingMode = static_cast<PaddingMode>(mindspore::lite::MindIR_PadFusion_GetPaddingMode(primitive));
+    padFusion.constantValue = mindspore::lite::MindIR_PadFusion_GetConstantValue(primitive);
     OHOS::MessageParcel data;
-    (void)PadFusionBlockMarshalling(data, pad_fusion);
+    (void)PadFusionBlockMarshalling(data, padFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1026,11 +1026,11 @@ std::vector<int8_t> ConvertPowFusion(PrimitivePtr primitive)
         return {};
     }
 
-    PowFusion pow_fusion{};
-    pow_fusion.scale = mindspore::lite::MindIR_PowFusion_GetScale(primitive);
-    pow_fusion.shift = mindspore::lite::MindIR_PowFusion_GetShift(primitive);
+    PowFusion powFusion{};
+    powFusion.scale = mindspore::lite::MindIR_PowFusion_GetScale(primitive);
+    powFusion.shift = mindspore::lite::MindIR_PowFusion_GetShift(primitive);
     OHOS::MessageParcel data;
-    (void)PowFusionBlockMarshalling(data, pow_fusion);
+    (void)PowFusionBlockMarshalling(data, powFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1043,10 +1043,10 @@ std::vector<int8_t> ConvertPReLUFusion(PrimitivePtr primitive)
         return {};
     }
 
-    PReLUFusion p_re_l_u_fusion{};
-    p_re_l_u_fusion.channelShared = mindspore::lite::MindIR_PReLUFusion_GetChannelShared(primitive);
+    PReLUFusion pReLUFusion{};
+    pReLUFusion.channelShared = mindspore::lite::MindIR_PReLUFusion_GetChannelShared(primitive);
     OHOS::MessageParcel data;
-    (void)PReLUFusionBlockMarshalling(data, p_re_l_u_fusion);
+    (void)PReLUFusionBlockMarshalling(data, pReLUFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1059,13 +1059,13 @@ std::vector<int8_t> ConvertQuantDTypeCast(PrimitivePtr primitive)
         return {};
     }
 
-    QuantDTypeCastV2 quant_d_type_cast{};
-    quant_d_type_cast.srcT = mindspore::lite::MindIR_QuantDTypeCast_GetSrcT(primitive);
-    quant_d_type_cast.dstT = mindspore::lite::MindIR_QuantDTypeCast_GetDstT(primitive);
-    quant_d_type_cast.axis = mindspore::lite::MindIR_QuantDTypeCast_GetAxis(primitive);
+    QuantDTypeCastV2 quantDTypeCast{};
+    quantDTypeCast.srcT = mindspore::lite::MindIR_QuantDTypeCast_GetSrcT(primitive);
+    quantDTypeCast.dstT = mindspore::lite::MindIR_QuantDTypeCast_GetDstT(primitive);
+    quantDTypeCast.axis = mindspore::lite::MindIR_QuantDTypeCast_GetAxis(primitive);
 
     OHOS::MessageParcel data;
-    (void)QuantDTypeCastV2BlockMarshalling(data, quant_d_type_cast);
+    (void)QuantDTypeCastV2BlockMarshalling(data, quantDTypeCast);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1130,13 +1130,13 @@ std::vector<int8_t> ConvertReduceFusion(PrimitivePtr primitive)
         return {};
     }
 
-    ReduceFusion reduce_fusion{};
-    reduce_fusion.keepDims = mindspore::lite::MindIR_ReduceFusion_GetKeepDims(primitive);
-    reduce_fusion.mode = static_cast<ReduceMode>(mindspore::lite::MindIR_ReduceFusion_GetMode(primitive));
-    reduce_fusion.reduceToEnd = mindspore::lite::MindIR_ReduceFusion_GetReduceToEnd(primitive);
-    reduce_fusion.coeff = mindspore::lite::MindIR_ReduceFusion_GetCoeff(primitive);
+    ReduceFusion reduceFusion{};
+    reduceFusion.keepDims = mindspore::lite::MindIR_ReduceFusion_GetKeepDims(primitive);
+    reduceFusion.mode = static_cast<ReduceMode>(mindspore::lite::MindIR_ReduceFusion_GetMode(primitive));
+    reduceFusion.reduceToEnd = mindspore::lite::MindIR_ReduceFusion_GetReduceToEnd(primitive);
+    reduceFusion.coeff = mindspore::lite::MindIR_ReduceFusion_GetCoeff(primitive);
     OHOS::MessageParcel data;
-    (void)ReduceFusionBlockMarshalling(data, reduce_fusion);
+    (void)ReduceFusionBlockMarshalling(data, reduceFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1220,12 +1220,12 @@ std::vector<int8_t> ConvertScaleFusion(PrimitivePtr primitive)
         return {};
     }
 
-    ScaleFusion scale_fusion{};
-    scale_fusion.axis = mindspore::lite::MindIR_ScaleFusion_GetAxis(primitive);
-    scale_fusion.activationType = static_cast<ActivationType>(
+    ScaleFusion scaleFusion{};
+    scaleFusion.axis = mindspore::lite::MindIR_ScaleFusion_GetAxis(primitive);
+    scaleFusion.activationType = static_cast<ActivationType>(
         mindspore::lite::MindIR_ScaleFusion_GetActivationType(primitive));
     OHOS::MessageParcel data;
-    (void)ScaleFusionBlockMarshalling(data, scale_fusion);
+    (void)ScaleFusionBlockMarshalling(data, scaleFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1285,10 +1285,10 @@ std::vector<int8_t> ConvertSliceFusion(PrimitivePtr primitive)
         return {};
     }
 
-    SliceFusion slice_fusion{};
-    slice_fusion.axes = mindspore::lite::MindIR_SliceFusion_GetAxes(primitive);
+    SliceFusion sliceFusion{};
+    sliceFusion.axes = mindspore::lite::MindIR_SliceFusion_GetAxes(primitive);
     OHOS::MessageParcel data;
-    (void)SliceFusionBlockMarshalling(data, slice_fusion);
+    (void)SliceFusionBlockMarshalling(data, sliceFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1317,11 +1317,11 @@ std::vector<int8_t> ConvertSpaceToBatchND(PrimitivePtr primitive)
         return {};
     }
 
-    SpaceToBatchND space_to_batch_n_d{};
-    space_to_batch_n_d.blockShape = mindspore::lite::MindIR_SpaceToBatchND_GetBlockShape(primitive);
-    space_to_batch_n_d.paddings = mindspore::lite::MindIR_SpaceToBatchND_GetPaddings(primitive);
+    SpaceToBatchND spaceToBatchND{};
+    spaceToBatchND.blockShape = mindspore::lite::MindIR_SpaceToBatchND_GetBlockShape(primitive);
+    spaceToBatchND.paddings = mindspore::lite::MindIR_SpaceToBatchND_GetPaddings(primitive);
     OHOS::MessageParcel data;
-    (void)SpaceToBatchNDBlockMarshalling(data, space_to_batch_n_d);
+    (void)SpaceToBatchNDBlockMarshalling(data, spaceToBatchND);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1415,9 +1415,9 @@ std::vector<int8_t> ConvertSquaredDifference(PrimitivePtr primitive)
         return {};
     }
 
-    SquaredDifference squared_difference{};
+    SquaredDifference squaredDifference{};
     OHOS::MessageParcel data;
-    (void)SquaredDifferenceBlockMarshalling(data, squared_difference);
+    (void)SquaredDifferenceBlockMarshalling(data, squaredDifference);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1462,14 +1462,14 @@ std::vector<int8_t> ConvertStridedSlice(PrimitivePtr primitive)
         return {};
     }
 
-    StridedSlice strided_slice{};
-    strided_slice.beginMask = mindspore::lite::MindIR_StridedSlice_GetBeginMask(primitive);
-    strided_slice.endMask = mindspore::lite::MindIR_StridedSlice_GetEndMask(primitive);
-    strided_slice.ellipsisMask = mindspore::lite::MindIR_StridedSlice_GetEllipsisMask(primitive);
-    strided_slice.newAxisMask = mindspore::lite::MindIR_StridedSlice_GetNewAxisMask(primitive);
-    strided_slice.shrinkAxisMask = mindspore::lite::MindIR_StridedSlice_GetShrinkAxisMask(primitive);
+    StridedSlice stridedSlice{};
+    stridedSlice.beginMask = mindspore::lite::MindIR_StridedSlice_GetBeginMask(primitive);
+    stridedSlice.endMask = mindspore::lite::MindIR_StridedSlice_GetEndMask(primitive);
+    stridedSlice.ellipsisMask = mindspore::lite::MindIR_StridedSlice_GetEllipsisMask(primitive);
+    stridedSlice.newAxisMask = mindspore::lite::MindIR_StridedSlice_GetNewAxisMask(primitive);
+    stridedSlice.shrinkAxisMask = mindspore::lite::MindIR_StridedSlice_GetShrinkAxisMask(primitive);
     OHOS::MessageParcel data;
-    (void)StridedSliceBlockMarshalling(data, strided_slice);
+    (void)StridedSliceBlockMarshalling(data, stridedSlice);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1482,11 +1482,11 @@ std::vector<int8_t> ConvertSubFusion(PrimitivePtr primitive)
         return {};
     }
 
-    SubFusion sub_fusion{};
-    sub_fusion.activationType = static_cast<ActivationType>(
+    SubFusion subFusion{};
+    subFusion.activationType = static_cast<ActivationType>(
         mindspore::lite::MindIR_SubFusion_GetActivationType(primitive));
     OHOS::MessageParcel data;
-    (void)SubFusionBlockMarshalling(data, sub_fusion);
+    (void)SubFusionBlockMarshalling(data, subFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1499,10 +1499,10 @@ std::vector<int8_t> ConvertTileFusion(PrimitivePtr primitive)
         return {};
     }
 
-    TileFusion tile_fusion{};
-    tile_fusion.dims = mindspore::lite::MindIR_TileFusion_GetDims(primitive);
+    TileFusion tileFusion{};
+    tileFusion.dims = mindspore::lite::MindIR_TileFusion_GetDims(primitive);
     OHOS::MessageParcel data;
-    (void)TileFusionBlockMarshalling(data, tile_fusion);
+    (void)TileFusionBlockMarshalling(data, tileFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1515,11 +1515,11 @@ std::vector<int8_t> ConvertTopKFusion(PrimitivePtr primitive)
         return {};
     }
 
-    TopKFusion top_k_fusion{};
-    top_k_fusion.sorted = mindspore::lite::MindIR_TopKFusion_GetSorted(primitive);
-    top_k_fusion.axis = mindspore::lite::MindIR_TopKFusion_GetAxis(primitive);
+    TopKFusion topKFusion{};
+    topKFusion.sorted = mindspore::lite::MindIR_TopKFusion_GetSorted(primitive);
+    topKFusion.axis = mindspore::lite::MindIR_TopKFusion_GetAxis(primitive);
     OHOS::MessageParcel data;
-    (void)TopKFusionBlockMarshalling(data, top_k_fusion);
+    (void)TopKFusionBlockMarshalling(data, topKFusion);
     std::vector<int8_t> ret(reinterpret_cast<const int8_t *>(data.GetData()),
                             reinterpret_cast<const int8_t *>(data.GetData()) + data.GetDataSize());
     return ret;
@@ -1763,20 +1763,20 @@ inline std::vector<OHOS::HDI::Nnrt::V2_1::QuantParam> MindIR_Tensor_GetQuantPara
 void HDIModel_Destroy(OHOS::HDI::Nnrt::V2_1::Model **model)
 {
     if (model != nullptr && *model != nullptr) {
-        auto model_data = *model;
-        delete (model_data);
+        auto modelData = *model;
+        delete (modelData);
         *model = nullptr;
     }
 }
 
 OHOS::HDI::Nnrt::V2_1::SharedBuffer Copy_MindIR_Tensor_Data_To_HDIBuffer(const TensorPtr tensor,
-    const OHOS::HDI::Nnrt::V2_1::SharedBuffer &buffer_templete, uint8_t *mmap_ptr, unsigned int offset)
+    const OHOS::HDI::Nnrt::V2_1::SharedBuffer &bufferTemplete, uint8_t *mmapPtr, unsigned int offset)
 {
     if (tensor == nullptr) {
         LOGE("");
         return {-1, 0, offset, 0};
     }
-    if (mmap_ptr == nullptr) {
+    if (mmapPtr == nullptr) {
         LOGE("Tensor GetData failed, mmap pointer should not be nullptr");
         return {-1, 0, offset, 0};
     }
@@ -1785,14 +1785,14 @@ OHOS::HDI::Nnrt::V2_1::SharedBuffer Copy_MindIR_Tensor_Data_To_HDIBuffer(const T
     std::vector<uint8_t> data = mindspore::lite::MindIR_Tensor_GetData(tensor);
     if (data.empty()) {
         result.fd = -1;
-        result.bufferSize = buffer_templete.bufferSize;
+        result.bufferSize = bufferTemplete.bufferSize;
         result.offset = offset;
         result.dataSize = 0;
         return result;
     }
-    result.fd = buffer_templete.fd;
-    result.bufferSize = buffer_templete.bufferSize;
-    auto ret = memcpy_s(mmap_ptr + offset, data.size(), data.data(), data.size());
+    result.fd = bufferTemplete.fd;
+    result.bufferSize = bufferTemplete.bufferSize;
+    auto ret = memcpy_s(mmapPtr + offset, data.size(), data.data(), data.size());
     if (ret != EOK) {
         LOGE("Tensor memcpy failed.");
         return {-1, 0, offset, 0};
@@ -1802,10 +1802,10 @@ OHOS::HDI::Nnrt::V2_1::SharedBuffer Copy_MindIR_Tensor_Data_To_HDIBuffer(const T
     return result;
 }
 
-OHOS::HDI::Nnrt::V2_1::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteGraph *lite_graph,
+OHOS::HDI::Nnrt::V2_1::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteGraph *liteGraph,
     const OHOS::HDI::Nnrt::V2_1::SharedBuffer &buffer)
 {
-    if (lite_graph == nullptr) {
+    if (liteGraph == nullptr) {
         LOGE("MindIR_LiteGraph_To_Model v2_1 failed, lite graph is nullptr.");
         return nullptr;
     }
@@ -1819,7 +1819,7 @@ OHOS::HDI::Nnrt::V2_1::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteG
     std::vector<OHOS::HDI::Nnrt::V2_1::SubGraph> subGraph;
 
     // nodes
-    for (auto node : lite_graph->all_nodes_) {
+    for (auto node : liteGraph->all_nodes_) {
         if (node == nullptr) {
             LOGE("MindIR_LiteGraph_To_Model v2_1 failed, node is nullptr.");
             return nullptr;
@@ -1840,37 +1840,37 @@ OHOS::HDI::Nnrt::V2_1::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteG
     }
 
     // Tensor
-    unsigned int tensor_buffer_offset = 0;
-    uint8_t *mmap_ptr = nullptr;
+    unsigned int tensorBufferOffset = 0;
+    uint8_t *mmapPtr = nullptr;
     if (buffer.fd != -1) {
-        mmap_ptr =
+        mmapPtr =
           static_cast<uint8_t *>(mmap(nullptr, buffer.bufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, buffer.fd, 0));
-        if (mmap_ptr == MAP_FAILED) {
+        if (mmapPtr == MAP_FAILED) {
             LOGE("MindIR_LiteGraph_To_Model v2_1 failed, mmap failed.");
             return nullptr;
         }
     }
-    for (auto tensor : lite_graph->all_tensors_) {
+    for (auto tensor : liteGraph->all_tensors_) {
         OHOS::HDI::Nnrt::V2_1::Tensor tmp;
         tmp.name = mindspore::lite::MindIR_Tensor_GetName(tensor);
         tmp.dataType = static_cast<DataType>(mindspore::lite::MindIR_Tensor_GetDataType(tensor));
         tmp.dims = mindspore::lite::MindIR_Tensor_GetDims(tensor);
         tmp.format = static_cast<Format>(mindspore::lite::MindIR_Tensor_GetFormat(tensor));
-        tmp.data = Copy_MindIR_Tensor_Data_To_HDIBuffer(tensor, buffer, mmap_ptr, tensor_buffer_offset); // todo 实现
+        tmp.data = Copy_MindIR_Tensor_Data_To_HDIBuffer(tensor, buffer, mmapPtr, tensorBufferOffset); // todo 实现
         tmp.quantParams = MindIR_Tensor_GetQuantParams_OHOS(tensor);
         allTensors.emplace_back(tmp);
-        tensor_buffer_offset = tmp.data.offset + tmp.data.dataSize;
+        tensorBufferOffset = tmp.data.offset + tmp.data.dataSize;
     }
     if (buffer.fd != -1) {
-        auto munmap_res = munmap(mmap_ptr, buffer.bufferSize);
-        if (munmap_res != 0) {
+        auto munmapRes = munmap(mmapPtr, buffer.bufferSize);
+        if (munmapRes != 0) {
             LOGE("MindIR_LiteGraph_To_Model v2_1 failed, unmap failed.");
             return nullptr;
         }
     }
 
     // SubGraph
-    for (auto graph : lite_graph->sub_graphs_) {
+    for (auto graph : liteGraph->sub_graphs_) {
         OHOS::HDI::Nnrt::V2_1::SubGraph tmp;
         tmp.name = graph->name_;
         tmp.inputIndices = std::vector<uint32_t>(graph->input_indices_);
@@ -1879,18 +1879,18 @@ OHOS::HDI::Nnrt::V2_1::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteG
         subGraph.emplace_back(tmp);
     }
 
-    auto *ret_model = new (std::nothrow) OHOS::HDI::Nnrt::V2_1::Model();
-    if (ret_model == nullptr) {
+    auto *retModel = new (std::nothrow) OHOS::HDI::Nnrt::V2_1::Model();
+    if (retModel == nullptr) {
         LOGE("MindIR_LiteGraph_To_Model v2_1 failed, new Model failed.");
         return nullptr;
     }
-    ret_model->name = lite_graph->name_;
-    ret_model->inputIndex = lite_graph->input_indices_;
-    ret_model->outputIndex = lite_graph->output_indices_;
-    ret_model->nodes = nodes;
-    ret_model->allTensors = allTensors;
-    ret_model->subGraph = subGraph;
-    return ret_model;
+    retModel->name = liteGraph->name_;
+    retModel->inputIndex = liteGraph->input_indices_;
+    retModel->outputIndex = liteGraph->output_indices_;
+    retModel->nodes = nodes;
+    retModel->allTensors = allTensors;
+    retModel->subGraph = subGraph;
+    return retModel;
 }
 } // NNRt_V2_1
 } // NeuralNetworkRuntime
