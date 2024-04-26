@@ -26,9 +26,7 @@ namespace OHOS {
 namespace NeuralNetworkRuntime {
 NNTensor2_0::~NNTensor2_0()
 {
-    if (!m_isUserData) {
-        ReleaseMemory();
-    }
+    ReleaseMemory();
 
     delete m_tensorDesc;
     m_tensorDesc = nullptr;
@@ -247,37 +245,39 @@ OH_NN_ReturnCode NNTensor2_0::ReleaseMemory()
         return OH_NN_INVALID_PARAMETER;
     }
 
-    BackendManager& backendManager = BackendManager::GetInstance();
-    std::shared_ptr<Backend> backend = backendManager.GetBackend(m_backendID);
-    if (backend == nullptr) {
-        LOGE("NNTensor2_0::ReleaseMemory failed, failed to get backend of %{public}zu.", m_backendID);
-        return OH_NN_NULL_PTR;
-    }
-
-    auto* nnrtBackend = reinterpret_cast<NNBackend*>(backend.get());
-    auto device = nnrtBackend->GetDevice();
-    if (device == nullptr) {
-        LOGE("");
-        return OH_NN_NULL_PTR;
-    }
-    auto oldRet = device->ReleaseBuffer(m_fd, m_size);
-    if (oldRet != OH_NN_SUCCESS) {
-        LOGE("NNTensor2_0::ReleaseMemory failed, failed to release buffer.");
-        return OH_NN_MEMORY_ERROR;
-    }
-
     auto unmapResult = munmap(m_data, m_size);
     if (unmapResult != 0) {
         LOGE("NNTensor2_0::ReleaseMemory failed. Please try again.");
         return OH_NN_MEMORY_ERROR;
+        }
+
+    if (!m_isUserData) {
+        if (close(m_fd) != 0) {
+            LOGE("NNTensor2_0::ReleaseMemory failed. fd=%{public}d", m_fd);
+            return OH_NN_MEMORY_ERROR;
+        }
+        BackendManager& backendManager = BackendManager::GetInstance();
+        std::shared_ptr<Backend> backend = backendManager.GetBackend(m_backendID);
+        if (backend == nullptr) {
+            LOGE("NNTensor2_0::ReleaseMemory failed, failed to get backend of %{public}zu.", m_backendID);
+            return OH_NN_NULL_PTR;
+        }
+
+        auto* nnrtBackend = reinterpret_cast<NNBackend*>(backend.get());
+        auto device = nnrtBackend->GetDevice();
+        if (device == nullptr) {
+            LOGE("");
+            return OH_NN_NULL_PTR;
+        }
+        auto oldRet = device->ReleaseBuffer(m_fd, m_size);
+        if (oldRet != OH_NN_SUCCESS) {
+            LOGE("NNTensor2_0::ReleaseMemory failed, failed to release buffer.");
+            return OH_NN_MEMORY_ERROR;
+        }
     }
+
     m_data = nullptr;
     m_size = 0;
-
-    if (close(m_fd) != 0) {
-        LOGE("NNTensor2_0::ReleaseMemory failed. fd=%{public}d", m_fd);
-        return OH_NN_MEMORY_ERROR;
-    }
     m_fd = 0;
 
     return OH_NN_SUCCESS;
