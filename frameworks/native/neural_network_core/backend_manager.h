@@ -33,7 +33,7 @@ namespace NeuralNetworkRuntime {
 class BackendManager {
 public:
     const std::vector<size_t>& GetAllBackendsID();
-    std::shared_ptr<Backend> GetBackend(size_t backendID) const;
+    std::shared_ptr<Backend> GetBackend(size_t backendID);
     const std::string& GetBackendName(size_t backendID);
 
     // Register backend by C++ API
