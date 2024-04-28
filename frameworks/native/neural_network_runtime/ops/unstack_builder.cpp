@@ -71,18 +71,22 @@ OH_NN_ReturnCode UnstackBuilder::Build(const std::vector<uint32_t>& paramsIndex,
     }
     
     size_t allTensorsSize = allTensors.size();
-    for (auto index : inputsIndex) {
-        if (index >= allTensorsSize) {
-            LOGE("The index of inputs is out of range.");
-            return OH_NN_INVALID_PARAMETER;
-        }
+    bool isOverTensorSize = std::any_of(inputsIndex.begin(), inputsIndex.end(), [allTensorsSize]() {
+        return index >= allTensorsSize;
+    });
+
+    if (isOverTensorSize) {
+        LOGE("The index of inputs is out of range.");
+        return OH_NN_INVALID_PARAMETER;
     }
 
-    for (auto index : outputsIndex) {
-        if (index >= allTensorsSize) {
-            LOGE("The index of outputs is out of range.");
-            return OH_NN_INVALID_PARAMETER;
-        }
+    bool isOverTensorSize = std::any_of(inputsIndex.begin(), inputsIndex.end(), [allTensorsSize]() {
+        return index >= allTensorsSize;
+    });
+
+    if (isOverTensorSize) {
+        LOGE("The index of outputs is out of range.");
+        return OH_NN_INVALID_PARAMETER;
     }
 
     m_inputsIndex = inputsIndex;
