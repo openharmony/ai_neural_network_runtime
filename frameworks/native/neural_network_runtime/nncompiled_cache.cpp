@@ -78,7 +78,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
     if (realpath(cacheInfoPath.c_str(), path) == nullptr) {
         LOGE("[NNCompiledCache] Restore failed, fail to get the real path of cacheInfoPath.");
         return OH_NN_INVALID_PARAMETER;
-    } 
+    }
     if (access(cacheInfoPath.c_str(), F_OK) != 0) {
         LOGE("[NNCompiledCache] Restore failed, cacheInfoPath is not exist.");
         return OH_NN_INVALID_PARAMETER;
