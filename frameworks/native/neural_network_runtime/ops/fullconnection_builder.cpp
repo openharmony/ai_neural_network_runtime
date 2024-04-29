@@ -38,12 +38,11 @@ OH_NN_ReturnCode FullConnectionBuilder::SetFullConnectionInput(const std::vector
         LOGE("[FullConnection] SetFullConnectionInput failed, the index of outputs don't equal to %d.", OUTPUT_NUM);
         return OH_NN_INVALID_PARAMETER;
     }
-    size_t allTensorsSize = allTensors.size();
 
+    size_t allTensorsSize = allTensors.size();
     bool isOverTensorSize = std::any_of(inputsIndex.begin(), inputsIndex.end(), [allTensorsSize](uint32_t index) {
         return index >= allTensorsSize;
     });
-
     if (isOverTensorSize) {
         LOGE("[FullConnection] SetFullConnectionInput failed, the index of inputs is out of range.");
         return OH_NN_INVALID_PARAMETER;
