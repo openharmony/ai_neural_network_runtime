@@ -64,7 +64,7 @@
                 }
             ],
             "test": [
-                "//foundation/ai/neural_network_runtime:nnrt_test_target",
+                "//foundation/ai/neural_network_runtime/test/unittest:ops_unittest",
                 "//foundation/ai/neural_network_runtime:nnrt_fuzztest"
             ]
         }
