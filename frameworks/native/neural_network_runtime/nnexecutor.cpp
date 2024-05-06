@@ -79,8 +79,8 @@ OH_NN_ReturnCode NNExecutor::GetInputDimRange(
     std::vector<size_t> minInputDimVecTmp;
     std::vector<size_t> maxInputDimVecTmp;
     for (size_t i = 0; i < *shapeNum; ++i) {
-    	minInputDimVecTmp.emplace_back(static_cast<size_t>(minInputDimVec[i]));
-    	maxInputDimVecTmp.emplace_back(static_cast<size_t>(maxInputDimVec[i]));
+        minInputDimVecTmp.emplace_back(static_cast<size_t>(minInputDimVec[i]));
+        maxInputDimVecTmp.emplace_back(static_cast<size_t>(maxInputDimVec[i]));
     }
     *minInputDims = minInputDimVec.data();
     *maxInputDims = maxInputDimVec.data();
