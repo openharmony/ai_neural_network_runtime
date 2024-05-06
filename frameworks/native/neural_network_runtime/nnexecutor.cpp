@@ -76,8 +76,14 @@ OH_NN_ReturnCode NNExecutor::GetInputDimRange(
         return OH_NN_INVALID_PARAMETER;
     }
     *shapeNum = minInputDimVec.size();
-    *minInputDims = reinterpret_cast<size_t*>(minInputDimVec.data());
-    *maxInputDims = reinterpret_cast<size_t*>(maxInputDimVec.data());
+    std::vector<size_t> minInputDimVecTmp;
+    std::vector<size_t> maxInputDimVecTmp;
+    for (size_t i = 0; i < *shapeNum; ++i) {
+    	minInputDimVecTmp.emplace_back(static_cast<size_t>(minInputDimVec[i]));
+    	maxInputDimVecTmp.emplace_back(static_cast<size_t>(maxInputDimVec[i]));
+    }
+    *minInputDims = minInputDimVec.data();
+    *maxInputDims = maxInputDimVec.data();
     return OH_NN_SUCCESS;
 }
 
