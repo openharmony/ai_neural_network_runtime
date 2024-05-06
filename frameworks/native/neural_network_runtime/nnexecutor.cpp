@@ -82,8 +82,8 @@ OH_NN_ReturnCode NNExecutor::GetInputDimRange(
         minInputDimVecTmp.emplace_back(static_cast<size_t>(minInputDimVec[i]));
         maxInputDimVecTmp.emplace_back(static_cast<size_t>(maxInputDimVec[i]));
     }
-    *minInputDims = minInputDimVec.data();
-    *maxInputDims = maxInputDimVec.data();
+    *minInputDims = minInputDimVecTmp.data();
+    *maxInputDims = maxInputDimVecTmp.data();
     return OH_NN_SUCCESS;
 }
 
