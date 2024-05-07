@@ -99,7 +99,7 @@ OH_NN_ReturnCode NNExecutor::GetInputDimRange(
     *shapeNum = m_minInputDimsVec[inputIndex].size();
     if (*shapeNum != m_maxInputDimsVec[inputIndex].size()) {
         LOGE("NNExecutor::GetInputDimRange failed, size of the min input dims is not equal to the max input"
-            " dims of the %{public}zuth input.", inputIndex);
+             " dims of the %{public}zuth input.", inputIndex);
         return OH_NN_INVALID_PARAMETER;
     }
     *minInputDims = m_minInputDimsVec[inputIndex].data();
