@@ -18,7 +18,6 @@
 #include <unistd.h>
 #include <functional>
 #include <memory>
-#include <cstdlib>
 #include <limits>
 
 #include "common/utils.h"
@@ -201,6 +200,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
     *cacheInfoPtr++ = static_cast<uint64_t>(version);
     *cacheInfoPtr++ = static_cast<uint64_t>(m_backendID); // Should call SetBackend first.
 
+    // standardize the input dir
     OH_NN_ReturnCode ret = OH_NN_SUCCESS;
     char path[PATH_MAX];
     if (realpath(cacheDir.c_str(), path) == nullptr) {
@@ -208,6 +208,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
         return OH_NN_INVALID_PARAMETER;
     }
 
+    // verify the Standardized path available
     ret = VerifyCachePath(path);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiledCache] GenerateCacheModel failed, fail to verify the file path of cacheDir.");
@@ -241,12 +242,14 @@ OH_NN_ReturnCode NNCompiledCache::WriteCacheInfo(uint32_t cacheSize,
                                                  std::unique_ptr<uint64_t[]>& cacheInfo,
                                                  const std::string& cacheDir) const
 {
+    // standardize the input dir
     char path[PATH_MAX];
     if (realpath(cacheDir.c_str(), path) == nullptr) {
         LOGE("[NNCompiledCache] WriteCacheInfo failed, fail to get the real path of cacheDir.");
         return OH_NN_INVALID_PARAMETER;
     }
 
+    // verify the Standardized path available
     OH_NN_ReturnCode ret = VerifyCachePath(path);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiledCache] WriteCacheInfo failed, fail to verify the file path of cacheDir.");
@@ -412,6 +415,7 @@ OH_NN_ReturnCode NNCompiledCache::GetCacheFileLength(std::ifstream& ifs, int& fi
 
 OH_NN_ReturnCode NNCompiledCache::VerifyCachePath(const std::string& cachePath) const
 {
+    // exception: input path is not start with '/'.
     if (cachePath.find(ROOT_DIR_STR) != size_t(0)) {
         LOGE("[NNCompiledCache] VerifyCachePath failed, input file dir=%{public}s is invalid, "
              "should start with '/'.",
@@ -419,6 +423,7 @@ OH_NN_ReturnCode NNCompiledCache::VerifyCachePath(const std::string& cachePath) 
         return OH_NN_INVALID_FILE;
     }
 
+    // exception: input path contains continuous double '/'.
     if (cachePath.find(DOUBLE_SLASH_STR) != std::string::npos) {
         LOGE("[NNCompiledCache] VerifyCachePath failed, input file dir=%{public}s is invalid, "
              "containing double '/'.",
