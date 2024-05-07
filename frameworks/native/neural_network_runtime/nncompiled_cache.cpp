@@ -30,8 +30,8 @@ constexpr int MAX_MODEL_SIZE = 200 * 1024 * 1024; // 200MB
 constexpr int NULL_PTR_LENGTH = 0;
 constexpr int NUMBER_CACHE_INFO_MEMBERS = 3;
 constexpr int HEX_UNIT = 16;
-constexpr std::string ROOT_DIR_STR = "/";
-constexpr std::string DOUBLE_SLASH_STR = "//";
+constexpr char ROOT_DIR_STR = '/';
+constexpr char DOUBLE_SLASH_STR[] = "//";
 
 OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
                                        const std::string& cacheDir,
