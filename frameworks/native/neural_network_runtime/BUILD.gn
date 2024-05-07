@@ -176,8 +176,8 @@ ohos_shared_library("libneural_network_runtime") {
   include_dirs = [ "../../.." ]
 
   public_configs = [
-    ":nnrt_config",
-    "//foundation/ai/neural_network_runtime:coverage_flags"
+    "../../..:coverage_flags",
+    ":nnrt_config"
   ]
 
   external_deps = [

@@ -150,8 +150,8 @@ ohos_unittest("OpsUnittest") {
   sources += [ "../common/base_test.cpp" ]
 
   configs = [
-    ":module_private_config",
-    "//foundation/ai/neural_network_runtime:coverage_flags"
+    "../../..:coverage_flags",
+    ":module_private_config"
  ]
 
   deps = [
