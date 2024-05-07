@@ -31,6 +31,8 @@ constexpr int MAX_MODEL_SIZE = 200 * 1024 * 1024; // 200MB
 constexpr int NULL_PTR_LENGTH = 0;
 constexpr int NUMBER_CACHE_INFO_MEMBERS = 3;
 constexpr int HEX_UNIT = 16;
+constexpr std::string ROOT_DIR_STR = "/";
+constexpr std::string DOUBLE_SLASH_STR = "//";
 
 OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
                                        const std::string& cacheDir,
@@ -410,14 +412,14 @@ OH_NN_ReturnCode NNCompiledCache::GetCacheFileLength(std::ifstream& ifs, int& fi
 
 OH_NN_ReturnCode NNCompiledCache::VerifyCachePath(const std::string& cachePath) const
 {
-    if (cachePath.find('/') != size_t(0)) {
+    if (cachePath.find(ROOT_DIR_STR) != size_t(0)) {
         LOGE("[NNCompiledCache] VerifyCachePath failed, input file dir=%{public}s is invalid, "
              "should start with '/'.",
              cachePath.c_str());
         return OH_NN_INVALID_FILE;
     }
 
-    if (cachePath.find("//") != std::string::npos) {
+    if (cachePath.find(DOUBLE_SLASH_STR) != std::string::npos) {
         LOGE("[NNCompiledCache] VerifyCachePath failed, input file dir=%{public}s is invalid, "
              "containing double '/'.",
              cachePath.c_str());
