@@ -35,7 +35,7 @@ public:
     OH_NN_ReturnCode GetInputDimRange(size_t inputIndex,
                                       size_t** minInputDims,
                                       size_t** maxInputDims,
-                                      size_t* shapeNum) const override;
+                                      size_t* shapeNum) override;
     OH_NN_ReturnCode GetOutputShape(uint32_t outputIndex, int32_t** shape, uint32_t* shapeNum) const override;
 
     size_t GetInputNum() const override;
@@ -107,6 +107,8 @@ private:
     std::unordered_map<int, ExeTensor> m_outputTensors;
     std::unordered_map<int, std::vector<void*>> m_inputCreatedMem;
     std::unordered_map<int, std::vector<void*>> m_outputCreatedMem;
+    std::vector<std::vector<size_t>> m_minInputDimsVec;
+    std::vector<std::vector<size_t>> m_maxInputDimsVec;
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
