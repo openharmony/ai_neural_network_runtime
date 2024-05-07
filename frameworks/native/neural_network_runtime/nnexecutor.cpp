@@ -35,7 +35,7 @@ NNExecutor::NNExecutor(size_t backendID, std::shared_ptr<Device> device, std::sh
     m_inputTensorDescs(inputTensorDescs),
     m_outputTensorDescs(outputTensorDescs) {}
 
-OH_NN_ReturnCode GetInputDimVec()
+OH_NN_ReturnCode NNExecutor::GetInputDimVec()
 {
     std::vector<std::vector<uint32_t>> minInputDimsVec;
     std::vector<std::vector<uint32_t>> maxInputDimsVec;
