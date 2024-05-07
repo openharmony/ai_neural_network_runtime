@@ -51,39 +51,45 @@ OH_NN_ReturnCode NNExecutor::GetInputDimRange(
         return OH_NN_INVALID_PARAMETER;
     }
 
-    std::vector<std::vector<uint32_t>> minInputDimsVec;
-    std::vector<std::vector<uint32_t>> maxInputDimsVec;
-    OH_NN_ReturnCode oldRet = m_preparedModel->GetInputDimRanges(minInputDimsVec, maxInputDimsVec);
-    if (oldRet != OH_NN_SUCCESS) {
-        LOGW("NNExecutor::GetInputDimRange failed, current version don't support get input dim ranges.");
-        return OH_NN_OPERATION_FORBIDDEN;
+    if (m_minInputDimsVec.empty()) {
+        std::vector<std::vector<uint32_t>> minInputDimsVec;
+        std::vector<std::vector<uint32_t>> maxInputDimsVec;
+        OH_NN_ReturnCode oldRet = m_preparedModel->GetInputDimRanges(minInputDimsVec, maxInputDimsVec);
+        if (oldRet != OH_NN_SUCCESS) {
+            LOGW("NNExecutor::GetInputDimRange failed, current version don't support get input dim ranges.");
+            return OH_NN_OPERATION_FORBIDDEN;
+        }
+        size_t inputSize = minInputDimsVec.size();
+        if (inputSize != maxInputDimsVec.size()) {
+            LOGE("NNExecutor::GetInputDimRange failed, size of minInputDimsVec is not equal to maxInputDimsVec.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+        for (size_t i = 0; i < inputSize; i++) {
+            std::vector<size_t> minInputDimVec;
+            std::vector<size_t> maxInputDimVec;
+            size_t minInputDimVecSize = minInputDimsVec[i].size();
+            if (minInputDimVecSize != maxInputDimsVec[i].size()) {
+                LOGE("NNExecutor::GetInputDimRange failed, size of the min input dims is not equal to the max input"
+                    " dims of the %{public}zuth input.", i);
+                return OH_NN_INVALID_PARAMETER;
+            }
+            for (size_t j = 0; j < minInputDimVecSize; j++) {
+                minInputDimVec.emplace_back(static_cast<size_t>(minInputDimsVec[i][j]));
+                maxInputDimVec.emplace_back(static_cast<size_t>(maxInputDimsVec[i][j]));
+            }
+            m_minInputDimsVec.emplace_back(minInputDimVec);
+            m_maxInputDimsVec.emplace_back(maxInputDimVec);
+        }
     }
 
-    if (minInputDimsVec.size() != maxInputDimsVec.size()) {
-        LOGE("NNExecutor::GetInputDimRange failed, size of minInputDimsVec is not equal to maxInputDimsVec.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-    if (inputIndex >= minInputDimsVec.size()) {
+    if (inputIndex >= m_minInputDimsVec.size()) {
         LOGE("NNExecutor::GetInputDimRange failed, inputIndex[%{public}zu] is out of range.", inputIndex);
         return OH_NN_INVALID_PARAMETER;
     }
 
-    std::vector<uint32_t> minInputDimVec = minInputDimsVec[inputIndex];
-    std::vector<uint32_t> maxInputDimVec = maxInputDimsVec[inputIndex];
-    if (minInputDimVec.size() != maxInputDimVec.size()) {
-        LOGE("NNExecutor::GetInputDimRange failed, size of the min input dims is not equal to the max input"
-             " dims of the %{public}zuth input.", inputIndex);
-        return OH_NN_INVALID_PARAMETER;
-    }
-    *shapeNum = minInputDimVec.size();
-    std::vector<size_t> minInputDimVecTmp;
-    std::vector<size_t> maxInputDimVecTmp;
-    for (size_t i = 0; i < *shapeNum; ++i) {
-        minInputDimVecTmp.emplace_back(static_cast<size_t>(minInputDimVec[i]));
-        maxInputDimVecTmp.emplace_back(static_cast<size_t>(maxInputDimVec[i]));
-    }
-    *minInputDims = minInputDimVecTmp.data();
-    *maxInputDims = maxInputDimVecTmp.data();
+    *shapeNum = m_minInputDimsVec[inputIndex].size();
+    *minInputDims = m_minInputDimsVec[inputIndex].data();
+    *maxInputDims = m_minInputDimsVec[inputIndex].data();
     return OH_NN_SUCCESS;
 }
 
