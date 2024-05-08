@@ -35,8 +35,41 @@ NNExecutor::NNExecutor(size_t backendID, std::shared_ptr<Device> device, std::sh
     m_inputTensorDescs(inputTensorDescs),
     m_outputTensorDescs(outputTensorDescs) {}
 
+OH_NN_ReturnCode NNExecutor::GetInputDimVec()
+{
+    std::vector<std::vector<uint32_t>> minInputDimsVec;
+    std::vector<std::vector<uint32_t>> maxInputDimsVec;
+    OH_NN_ReturnCode oldRet = m_preparedModel->GetInputDimRanges(minInputDimsVec, maxInputDimsVec);
+    if (oldRet != OH_NN_SUCCESS) {
+        LOGW("GetInputDimVec failed, current version don't support get input dim ranges.");
+        return OH_NN_OPERATION_FORBIDDEN;
+    }
+    size_t inputSize = minInputDimsVec.size();
+    if (inputSize != maxInputDimsVec.size()) {
+        LOGE("GetInputDimVece failed, size of minInputDimsVec is not equal to maxInputDimsVec.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    for (size_t i = 0; i < inputSize; i++) {
+        std::vector<size_t> minInputDimVec;
+        std::vector<size_t> maxInputDimVec;
+        size_t minInputDimVecSize = minInputDimsVec[i].size();
+        if (minInputDimVecSize != maxInputDimsVec[i].size()) {
+            LOGE("GetInputDimVec failed, size of the min input dims is not equal to the max input"
+                " dims of the %{public}zuth input.", i);
+            return OH_NN_INVALID_PARAMETER;
+        }
+        for (size_t j = 0; j < minInputDimVecSize; j++) {
+            minInputDimVec.emplace_back(static_cast<size_t>(minInputDimsVec[i][j]));
+            maxInputDimVec.emplace_back(static_cast<size_t>(maxInputDimsVec[i][j]));
+        }
+        m_minInputDimsVec.emplace_back(minInputDimVec);
+        m_maxInputDimsVec.emplace_back(maxInputDimVec);
+    }
+    return OH_NN_SUCCESS;
+}
+
 OH_NN_ReturnCode NNExecutor::GetInputDimRange(
-    size_t inputIndex, size_t** minInputDims, size_t** maxInputDims, size_t* shapeNum) const
+    size_t inputIndex, size_t** minInputDims, size_t** maxInputDims, size_t* shapeNum)
 {
     if (minInputDims == nullptr) {
         LOGE("NNExecutor::GetInputDimRange failed, minInputDims is nullptr.");
@@ -51,33 +84,27 @@ OH_NN_ReturnCode NNExecutor::GetInputDimRange(
         return OH_NN_INVALID_PARAMETER;
     }
 
-    std::vector<std::vector<uint32_t>> minInputDimsVec;
-    std::vector<std::vector<uint32_t>> maxInputDimsVec;
-    OH_NN_ReturnCode oldRet = m_preparedModel->GetInputDimRanges(minInputDimsVec, maxInputDimsVec);
-    if (oldRet != OH_NN_SUCCESS) {
-        LOGW("NNExecutor::GetInputDimRange failed, current version don't support get input dim ranges.");
-        return OH_NN_OPERATION_FORBIDDEN;
+    if (m_minInputDimsVec.empty()) {
+        OH_NN_ReturnCode ret = GetInputDimVec();
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("NNExecutor::GetInputDimRange failed, GetInputDimVec failed.");
+            return ret;
+        }
     }
 
-    if (minInputDimsVec.size() != maxInputDimsVec.size()) {
-        LOGE("NNExecutor::GetInputDimRange failed, size of minInputDimsVec is not equal to maxInputDimsVec.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-    if (inputIndex >= minInputDimsVec.size()) {
+    if (inputIndex >= m_minInputDimsVec.size()) {
         LOGE("NNExecutor::GetInputDimRange failed, inputIndex[%{public}zu] is out of range.", inputIndex);
         return OH_NN_INVALID_PARAMETER;
     }
 
-    std::vector<uint32_t> minInputDimVec = minInputDimsVec[inputIndex];
-    std::vector<uint32_t> maxInputDimVec = maxInputDimsVec[inputIndex];
-    if (minInputDimVec.size() != maxInputDimVec.size()) {
+    *shapeNum = m_minInputDimsVec[inputIndex].size();
+    if (*shapeNum != m_maxInputDimsVec[inputIndex].size()) {
         LOGE("NNExecutor::GetInputDimRange failed, size of the min input dims is not equal to the max input"
              " dims of the %{public}zuth input.", inputIndex);
         return OH_NN_INVALID_PARAMETER;
     }
-    *shapeNum = minInputDimVec.size();
-    *minInputDims = reinterpret_cast<size_t*>(minInputDimVec.data());
-    *maxInputDims = reinterpret_cast<size_t*>(maxInputDimVec.data());
+    *minInputDims = m_minInputDimsVec[inputIndex].data();
+    *maxInputDims = m_maxInputDimsVec[inputIndex].data();
     return OH_NN_SUCCESS;
 }
 
