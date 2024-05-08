@@ -15,7 +15,5 @@ import("//build/ohos.gni")
 
 group("unittest") {
   testonly = true
-  deps = [
-    "ops:ops_unittest",
-  ]
+  deps = [ "ops:ops_unittest" ]
 }
