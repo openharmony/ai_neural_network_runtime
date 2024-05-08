@@ -88,6 +88,7 @@ OH_NN_ReturnCode NNExecutor::GetInputDimRange(
         OH_NN_ReturnCode ret = GetInputDimVec();
         if (ret != OH_NN_SUCCESS) {
             LOGE("NNExecutor::GetInputDimRange failed, GetInputDimVec failed.");
+            return ret;
         }
     }
 
