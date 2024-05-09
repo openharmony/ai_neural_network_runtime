@@ -63,6 +63,8 @@ public:
     std::string GetModelName() const;
     std::string GetProfiling() const;
     std::map<std::string, std::string> GetOpLayouts() const;
+    TuningStrategy GetTuningStrategy() const;
+    void SetTuningStrategy(const TuningStrategy tuningStrategy);
 
 private:
     void AddTensorsToLiteGraph(std::unordered_map<uint32_t, uint32_t>& modelIDToGraphID);
@@ -86,6 +88,7 @@ private:
     std::string m_modelName;
     std::string m_isProfiling;
     std::map<std::string, std::string> m_opLayouts;
+    TuningStrategy m_tuningStrategy{TuningStrategy::OFF};
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
