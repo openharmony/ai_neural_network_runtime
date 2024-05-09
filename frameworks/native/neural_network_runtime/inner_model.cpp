@@ -780,5 +780,15 @@ std::map<std::string, std::string> InnerModel::GetOpLayouts() const
 {
     return m_opLayouts;
 }
+
+TuningStrategy InnerModel::GetTuningStrategy() const
+{
+    return m_tuningStrategy;
+}
+
+void InnerModel::SetTuningStrategy(const TuningStrategy tuningStrategy)
+{
+    m_tuningStrategy = tuningStrategy;
+}
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
