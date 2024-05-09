@@ -71,7 +71,7 @@ public:
     OH_NN_ReturnCode Run();
 
 private:
-    OH_NN_ReturnCode GetInputDimVec();
+    OH_NN_ReturnCode GetInputDimVec() const;
     OH_NN_ReturnCode CheckInputDimRanges(NN_Tensor* inputTensors[], size_t inputSize);
 
     // The following APIs are compatible with older versions
