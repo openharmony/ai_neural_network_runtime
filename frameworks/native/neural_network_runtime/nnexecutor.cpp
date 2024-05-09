@@ -35,7 +35,7 @@ NNExecutor::NNExecutor(size_t backendID, std::shared_ptr<Device> device, std::sh
     m_inputTensorDescs(inputTensorDescs),
     m_outputTensorDescs(outputTensorDescs) {}
 
-OH_NN_ReturnCode NNExecutor::GetInputDimVec()
+OH_NN_ReturnCode NNExecutor::GetInputDimVec() const
 {
     std::vector<std::vector<uint32_t>> minInputDimsVec;
     std::vector<std::vector<uint32_t>> maxInputDimsVec;
@@ -69,7 +69,7 @@ OH_NN_ReturnCode NNExecutor::GetInputDimVec()
 }
 
 OH_NN_ReturnCode NNExecutor::GetInputDimRange(
-    size_t inputIndex, size_t** minInputDims, size_t** maxInputDims, size_t* shapeNum)
+    size_t inputIndex, size_t** minInputDims, size_t** maxInputDims, size_t* shapeNum) const
 {
     if (minInputDims == nullptr) {
         LOGE("NNExecutor::GetInputDimRange failed, minInputDims is nullptr.");
