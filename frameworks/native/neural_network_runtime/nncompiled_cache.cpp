@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <functional>
 #include <memory>
+#include <limits>
 
 #include "common/utils.h"
 #include "backend_manager.h"
@@ -29,6 +30,8 @@ constexpr int MAX_MODEL_SIZE = 200 * 1024 * 1024; // 200MB
 constexpr int NULL_PTR_LENGTH = 0;
 constexpr int NUMBER_CACHE_INFO_MEMBERS = 3;
 constexpr int HEX_UNIT = 16;
+constexpr char ROOT_DIR_STR = '/';
+constexpr char DOUBLE_SLASH_STR[] = "//";
 
 OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
                                        const std::string& cacheDir,
@@ -197,6 +200,21 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
     *cacheInfoPtr++ = static_cast<uint64_t>(version);
     *cacheInfoPtr++ = static_cast<uint64_t>(m_backendID); // Should call SetBackend first.
 
+    // standardize the input dir
+    OH_NN_ReturnCode ret = OH_NN_SUCCESS;
+    char path[PATH_MAX];
+    if (realpath(cacheDir.c_str(), path) == nullptr) {
+        LOGE("[NNCompiledCache] GenerateCacheModel failed, fail to get the real path of cacheDir.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    // verify the Standardized path available
+    ret = VerifyCachePath(path);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNCompiledCache] GenerateCacheModel failed, fail to verify the file path of cacheDir.");
+        return ret;
+    }
+
     for (size_t i = 0; i < cacheNumber; ++i) {
         std::string cacheModelFile = cacheDir + "/" + m_modelName + std::to_string(i) + ".nncache";
         std::ofstream cacheModelStream(cacheModelFile, std::ios::binary | std::ios::out | std::ios::trunc);
@@ -224,6 +242,20 @@ OH_NN_ReturnCode NNCompiledCache::WriteCacheInfo(uint32_t cacheSize,
                                                  std::unique_ptr<uint64_t[]>& cacheInfo,
                                                  const std::string& cacheDir) const
 {
+    // standardize the input dir
+    char path[PATH_MAX];
+    if (realpath(cacheDir.c_str(), path) == nullptr) {
+        LOGE("[NNCompiledCache] WriteCacheInfo failed, fail to get the real path of cacheDir.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    // verify the Standardized path available
+    OH_NN_ReturnCode ret = VerifyCachePath(path);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNCompiledCache] WriteCacheInfo failed, fail to verify the file path of cacheDir.");
+        return ret;
+    }
+
     std::string cacheInfoPath = cacheDir + "/" + m_modelName + "cache_info.nncache";
     std::ofstream cacheInfoStream(cacheInfoPath, std::ios::binary | std::ios::out | std::ios::trunc);
     if (cacheInfoStream.fail()) {
@@ -378,6 +410,27 @@ OH_NN_ReturnCode NNCompiledCache::GetCacheFileLength(std::ifstream& ifs, int& fi
     }
 
     fileSize = handleValue;
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNCompiledCache::VerifyCachePath(const std::string& cachePath) const
+{
+    // exception: input path is not start with '/'.
+    if (cachePath.find(ROOT_DIR_STR) != size_t(0)) {
+        LOGE("[NNCompiledCache] VerifyCachePath failed, input file dir=%{public}s is invalid, "
+             "should start with '/'.",
+             cachePath.c_str());
+        return OH_NN_INVALID_FILE;
+    }
+
+    // exception: input path contains continuous double '/'.
+    if (cachePath.find(DOUBLE_SLASH_STR) != std::string::npos) {
+        LOGE("[NNCompiledCache] VerifyCachePath failed, input file dir=%{public}s is invalid, "
+             "containing double '/'.",
+             cachePath.c_str());
+        return OH_NN_INVALID_FILE;
+    }
+
     return OH_NN_SUCCESS;
 }
 } // namespace NeuralNetworkRuntime
