@@ -36,8 +36,8 @@ enum DeviceStatus: int {
 
 enum class TuningStrategy {
     OFF = 0,
-    OH_DEVICE_TUNING,
-    OH_DEVICE_PREPROCESS_TUNING,
+    ON_DEVICE_TUNING,
+    ON_DEVICE_PREPROCESS_TUNING,
     ON_CLOUD_TUNING
 };
 
