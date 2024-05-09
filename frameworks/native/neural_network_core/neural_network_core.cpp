@@ -1135,7 +1135,7 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_GetInputDimRange(const OH_NNExecutor *ex
         return OH_NN_INVALID_PARAMETER;
     }
 
-    Executor *executorImpl = reinterpret_cast<Executor *>(const_cast<OH_NNExecutor*>(executor));
+    const Executor *executorImpl = reinterpret_cast<const Executor *>(executor);
     return executorImpl->GetInputDimRange(index, minInputDims, maxInputDims, shapeLength);
 }
                                               
