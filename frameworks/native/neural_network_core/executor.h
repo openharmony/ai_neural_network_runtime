@@ -34,7 +34,7 @@ public:
     virtual OH_NN_ReturnCode GetInputDimRange(size_t inputIndex,
                                               size_t** minInputDims,
                                               size_t** maxInputDims,
-                                              size_t* shapeNum) = 0;
+                                              size_t* shapeNum) const = 0;
     virtual OH_NN_ReturnCode GetOutputShape(uint32_t outputIndex, int32_t** shape, uint32_t* shapeNum) const = 0;
 
     virtual size_t GetInputNum() const = 0;
