@@ -149,7 +149,10 @@ ohos_unittest("OpsUnittest") {
   sources += [ "./ops_test.cpp" ]
   sources += [ "../common/base_test.cpp" ]
 
-  configs = [ ":module_private_config" ]
+  configs = [
+    "../../..:coverage_flags",
+    ":module_private_config",
+  ]
 
   deps = [
     "../../../frameworks/native/neural_network_core:libneural_network_core",

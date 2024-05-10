@@ -13,6 +13,18 @@
 
 import("//build/ohos.gni")
 
+declare_args() {
+  neural_network_runtime_coverage = false
+}
+
+config("coverage_flags") {
+  if (neural_network_runtime_coverage) {
+    cflags = [ "--coverage" ]
+    cflags_cc = [ "--coverage" ]
+    ldflags = [ "--coverage" ]
+  }
+}
+
 group("nnrt_target") {
   deps = [
     "frameworks/native/neural_network_core:libneural_network_core",
