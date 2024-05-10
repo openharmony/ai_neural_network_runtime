@@ -331,6 +331,7 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
 
     auto *pLiteGraph = static_cast<const mindspore::lite::LiteGraph*>(liteGraph);
     InnerModel *innerModel = reinterpret_cast<InnerModel*>(model);
+    innerModel->SetTuningStrategy(TuningStrategy::ON_DEVICE_PREPROCESS_TUNING);
 
     // Once the innerModel built from the liteGraph successfully, the innerModel
     // owns the liteGraph, in which case, the invoker should not delete

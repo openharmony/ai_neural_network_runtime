@@ -89,6 +89,7 @@ private:
     std::shared_ptr<mindspore::lite::LiteGraph> m_liteGraph {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    TuningStrategy m_tuningStrategy{TuningStrategy::OFF};
 };
 } // NeuralNetworkRuntime
 } // OHOS

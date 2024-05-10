@@ -34,6 +34,13 @@ enum DeviceStatus: int {
     OFFLINE
 };
 
+enum class TuningStrategy {
+    OFF = 0,
+    ON_DEVICE_TUNING,
+    ON_DEVICE_PREPROCESS_TUNING,
+    ON_CLOUD_TUNING
+};
+
 struct ModelConfig {
     bool enableFloat16;
     OH_NN_PerformanceMode mode;
@@ -41,6 +48,7 @@ struct ModelConfig {
     std::string isProfiling;
     std::string cachePath;
     std::map<std::string, std::string> opLayout;
+    TuningStrategy tuningStrategy{TuningStrategy::OFF};
 };
 
 struct Buffer {
