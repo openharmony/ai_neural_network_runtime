@@ -75,15 +75,15 @@ OH_NN_ReturnCode UnstackBuilder::Build(const std::vector<uint32_t>& paramsIndex,
         return index >= allTensorsSize;
     });
     if (isOverTensorSize) {
-        LOGE("The index of inputs is out of range.");
+        LOGE("[Unstack] The index of inputs is out of range.");
         return OH_NN_INVALID_PARAMETER;
     }
 
-    isOverTensorSize = std::any_of(inputsIndex.begin(), inputsIndex.end(), [allTensorsSize](uint32_t index) {
+    isOverTensorSize = std::any_of(outputsIndex.begin(), outputsIndex.end(), [allTensorsSize](uint32_t index) {
         return index >= allTensorsSize;
     });
     if (isOverTensorSize) {
-        LOGE("The index of outputs is out of range.");
+        LOGE("[Unstack] The index of outputs is out of range.");
         return OH_NN_INVALID_PARAMETER;
     }
 
