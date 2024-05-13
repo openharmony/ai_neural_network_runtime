@@ -18,4 +18,5 @@ group("fuzztest") {
 
   deps += [ "hdinnrtdevice_fuzzer:HdiNnrtDeviceFuzzTest" ]
   deps += [ "hdinnrtpreparedmodel_fuzzer:HdiNnrtPreparedModelFuzzTest" ]
+  deps += [ "neural_network_core_fuzzer:NNCoreFuzzTest" ]
 }
