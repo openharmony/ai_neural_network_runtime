@@ -150,7 +150,7 @@ ohos_unittest("OpsUnittest") {
   sources += [ "../common/base_test.cpp" ]
 
   configs = [
-    "../../../config/build:coverage_flags",
+    "../../../config:coverage_flags",
     ":module_private_config",
   ]
 
