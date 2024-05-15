@@ -1,0 +1,49 @@
+# Copyright (C) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+module_output_path = "drivers_interface_nnrt/drivers_interface_nnrt"
+
+##############################fuzztest##########################################
+ohos_fuzztest("HdiNnrtOpsFuzzTest") {
+  module_out_path = module_output_path
+  fuzz_config_file = "../hdinnrtops_fuzzer"
+
+  include_dirs = [
+    "//third_party/bounds_checking_function/include",
+    "../../../frameworks/native/neural_network_runtime",
+    "../../../interfaces/kits/c/neural_network_runtime",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  configs = [ "../../../config:coverage_flags" ]
+  sources = [ "hdinnrtops_fuzzer.cpp" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_2.1",
+    "hdf_core:libhdi",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "neural_network_runtime:nnrt_target",
+  ]
+}
