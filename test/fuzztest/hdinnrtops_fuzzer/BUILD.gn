@@ -44,7 +44,6 @@ ohos_fuzztest("HdiNnrtOpsFuzzTest") {
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "mindspore:mindir",
     "neural_network_runtime:nnrt_target",
   ]
 }
