@@ -97,7 +97,8 @@ int SingleModelBuildEndStep(OH_NNModel *model, const OHNNGraphArgs &graphArgs)
     return ret;
 }
 
-int buildModel0(uint32_t opsType) {
+int buildModel0(uint32_t opsType)
+{
     OH_NNModel *model = OH_NNModel_Construct();
     if (model == nullptr) {
         return -1;
