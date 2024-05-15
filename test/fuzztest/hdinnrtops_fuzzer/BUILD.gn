@@ -26,7 +26,7 @@ ohos_fuzztest("HdiNnrtOpsFuzzTest") {
     "//third_party/bounds_checking_function/include",
     "../../../frameworks/native/neural_network_runtime",
     "../../../interfaces/kits/c/neural_network_runtime",
-    ]
+  ]
 
   cflags = [
     "-g",
