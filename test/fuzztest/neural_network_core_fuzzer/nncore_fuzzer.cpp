@@ -277,6 +277,95 @@ bool NNCoreTensorDescFuzzTest(const uint8_t* data, size_t size)
     return true;
 }
 
+bool NNCoreTensorFuzzTest(const uint8_t* data, size_t size)
+{
+    Data dataFuzz(data, size);
+    size_t deviceId = dataFuzz.GetData<size_t>();
+    NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
+    int32_t inputDims[4] = {1, 2, 2, 3};
+    OH_NNTensorDesc_SetShape(tensorDesc, inputDims, 4);
+    OH_NNTensorDesc_SetDataType(tensorDesc, OH_NN_FLOAT32);
+    OH_NNTensorDesc_SetFormat(tensorDesc, OH_NN_FORMAT_NONE);
+    OH_NNModel_AddTensorToModel(model, tensorDesc);
+    rOH_NNModel_SetTensorType(model, 0, OH_NN_TENSOR);
+    NNTensor* nnTensor = OH_NNTensor_create(deviceId, tensorDesc);
+    
+    size_t tensorSize = dataFuzz.GetData<size_t>();
+    nnTensor = OH_NNTensor_create(deviceId, tensorDesc, tensorSize);
+
+    int fd = dataFuzz.GetData<int>();
+    size_t offset = dataFuzz.GetData<size_t>();
+    nnTensor = OH_NNTensor_create(deviceId, tensorDesc, fd, tensorSize, offset);
+
+    OH_NNTensor_GetTensorDesc(nnTensor);
+
+    OH_NNTensor_GetDataBuffer(nnTensor);
+
+    OH_NNTensor_Getfd(nnTensor, &fd);
+
+    OH_NNTensor_GetSize(nnTensor, &tensorSize);
+
+    OH_NNTensor_GetOffset(nnTensor, &offset);
+
+    OH_NNTensor_Destroy(&nnTensor);
+    return true;
+}
+
+bool NNCoreExecutorFuzzTest(const uint8_t* data, size_t size)
+{
+    Data dataFuzz(data, size);
+    Compilation compilation = dataFuzz.GetData<Compilation>();
+    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(&compilation);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+
+    uint32_t outputIndex = dataFuzz.GetData<uint32_t>();
+    int32_t *shape = nullptr;
+    uint32_t shapeLenth = 0;
+    OH_NNExecutor_GetOutputShape(nnExecutor, outputIndex, &shape, &shapeLenth);
+
+    size_t inputCount = 0;
+    OH_NNExecutor_GetInputCount(nnExecutor, &inputCount);
+
+    size_t outputCount = 0;
+    OH_NNExecutor_GetOutputCount(nnExecutor, &outputCount);
+
+    size_t index = dataFuzz.GetData<size_t>();
+    NN_TensorDesc* inputTensorDesc = OH_NNExecutor_CreateInputTensorDesc(nnExecutor, index);
+
+    NN_TensorDesc* outputTensorDesc = OH_NNExecutor_CreateOutputTensorDesc(nnExecutor, index);
+
+    size_t *minInputDims = nullptr;
+    size_t *maxInputDIms = nullptr;
+    size_t shapeLength = 0;
+    OH_NNExecutor_GetInputDimRange(nnExecutor, index, &minInputDims, &maxInputDIms, &shapeLength);
+
+    NN_OnRunDone onRunDone = dataFuzz.GetData<NN_OnRunDone>();
+    OH_NNExecutor_SetOnRunDone(nnExecutor, onRunDone);
+
+    NN_OnServiceDied onServiceDied = dataFuzz.GetData<NN_OnServiceDied>();
+    OH_NNExecutor_SetOnServiceDied(nnExecutor, onServiceDied);
+
+    vector<NN_Tensor*> inputTensors, outputTensors;
+    inputCount = dataFuzz.GetData<size_t>();
+    outputCount = dataFuzz.GetData<size_t>();
+    for (size_t i = 0; i < inputCount; ++i) {
+        NN_Tensor* inputTensor = dataFuzz.GetData<NN_Tensor*>();
+        inputTensors.emplace_back(inputTensor);
+    }
+    for (size_t i = 0; i < outputCount; ++i) {
+        NN_Tensor* outputTensor = dataFuzz.GetData<NN_Tensor*>();
+        outputTensors.emplace_back(outputTensor);
+    }
+    OH_NNExecutor_RunSync(nnExecutor, inputTensors.data(), inputCount, outputTensors.data(), outputCount);
+
+    int32_t timeout = dataFuzz.GetData<int32_t>();
+    void* userData = dataFuzz.GetData<void*>();
+    OH_NNExecutor_RunAsync(nnExecutor, inputTensors.data(), inputCount, outputTensors.data(), outputCount, timeout, userData);
+
+    OH_NNExecutor_Destroy(&nnExecutor);
+    return true;
+}
+
 bool NNCoreFuzzTest(const uint8_t* data, size_t size)
 {
     bool ret = true;
