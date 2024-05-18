@@ -55,6 +55,15 @@ public:
     {
         return dataSize - dataPos;
     }
+
+    const uint8_t* GetSpecificData(size_t startPos, size_t& size) const
+    {
+        if ((startPos + size) > dataSize) {
+            size = dataSize - startPos;
+        }
+        return dataFuzz + startPos;
+    }
+
 private:
     const uint8_t* dataFuzz {nullptr};
     size_t dataSize {0};
