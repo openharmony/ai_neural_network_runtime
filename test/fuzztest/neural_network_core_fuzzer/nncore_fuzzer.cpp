@@ -287,6 +287,12 @@ bool NNCoreFuzzTest(const uint8_t* data, size_t size)
     if (!NNCoreTensorDescFuzzTest(data, size)) {
         ret = false;
     }
+    if (!NNCoreTensorFuzzTest(data, size)) {
+        ret = false;
+    }
+    if (!NNCoreExecutorFuzzTest(data, size)) {
+        ret = false;
+    }
 
     return ret;
 }
