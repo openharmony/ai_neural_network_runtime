@@ -22,7 +22,14 @@ ohos_fuzztest("NNCoreFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file = "../neural_network_core_fuzzer"
 
-  include_dirs = [ "../../../interfaces/kits/c/neural_network_runtime" ]
+  include_dirs = [
+    "../../..",
+    "../../../frameworks/native",
+    "../../../frameworks/native/neural_network_core",
+    "../../../frameworks/native/neural_network_runtime",
+    "../../../interfaces/kits/c/neural_network_runtime",
+    "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
+  ]
 
   cflags = [
     "-g",
