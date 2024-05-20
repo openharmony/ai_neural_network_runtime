@@ -283,25 +283,27 @@ bool NNCoreTensorFuzzTest(const uint8_t* data, size_t size)
     size_t deviceId = dataFuzz.GetData<size_t>();
     NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
     int32_t inputDims[4] = {1, 2, 2, 3};
+    OH_NNModel* model = nullptr;
+    BuildModel(&model);
     OH_NNTensorDesc_SetShape(tensorDesc, inputDims, 4);
     OH_NNTensorDesc_SetDataType(tensorDesc, OH_NN_FLOAT32);
     OH_NNTensorDesc_SetFormat(tensorDesc, OH_NN_FORMAT_NONE);
     OH_NNModel_AddTensorToModel(model, tensorDesc);
-    rOH_NNModel_SetTensorType(model, 0, OH_NN_TENSOR);
-    NNTensor* nnTensor = OH_NNTensor_create(deviceId, tensorDesc);
+    OH_NNModel_SetTensorType(model, 0, OH_NN_TENSOR);
+    NN_Tensor* nnTensor = OH_NNTensor_Create(deviceId, tensorDesc);
     
     size_t tensorSize = dataFuzz.GetData<size_t>();
-    nnTensor = OH_NNTensor_create(deviceId, tensorDesc, tensorSize);
+    nnTensor = OH_NNTensor_CreateWithSize(deviceId, tensorDesc, tensorSize);
 
     int fd = dataFuzz.GetData<int>();
     size_t offset = dataFuzz.GetData<size_t>();
-    nnTensor = OH_NNTensor_create(deviceId, tensorDesc, fd, tensorSize, offset);
+    nnTensor = OH_NNTensor_CreateWithFd(deviceId, tensorDesc, fd, tensorSize, offset);
 
     OH_NNTensor_GetTensorDesc(nnTensor);
 
     OH_NNTensor_GetDataBuffer(nnTensor);
 
-    OH_NNTensor_Getfd(nnTensor, &fd);
+    OH_NNTensor_GetFd(nnTensor, &fd);
 
     OH_NNTensor_GetSize(nnTensor, &tensorSize);
 
@@ -330,9 +332,9 @@ bool NNCoreExecutorFuzzTest(const uint8_t* data, size_t size)
     OH_NNExecutor_GetOutputCount(nnExecutor, &outputCount);
 
     size_t index = dataFuzz.GetData<size_t>();
-    NN_TensorDesc* inputTensorDesc = OH_NNExecutor_CreateInputTensorDesc(nnExecutor, index);
+    OH_NNExecutor_CreateInputTensorDesc(nnExecutor, index);
 
-    NN_TensorDesc* outputTensorDesc = OH_NNExecutor_CreateOutputTensorDesc(nnExecutor, index);
+    OH_NNExecutor_CreateOutputTensorDesc(nnExecutor, index);
 
     size_t *minInputDims = nullptr;
     size_t *maxInputDIms = nullptr;
@@ -345,7 +347,7 @@ bool NNCoreExecutorFuzzTest(const uint8_t* data, size_t size)
     NN_OnServiceDied onServiceDied = dataFuzz.GetData<NN_OnServiceDied>();
     OH_NNExecutor_SetOnServiceDied(nnExecutor, onServiceDied);
 
-    vector<NN_Tensor*> inputTensors, outputTensors;
+    std::vector<NN_Tensor*> inputTensors, outputTensors;
     inputCount = dataFuzz.GetData<size_t>();
     outputCount = dataFuzz.GetData<size_t>();
     for (size_t i = 0; i < inputCount; ++i) {
