@@ -165,6 +165,17 @@ HDIPreparedModelV1_0::HDIPreparedModelV1_0(OHOS::sptr<V1_0::IPreparedModel> hdiP
     hdiPreparedModel->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
 }
 
+HDIPreparedModelV2_0::HDIPreparedModelV2_0()
+{
+    for (auto addr : m_addrs) {
+        auto memManager = MemoryManager::GetInstance();
+        OH_NN_ReturnCode ret = memManager->UnMapMemory(addr);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("~HDIPreparedModelV2_0 UnMapMemory failed.");
+        }
+    }
+}
+
 OH_NN_ReturnCode HDIPreparedModelV1_0::ExportModelCache(std::vector<Buffer>& modelCache)
 {
     if (!modelCache.empty()) {
@@ -187,6 +198,7 @@ OH_NN_ReturnCode HDIPreparedModelV1_0::ExportModelCache(std::vector<Buffer>& mod
             LOGE("Export the %zuth model cache failed, cannot not map fd to address.", i + 1);
             return OH_NN_MEMORY_ERROR;
         }
+        m_addrs.emplace_back(addr);
         Buffer modelbuffer {addr, iBuffers[i].bufferSize};
         modelCache.emplace_back(modelbuffer);
     }
