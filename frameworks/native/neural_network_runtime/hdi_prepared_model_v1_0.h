@@ -33,7 +33,7 @@ namespace NeuralNetworkRuntime {
 class HDIPreparedModelV1_0 : public PreparedModel {
 public:
     explicit HDIPreparedModelV1_0(OHOS::sptr<V1_0::IPreparedModel> hdiPreparedModel);
-    ~HDIPreparedModelV2_0() override;
+    ~HDIPreparedModelV1_0() override;
 
     OH_NN_ReturnCode ExportModelCache(std::vector<Buffer>& modelCache) override;
 
