@@ -183,7 +183,7 @@ bool NNCoreCompilationConstructTest(const uint8_t* data, size_t size)
 {
     Data dataFuzz(data, size);
     InnerModel model = dataFuzz.GetData<InnerModel>();
-    OH_NNCompilation_Construct(reinterpret_cast<OH_NNModel*>(&model));
+    OH_NNCompilation* compilationC = OH_NNCompilation_Construct(reinterpret_cast<OH_NNModel*>(&model));
 
     size_t bufferSize = BUFFER_SIZE;
     auto bufferAddr = dataFuzz.GetSpecificData(0, bufferSize);
@@ -202,7 +202,7 @@ bool NNCoreCompilationConstructTest(const uint8_t* data, size_t size)
 
     OH_NNCompilation_Build(nnCompilation);
 
-    OH_NNCompilation_Destroy(&nnCompilation);
+    OH_NNCompilation_Destroy(&compilationC);
 
     OH_NNModel* validModel;
     if (BuildModel(&validModel) != OH_NN_SUCCESS) {
