@@ -21,12 +21,13 @@
     <oatconfig>
         <filefilterlist>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
-                <filteritem type="filename" name="neural_network_runtime_intro.png" desc="自研图片"/>
-                <filteritem type="filename" name="neural_network_runtime_add_op_model.png" desc="自研图片"/>
-                <filteritem type="filename" name="arch_diagram.png" desc="自研图片"/>
-                <filteritem type="filename" name="dev_flow.png" desc="自研图片"/>
-                <filteritem type="filename" name="Flowchart.png" desc="自研图片"/>
-                <filteritem type="filename" name="Principle.png" desc="自研图片"/>
+                <filteritem type="filepath" name="figures/arch_diagram.png" desc="自研图片"/>
+                <filteritem type="filepath" name="figures/dev_flow.png" desc="自研图片"/>
+                <filteritem type="filepath" name="figures/Flowchart.png" desc="自研图片"/>
+                <filteritem type="filepath" name="figures/neural_network_runtime.png" desc="自研图片"/>
+                <filteritem type="filepath" name="figures/neural_network_runtime_add_op_model.png" desc="自研图片"/>
+                <filteritem type="filepath" name="figures/Principle.png" desc="自研图片"/>
+                <filteritem type="filepath" name="figures/zh-cn_neural_network_runtime_intro.jpg" desc="自研图片"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>
