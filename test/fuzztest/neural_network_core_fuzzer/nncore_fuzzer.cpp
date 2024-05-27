@@ -61,7 +61,7 @@ OH_NN_ReturnCode AddTensorDescToModel(OH_NNModel* model, int32_t* inputDims, siz
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set TensorDesc format failed.");
 
     returnCode = OH_NNModel_AddTensorToModel(model, tensorDesc);
-    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Add first TensorDesc to model failed.");
+    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Add TensorDesc to model failed.");
 
     returnCode = OH_NNModel_SetTensorType(model, inputIndex, OH_NN_TENSOR);
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set model tensor type failed.");
@@ -77,17 +77,19 @@ OH_NN_ReturnCode BuildModel(OH_NNModel** pmodel)
 
     // 添加Add算子的第一个输入张量，类型为float32，张量形状为[1, 2, 2, 3]
     int32_t inputDims[4] = {1, 2, 2, 3};
-    AddTensorDescToModel(model, inputDims, SHAPE_LENTH, 0);
+    auto returnCode = AddTensorDescToModel(model, inputDims, SHAPE_LENTH, 0);
+    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Add first TensorDesc to model failed.");
 
     // 添加Add算子的第二个输入张量，类型为float32，张量形状为[1, 2, 2, 3]
-    AddTensorDescToModel(model, inputDims, SHAPE_LENTH, 1);
+    returnCode = AddTensorDescToModel(model, inputDims, SHAPE_LENTH, 1);
+    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Add second TensorDesc to model failed.");
 
     // 添加Add算子的参数张量，该参数张量用于指定激活函数的类型，张量的数据类型为int8。
     NN_TensorDesc*tensorDesc = OH_NNTensorDesc_Create();
     CHECKEQ(tensorDesc, nullptr, OH_NN_NULL_PTR, "Create TensorDesc failed.");
 
     int32_t activationDims = 1;
-    auto returnCode = OH_NNTensorDesc_SetShape(tensorDesc, &activationDims, 1);
+    returnCode = OH_NNTensorDesc_SetShape(tensorDesc, &activationDims, 1);
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set TensorDesc shape failed.");
 
     returnCode = OH_NNTensorDesc_SetDataType(tensorDesc, OH_NN_INT8);
@@ -108,7 +110,8 @@ OH_NN_ReturnCode BuildModel(OH_NNModel** pmodel)
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set model tensor data failed.");
 
     // 设置Add算子的输出张量，类型为float32，张量形状为[1, 2, 2, 3]
-    AddTensorDescToModel(model, inputDims, SHAPE_LENTH, TENSOR_THREE);
+    returnCode = AddTensorDescToModel(model, inputDims, SHAPE_LENTH, TENSOR_THREE);
+    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Add third TensorDesc to model failed.");
 
     // 指定Add算子的输入张量、参数张量和输出张量的索引
     uint32_t inputIndicesValues[2] = {0, 1};
