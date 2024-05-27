@@ -46,7 +46,7 @@ const size_t SHAPE_LENTH = 4;
         } \
     } while (0)
 
-void AddTensorDescToModel(OH_NNModel* model, int32_t* inputDims, size_t shapeLength, size_t inputIndex)
+OH_NN_ReturnCode AddTensorDescToModel(OH_NNModel* model, int32_t* inputDims, size_t shapeLength, size_t inputIndex)
 {
     NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
     CHECKEQ(tensorDesc, nullptr, OH_NN_NULL_PTR, "Create TensorDesc failed.");
@@ -65,6 +65,8 @@ void AddTensorDescToModel(OH_NNModel* model, int32_t* inputDims, size_t shapeLen
 
     returnCode = OH_NNModel_SetTensorType(model, inputIndex, OH_NN_TENSOR);
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set model tensor type failed.");
+
+    return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode BuildModel(OH_NNModel** pmodel)
