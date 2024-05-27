@@ -176,7 +176,7 @@ ohos_shared_library("libneural_network_runtime") {
   include_dirs = [ "../../.." ]
 
   public_configs = [
-    "../../..:coverage_flags",
+    "../../../config:coverage_flags",
     ":nnrt_config",
   ]
 

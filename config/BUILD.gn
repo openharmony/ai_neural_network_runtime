@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,13 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/test.gni")
-group("fuzztest") {
-  testonly = true
-  deps = []
+declare_args() {
+  neural_network_runtime_coverage = false
+}
 
-  deps += [ "hdinnrtdevice_fuzzer:HdiNnrtDeviceFuzzTest" ]
-  deps += [ "hdinnrtpreparedmodel_fuzzer:HdiNnrtPreparedModelFuzzTest" ]
-  deps += [ "neural_network_core_fuzzer:NNCoreFuzzTest" ]
-  deps += [ "hdinnrtops_fuzzer:HdiNnrtOpsFuzzTest" ]
+config("coverage_flags") {
+  if (neural_network_runtime_coverage) {
+    cflags = [ "--coverage" ]
+    cflags_cc = [ "--coverage" ]
+    ldflags = [ "--coverage" ]
+  }
 }
