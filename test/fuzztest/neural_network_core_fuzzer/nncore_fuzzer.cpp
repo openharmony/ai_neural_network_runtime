@@ -85,7 +85,7 @@ OH_NN_ReturnCode BuildModel(OH_NNModel** pmodel)
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Add second TensorDesc to model failed.");
 
     // 添加Add算子的参数张量，该参数张量用于指定激活函数的类型，张量的数据类型为int8。
-    NN_TensorDesc*tensorDesc = OH_NNTensorDesc_Create();
+    NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
     CHECKEQ(tensorDesc, nullptr, OH_NN_NULL_PTR, "Create TensorDesc failed.");
 
     int32_t activationDims = 1;
