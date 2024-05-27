@@ -25,6 +25,9 @@ namespace NeuralNetworkRuntime {
 const size_t SIZE_ONE = 1;
 const size_t CACHE_VERSION = 1;
 const size_t BUFFER_SIZE = 32;
+const size_t TENSOR_TWO = 2;
+const size_t TENSOR_THREE = 3;
+const size_t SHAPE_LENTH = 4;
 
 // 返回值检查宏
 #define CHECKNEQ(realRet, expectRet, retValue, ...) \
@@ -43,18 +46,12 @@ const size_t BUFFER_SIZE = 32;
         } \
     } while (0)
 
-OH_NN_ReturnCode BuildModel(OH_NNModel** pmodel)
+void AddTensorDescToModel(OH_NNModel* model, int32_t* inputDims, size_t shapeLength, size_t inputIndex)
 {
-    // 创建模型实例model，进行模型构造
-    OH_NNModel* model = OH_NNModel_Construct();
-    CHECKEQ(model, nullptr, OH_NN_NULL_PTR, "Create model failed.");
-
-    // 添加Add算子的第一个输入张量，类型为float32，张量形状为[1, 2, 2, 3]
     NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
     CHECKEQ(tensorDesc, nullptr, OH_NN_NULL_PTR, "Create TensorDesc failed.");
 
-    int32_t inputDims[4] = {1, 2, 2, 3};
-    auto returnCode = OH_NNTensorDesc_SetShape(tensorDesc, inputDims, 4);
+    auto returnCode = OH_NNTensorDesc_SetShape(tensorDesc, inputDims, shapeLength);
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set TensorDesc shape failed.");
 
     returnCode = OH_NNTensorDesc_SetDataType(tensorDesc, OH_NN_FLOAT32);
@@ -66,34 +63,29 @@ OH_NN_ReturnCode BuildModel(OH_NNModel** pmodel)
     returnCode = OH_NNModel_AddTensorToModel(model, tensorDesc);
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Add first TensorDesc to model failed.");
 
-    returnCode = OH_NNModel_SetTensorType(model, 0, OH_NN_TENSOR);
+    returnCode = OH_NNModel_SetTensorType(model, inputIndex, OH_NN_TENSOR);
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set model tensor type failed.");
+}
+
+OH_NN_ReturnCode BuildModel(OH_NNModel** pmodel)
+{
+    // 创建模型实例model，进行模型构造
+    OH_NNModel* model = OH_NNModel_Construct();
+    CHECKEQ(model, nullptr, OH_NN_NULL_PTR, "Create model failed.");
+
+    // 添加Add算子的第一个输入张量，类型为float32，张量形状为[1, 2, 2, 3]
+    int32_t inputDims[4] = {1, 2, 2, 3};
+    AddTensorDescToModel(model, inputDims, SHAPE_LENTH, 0);
 
     // 添加Add算子的第二个输入张量，类型为float32，张量形状为[1, 2, 2, 3]
-    tensorDesc = OH_NNTensorDesc_Create();
-    CHECKEQ(tensorDesc, nullptr, OH_NN_NULL_PTR, "Create TensorDesc failed.");
-
-    returnCode = OH_NNTensorDesc_SetShape(tensorDesc, inputDims, 4);
-    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set TensorDesc shape failed.");
-
-    returnCode = OH_NNTensorDesc_SetDataType(tensorDesc, OH_NN_FLOAT32);
-    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set TensorDesc data type failed.");
-
-    returnCode = OH_NNTensorDesc_SetFormat(tensorDesc, OH_NN_FORMAT_NONE);
-    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set TensorDesc format failed.");
-
-    returnCode = OH_NNModel_AddTensorToModel(model, tensorDesc);
-    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Add second TensorDesc to model failed.");
-
-    returnCode = OH_NNModel_SetTensorType(model, 1, OH_NN_TENSOR);
-    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set model tensor type failed.");
+    AddTensorDescToModel(model, inputDims, SHAPE_LENTH, 1);
 
     // 添加Add算子的参数张量，该参数张量用于指定激活函数的类型，张量的数据类型为int8。
-    tensorDesc = OH_NNTensorDesc_Create();
+    NN_TensorDesc*tensorDesc = OH_NNTensorDesc_Create();
     CHECKEQ(tensorDesc, nullptr, OH_NN_NULL_PTR, "Create TensorDesc failed.");
 
     int32_t activationDims = 1;
-    returnCode = OH_NNTensorDesc_SetShape(tensorDesc, &activationDims, 1);
+    auto returnCode = OH_NNTensorDesc_SetShape(tensorDesc, &activationDims, 1);
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set TensorDesc shape failed.");
 
     returnCode = OH_NNTensorDesc_SetDataType(tensorDesc, OH_NN_INT8);
@@ -105,32 +97,16 @@ OH_NN_ReturnCode BuildModel(OH_NNModel** pmodel)
     returnCode = OH_NNModel_AddTensorToModel(model, tensorDesc);
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Add second TensorDesc to model failed.");
 
-    returnCode = OH_NNModel_SetTensorType(model, 2, OH_NN_ADD_ACTIVATIONTYPE);
+    returnCode = OH_NNModel_SetTensorType(model, TENSOR_TWO, OH_NN_ADD_ACTIVATIONTYPE);
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set model tensor type failed.");
 
     // 将激活函数类型设置为OH_NNBACKEND_FUSED_NONE，表示该算子不添加激活函数。
     int8_t activationValue = OH_NN_FUSED_NONE;
-    returnCode = OH_NNModel_SetTensorData(model, 2, &activationValue, sizeof(int8_t));
+    returnCode = OH_NNModel_SetTensorData(model, TENSOR_TWO, &activationValue, sizeof(int8_t));
     CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set model tensor data failed.");
 
     // 设置Add算子的输出张量，类型为float32，张量形状为[1, 2, 2, 3]
-    tensorDesc = OH_NNTensorDesc_Create();
-    CHECKEQ(tensorDesc, nullptr, OH_NN_NULL_PTR, "Create TensorDesc failed.");
-
-    returnCode = OH_NNTensorDesc_SetShape(tensorDesc, inputDims, 4);
-    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set TensorDesc shape failed.");
-
-    returnCode = OH_NNTensorDesc_SetDataType(tensorDesc, OH_NN_FLOAT32);
-    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set TensorDesc data type failed.");
-
-    returnCode = OH_NNTensorDesc_SetFormat(tensorDesc, OH_NN_FORMAT_NONE);
-    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set TensorDesc format failed.");
-
-    returnCode = OH_NNModel_AddTensorToModel(model, tensorDesc);
-    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Add forth TensorDesc to model failed.");
-
-    returnCode = OH_NNModel_SetTensorType(model, 3, OH_NN_TENSOR);
-    CHECKNEQ(returnCode, OH_NN_SUCCESS, returnCode, "Set model tensor type failed.");
+    AddTensorDescToModel(model, inputDims, SHAPE_LENTH, TENSOR_THREE);
 
     // 指定Add算子的输入张量、参数张量和输出张量的索引
     uint32_t inputIndicesValues[2] = {0, 1};
@@ -285,7 +261,7 @@ bool NNCoreTensorFuzzTest(const uint8_t* data, size_t size)
     int32_t inputDims[4] = {1, 2, 2, 3};
     OH_NNModel* model = nullptr;
     BuildModel(&model);
-    OH_NNTensorDesc_SetShape(tensorDesc, inputDims, 4);
+    OH_NNTensorDesc_SetShape(tensorDesc, inputDims, SHAPE_LENTH);
     OH_NNTensorDesc_SetDataType(tensorDesc, OH_NN_FLOAT32);
     OH_NNTensorDesc_SetFormat(tensorDesc, OH_NN_FORMAT_NONE);
     OH_NNModel_AddTensorToModel(model, tensorDesc);
@@ -347,7 +323,8 @@ bool NNCoreExecutorFuzzTest(const uint8_t* data, size_t size)
     NN_OnServiceDied onServiceDied = dataFuzz.GetData<NN_OnServiceDied>();
     OH_NNExecutor_SetOnServiceDied(nnExecutor, onServiceDied);
 
-    std::vector<NN_Tensor*> inputTensors, outputTensors;
+    std::vector<NN_Tensor*> inputTensors;
+    std::vector<NN_Tensor*> outputTensors;
     inputCount = dataFuzz.GetData<size_t>();
     outputCount = dataFuzz.GetData<size_t>();
     for (size_t i = 0; i < inputCount; ++i) {
@@ -362,7 +339,8 @@ bool NNCoreExecutorFuzzTest(const uint8_t* data, size_t size)
 
     int32_t timeout = dataFuzz.GetData<int32_t>();
     void* userData = dataFuzz.GetData<void*>();
-    OH_NNExecutor_RunAsync(nnExecutor, inputTensors.data(), inputCount, outputTensors.data(), outputCount, timeout, userData);
+    OH_NNExecutor_RunAsync(nnExecutor, inputTensors.data(), inputCount, outputTensors.data(),
+                           outputCount, timeout, userData);
 
     OH_NNExecutor_Destroy(&nnExecutor);
     return true;
