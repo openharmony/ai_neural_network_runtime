@@ -165,7 +165,7 @@ HDIPreparedModelV1_0::HDIPreparedModelV1_0(OHOS::sptr<V1_0::IPreparedModel> hdiP
     hdiPreparedModel->GetVersion(m_hdiVersion.first, m_hdiVersion.second);
 }
 
-HDIPreparedModelV1_0::HDIPreparedModelV1_0()
+HDIPreparedModelV1_0::~HDIPreparedModelV1_0()
 {
     for (auto addr : m_addrs) {
         auto memManager = MemoryManager::GetInstance();

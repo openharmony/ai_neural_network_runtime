@@ -55,6 +55,7 @@ OH_NN_ReturnCode MemoryManager::UnMapMemory(const void* buffer)
         return OH_NN_INVALID_PARAMETER;
     }
 
+    std::lock_guard<std::mutex> lock(m_mtx);
     auto iter = m_memorys.find(buffer);
     if (iter == m_memorys.end()) {
         LOGE("This buffer is not found, cannot release.");
@@ -69,23 +70,18 @@ OH_NN_ReturnCode MemoryManager::UnMapMemory(const void* buffer)
     }
     memory.data = nullptr;
 
-    if (close(memory.fd) != 0) {
-        LOGE("Close memory fd failed. fd=%d", memory.fd);
-        return OH_NN_MEMORY_ERROR;
-    }
-
-    std::lock_guard<std::mutex> lock(m_mtx);
     m_memorys.erase(iter);
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode MemoryManager::GetMemory(const void* buffer, Memory& memory) const
+OH_NN_ReturnCode MemoryManager::GetMemory(const void* buffer, Memory& memory)
 {
     if (buffer == nullptr) {
         LOGE("Memory is nullptr.");
         return OH_NN_NULL_PTR;
     }
 
+    std::lock_guard<std::mutex> lock(m_mtx);
     auto iter = m_memorys.find(buffer);
     if (iter == m_memorys.end()) {
         LOGE("Memory is not found.");

@@ -252,10 +252,6 @@ OH_NN_ReturnCode NNTensor2_0::ReleaseMemory()
         }
 
     if (!m_isUserData) {
-        if (close(m_fd) != 0) {
-            LOGE("NNTensor2_0::ReleaseMemory failed. fd=%{public}d", m_fd);
-            return OH_NN_MEMORY_ERROR;
-        }
         BackendManager& backendManager = BackendManager::GetInstance();
         std::shared_ptr<Backend> backend = backendManager.GetBackend(m_backendID);
         if (backend == nullptr) {
