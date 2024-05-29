@@ -34,6 +34,7 @@ namespace NeuralNetworkRuntime {
 class HDIPreparedModelV2_1 : public PreparedModel {
 public:
     explicit HDIPreparedModelV2_1(OHOS::sptr<V2_1::IPreparedModel> hdiPreparedModel);
+    ~HDIPreparedModelV2_1() override;
 
     OH_NN_ReturnCode ExportModelCache(std::vector<Buffer>& modelCache) override;
 
@@ -54,6 +55,7 @@ private:
     // first: major version, second: minor version
     std::pair<uint32_t, uint32_t> m_hdiVersion;
     OHOS::sptr<V2_1::IPreparedModel> m_hdiPreparedModel {nullptr};
+    std::vector<void*> m_addrs;
 };
 } // namespace NeuralNetworkRuntime
 } // OHOS
