@@ -389,6 +389,7 @@ void* HDIDeviceV2_0::AllocateBuffer(size_t length)
     auto addr = memManager->MapMemory(buffer.fd, length);
     if (addr == nullptr) {
         LOGE("Map fd to address failed.");
+        m_iDevice->ReleaseBuffer(buffer);
     }
     return addr;
 }
