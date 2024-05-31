@@ -394,7 +394,6 @@ HWTEST_F(ReduceProdBuilderTest, reduceprod_build_016, TestSize.Level0)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    keepDimsTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -415,7 +414,6 @@ HWTEST_F(ReduceProdBuilderTest, reduceprod_build_017, TestSize.Level0)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    coeffTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -436,7 +434,6 @@ HWTEST_F(ReduceProdBuilderTest, reduceprod_build_018, TestSize.Level0)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    reduceToEndTensor->SetBuffer(nullptr, 0);
 }
 
 /**

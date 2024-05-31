@@ -175,7 +175,6 @@ HWTEST_F(TileBuilderTest, tile_build_007, TestSize.Level0)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    dimsTensor->SetBuffer(nullptr, 0);
 }
 
 /**

@@ -342,7 +342,6 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_007, Test
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    inputSizeTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -373,7 +372,6 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_008, Test
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    scaleTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -403,7 +401,6 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_009, Test
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    nmsIoUThresholdTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -433,7 +430,6 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_010, Test
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    nmsScoreThresholdTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -463,7 +459,6 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_011, Test
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    maxDetectionsTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -493,7 +488,6 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_012, Test
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    detectionsPerClassTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -523,7 +517,6 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_013, Test
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    maxClassesPerDetectionTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -554,7 +547,6 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_014, Test
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    numClassesTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -584,7 +576,6 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_015, Test
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    useRegularNmsTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -614,7 +605,6 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_016, Test
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    outQuantizedTensor->SetBuffer(nullptr, 0);
 }
 
 /**
