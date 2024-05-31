@@ -47,6 +47,7 @@ void SliceBuilderTest::InitTensor(const std::vector<uint32_t>& inputsIndex,
     std::vector<int32_t> inputDim = {3, 2, 3};
     std::vector<int32_t> OutputDim = {1, 1, 3};
 
+    m_paramsIndex = paramsIndex;
     SaveInputTensor(inputsIndex, OH_NN_FLOAT32, inputDim, nullptr);
     SaveOutputTensor(outputsIndex, OH_NN_FLOAT32, OutputDim, nullptr);
 }
@@ -203,7 +204,6 @@ HWTEST_F(SliceBuilderTest, slice_build_008, TestSize.Level0)
     SaveInputTensor(inputsIndex, OH_NN_FLOAT32, inputDim, nullptr);
     SaveOutputTensor(outputsIndex, OH_NN_FLOAT32, OutputDim, nullptr);
     SaveAxesTensor(OH_NN_INT64, paramsDim, nullptr, OH_NN_MUL_ACTIVATION_TYPE);
-
 
     OH_NN_ReturnCode ret = m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
