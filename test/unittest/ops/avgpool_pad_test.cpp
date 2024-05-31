@@ -225,7 +225,6 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_007, TestSize.Level1)
     SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
     SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
-    tensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -252,7 +251,6 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_008, TestSize.Level1)
     SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
     SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
-    tensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -279,7 +277,6 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_009, TestSize.Level1)
     SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
     SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
-    tensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -306,7 +303,6 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_010, TestSize.Level1)
     SetRoundMode(OH_NN_INT32, m_param_dim, nullptr, OH_NN_AVG_POOL_ROUND_MODE);
     SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
-    tensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -333,7 +329,6 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_011, TestSize.Level1)
     m_allTensors.emplace_back(tensor);
     SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_AVG_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
-    tensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -360,7 +355,6 @@ HWTEST_F(AvgPoolPadBuilderTest, avgpool_build_pad_012, TestSize.Level1)
     tensor->SetBuffer(globalValue, sizeof(int32_t));
     m_allTensors.emplace_back(tensor);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
-    tensor->SetBuffer(nullptr, 0);
 }
 
 /**

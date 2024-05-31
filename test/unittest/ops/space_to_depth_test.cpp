@@ -168,7 +168,6 @@ HWTEST_F(SpaceToDepthBuilderTest, space_to_depth_build_007, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    blockSizeTensor->SetBuffer(nullptr, 0);
 }
 
 /**

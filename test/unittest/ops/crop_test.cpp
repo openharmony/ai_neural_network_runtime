@@ -194,13 +194,12 @@ HWTEST_F(CropBuilderTest, crop_build_007, TestSize.Level1)
     std::shared_ptr<NNTensor> axisTensor = TransToNNTensor(OH_NN_FLOAT32, m_axisDim,
         nullptr, OH_NN_CROP_AXIS);
     float* axisValue = new (std::nothrow) float [1]{0.0f};
-    axisTensor->SetBuffer(&axisValue, sizeof(float));
+    axisTensor->SetBuffer(axisValue, sizeof(float));
     m_allTensors.emplace_back(axisTensor);
     SaveOffset(OH_NN_INT64, m_offsetDim, nullptr, OH_NN_CROP_OFFSET);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    axisTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -224,7 +223,6 @@ HWTEST_F(CropBuilderTest, crop_build_008, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    offsetTensor->SetBuffer(nullptr, 0);
 }
 
 /**

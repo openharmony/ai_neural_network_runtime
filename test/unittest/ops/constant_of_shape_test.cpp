@@ -179,13 +179,12 @@ HWTEST_F(ConstantOfShapeBuilderTest, constant_of_shape_build_007, TestSize.Level
     std::shared_ptr<NNTensor> dataTypeTensor = TransToNNTensor(OH_NN_FLOAT32, m_dataTypeDim,
         nullptr, OH_NN_CONSTANT_OF_SHAPE_DATA_TYPE);
     float* dataTypeValue = new (std::nothrow) float [1]{0.0f};
-    dataTypeTensor->SetBuffer(&dataTypeValue, sizeof(float));
+    dataTypeTensor->SetBuffer(dataTypeValue, sizeof(float));
     m_allTensors.emplace_back(dataTypeTensor);
     SaveValue(OH_NN_FLOAT32, m_valueDim, nullptr, OH_NN_CONSTANT_OF_SHAPE_VALUE);
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    dataTypeTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -209,7 +208,6 @@ HWTEST_F(ConstantOfShapeBuilderTest, constant_of_shape_build_008, TestSize.Level
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    valueTensor->SetBuffer(nullptr, 0);
 }
 
 /**

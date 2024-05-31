@@ -189,7 +189,6 @@ HWTEST_F(GeluBuilderTest, gelu_build_008, TestSize.Level0)
 
     OH_NN_ReturnCode ret = m_gelu.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    approximateTensor->SetBuffer(nullptr, 0);
 }
 
 /**

@@ -379,7 +379,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_007, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    bidirectionalTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -410,7 +409,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_008, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    hasBiasTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -441,7 +439,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_009, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    inputSizeTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -472,7 +469,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_010, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    hiddenSizeTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -503,7 +499,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_011, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    numLayersTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -534,7 +529,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_012, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    numDirectionsTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -565,7 +559,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_013, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    dropoutTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -596,7 +589,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_014, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    zoneoutCellTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -627,7 +619,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_015, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    zoneoutHiddenTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -658,7 +649,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_016, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    projSizeTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -1042,7 +1032,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_031, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    hiddenSizeTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -1070,7 +1059,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_032, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    numLayersTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -1098,7 +1086,6 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_033, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    numDirectionsTensor->SetBuffer(nullptr, 0);
 }
 
 /**
