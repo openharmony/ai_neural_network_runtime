@@ -37,7 +37,7 @@ public:
 
     void* MapMemory(int fd, size_t length);
     OH_NN_ReturnCode UnMapMemory(const void* buffer);
-    OH_NN_ReturnCode GetMemory(const void* buffer, Memory& memory) const;
+    OH_NN_ReturnCode GetMemory(const void* buffer, Memory& memory);
 
     static MemoryManager* GetInstance()
     {
