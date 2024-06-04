@@ -18,3 +18,7 @@ jni/include/schema/
 # ignore runtime file
 deploy.bat
 log.txt
+/.idea/.gitignore
+/.idea/ai_neural_network_runtime.iml
+/.idea/modules.xml
+/.idea/vcs.xml

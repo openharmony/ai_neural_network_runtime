@@ -21,6 +21,7 @@ config("module_private_config") {
   include_dirs = [
     "//third_party/googletest/googlemock/include",
     "../../..",
+    "../../../frameworks/native",
     "../../../frameworks/native/neural_network_runtime",
     "../../../frameworks/native/neural_network_core",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
@@ -617,16 +618,6 @@ ohos_unittest("NeuralNetworkRuntimeV2_0Test") {
 group("components_unittest") {
   testonly = true
   deps = [
-    ":CompilationV1_0Test",
-    ":CompilationV2_0Test",
-    ":DeviceManagerV1_0Test",
-    ":DeviceManagerV2_0Test",
-    ":DeviceRegistrarV1_0Test",
-    ":DeviceRegistrarV2_0Test",
-    ":ExecutorV1_0Test",
-    ":ExecutorV2_0Test",
-    ":HDIDeviceV1_0Test",
-    ":HDIDeviceV2_0Test",
     ":HDIPreparedModelV1_0Test",
     ":HDIPreparedModelV2_0Test",
     ":InnerModelV1_0Test",

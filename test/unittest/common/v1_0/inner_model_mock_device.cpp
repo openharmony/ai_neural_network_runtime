@@ -19,35 +19,11 @@
 #include "common/utils.h"
 #include "inner_model.h"
 #include "hdi_device_v1_0.h"
-#include "device_manager.h"
 #include "ops/div_builder.h"
 #include "mock_idevice.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-// Mock the palce where the devicemanager GetDevice is called in inner_model build function.
-std::shared_ptr<Device> DeviceManager::GetDevice(size_t deviceId) const
-{
-    sptr<OHOS::HDI::Nnrt::V1_0::INnrtDevice> idevice =
-        sptr<OHOS::HDI::Nnrt::V1_0::MockIDevice>(new (std::nothrow) OHOS::HDI::Nnrt::V1_0::MockIDevice());
-
-    if (idevice == nullptr) {
-        LOGE("DeviceManager mock GetDevice failed, error happened when new sptr");
-        return nullptr;
-    } else {
-        std::shared_ptr<Device> device = CreateSharedPtr<HDIDeviceV1_0>(idevice);
-        if (device == nullptr) {
-            LOGE("DeviceManager mock GetDevice failed, device is nullptr");
-            return nullptr;
-        }
-
-        if (deviceId == 0) {
-            return nullptr;
-        } else {
-            return device;
-        }
-    }
-}
 
 // Mock the palce where the operator GetPrimitive is called in inner_model build function.
 Ops::LiteGraphPrimitvePtr Ops::DivBuilder::GetPrimitive()
