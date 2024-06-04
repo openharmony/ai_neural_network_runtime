@@ -14,7 +14,6 @@
  */
 
 #include "compilation.h"
-#include "execution_plan.h"
 #include "hdi_device_v2_0.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"
 
@@ -22,21 +21,6 @@ OH_NN_ReturnCode OHOS::HDI::Nnrt::V2_0::MockIPreparedModel::m_ExpectRetCode = OH
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-std::shared_ptr<Device> ExecutionPlan::GetInputDevice() const
-{
-    sptr<OHOS::HDI::Nnrt::V2_0::INnrtDevice> idevice
-        = sptr<OHOS::HDI::Nnrt::V2_0::MockIDevice>(new (std::nothrow) OHOS::HDI::Nnrt::V2_0::MockIDevice());
-    std::shared_ptr<Device> device = std::make_shared<HDIDeviceV2_0>(idevice);
-    return device;
-}
-
-std::shared_ptr<Device> ExecutionPlan::GetOutputDevice() const
-{
-    sptr<OHOS::HDI::Nnrt::V2_0::INnrtDevice> idevice
-        = sptr<OHOS::HDI::Nnrt::V2_0::MockIDevice>(new (std::nothrow) OHOS::HDI::Nnrt::V2_0::MockIDevice());
-    std::shared_ptr<Device> device = std::make_shared<HDIDeviceV2_0>(idevice);
-    return device;
-}
 
 void* HDIDeviceV2_0::AllocateBuffer(size_t length)
 {
@@ -94,20 +78,6 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::Run(const std::vector<IOTensor>& inputs, 
     outputsDims.emplace_back(outputs[0].dimensions);
 
     return OH_NN_SUCCESS;
-}
-
-std::shared_ptr<ExecutionPlan> Compilation::GetExecutionPlan() const
-{
-    sptr<OHOS::HDI::Nnrt::V2_0::IPreparedModel> hdiPreparedModel = OHOS::sptr<OHOS::HDI::Nnrt::V2_0::HDI::Nnrt::V2_0
-        ::MockIPreparedModel>(new (std::nothrow) OHOS::HDI::Nnrt::V2_0::HDI::Nnrt::V2_0::MockIPreparedModel());
-
-    std::shared_ptr<PreparedModel> preparedModel = std::make_shared<HDIPreparedModelV2_0>(hdiPreparedModel);
-    sptr<OHOS::HDI::Nnrt::V2_0::INnrtDevice> idevice
-        = OHOS::sptr<OHOS::HDI::Nnrt::V2_0::MockIDevice>(new (std::nothrow) OHOS::HDI::Nnrt::V2_0::MockIDevice());
-    std::shared_ptr<Device> device = std::make_shared<HDIDeviceV2_0>(idevice);
-    ExecutionPlan executor(preparedModel, device);
-    std::shared_ptr<ExecutionPlan> pExcutor = std::make_shared<ExecutionPlan>(executor);
-    return pExcutor;
 }
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
