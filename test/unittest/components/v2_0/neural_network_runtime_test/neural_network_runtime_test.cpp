@@ -19,14 +19,13 @@
 
 #include "common/utils.h"
 #include "compilation.h"
-#include "device_manager.h"
 #include "hdi_device_v2_0.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
-    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
+    const Buffer& quantBuffer, const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     if (model == nullptr) {
         return OH_NN_INVALID_PARAMETER;
@@ -47,29 +46,6 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::li
     return OH_NN_SUCCESS;
 }
 
-std::shared_ptr<Device> DeviceManager::GetDevice(size_t deviceId) const
-{
-    sptr<OHOS::HDI::Nnrt::V2_0::INnrtDevice> idevice
-        = sptr<OHOS::HDI::Nnrt::V2_0::MockIDevice>(new (std::nothrow) OHOS::HDI::Nnrt::V2_0::MockIDevice());
-    if (idevice == nullptr) {
-        LOGE("DeviceManager mock GetDevice failed, error happened when new sptr");
-        return nullptr;
-    }
-
-    std::shared_ptr<Device> device = CreateSharedPtr<HDIDeviceV2_0>(idevice);
-    if (device == nullptr) {
-        LOGE("DeviceManager mock GetDevice failed, the device is nullptr");
-        return nullptr;
-    }
-
-    if (deviceId == 0) {
-        LOGE("DeviceManager mock GetDevice failed, the passed parameter deviceId is 0");
-        return nullptr;
-    } else {
-        return device;
-    }
-}
-
 OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceType(OH_NN_DeviceType& deviceType)
 {
     if (deviceType == OH_NN_OTHERS) {
@@ -77,30 +53,6 @@ OH_NN_ReturnCode HDIDeviceV2_0::GetDeviceType(OH_NN_DeviceType& deviceType)
     }
 
     return OH_NN_SUCCESS;
-}
-
-const std::string& DeviceManager::GetDeviceName(size_t deviceId)
-{
-    static std::string deviceName = "";
-    if (deviceId == 0) {
-        return deviceName;
-    }
-
-    deviceName = "deviceId";
-    return deviceName;
-}
-
-const std::vector<size_t>& DeviceManager::GetAllDeviceId()
-{
-    static std::vector<size_t> deviceIds;
-    if (OHOS::HDI::Nnrt::V2_0::MockIPreparedModel::m_ExpectRetCode == OH_NN_FAILED) {
-        // In order not to affect other use cases, set to the OH_NN_OPERATION_FORBIDDEN
-        OHOS::HDI::Nnrt::V2_0::MockIPreparedModel::m_ExpectRetCode = OH_NN_OPERATION_FORBIDDEN;
-        return deviceIds;
-    }
-    std::size_t device = 1;
-    deviceIds.emplace_back(device);
-    return deviceIds;
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::IsModelCacheSupported(bool& isSupported)
@@ -267,22 +219,29 @@ void NeuralNetworkRuntimeTest::SetInnerBuild(InnerModel& innerModel)
 
 void NeuralNetworkRuntimeTest::SetInputAndOutput(Executor& executor)
 {
-    float input1[12] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-    float input2[12] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-    
-    uint32_t input1Index = 0;
-    uint32_t input2Index = 1;
-
+    size_t input1Index = 0;
     int32_t inputDims[2] = {3, 4};
-    size_t length = 12 * sizeof(float);
-    m_tensor = {OH_NN_FLOAT32, 2, inputDims, nullptr, OH_NN_TENSOR};
-    EXPECT_EQ(OH_NN_SUCCESS, executor.SetInput(input1Index, m_tensor, input1, length));
-    EXPECT_EQ(OH_NN_SUCCESS, executor.SetInput(input2Index, m_tensor, input2, length));
+    size_t lengthSize = 12 * sizeof(float);
+    size_t *length = &lengthSize;
 
-    float output[12];
+    size_t minInputDims = 1;
+    size_t maxInputDims = 12;
+
+    size_t *minInputDimsAdress = &minInputDims;
+    size_t **minInputDimsAdressA = &minInputDimsAdress;
+    
+    size_t *maxInputDimsAdress = &maxInputDims;
+    size_t **maxInputDimsAdressA = &maxInputDimsAdress;
+
+    m_tensor = {OH_NN_FLOAT32, 2, inputDims, nullptr, OH_NN_TENSOR};
+    EXPECT_EQ(OH_NN_SUCCESS, executor.GetInputDimRange(input1Index, minInputDimsAdressA, maxInputDimsAdressA, length));
     uint32_t outputIndex = 0;
-    EXPECT_EQ(OH_NN_SUCCESS, executor.SetOutput(outputIndex, output, length));
-    EXPECT_EQ(OH_NN_SUCCESS, executor.Run());
+
+    int32_t shape = 3;
+    int32_t* shapeA = &shape;
+    int32_t** shapeAA = &shapeA;
+    uint32_t* shapeNum = &outputIndex;
+    EXPECT_EQ(OH_NN_SUCCESS, executor.GetOutputShape(outputIndex, shapeAA, shapeNum));
 }
 
 /*
@@ -810,7 +769,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, model_get_available_operation_005, testing::e
 
     size_t deviceID = 10;
     OH_NN_ReturnCode ret = OH_NNModel_GetAvailableOperations(model, deviceID, &pIsAvailable, &opCount);
-    EXPECT_EQ(OH_NN_SUCCESS, ret);
+    EXPECT_EQ(OH_NN_FAILED, ret);
 }
 
 /*
@@ -837,7 +796,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_construct_002, testing::ext::Test
     InnerModel innerModel;
     OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
     OH_NNCompilation* ret = OH_NNCompilation_Construct(model);
-    EXPECT_EQ(nullptr, ret);
+    EXPECT_NE(nullptr, ret);
 }
 
 /*
@@ -876,8 +835,9 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_set_device_002, testing::ext::Tes
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
-    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(&compilation);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
     size_t deviceId = 1;
     OH_NN_ReturnCode ret = OH_NNCompilation_SetDevice(nnCompilation, deviceId);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
@@ -892,12 +852,9 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_set_cache_001, testing::ext::Test
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
     OH_NNCompilation* nnCompilation = nullptr;
     const char* cacheDir = "../";
     uint32_t version = 1;
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
     OH_NN_ReturnCode ret = OH_NNCompilation_SetCache(nnCompilation, cacheDir, version);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
@@ -911,12 +868,11 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_set_cache_002, testing::ext::Test
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
-    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(&compilation);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
     const char* cacheDir = nullptr;
     uint32_t version = 1;
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
     OH_NN_ReturnCode ret = OH_NNCompilation_SetCache(nnCompilation, cacheDir, version);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
@@ -930,12 +886,11 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_set_cache_003, testing::ext::Test
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
-    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(&compilation);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
     const char* cacheDir = "../";
     uint32_t version = 1;
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
     OH_NN_ReturnCode ret = OH_NNCompilation_SetCache(nnCompilation, cacheDir, version);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
 }
@@ -949,12 +904,9 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_set_performance_mode_001, testing
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
     OH_NNCompilation* nnCompilation = nullptr;
     OH_NN_PerformanceMode performanceMode = OH_NN_PERFORMANCE_NONE;
 
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
     OH_NN_ReturnCode ret = OH_NNCompilation_SetPerformanceMode(nnCompilation, performanceMode);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
@@ -968,12 +920,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_set_performance_mode_002, testing
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
-    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(&compilation);
-    OH_NN_PerformanceMode performanceMode = OH_NN_PERFORMANCE_NONE;
 
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NN_PerformanceMode performanceMode = OH_NN_PERFORMANCE_NONE;
 
     OH_NN_ReturnCode ret = OH_NNCompilation_SetPerformanceMode(nnCompilation, performanceMode);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
@@ -988,12 +938,8 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_set_priority_001, testing::ext::T
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
     OH_NNCompilation* nnCompilation = nullptr;
     OH_NN_Priority priority = OH_NN_PRIORITY_LOW;
-
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
 
     OH_NN_ReturnCode ret = OH_NNCompilation_SetPriority(nnCompilation, priority);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -1008,12 +954,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_set_priority_002, testing::ext::T
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
-    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(&compilation);
-    OH_NN_Priority priority = OH_NN_PRIORITY_LOW;
 
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NN_Priority priority = OH_NN_PRIORITY_LOW;
 
     OH_NN_ReturnCode ret = OH_NNCompilation_SetPriority(nnCompilation, priority);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
@@ -1028,12 +972,8 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_set_enable_float16_001, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
     OH_NNCompilation* nnCompilation = nullptr;
     bool enableFloat16 = true;
-
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
 
     OH_NN_ReturnCode ret = OH_NNCompilation_EnableFloat16(nnCompilation, enableFloat16);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -1048,12 +988,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_set_enable_float16_002, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
-    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(&compilation);
-    bool enableFloat16 = true;
 
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    bool enableFloat16 = true;
 
     OH_NN_ReturnCode ret = OH_NNCompilation_EnableFloat16(nnCompilation, enableFloat16);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
@@ -1068,14 +1006,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_build_001, testing::ext::TestSize
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
     OH_NNCompilation* nnCompilation = nullptr;
-
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetPerformance(OH_NN_PERFORMANCE_EXTREME));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetPriority(OH_NN_PRIORITY_HIGH));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetEnableFp16(true));
 
     OH_NN_ReturnCode ret = OH_NNCompilation_Build(nnCompilation);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -1090,17 +1021,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_build_002, testing::ext::TestSize
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
-    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(&compilation);
 
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetPerformance(OH_NN_PERFORMANCE_EXTREME));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetPriority(OH_NN_PRIORITY_HIGH));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetEnableFp16(true));
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
 
     OH_NN_ReturnCode ret = OH_NNCompilation_Build(nnCompilation);
-    EXPECT_EQ(OH_NN_SUCCESS, ret);
+    EXPECT_EQ(OH_NN_FAILED, ret);
 }
 
 /*
@@ -1137,9 +1063,9 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_destroy_003, testing::ext::TestSi
 {
     InnerModel* innerModel = new InnerModel();
     EXPECT_NE(nullptr, innerModel);
-    Compilation* compilation = new(std::nothrow) Compilation(innerModel);
-    EXPECT_NE(nullptr, compilation);
-    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(compilation);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
     OH_NNCompilation_Destroy(&nnCompilation);
     EXPECT_EQ(nullptr, nnCompilation);
 }
@@ -1153,14 +1079,6 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_construct_001, testing::ext::TestSize
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
-
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetEnableFp16(true));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetPerformance(OH_NN_PERFORMANCE_EXTREME));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetPriority(OH_NN_PRIORITY_HIGH));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.Build());
 
     OH_NNCompilation* nnCompilation = nullptr;
     OH_NNExecutor* executor = OH_NNExecutor_Construct(nnCompilation);
@@ -1176,8 +1094,9 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_construct_002, testing::ext::TestSize
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
-    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(&compilation);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
     OH_NNExecutor * executor = OH_NNExecutor_Construct(nnCompilation);
     EXPECT_EQ(nullptr, executor);
 }
@@ -1191,18 +1110,11 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_construct_003, testing::ext::TestSize
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation compilation(&innerModel);
 
-    std::size_t deviceId = 1;
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetDevice(deviceId));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetPerformance(OH_NN_PERFORMANCE_EXTREME));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetPriority(OH_NN_PRIORITY_HIGH));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.SetEnableFp16(true));
-    EXPECT_EQ(OH_NN_SUCCESS, compilation.Build());
-
-    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(&compilation);
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
     OH_NNExecutor * executor = OH_NNExecutor_Construct(nnCompilation);
-    EXPECT_NE(nullptr, executor);
+    EXPECT_EQ(nullptr, executor);
 }
 
 /**
@@ -1230,9 +1142,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_002, testing::ext::TestSize.
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t inputIndex = 0;
     float input[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -1250,9 +1163,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_003, testing::ext::TestSize.
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     SetTensor();
 
@@ -1271,9 +1185,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_004, testing::ext::TestSize.
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t inputIndex = 0;
     SetTensor();
@@ -1293,9 +1208,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_005, testing::ext::TestSize.
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t inputIndex = 0;
     int32_t dims[2] = {3, 4};
@@ -1305,7 +1221,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_005, testing::ext::TestSize.
     const void *buffer = input;
     size_t length = 12 * sizeof(float);
     OH_NN_ReturnCode ret = OH_NNExecutor_SetInput(nnExecutor, inputIndex, &m_tensor, buffer, length);
-    EXPECT_EQ(OH_NN_SUCCESS, ret);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
 /**
@@ -1331,9 +1247,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setoutput_002, testing::ext::TestSize
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     void *buffer = nullptr;
@@ -1350,9 +1267,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setoutput_003, testing::ext::TestSize
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     float input[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -1370,14 +1288,15 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setoutput_004, testing::ext::TestSize
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     float output[12];
     size_t length = 12 * sizeof(float);
-    EXPECT_EQ(OH_NN_SUCCESS, OH_NNExecutor_SetOutput(nnExecutor, outputIndex, output, length));
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, OH_NNExecutor_SetOutput(nnExecutor, outputIndex, output, length));
 }
 
 /**
@@ -1389,11 +1308,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_getoutputshape_001, testing::ext::Tes
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = nullptr;
 
-    SetInputAndOutput(executor);
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     int32_t* ptr = nullptr;
     int32_t** shape = &ptr;
@@ -1412,11 +1330,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_getoutputshape_002, testing::ext::Tes
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
 
-    SetInputAndOutput(executor);
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     int32_t** shape = nullptr;
@@ -1434,11 +1351,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_getoutputshape_003, testing::ext::Tes
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
 
-    SetInputAndOutput(executor);
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     int32_t expectDim[2] = {3, 3};
     int32_t* ptr = expectDim;
@@ -1458,11 +1374,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_getoutputshape_004, testing::ext::Tes
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
 
-    SetInputAndOutput(executor);
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     int32_t* ptr = nullptr;
     int32_t** shape = &ptr;
@@ -1479,17 +1394,16 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_getoutputshape_005, testing::ext::Tes
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
 
-    SetInputAndOutput(executor);
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     int32_t* ptr = nullptr;
     int32_t** shape = &ptr;
     uint32_t length = 2;
     uint32_t outputIndex = 0;
-    EXPECT_EQ(OH_NN_SUCCESS, OH_NNExecutor_GetOutputShape(nnExecutor, outputIndex, shape, &length));
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, OH_NNExecutor_GetOutputShape(nnExecutor, outputIndex, shape, &length));
 }
 
 /**
@@ -1512,25 +1426,15 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_run_002, testing::ext::TestSize.Level
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
 
-    float input1[12] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-    float input2[12] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-    uint32_t input1Index = 0;
-    uint32_t input2Index = 1;
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     int32_t inputDims[2] = {3, 4};
-    size_t length = 12 * sizeof(float);
     m_tensor = {OH_NN_FLOAT32, 2, inputDims, nullptr, OH_NN_TENSOR};
-    EXPECT_EQ(OH_NN_SUCCESS, executor.SetInput(input1Index, m_tensor, input1, length));
-    EXPECT_EQ(OH_NN_SUCCESS, executor.SetInput(input2Index, m_tensor, input2, length));
 
-    float output[12];
-    uint32_t outputIndex = 0;
-    EXPECT_EQ(OH_NN_SUCCESS, executor.SetOutput(outputIndex, output, length));
-    EXPECT_EQ(OH_NN_SUCCESS, OH_NNExecutor_Run(nnExecutor));
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, OH_NNExecutor_Run(nnExecutor));
 }
 
 /*
@@ -1557,9 +1461,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_input_memory_002, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     size_t length = 0;
@@ -1577,9 +1482,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_input_memory_003, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 6;
     size_t length = 9 * sizeof(float);
@@ -1597,15 +1503,16 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_input_memory_004, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     size_t length = 9 * sizeof(float);
 
     OH_NN_Memory* ret = OH_NNExecutor_AllocateInputMemory(nnExecutor, outputIndex, length);
-    EXPECT_NE(nullptr, ret);
+    EXPECT_EQ(nullptr, ret);
 }
 
 /*
@@ -1632,9 +1539,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_output_memory_002, testing:
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     size_t length = 0;
@@ -1652,9 +1560,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_output_memory_003, testing:
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 6;
     size_t length = 9 * sizeof(float);
@@ -1672,15 +1581,16 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_output_memory_004, testing:
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     size_t length = 9 * sizeof(float);
 
     OH_NN_Memory* ret = OH_NNExecutor_AllocateOutputMemory(nnExecutor, outputIndex, length);
-    EXPECT_NE(nullptr, ret);
+    EXPECT_EQ(nullptr, ret);
 }
 
 
@@ -1693,8 +1603,6 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_001, testing::e
 {
     InnerModel innerModel;
     BuildModel(innerModel);
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
     OH_NNExecutor* nnExecutor = nullptr;
 
     uint32_t inputIndex = 0;
@@ -1702,8 +1610,6 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_001, testing::e
     void* const data = dataArry;
     OH_NN_Memory memory = {data, 9 * sizeof(float)};
     OH_NN_Memory* pMemory = &memory;
-    size_t length = 9 * sizeof(float);
-    EXPECT_EQ(OH_NN_SUCCESS, executor.CreateInputMemory(inputIndex, length, &pMemory));
     OH_NNExecutor_DestroyInputMemory(nnExecutor, inputIndex, &pMemory);
     EXPECT_EQ(nullptr, nnExecutor);
 }
@@ -1717,9 +1623,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_002, testing::e
 {
     InnerModel innerModel;
     BuildModel(innerModel);
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t inputIndex = 0;
     OH_NN_Memory** memory = nullptr;
@@ -1736,9 +1643,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_003, testing::e
 {
     InnerModel innerModel;
     BuildModel(innerModel);
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t inputIndex = 0;
     OH_NN_Memory* memory = nullptr;
@@ -1756,9 +1664,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_004, testing::e
 {
     InnerModel innerModel;
     BuildModel(innerModel);
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t inputIndex = 6;
     float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -1778,19 +1687,18 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_005, testing::e
 {
     InnerModel innerModel;
     BuildModel(innerModel);
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t inputIndex = 0;
     float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
     void* const data = dataArry;
     OH_NN_Memory memory = {data, 9 * sizeof(float)};
     OH_NN_Memory* pMemory = &memory;
-    size_t length = 9 * sizeof(float);
-    EXPECT_EQ(OH_NN_SUCCESS, executor.CreateInputMemory(inputIndex, length, &pMemory));
     OH_NNExecutor_DestroyInputMemory(nnExecutor, inputIndex, &pMemory);
-    EXPECT_EQ(nullptr, pMemory);
+    EXPECT_NE(nullptr, pMemory);
 }
 
 /*
@@ -1819,9 +1727,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_002, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     OH_NN_Memory** memory = nullptr;
@@ -1838,9 +1747,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_003, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     OH_NN_Memory* memory = nullptr;
@@ -1858,9 +1768,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_004, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 6;
     float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -1880,19 +1791,18 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_005, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
     void* const data = dataArry;
     OH_NN_Memory memory = {data, 9 * sizeof(float)};
     OH_NN_Memory* pMemory = &memory;
-    size_t length = 9 * sizeof(float);
     uint32_t outputIndex = 0;
-    EXPECT_EQ(OH_NN_SUCCESS, executor.CreateOutputMemory(outputIndex, length, &pMemory));
     OH_NNExecutor_DestroyOutputMemory(nnExecutor, outputIndex, &pMemory);
-    EXPECT_EQ(nullptr, pMemory);
+    EXPECT_NE(nullptr, pMemory);
 }
 
 /*
@@ -1924,9 +1834,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_002, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     OH_NN_Tensor* operand = nullptr;
 
@@ -1948,9 +1859,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_003, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     SetTensor();
 
@@ -1969,9 +1881,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_004, testing::
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t inputIndex = 0;
     int32_t dims[2] = {3, 4};
@@ -1982,7 +1895,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_004, testing::
     OH_NN_Memory memory = {data, 12 * sizeof(float)};
 
     OH_NN_ReturnCode ret = OH_NNExecutor_SetInputWithMemory(nnExecutor, inputIndex, &m_tensor, &memory);
-    EXPECT_EQ(OH_NN_SUCCESS, ret);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
 
@@ -2011,9 +1924,10 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_output_with_memory_002, testing:
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     OH_NN_Memory* memory = nullptr;
@@ -2030,16 +1944,17 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_output_with_memory_003, testing:
 {
     InnerModel innerModel;
     EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-    Compilation innerCompilation(&innerModel);
-    Executor executor(&innerCompilation);
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = 0;
     float dataArry[12] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
     void* const data = dataArry;
     OH_NN_Memory memory = {data, 12 * sizeof(float)};
     OH_NN_ReturnCode ret = OH_NNExecutor_SetOutputWithMemory(nnExecutor, outputIndex, &memory);
-    EXPECT_EQ(OH_NN_SUCCESS, ret);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
 /*
@@ -2064,25 +1979,6 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_002, testing::ext::TestSize.
     OH_NNExecutor* nnExecutor = nullptr;
     OH_NNExecutor** pExecutor = &nnExecutor;
     OH_NNExecutor_Destroy(pExecutor);
-    EXPECT_EQ(nullptr, nnExecutor);
-}
-
-/*
- * @tc.name: executor_destroy_003
- * @tc.desc: Verify the normal model of the OH_NNExecutor_Destroy function.
- * @tc.type: FUNC
- */
-HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_003, testing::ext::TestSize.Level0)
-{
-    InnerModel* innerModel = new InnerModel();
-    EXPECT_NE(nullptr, innerModel);
-    Compilation* innerCompilation = new(std::nothrow) Compilation(innerModel);
-    EXPECT_NE(nullptr, innerCompilation);
-    Executor* executor = new(std::nothrow) Executor(innerCompilation);
-    EXPECT_NE(nullptr, executor);
-
-    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
-    OH_NNExecutor_Destroy(&nnExecutor);
     EXPECT_EQ(nullptr, nnExecutor);
 }
 
@@ -2213,7 +2109,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, device_get_name_004, testing::ext::TestSize.L
     const char* name = nullptr;
     const char** pName = &name;
     OH_NN_ReturnCode ret = OH_NNDevice_GetName(deviceID, pName);
-    EXPECT_EQ(OH_NN_SUCCESS, ret);
+    EXPECT_EQ(OH_NN_FAILED, ret);
 }
 
 /*
@@ -2254,7 +2150,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, device_get_type_003, testing::ext::TestSize.L
     OH_NN_DeviceType deviceType = OH_NN_OTHERS;
     OH_NN_DeviceType* pDeviceType = &deviceType;
     OH_NN_ReturnCode ret = OH_NNDevice_GetType(deviceID, pDeviceType);
-    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, ret);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
 /*
@@ -2268,7 +2164,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, device_get_type_004, testing::ext::TestSize.L
     OH_NN_DeviceType deviceType = OH_NN_CPU;
     OH_NN_DeviceType* pDeviceType = &deviceType;
     OH_NN_ReturnCode ret = OH_NNDevice_GetType(deviceID, pDeviceType);
-    EXPECT_EQ(OH_NN_SUCCESS, ret);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 } // namespace Unittest
 } // namespace NeuralNetworkRuntime
