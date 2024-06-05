@@ -117,7 +117,7 @@ HWTEST_F(HDIPreparedModelTest, hidpreparedmodel_exportmodelcache_001, TestSize.L
     OHOS::sptr<V2_0::IPreparedModel> hdiPreparedModel =
         OHOS::sptr<V2_0::MockIPreparedModel>(new (std::nothrow) V2_0::MockIPreparedModel());
     std::unique_ptr<HDIPreparedModelV2_0> preparedModel = std::make_unique<HDIPreparedModelV2_0>(hdiPreparedModel);
-    std::vector<ModelBuffer> modelCache;
+    std::vector<Buffer> modelCache;
     EXPECT_CALL(*((V2_0::MockIPreparedModel*)hdiPreparedModel.GetRefPtr()),
         ExportModelCache(::testing::_))
         .WillRepeatedly(
@@ -144,7 +144,7 @@ HWTEST_F(HDIPreparedModelTest, hidpreparedmodel_exportmodelcache_002, TestSize.L
     EXPECT_NE(mockPreparedModel, nullptr);
 
     std::unique_ptr<HDIPreparedModelV2_0> preparedModel = std::make_unique<HDIPreparedModelV2_0>(mockPreparedModel);
-    std::vector<ModelBuffer> modelCache;
+    std::vector<Buffer> modelCache;
     EXPECT_CALL(*((V2_0::MockIPreparedModel*)mockPreparedModel.GetRefPtr()),
         ExportModelCache(::testing::_))
         .WillRepeatedly(
@@ -170,9 +170,9 @@ HWTEST_F(HDIPreparedModelTest, hidpreparedmodel_exportmodelcache_003, TestSize.L
     EXPECT_NE(hdiPreparedModel, nullptr);
 
     std::unique_ptr<HDIPreparedModelV2_0> preparedModel = std::make_unique<HDIPreparedModelV2_0>(hdiPreparedModel);
-    std::vector<ModelBuffer> modelCache {{nullptr, 0}};
+    std::vector<Buffer> modelCache;
     OH_NN_ReturnCode result = preparedModel->ExportModelCache(modelCache);
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, result);
+    EXPECT_EQ(OH_NN_SUCCESS, result);
 }
 
 /**
@@ -188,7 +188,7 @@ HWTEST_F(HDIPreparedModelTest, hidpreparedmodel_exportmodelcache_004, TestSize.L
     EXPECT_NE(mockPreparedModel, nullptr);
 
     std::unique_ptr<HDIPreparedModelV2_0> preparedModel = std::make_unique<HDIPreparedModelV2_0>(mockPreparedModel);
-    std::vector<ModelBuffer> modelCache;
+    std::vector<Buffer> modelCache;
     EXPECT_CALL(*((V2_0::MockIPreparedModel*)mockPreparedModel.GetRefPtr()),
         ExportModelCache(::testing::_))
         .WillRepeatedly(
@@ -199,7 +199,7 @@ HWTEST_F(HDIPreparedModelTest, hidpreparedmodel_exportmodelcache_004, TestSize.L
         );
 
     OH_NN_ReturnCode result = preparedModel->ExportModelCache(modelCache);
-    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_SAVE_CACHE_EXCEPTION, result);
 }
 
 /**
