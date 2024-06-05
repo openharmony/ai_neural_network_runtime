@@ -115,7 +115,8 @@ HWTEST_F(InnerModelTest, inner_model_construct_nntensor_from_litegraph_001, Test
     std::string opLayout;
     std::map<std::string, std::string> opLayouts;
 
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest
+        .BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
 }
 
 /**
@@ -137,7 +138,8 @@ HWTEST_F(InnerModelTest, inner_model_construct_nntensor_from_litegraph_002, Test
     std::string opLayout;
     std::map<std::string, std::string> opLayouts;
 
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest
+        .BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
 }
 
 /**
@@ -200,7 +202,8 @@ HWTEST_F(InnerModelTest, inner_model_construct_nntensor_from_litegraph_005, Test
     std::string opLayout;
     std::map<std::string, std::string> opLayouts;
 
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest
+        .BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
 }
 
 /**
@@ -261,7 +264,8 @@ HWTEST_F(InnerModelTest, inner_model_build_from_lite_graph_002, TestSize.Level1)
     std::map<std::string, std::string> opLayouts;
 
     EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
-    EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest
+        .BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
 }
 
 /**
@@ -286,7 +290,8 @@ HWTEST_F(InnerModelTest, inner_model_build_from_lite_graph_003, TestSize.Level1)
     std::string opLayout;
     std::map<std::string, std::string> opLayouts;
 
-    EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest
+        .BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
 }
 
 
