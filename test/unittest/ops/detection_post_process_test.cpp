@@ -1091,7 +1091,7 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_035, Test
     SetDetectionsPerClass(OH_NN_INT64, m_paramDim, nullptr, OH_NN_DETECTION_POST_PROCESS_DETECTIONS_PER_CLASS);
     SetMaxClassesPerDetection(OH_NN_INT64, m_paramDim, nullptr, OH_NN_DETECTION_POST_PROCESS_MAX_CLASSES_PER_DETECTION);
     SetNumClasses(OH_NN_INT64, m_paramDim, nullptr, OH_NN_DETECTION_POST_PROCESS_NUM_CLASSES);
-    std::shared_ptr<NNTensor> useRegularNmsTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
+    std::shared_ptr<NNTensor> useRegularNmsTensor = TransToNNTensor(OH_NN_BOOL, m_paramDim,
         nullptr, OH_NN_DETECTION_POST_PROCESS_USE_REGULAR_NMS);
     m_allTensors.emplace_back(useRegularNmsTensor);
     SetOutQuantized(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_DETECTION_POST_PROCESS_OUT_QUANTIZED);
@@ -1119,7 +1119,7 @@ HWTEST_F(DetectionPostProcessBuilderTest, detection_post_process_build_036, Test
     SetMaxClassesPerDetection(OH_NN_INT64, m_paramDim, nullptr, OH_NN_DETECTION_POST_PROCESS_MAX_CLASSES_PER_DETECTION);
     SetNumClasses(OH_NN_INT64, m_paramDim, nullptr, OH_NN_DETECTION_POST_PROCESS_NUM_CLASSES);
     SetUseRegularNms(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_DETECTION_POST_PROCESS_USE_REGULAR_NMS);
-    std::shared_ptr<NNTensor> outQuantizedTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
+    std::shared_ptr<NNTensor> outQuantizedTensor = TransToNNTensor(OH_NN_BOOL, m_paramDim,
         nullptr, OH_NN_DETECTION_POST_PROCESS_OUT_QUANTIZED);
     m_allTensors.emplace_back(outQuantizedTensor);
 

@@ -257,12 +257,12 @@ HWTEST_F(ReduceAllBuilderTest, reduceall_build_009, TestSize.Level0)
  */
 HWTEST_F(ReduceAllBuilderTest, reduceall_build_010, TestSize.Level0)
 {
-    m_paramDim = {1, 2};
+    std::vector<int32_t> m_paramDims = {1, 2};
 
     SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
 
-    std::shared_ptr<NNTensor> keepDimsTensor = TransToNNTensor(OH_NN_BOOL, m_paramDim,
+    std::shared_ptr<NNTensor> keepDimsTensor = TransToNNTensor(OH_NN_BOOL, m_paramDims,
         nullptr, OH_NN_REDUCE_ALL_KEEP_DIMS);
     bool keepDimsValue[2] = {true, true};
     keepDimsTensor->SetBuffer(keepDimsValue, 2 * sizeof(bool));
@@ -282,13 +282,13 @@ HWTEST_F(ReduceAllBuilderTest, reduceall_build_010, TestSize.Level0)
  */
 HWTEST_F(ReduceAllBuilderTest, reduceall_build_011, TestSize.Level0)
 {
-    m_paramDim = {1, 2};
+    std::vector<int32_t> m_paramDims = {1, 2};
 
     SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
 
     SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_ALL_KEEP_DIMS);
-    std::shared_ptr<NNTensor> coeffTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
+    std::shared_ptr<NNTensor> coeffTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDims,
         nullptr, OH_NN_REDUCE_ALL_COEFF);
     float coeffValue[2] = {1.0f, 1.0f};
     coeffTensor->SetBuffer(coeffValue, 2 * sizeof(float));
@@ -307,14 +307,14 @@ HWTEST_F(ReduceAllBuilderTest, reduceall_build_011, TestSize.Level0)
  */
 HWTEST_F(ReduceAllBuilderTest, reduceall_build_012, TestSize.Level0)
 {
-    m_paramDim = {1, 2};
+    std::vector<int32_t> m_paramDims = {1, 2};
 
     SaveInputTensor(m_inputs, OH_NN_BOOL, m_inputDim, nullptr);
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
 
     SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_ALL_KEEP_DIMS);
     SetCoeff(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_REDUCE_ALL_COEFF);
-    std::shared_ptr<NNTensor> reduceToEndTensor = TransToNNTensor(OH_NN_BOOL, m_paramDim,
+    std::shared_ptr<NNTensor> reduceToEndTensor = TransToNNTensor(OH_NN_BOOL, m_paramDims,
         nullptr, OH_NN_REDUCE_ALL_REDUCE_TO_END);
     bool reduceToEndValue[2] = {true, true};
     reduceToEndTensor->SetBuffer(reduceToEndValue, 2 * sizeof(bool));
@@ -407,7 +407,7 @@ HWTEST_F(ReduceAllBuilderTest, reduceall_build_017, TestSize.Level0)
     SaveOutputTensor(m_outputs, OH_NN_BOOL, m_outputDim, nullptr);
 
     SetKeepDims(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_ALL_KEEP_DIMS);
-    std::shared_ptr<NNTensor> coeffTensor = TransToNNTensor(OH_NN_INT64,
+    std::shared_ptr<NNTensor> coeffTensor = TransToNNTensor(OH_NN_FLOAT32,
         m_paramDim, nullptr, OH_NN_REDUCE_ALL_COEFF);
     m_allTensors.emplace_back(coeffTensor);
     SetReduceToEnd(OH_NN_BOOL, m_paramDim, nullptr, OH_NN_REDUCE_ALL_REDUCE_TO_END);
