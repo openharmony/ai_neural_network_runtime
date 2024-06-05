@@ -134,13 +134,13 @@ public:
         return OH_NN_SUCCESS;
     };
 
-    OH_NN_ReturnCode PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model, const Buffer& quantBuffer, const ModelConfig& config,
-        std::shared_ptr<PreparedModel>& preparedModel) override
+    OH_NN_ReturnCode PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
+        const Buffer& quantBuffer, const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel) override
     {
         return OH_NN_SUCCESS;
     };
     OH_NN_ReturnCode PrepareModelFromModelCache(const std::vector<Buffer>& modelCache,
-    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel) override
+        const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel) override
     {
         return OH_NN_SUCCESS;
     };
