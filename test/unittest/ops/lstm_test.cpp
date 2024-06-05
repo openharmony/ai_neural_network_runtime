@@ -610,7 +610,7 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_015, TestSize.Level1)
     SaveDropout(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LSTM_DROPOUT);
     SaveZoneoutCell(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LSTM_ZONEOUT_CELL);
     std::shared_ptr<NNTensor> zoneoutHiddenTensor = TransToNNTensor(OH_NN_INT64, m_paramDim,
-        nullptr, OH_NN_LSTM_ZONEOUT_CELL);
+        nullptr, OH_NN_LSTM_ZONEOUT_HIDDEN);
     int64_t* zoneoutHiddenValue = new (std::nothrow) int64_t [1]{0};
     EXPECT_NE(nullptr, zoneoutHiddenValue);
     zoneoutHiddenTensor->SetBuffer(zoneoutHiddenValue, sizeof(int64_t));
@@ -1161,7 +1161,7 @@ HWTEST_F(LSTMBuilderTest, LSTM_build_036, TestSize.Level1)
     SaveDropout(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LSTM_DROPOUT);
     SaveZoneoutCell(OH_NN_FLOAT32, m_paramDim, nullptr, OH_NN_LSTM_ZONEOUT_CELL);
     std::shared_ptr<NNTensor> zoneoutHiddenTensor = TransToNNTensor(OH_NN_FLOAT32, m_paramDim,
-        nullptr, OH_NN_LSTM_ZONEOUT_CELL);
+        nullptr, OH_NN_LSTM_ZONEOUT_HIDDEN);
     m_allTensors.emplace_back(zoneoutHiddenTensor);
     SaveProjSize(OH_NN_INT64, m_paramDim, nullptr, OH_NN_LSTM_PROJ_SIZE);
 
