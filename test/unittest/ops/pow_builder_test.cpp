@@ -184,7 +184,6 @@ HWTEST_F(PowBuilderTest, pow_build_007, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    shiftTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -206,7 +205,6 @@ HWTEST_F(PowBuilderTest, pow_build_008, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    scaleTensor->SetBuffer(nullptr, 0);
 }
 
 /**

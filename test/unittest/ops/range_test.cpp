@@ -201,7 +201,6 @@ HWTEST_F(RangeBuilderTest, range_build_007, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    startTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -225,7 +224,6 @@ HWTEST_F(RangeBuilderTest, range_build_008, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    limitTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -249,7 +247,6 @@ HWTEST_F(RangeBuilderTest, range_build_009, TestSize.Level1)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    deltaTensor->SetBuffer(nullptr, 0);
 }
 
 /**
