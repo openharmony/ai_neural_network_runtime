@@ -239,7 +239,8 @@ HWTEST_F(InnerModelTest, inner_model_build_from_lite_graph_001, TestSize.Level1)
         }
     }
 
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest.BuildFromLiteGraph(nullptr, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest
+        .BuildFromLiteGraph(nullptr, buffer, modelName, isProfiling, opLayouts));
 }
 
 /**

@@ -25,9 +25,7 @@
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
-                                  const Buffer& quantBuffer,
-                                  const ModelConfig& config,
-                                  std::shared_ptr<PreparedModel>& preparedModel)
+    const Buffer& quantBuffer, const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     if (model == nullptr) {
         return OH_NN_INVALID_PARAMETER;
@@ -224,16 +222,16 @@ void NeuralNetworkRuntimeTest::SetInputAndOutput(Executor& executor)
     size_t input1Index = 0;
     int32_t inputDims[2] = {3, 4};
     size_t lengthSize = 12 * sizeof(float);
-    size_t * length = &lengthSize;
+    size_t *length = &lengthSize;
 
     size_t minInputDims = 1;
     size_t maxInputDims = 12;
+
+    size_t *minInputDimsAdress = &minInputDims;
+    size_t **minInputDimsAdressA = &minInputDimsAdress;
     
-    size_t * minInputDimsAdress = &minInputDims;
-    size_t ** minInputDimsAdressA = &minInputDimsAdress;
-    
-    size_t * maxInputDimsAdress = &maxInputDims;
-    size_t ** maxInputDimsAdressA = &maxInputDimsAdress;
+    size_t *maxInputDimsAdress = &maxInputDims;
+    size_t **maxInputDimsAdressA = &maxInputDimsAdress;
 
     m_tensor = {OH_NN_FLOAT32, 2, inputDims, nullptr, OH_NN_TENSOR};
     EXPECT_EQ(OH_NN_SUCCESS, executor.GetInputDimRange(input1Index, minInputDimsAdressA, maxInputDimsAdressA, length));
