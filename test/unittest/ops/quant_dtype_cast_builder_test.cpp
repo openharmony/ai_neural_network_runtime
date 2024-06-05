@@ -321,7 +321,6 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_013, TestSize.Level0)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    srcTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -342,7 +341,6 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_014, TestSize.Level0)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    dstTensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -363,7 +361,6 @@ HWTEST_F(QuantDTypeCastBuilderTest, quantdtypecast_build_015, TestSize.Level0)
 
     OH_NN_ReturnCode ret = m_builder.Build(m_params, m_inputsIndex, m_outputs, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-    axisTensor->SetBuffer(nullptr, 0);
 }
 
 /**

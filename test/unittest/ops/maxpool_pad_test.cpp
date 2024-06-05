@@ -330,7 +330,6 @@ HWTEST_F(MaxPoolPadBuilderTest, maxpool_build_pad_011, TestSize.Level1)
     m_allTensors.emplace_back(tensor);
     SetGlobal(OH_NN_BOOL, m_param_dim, nullptr, OH_NN_MAX_POOL_GLOBAL);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
-    tensor->SetBuffer(nullptr, 0);
 }
 
 /**
@@ -357,7 +356,6 @@ HWTEST_F(MaxPoolPadBuilderTest, maxpool_build_pad_012, TestSize.Level1)
     tensor->SetBuffer(globalValue, sizeof(int32_t));
     m_allTensors.emplace_back(tensor);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
-    tensor->SetBuffer(nullptr, 0);
 }
 
 /**

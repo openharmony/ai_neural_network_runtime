@@ -42,11 +42,9 @@ protected:
 
 void TopKBuilderTest::InitTensor(const std::vector<uint32_t>& inputsIndex, const std::vector<uint32_t>& outputsIndex)
 {
-    std::vector<uint32_t> paramsIndex = { 4 };
     std::vector<int32_t> inputDim = {9};
     std::vector<int32_t> OutputDim = {3};
 
-    m_paramsIndex = paramsIndex;
     SaveInputTensor(inputsIndex, OH_NN_FLOAT32, inputDim, nullptr);
     SaveOutputTensor(outputsIndex, OH_NN_FLOAT32, OutputDim, nullptr);
 }
@@ -201,8 +199,8 @@ HWTEST_F(TopKBuilderTest, topk_build_007, TestSize.Level0)
     std::vector<int32_t> paramDim = {};
 
     InitTensor(inputsIndex, outputsIndex);
-    SaveSortedTensor(OH_NN_INT32, paramDim, nullptr, OH_NN_TOP_K_SORTED);
-    SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
+    SaveSortedTensor(OH_NN_BOOL, paramDim, nullptr, OH_NN_TOP_K_SORTED);
+    SaveAxisTensor(OH_NN_INT32, paramDim, nullptr, OH_NN_TOP_K_AXIS);
 
     OH_NN_ReturnCode ret = m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -245,7 +243,7 @@ HWTEST_F(TopKBuilderTest, topk_build_009, TestSize.Level0)
 
     InitTensor(inputsIndex, outputsIndex);
 
-    SaveSortedTensor(OH_NN_INT32, paramDim, nullptr, OH_NN_TOP_K_SORTED);
+    SaveSortedTensor(OH_NN_BOOL, paramDim, nullptr, OH_NN_TOP_K_SORTED);
     std::shared_ptr<NNTensor> axisTensor = TransToNNTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
     axisTensor->SetBuffer(nullptr, 0);
     m_allTensors.emplace_back(axisTensor);
@@ -323,7 +321,7 @@ HWTEST_F(TopKBuilderTest, topk_get_primitive_002, TestSize.Level0)
     SaveAxisTensor(OH_NN_INT64, paramDim, nullptr, OH_NN_TOP_K_AXIS);
 
     int64_t axisValue = 0;
-    EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(m_paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
+    EXPECT_EQ(OH_NN_SUCCESS, m_builder.Build(paramsIndex, m_inputsIndex, m_outputsIndex, m_allTensors));
     LiteGraphTensorPtr primitive = m_builder.GetPrimitive();
     LiteGraphTensorPtr expectPrimitive = { nullptr, DestroyLiteGraphPrimitive };
     EXPECT_NE(primitive, expectPrimitive);
