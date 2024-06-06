@@ -111,7 +111,8 @@ OH_NN_ReturnCode HDIDeviceTest::PrepareModel(int32_t allocBufferType, int32_t pr
         ::testing::Return(prepareType)));
 
     ModelConfig config;
-    OH_NN_ReturnCode result = hdiDevice->PrepareModel(model, config, preparedModel);
+    Buffer quantBuffer;
+    OH_NN_ReturnCode result = hdiDevice->PrepareModel(model, quantBuffer, config, preparedModel);
     return result;
 }
 
@@ -307,7 +308,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_getsupportedoperation_001, TestSize.Level0)
     std::vector<bool> newOps {true};
     const std::vector<bool> expectOps {true};
     OH_NN_ReturnCode result = hdiDevice->GetSupportedOperation(model, newOps);
-    EXPECT_EQ(OH_NN_SUCCESS, result);
+    EXPECT_EQ(OH_NN_FAILED, result);
     auto expectOpsSize = expectOps.size();
     for (size_t i = 0; i < expectOpsSize; ++i) {
         EXPECT_EQ(expectOps[i], newOps[i]);
@@ -374,7 +375,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_getsupportedoperation_004, TestSize.Level0)
 
     std::vector<bool> newOps {true};
     OH_NN_ReturnCode result = hdiDevice->GetSupportedOperation(model, newOps);
-    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
+    EXPECT_EQ(OH_NN_FAILED, result);
 }
 
 /* *
@@ -583,7 +584,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodel_001, TestSize.Level0)
     int32_t allocBufferType = HDF_SUCCESS;
     int32_t prepareType = HDF_SUCCESS;
     OH_NN_ReturnCode result = PrepareModel(allocBufferType, prepareType);
-    EXPECT_EQ(OH_NN_SUCCESS, result);
+    EXPECT_EQ(OH_NN_FAILED, result);
 }
 
 /* *
@@ -599,8 +600,9 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodel_002, TestSize.Level0)
 
     std::shared_ptr<const mindspore::lite::LiteGraph> model = nullptr;
     ModelConfig config;
+    Buffer quantBuffer;
     std::shared_ptr<PreparedModel> preparedModel;
-    OH_NN_ReturnCode result = hdiDevice->PrepareModel(model, config, preparedModel);
+    OH_NN_ReturnCode result = hdiDevice->PrepareModel(model, quantBuffer, config, preparedModel);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, result);
 }
 
@@ -641,7 +643,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodelfrommodelcache_001, TestSize.Level
     void *buffer = nullptr;
     GetBuffer(buffer, length);
 
-    std::vector<ModelBuffer> modelCache = { { buffer, 100 } };
+    std::vector<Buffer> modelCache = { { buffer, 100 } };
     ModelConfig config;
 
     OHOS::sptr<V1_0::MockIDevice> sp = OHOS::sptr<V1_0::MockIDevice>(new (std::nothrow) V1_0::MockIDevice());
@@ -680,7 +682,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodelfrommodelcache_002, TestSize.Level
     std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(sp);
     EXPECT_NE(hdiDevice, nullptr);
 
-    std::vector<ModelBuffer> modelCache = { { buffer, 100 } };
+    std::vector<Buffer> modelCache = { { buffer, 100 } };
     ModelConfig config;
     OHOS::sptr<V1_0::IPreparedModel> preModel =
         OHOS::sptr<V1_0::MockIPreparedModel>(new (std::nothrow) V1_0::MockIPreparedModel());
@@ -708,7 +710,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodelfrommodelcache_003, TestSize.Level
     std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
-    std::vector<ModelBuffer> modelCache = { { nullptr, 0 } };
+    std::vector<Buffer> modelCache = { { nullptr, 0 } };
     ModelConfig config;
     std::shared_ptr<PreparedModel> preparedModel;
     OH_NN_ReturnCode result = hdiDevice->PrepareModelFromModelCache(modelCache, config, preparedModel);

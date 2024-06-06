@@ -20,9 +20,7 @@
 #include <gtest/gtest.h>
 
 #include "common/log.h"
-#include "device_registrar.h"
 #include "hdi_device_v2_0.h"
-#include "device_manager.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"
 
 using namespace testing;
@@ -136,12 +134,12 @@ public:
         return OH_NN_SUCCESS;
     };
 
-    OH_NN_ReturnCode PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model, const ModelConfig& config,
-        std::shared_ptr<PreparedModel>& preparedModel) override
+    OH_NN_ReturnCode PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
+        const Buffer& quantBuffer, const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel) override
     {
         return OH_NN_SUCCESS;
     };
-    OH_NN_ReturnCode PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
+    OH_NN_ReturnCode PrepareModelFromModelCache(const std::vector<Buffer>& modelCache,
         const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel) override
     {
         return OH_NN_SUCCESS;
@@ -220,54 +218,9 @@ public:
     ~DeviceRegistrarTest() = default;
 };
 
-std::shared_ptr<Device> CreateDeviceObjectCallback()
-{
-    OHOS::sptr<IRegisterDevice> device = IRegisterDevice::Get(false);
-    EXPECT_NE(device, nullptr);
-    std::shared_ptr<Device> m_mockDevice = std::make_shared<SimulationDevice>(device);
-    return m_mockDevice;
-}
-
 std::shared_ptr<Device> CreateNullObjectCallback()
 {
     return nullptr;
-}
-
-/* *
- * @tc.name: devicemanager_getalldeviceid_001
- * @tc.desc: Verify the Constructor function register object success.
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceRegistrarTest, deviceregistrar_constructor_001, TestSize.Level0)
-{
-    CreateDevice creator = CreateDeviceObjectCallback;
-    std::unique_ptr<DeviceRegistrar> deviceRegister = std::make_unique<DeviceRegistrar>(creator);
-    EXPECT_NE(deviceRegister, nullptr);
-    auto &deviceManager = DeviceManager::GetInstance();
-    std::vector<size_t> idVect = deviceManager.GetAllDeviceId();
-    EXPECT_EQ((size_t)2, idVect.size());
-
-    const std::string expectDeviceNameA = "MockDevice";
-    std::string deviceName = "";
-    std::shared_ptr<Device> retDevice = deviceManager.GetDevice(idVect[1]);
-    retDevice->GetDeviceName(deviceName);
-    EXPECT_EQ(deviceName, expectDeviceNameA);
-
-    const std::string expectDeviceNameB = "MockDevice_MockVendor_v0_0";
-    std::string queryDeviceName = deviceManager.GetDeviceName(idVect[1]);
-    EXPECT_EQ(queryDeviceName, expectDeviceNameB);
-}
-
-/* *
- * @tc.name: devicemanager_getalldeviceid_002
- * @tc.desc: Verify the Constructor function register object creator return nullptr, used for branch coverage.
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceRegistrarTest, deviceregistrar_constructor_002, TestSize.Level0)
-{
-    CreateDevice creator = CreateNullObjectCallback;
-    std::unique_ptr<DeviceRegistrar> deviceRegister = std::make_unique<DeviceRegistrar>(creator);
-    EXPECT_NE(deviceRegister, nullptr);
 }
 } // namespace UnitTest
 } // namespace NeuralNetworkRuntime

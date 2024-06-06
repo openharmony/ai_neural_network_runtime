@@ -14,7 +14,6 @@
  */
 
 #include "common/utils.h"
-#include "device_manager.h"
 #include "hdi_device_v2_0.h"
 #include "nn_tensor.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"
@@ -23,29 +22,6 @@ OH_NN_ReturnCode OHOS::HDI::Nnrt::V2_0::MockIPreparedModel::m_ExpectRetCode = OH
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-std::shared_ptr<Device> DeviceManager::GetDevice(size_t deviceId) const
-{
-    sptr<OHOS::HDI::Nnrt::V2_0::INnrtDevice> idevice
-        = sptr<OHOS::HDI::Nnrt::V2_0::MockIDevice>(new (std::nothrow) OHOS::HDI::Nnrt::V2_0::MockIDevice());
-    if (idevice == nullptr) {
-        LOGE("DeviceManager mock GetDevice failed, error happened when new sptr");
-        return nullptr;
-    }
-
-    std::shared_ptr<Device> device = CreateSharedPtr<HDIDeviceV2_0>(idevice);
-    if (device == nullptr) {
-        LOGE("DeviceManager mock GetDevice failed, the device is nullptr");
-        return nullptr;
-    }
-
-    if (deviceId == 0) {
-        LOGE("DeviceManager mock GetDevice failed, the passed parameter deviceId is 0");
-        return nullptr;
-    } else {
-        return device;
-    }
-}
-
 OH_NN_ReturnCode HDIDeviceV2_0::IsModelCacheSupported(bool& isSupported)
 {
     // isSupported is false when expecting to return success
@@ -163,7 +139,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::IsFloat16PrecisionSupported(bool& isSupported)
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
-    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
+    const Buffer& quantBuffer, const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     if (model == nullptr) {
         LOGE("HDIDeviceV2_0 mock PrepareModel failed, the model is nullptr");
@@ -186,7 +162,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::li
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIPreparedModelV2_0::ExportModelCache(std::vector<ModelBuffer>& modelCache)
+OH_NN_ReturnCode HDIPreparedModelV2_0::ExportModelCache(std::vector<Buffer>& modelCache)
 {
     if (!modelCache.empty()) {
         LOGE("HDIPreparedModelV2_0 mock ExportModelCache failed, the modelCache is not empty");
@@ -199,17 +175,17 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::ExportModelCache(std::vector<ModelBuffer>
     }
 
     int bufferSize = 13;
-    ModelBuffer modelBuffer;
+    Buffer buffer;
     std::string aBuffer = "mock_buffer_a";
-    modelBuffer.buffer = static_cast<void*>(aBuffer.c_str());
-    modelBuffer.length = bufferSize;
-    modelCache.emplace_back(modelBuffer);
+    buffer.data = (void*)aBuffer.c_str();
+    buffer.length = bufferSize;
+    modelCache.emplace_back(buffer);
 
-    ModelBuffer modelBuffer2;
+    Buffer buffer2;
     std::string bBuffer = "mock_buffer_b";
-    modelBuffer2.buffer = static_cast<void*>(bBuffer.c_str());
-    modelBuffer2.length = bufferSize;
-    modelCache.emplace_back(modelBuffer2);
+    buffer2.data = (void*)bBuffer.c_str();
+    buffer2.length = bufferSize;
+    modelCache.emplace_back(buffer2);
 
     return OH_NN_SUCCESS;
 }
@@ -246,7 +222,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::ReleaseBuffer(const void* buffer)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<ModelBuffer>& modelCache,
+OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<Buffer>& modelCache,
     const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     if (HDI::Nnrt::V2_0::MockIPreparedModel::m_ExpectRetCode == OH_NN_FAILED) {
