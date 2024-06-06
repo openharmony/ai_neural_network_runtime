@@ -25,6 +25,7 @@ BackendManager::~BackendManager()
     m_backends.clear();
     m_backendNames.clear();
     m_backendIDs.clear();
+    m_backendIDGroup.clear();
 }
 
 const std::vector<size_t>& BackendManager::GetAllBackendsID()
@@ -79,7 +80,8 @@ const std::string& BackendManager::GetBackendName(size_t backendID)
     return iter->second;
 }
 
-OH_NN_ReturnCode BackendManager::RegisterBackend(std::function<std::shared_ptr<Backend>()> creator)
+OH_NN_ReturnCode BackendManager::RegisterBackend(
+    const std::string& backendName, std::function<std::shared_ptr<Backend>()> creator)
 {
     auto regBackend = creator();
     if (regBackend == nullptr) {
@@ -111,7 +113,39 @@ OH_NN_ReturnCode BackendManager::RegisterBackend(std::function<std::shared_ptr<B
     m_backends.emplace(backendID, regBackend);
     m_backendIDs.emplace_back(backendID);
     m_backendNames.emplace(backendID, tmpBackendName);
+    if (m_backendIDGroup.find(backendName) == m_backendIDGroup.end()) {
+        std::vector<size_t> backendIDsTmp {backendID};
+        m_backendIDGroup.emplace(backendName, backendIDsTmp);
+    } else {
+        m_backendIDGroup[backendName].emplace_back(backendID);
+    }
     return OH_NN_SUCCESS;
+}
+
+void BackendManager::RemoveBackend(const std::string& backendName)
+{
+    LOGI("[RemoveBackend] start remove backend for %{public}s.", backendName.c_str());
+    const std::lock_guard<std::mutex> lock(m_mtx);
+    if (m_backendIDGroup.find(backendName) == m_backendIDGroup.end()) {
+        LOGI("[RemoveBackend] No need to remove backend for %{public}s.", backendName.c_str());
+        return;
+    }
+
+    auto backendIDs = m_backendIDGroup[backendName];
+    for (auto backendID : backendIDs) {
+        if (m_backends.find(backendID) != m_backends.end()) {
+            m_backends.erase(backendID);
+        }
+        auto iter = std::find(m_backendIDs.begin(), m_backendIDs.end(), backendID);
+        if (iter != m_backendIDs.end()) {
+            m_backendIDs.erase(iter);
+        }
+        if (m_backendNames.find(backendID) != m_backendNames.end()) {
+            m_backendNames.erase(backendID);
+        }
+        LOGI("[RemoveBackend] remove backendID[%{public}zu] for %{public}s success.", backendID, backendName.c_str());
+    }
+    m_backendIDGroup.erase(backendName);
 }
 
 bool BackendManager::IsValidBackend(std::shared_ptr<Backend> backend) const
