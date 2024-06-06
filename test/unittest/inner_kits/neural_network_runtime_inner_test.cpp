@@ -45,9 +45,11 @@ void NeuralNetworkRuntimeInnerTest::TearDown(void)
 HWTEST_F(NeuralNetworkRuntimeInnerTest, build_from_lite_graph_001, testing::ext::TestSize.Level0)
 {
     OH_NNModel* model = nullptr;
+    OH_NN_Extension* extensions = nullptr;
+    size_t extensionSize = 0;
     mindspore::lite::LiteGraph* liteGraph = new (std::nothrow) mindspore::lite::LiteGraph;
     EXPECT_NE(nullptr, liteGraph);
-    OH_NN_ReturnCode ret = OH_NNModel_BuildFromLiteGraph(model, liteGraph);
+    OH_NN_ReturnCode ret = OH_NNModel_BuildFromLiteGraph(model, liteGraph, extensions, extensionSize);
     delete liteGraph;
     liteGraph = nullptr;
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -64,7 +66,9 @@ HWTEST_F(NeuralNetworkRuntimeInnerTest, build_from_lite_graph_002, testing::ext:
     EXPECT_NE(nullptr, innerModel);
     OH_NNModel* model = reinterpret_cast<OH_NNModel*>(innerModel);
     const void* liteGraph = nullptr;
-    OH_NN_ReturnCode ret = OH_NNModel_BuildFromLiteGraph(model, liteGraph);
+    OH_NN_Extension* extensions = nullptr;
+    size_t extensionSize = 0;
+    OH_NN_ReturnCode ret = OH_NNModel_BuildFromLiteGraph(model, liteGraph, extensions, extensionSize);
     delete innerModel;
     innerModel = nullptr;
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
@@ -81,6 +85,8 @@ HWTEST_F(NeuralNetworkRuntimeInnerTest, build_from_lite_graph_003, testing::ext:
     EXPECT_NE(nullptr, innerModel);
     OH_NNModel* model = reinterpret_cast<OH_NNModel*>(innerModel);
     mindspore::lite::LiteGraph* liteGraph = new (std::nothrow) mindspore::lite::LiteGraph;
+    OH_NN_Extension* extensions = nullptr;
+    size_t extensionSize = 0;
     EXPECT_NE(nullptr, liteGraph);
     liteGraph->name_ = "testGraph";
     liteGraph->input_indices_ = {0};
@@ -90,16 +96,14 @@ HWTEST_F(NeuralNetworkRuntimeInnerTest, build_from_lite_graph_003, testing::ext:
         const std::vector<int32_t> dim = {3, 3};
         const std::vector<uint8_t> data(36, 1);
 
-        liteGraph->all_tensors_.emplace_back(mindspore::lite::MindIR_Tensor_Create(liteGraph->name_,
-            mindspore::lite::DATA_TYPE_FLOAT32, dim, mindspore::lite::FORMAT_NCHW, data, quant_params));
+        liteGraph->all_tensors_.emplace_back(mindspore::lite::MindIR_Tensor_Create());
     }
     for (size_t indexOutput = 0; indexOutput < liteGraph->output_indices_.size(); ++indexOutput) {
         const std::vector<int32_t> dimOut = {3, 3};
         const std::vector<uint8_t> dataOut(36, 1);
-        liteGraph->all_tensors_.emplace_back(mindspore::lite::MindIR_Tensor_Create(liteGraph->name_,
-            mindspore::lite::DATA_TYPE_FLOAT32, dimOut, mindspore::lite::FORMAT_NCHW, dataOut, quant_params));
+        liteGraph->all_tensors_.emplace_back(mindspore::lite::MindIR_Tensor_Create());
     }
-    OH_NN_ReturnCode ret = OH_NNModel_BuildFromLiteGraph(model, liteGraph);
+    OH_NN_ReturnCode ret = OH_NNModel_BuildFromLiteGraph(model, liteGraph, extensions, extensionSize);
     delete innerModel;
     innerModel = nullptr;
     EXPECT_EQ(OH_NN_SUCCESS, ret);
@@ -116,9 +120,11 @@ HWTEST_F(NeuralNetworkRuntimeInnerTest, build_from_lite_graph_004, testing::ext:
     EXPECT_NE(nullptr, innerModel);
     OH_NNModel* model = reinterpret_cast<OH_NNModel*>(innerModel);
     mindspore::lite::LiteGraph* liteGraph = new (std::nothrow) mindspore::lite::LiteGraph;
+    OH_NN_Extension* extensions = nullptr;
+    size_t extensionSize = 0;
     EXPECT_NE(nullptr, liteGraph);
     liteGraph->name_ = "testGraph";
-    OH_NN_ReturnCode ret = OH_NNModel_BuildFromLiteGraph(model, liteGraph);
+    OH_NN_ReturnCode ret = OH_NNModel_BuildFromLiteGraph(model, liteGraph, extensions, extensionSize);
     delete innerModel;
     delete liteGraph;
     innerModel = nullptr;
