@@ -136,8 +136,13 @@ LiteGraphPrimitvePtr QuantDTypeCastBuilder::GetPrimitive()
         return {nullptr, DestroyLiteGraphPrimitive};
     }
 
-    if (!m_src_t || !m_dst_t) {
-        LOGE("[QuantDTypeCast] GetPrimitive failed, cannot get primitive before SetSrcT and SetDstT.");
+    if (m_src_t == nullptr) {
+        LOGE("[QuantDTypeCast] GetPrimitive failed, cannot get primitive before SetSrcT.");
+        return {nullptr, DestroyLiteGraphPrimitive};
+    }
+
+    if (m_dst_t == nullptr) {
+        LOGE("[QuantDTypeCast] GetPrimitive failed, cannot get primitive before SetDstT.");
         return {nullptr, DestroyLiteGraphPrimitive};
     }
 
