@@ -15,15 +15,14 @@
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-module_output_path = "drivers_interface_nnrt/drivers_interface_nnrt"
+module_output_path = "neural_network_runtime/"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("HdiNnrtOpsFuzzTest") {
+ohos_fuzztest("NnrtOpsFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "../hdinnrtops_fuzzer"
+  fuzz_config_file = "../nnrtops_fuzzer"
 
   include_dirs = [
-    "//third_party/bounds_checking_function/include",
     "../../../frameworks/native/neural_network_runtime",
     "../../../interfaces/kits/c/neural_network_runtime",
   ]
@@ -36,14 +35,12 @@ ohos_fuzztest("HdiNnrtOpsFuzzTest") {
   ]
 
   configs = [ "../../../config:coverage_flags" ]
-  sources = [ "hdinnrtops_fuzzer.cpp" ]
+  sources = [ "nnrtops_fuzzer.cpp" ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_2.1",
-    "hdf_core:libhdi",
     "hilog:libhilog",
-    "ipc:ipc_core",
     "neural_network_runtime:nnrt_target",
   ]
 }
