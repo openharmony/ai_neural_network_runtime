@@ -136,6 +136,10 @@ LiteGraphPrimitvePtr QuantDTypeCastBuilder::GetPrimitive()
         return {nullptr, DestroyLiteGraphPrimitive};
     }
 
+    if (!m_src_t || !m_dst_t) {
+        LOGE("[QuantDTypeCast] GetPrimitive failed, cannot get primitive before SetSrcT and SetDstT.");
+        return {nullptr, DestroyLiteGraphPrimitive};
+    }
     void* primitive = mindspore::lite::MindIR_QuantDTypeCast_CreatePrimitive(*m_src_t, *m_dst_t, m_axis);
     LiteGraphPrimitvePtr graphPrimitivePtr(primitive, DestroyLiteGraphPrimitive);
     return graphPrimitivePtr;
