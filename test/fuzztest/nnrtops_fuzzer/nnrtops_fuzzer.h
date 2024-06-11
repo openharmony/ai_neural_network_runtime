@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef NNRT_FUZZ_HDI_OPS_H
-#define NNRT_FUZZ_HDI_OPS_H
+#ifndef NNRT_FUZZ_OPS_H
+#define NNRT_FUZZ_OPS_H
 
-#define FUZZ_PROJECT_NAME "hdinnrtops_fuzzer"
+#define FUZZ_PROJECT_NAME "nnrtops_fuzzer"
 
 #endif
