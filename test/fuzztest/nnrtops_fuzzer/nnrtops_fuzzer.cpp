@@ -14,7 +14,7 @@
  */
 
 #include <vector>
-#include "hdinnrtops_fuzzer.h"
+#include "nnrtops_fuzzer.h"
 #include "../data.h"
 #include "../../../common/log.h"
 
@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 constexpr size_t U32_AT_SIZE = 4;
-
 struct OHNNOperandTest {
     OH_NN_DataType dataType;
     OH_NN_TensorType type;
@@ -63,6 +62,37 @@ OH_NN_UInt32Array TransformUInt32Array(const std::vector<uint32_t>& vector)
     return {data, vector.size()};
 }
 
+NN_TensorDesc* createTensorDesc(const int32_t* shape, size_t shapeNum, OH_NN_DataType dataType, OH_NN_Format format)
+{
+    NN_TensorDesc* tensorDescTmp = OH_NNTensorDesc_Create();
+    if (tensorDescTmp == nullptr) {
+        LOGE("[NnrtOpsFuzzTest]OH_NNTensorDesc_Create failed!");
+        return nullptr;
+    }
+
+    OH_NN_ReturnCode ret = OH_NNTensorDesc_SetDataType(tensorDescTmp, dataType);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NnrtOpsFuzzTest]OH_NNTensorDesc_SetDataType failed!ret = %d\n", ret);
+        return nullptr;
+    }
+
+    if (shape != nullptr) {
+        ret = OH_NNTensorDesc_SetShape(tensorDescTmp, shape, shapeNum);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[NnrtOpsFuzzTest]OH_NNTensorDesc_SetShape failed!ret = %d\n", ret);
+            return nullptr;
+        }
+    }
+
+    ret = OH_NNTensorDesc_SetFormat(tensorDescTmp, format);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NnrtOpsFuzzTest]OH_NNTensorDesc_SetShape failed!ret = %d\n", ret);
+        return nullptr;
+    }
+
+    return tensorDescTmp;
+}
+
 int SingleModelBuildEndStep(OH_NNModel *model, const OHNNGraphArgs &graphArgs)
 {
     int ret = 0;
@@ -74,7 +104,7 @@ int SingleModelBuildEndStep(OH_NNModel *model, const OHNNGraphArgs &graphArgs)
         ret = OH_NNModel_AddOperation(model, graphArgs.operationType, &paramIndices, &inputIndices,
                                       &outputIndices);
         if (ret != OH_NN_SUCCESS) {
-            LOGE("[NNRtTest] OH_NNModel_AddOperation failed! ret=%{public}d\n", ret);
+            LOGE("[NnrtOpsFuzzTest] OH_NNModel_AddOperation failed! ret=%{public}d\n", ret);
             return ret;
         }
     }
@@ -82,7 +112,7 @@ int SingleModelBuildEndStep(OH_NNModel *model, const OHNNGraphArgs &graphArgs)
     if (graphArgs.specifyIO) {
         ret = OH_NNModel_SpecifyInputsAndOutputs(model, &inputIndices, &outputIndices);
         if (ret != OH_NN_SUCCESS) {
-            LOGE("[NNRtTest] OH_NNModel_SpecifyInputsAndOutputs failed! ret=%{public}d\n", ret);
+            LOGE("[NnrtOpsFuzzTest] OH_NNModel_SpecifyInputsAndOutputs failed! ret=%{public}d\n", ret);
             return ret;
         }
     }
@@ -90,10 +120,45 @@ int SingleModelBuildEndStep(OH_NNModel *model, const OHNNGraphArgs &graphArgs)
     if (graphArgs.build) {
         ret = OH_NNModel_Finish(model);
         if (ret != OH_NN_SUCCESS) {
-            LOGE("[NNRtTest] OH_NNModel_Finish failed! ret=%d\n", ret);
+            LOGE("[NnrtOpsFuzzTest] OH_NNModel_Finish failed! ret=%d\n", ret);
             return ret;
         }
     }
+    return ret;
+}
+
+int BuildSingleOpGraph(OH_NNModel *model, const OHNNGraphArgs &graphArgs)
+{
+    int ret = 0;
+    for (size_t i = 0; i < graphArgs.operands.size(); i++) {
+        const OHNNOperandTest &operandTem = graphArgs.operands[i];
+        NN_TensorDesc* tensorDesc = createTensorDesc(operandTem.shape.data(),
+                                                     (uint32_t) operandTem.shape.size(),
+                                                     operandTem.dataType, operandTem.format);
+
+        ret = OH_NNModel_AddTensorToModel(model, tensorDesc);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[NnrtOpsFuzzTest] OH_NNModel_AddTensor failed! ret=%d\n", ret);
+            return ret;
+        }
+
+        ret = OH_NNModel_SetTensorType(model, i, operandTem.type);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[NnrtOpsFuzzTest] OH_NNBackend_SetModelTensorType failed! ret=%d\n", ret);
+            return ret;
+        }
+
+        if (std::find(graphArgs.paramIndices.begin(), graphArgs.paramIndices.end(), i) !=
+            graphArgs.paramIndices.end()) {
+            ret = OH_NNModel_SetTensorData(model, i, operandTem.data, operandTem.length);
+            if (ret != OH_NN_SUCCESS) {
+                LOGE("[NnrtOpsFuzzTest] OH_NNModel_SetTensorData failed! ret=%{public}d\n", ret);
+                return ret;
+            }
+        }
+        OH_NNTensorDesc_Destroy(&tensorDesc);
+    }
+    ret = SingleModelBuildEndStep(model, graphArgs);
     return ret;
 }
 
@@ -108,7 +173,7 @@ int buildModel0(uint32_t opsType)
     OHNNGraphArgs graphArgs = model0.graphArgs;
     graphArgs.operationType = static_cast<OH_NN_OperationType>(opsType);
 
-    if (SingleModelBuildEndStep(model, graphArgs) != OH_NN_SUCCESS) {
+    if (BuildSingleOpGraph(model, graphArgs) != OH_NN_SUCCESS) {
         OH_NNModel_Destroy(&model);
         return -1;
     }
@@ -121,7 +186,6 @@ bool HdiNnrtOpsFuzzTest(const uint8_t* data, size_t size)
     Data dataFuzz(data, size);
     uint32_t opsType = dataFuzz.GetData<uint32_t>()
         % (OH_NN_OPS_GATHER_ND - OH_NN_OPS_ADD + 1);
-
     buildModel0(opsType);
     return true;
 }
