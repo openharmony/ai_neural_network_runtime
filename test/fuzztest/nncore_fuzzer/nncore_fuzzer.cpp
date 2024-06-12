@@ -176,6 +176,14 @@ OH_NNModel* buildModel0(uint32_t opsType)
     return model;
 }
 
+OH_NNCompilation* BuildCompilation(OH_NNModel* model, size_t deviceId)
+{
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNCompilation_SetDevice(nnCompilation, deviceId);
+    OH_NNCompilation_Build(nnCompilation);
+    return nnCompilation;
+}
+
 void NNCoreDeviceFuzzTest(const uint8_t* data, size_t size)
 {
     OH_NNDevice_GetAllDevicesID(nullptr, nullptr);
@@ -329,13 +337,10 @@ bool NNCoreTensorFuzzTest(const uint8_t* data, size_t size)
 bool NNCoreExecutorFuzzTest(const uint8_t* data, size_t size)
 {
     Data dataFuzz(data, size);
-    uint32_t opsType = dataFuzz.GetData<uint32_t>()
-        % (OH_NN_OPS_GATHER_ND - OH_NN_OPS_ADD + 1);
+    uint32_t opsType = dataFuzz.GetData<uint32_t>() % (OH_NN_OPS_GATHER_ND - OH_NN_OPS_ADD + 1);
     OH_NNModel* model = buildModel0(opsType);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
     size_t deviceid = dataFuzz.GetData<size_t>();
-    OH_NNCompilation_SetDevice(nnCompilation, deviceid);
-    OH_NNCompilation_Build(nnCompilation);
+    OH_NNCompilation* nnCompilation = BuildCompilation(model, deviceid);
     OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
 
     uint32_t outputIndex = dataFuzz.GetData<uint32_t>();
@@ -352,12 +357,12 @@ bool NNCoreExecutorFuzzTest(const uint8_t* data, size_t size)
     std::vector<NN_TensorDesc*> outputTensorDescs;
     size_t index = 0;
     for (size_t i = 0; i < inputCount; i++) {
-        index = dataFuzz.GetData<size_t>() % inputCount;
+        index = (inputCount == 0) ? 0 : (dataFuzz.GetData<size_t>() % inputCount);
         NN_TensorDesc* nnTensorDesc = OH_NNExecutor_CreateInputTensorDesc(nnExecutor, index);
         inputTensorDescs.emplace_back(nnTensorDesc);
     }
     for (size_t i = 0; i < outputCount; i++) {
-        index = dataFuzz.GetData<size_t>() % outputCount;
+        index = (outputCount == 0) ? 0 : (dataFuzz.GetData<size_t>() % outputCount);
         NN_TensorDesc* nnTensorDesc = OH_NNExecutor_CreateOutputTensorDesc(nnExecutor, index);
         outputTensorDescs.emplace_back(nnTensorDesc);
     }
