@@ -233,11 +233,11 @@ bool NNCoreCompilationConstructTest(const uint8_t* data, size_t size)
     OH_NNCompilation_SetCache(validCompilation, path.c_str(), CACHE_VERSION);
 
     OH_NN_PerformanceMode perf = static_cast<OH_NN_PerformanceMode>(
-        dataFuzz.GetData<uint32_t>() % OH_NN_PERFORMANCE_EXTREME - OH_NN_PERFORMANCE_NONE + 1);
+        dataFuzz.GetData<uint32_t>() % (OH_NN_PERFORMANCE_EXTREME - OH_NN_PERFORMANCE_NONE + 1));
     OH_NNCompilation_SetPerformanceMode(validCompilation, perf);
 
     OH_NN_Priority priority = static_cast<OH_NN_Priority>(
-        dataFuzz.GetData<uint32_t>() % OH_NN_PRIORITY_HIGH - OH_NN_PRIORITY_NONE + 1);
+        dataFuzz.GetData<uint32_t>() % (OH_NN_PRIORITY_HIGH - OH_NN_PRIORITY_NONE + 1));
     OH_NNCompilation_SetPriority(validCompilation, priority);
 
     bool enableFloat16 = dataFuzz.GetData<bool>();
@@ -264,7 +264,7 @@ bool NNCoreTensorDescFuzzTest(const uint8_t* data, size_t size)
     OH_NNTensorDesc_GetName(tensorDesc, &name);
 
     OH_NN_DataType dataType = static_cast<OH_NN_DataType>(
-        dataFuzz.GetData<uint32_t>() % OH_NN_FLOAT64 - OH_NN_UNKNOWN + 1);
+        dataFuzz.GetData<uint32_t>() % (OH_NN_FLOAT64 - OH_NN_UNKNOWN + 1));
     OH_NNTensorDesc_SetDataType(tensorDesc, dataType);
     OH_NN_DataType dataTypeOut;
     OH_NNTensorDesc_GetDataType(tensorDesc, &dataTypeOut);
@@ -276,7 +276,7 @@ bool NNCoreTensorDescFuzzTest(const uint8_t* data, size_t size)
     OH_NNTensorDesc_GetShape(tensorDesc, &shape, &shapeLength);
 
     OH_NN_Format format = static_cast<OH_NN_Format>(
-        dataFuzz.GetData<uint32_t>() % OH_NN_FORMAT_ND - OH_NN_FORMAT_NONE + 1);
+        dataFuzz.GetData<uint32_t>() % (OH_NN_FORMAT_ND - OH_NN_FORMAT_NONE + 1));
     OH_NNTensorDesc_SetFormat(tensorDesc, format);
     OH_NN_Format formatOut;
     OH_NNTensorDesc_GetFormat(tensorDesc, &formatOut);
@@ -361,7 +361,7 @@ bool NNCoreExecutorFuzzTest(const uint8_t* data, size_t size)
         NN_TensorDesc* nnTensorDesc = OH_NNExecutor_CreateOutputTensorDesc(nnExecutor, index);
         outputTensorDescs.emplace_back(nnTensorDesc);
     }
-    
+
     size_t *minInputDims = nullptr;
     size_t *maxInputDIms = nullptr;
     size_t shapeLength = 0;
