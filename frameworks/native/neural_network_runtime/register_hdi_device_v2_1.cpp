@@ -24,6 +24,16 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
+void PrintRetLog(int32_t ret, int32_t nnrtSuccess, const std::string& makeName)
+{
+    if (ret < nnrtSuccess) {
+            LOGW("%s failed. An error occurred in HDI, errorcode is %{public}d.", makeName.c_str(), ret);
+        } else {
+            OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode nnrtRet = static_cast<OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode>(ret);
+            LOGW("%s failed. Errorcode is %{public}s.", makeName.c_str(), ConverterRetToString(nnrtRet).c_str());
+        }
+}
+
 std::shared_ptr<Backend> HDIDeviceV2_1Creator()
 {
     std::string deviceName;
@@ -40,35 +50,23 @@ std::shared_ptr<Backend> HDIDeviceV2_1Creator()
     auto ret = iDevice->GetDeviceName(deviceName);
     int32_t nnrtSuccess = static_cast<int32_t>(V2_1::NNRT_ReturnCode::NNRT_SUCCESS);
     if (ret != nnrtSuccess) {
-        if (ret < nnrtSuccess) {
-            LOGW("Get device name failed. An error occurred in HDI, errorcode is %{public}d.", ret);
-        } else {
-            OHOS::HDI::Nnrt::V2_1::NNRT_ReturnCode nnrtRet = static_cast<OHOS::HDI::Nnrt::V2_1::NNRT_ReturnCode>(ret);
-            LOGW("Get device name failed. Errorcode is %{public}s.", ConverterRetToString(nnrtRet).c_str());
-        }
+        std::string makeName = "Get device name";
+        PrintRetLog(ret, nnrtSuccess, makeName);
         return nullptr;
     }
 
     ret = iDevice->GetVendorName(vendorName);
     if (ret != nnrtSuccess) {
-        if (ret < nnrtSuccess) {
-            LOGW("Get vendor name failed. An error occurred in HDI, errorcode is %{public}d.", ret);
-        } else {
-            OHOS::HDI::Nnrt::V2_1::NNRT_ReturnCode nnrtRet = static_cast<OHOS::HDI::Nnrt::V2_1::NNRT_ReturnCode>(ret);
-            LOGW("Get vendor name failed. Errorcode is %{public}s.", ConverterRetToString(nnrtRet).c_str());
-        }
+        std::string makeName = "Get vendor name";
+        PrintRetLog(ret, nnrtSuccess, makeName);
         return nullptr;
     }
 
     std::pair<uint32_t, uint32_t> hdiVersion;
     ret = iDevice->GetVersion(hdiVersion.first, hdiVersion.second);
     if (ret != nnrtSuccess) {
-        if (ret < nnrtSuccess) {
-            LOGW("Get version failed. An error occurred in HDI, errorcode is %{public}d.", ret);
-        } else {
-            OHOS::HDI::Nnrt::V2_1::NNRT_ReturnCode nnrtRet = static_cast<OHOS::HDI::Nnrt::V2_1::NNRT_ReturnCode>(ret);
-            LOGW("Get version failed. Errorcode is %{public}s.", ConverterRetToString(nnrtRet).c_str());
-        }
+        std::string makeName = "Get version";
+        PrintRetLog(ret, nnrtSuccess, makeName);
         return nullptr;
     }
     version = 'v' + std::to_string(hdiVersion.first) + '_' + std::to_string(hdiVersion.second);
