@@ -20,7 +20,7 @@ module_output_path = "neural_network_runtime/"
 ##############################fuzztest##########################################
 ohos_fuzztest("NNCoreFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "../neural_network_core_fuzzer"
+  fuzz_config_file = "../nncore_fuzzer"
 
   include_dirs = [
     "../../..",
