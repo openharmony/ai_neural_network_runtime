@@ -29,7 +29,7 @@ void PrintRetLog(int32_t ret, int32_t nnrtSuccess, const std::string& makeName)
     if (ret < nnrtSuccess) {
             LOGW("%s failed. An error occurred in HDI, errorcode is %{public}d.", makeName.c_str(), ret);
         } else {
-            OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode nnrtRet = static_cast<OHOS::HDI::Nnrt::V2_0::NNRT_ReturnCode>(ret);
+            OHOS::HDI::Nnrt::V2_1::NNRT_ReturnCode nnrtRet = static_cast<OHOS::HDI::Nnrt::V2_1::NNRT_ReturnCode>(ret);
             LOGW("%s failed. Errorcode is %{public}s.", makeName.c_str(), ConverterRetToString(nnrtRet).c_str());
         }
 }
