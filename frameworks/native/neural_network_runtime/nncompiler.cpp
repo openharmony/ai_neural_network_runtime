@@ -126,11 +126,7 @@ NNCompiler::NNCompiler(const void* model, std::shared_ptr<Device> device, size_t
     m_inputTensorDescs = m_innerModel->GetInputTensorDescs();
     m_outputTensorDescs = m_innerModel->GetOutputTensorDescs();
     m_metaGraph = m_innerModel->GetMetaGraph();
-    m_quantBuffer = m_innerModel->GetQuantBuffer();
-    m_modelName = m_innerModel->GetModelName();
-    m_isProfiling = m_innerModel->GetProfiling();
-    m_opLayouts = m_innerModel->GetOpLayouts();
-    m_tuningStrategy = m_innerModel->GetTuningStrategy();
+    m_extensionConfig = m_innerModel->GetExtensionConfig();
 }
 
 NNCompiler::~NNCompiler()
@@ -376,12 +372,12 @@ OH_NN_ReturnCode NNCompiler::NormalBuild()
     }
 
     ModelConfig config {m_enableFp16, static_cast<OH_NN_PerformanceMode>(m_performance),
-        static_cast<OH_NN_Priority>(m_priority), m_isProfiling, m_cachePath, m_opLayouts, m_tuningStrategy};
+        static_cast<OH_NN_Priority>(m_priority), m_cachePath, m_extensionConfig};
     if (m_liteGraph != nullptr) {
-        ret = m_device->PrepareModel(m_liteGraph, m_quantBuffer, config, m_preparedModel);
+        ret = m_device->PrepareModel(m_liteGraph, config, m_preparedModel);
     }
     if (m_metaGraph != nullptr) {
-        ret = m_device->PrepareModel(m_metaGraph, m_quantBuffer, config, m_preparedModel);
+        ret = m_device->PrepareModel(m_metaGraph, config, m_preparedModel);
     }
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] Build failed, fail to prepare model when normally building.");
@@ -529,7 +525,7 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
     caches.emplace_back(outputTensorDescBuffer);
     tensorBuffers.emplace_back(outputTensorDescBuffer);
 
-    compiledCache.SetModelName(m_modelName);
+    compiledCache.SetModelName(m_extensionConfig.modelName);
     ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] SaveToCacheFile failed, error happened when saving model cache.");
@@ -567,7 +563,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     }
 
     std::vector<Buffer> caches;
-    compiledCache.SetModelName(m_modelName);
+    compiledCache.SetModelName(m_extensionConfig.modelName);
     ret = compiledCache.Restore(m_cachePath, m_cacheVersion, caches);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when restoring model cache.");

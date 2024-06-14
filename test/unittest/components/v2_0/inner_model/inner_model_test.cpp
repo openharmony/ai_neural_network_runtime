@@ -109,14 +109,10 @@ HWTEST_F(InnerModelTest, inner_model_construct_nntensor_from_litegraph_001, Test
 
     SetLiteGraph(liteGraph);
 
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+    ExtensionConfig extensionConfig;
 
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest
-        .BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+        .BuildFromLiteGraph(liteGraph, extensionConfig));
 }
 
 /**
@@ -132,14 +128,10 @@ HWTEST_F(InnerModelTest, inner_model_construct_nntensor_from_litegraph_002, Test
 
     SetLiteGraph(liteGraph);
 
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+    ExtensionConfig extensionConfig;
 
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest
-        .BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+        .BuildFromLiteGraph(liteGraph, extensionConfig));
 }
 
 /**
@@ -154,13 +146,9 @@ HWTEST_F(InnerModelTest, inner_model_construct_nntensor_from_litegraph_003, Test
 
     SetLiteGraph(liteGraph);
 
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+    ExtensionConfig extensionConfig;
 
-    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, extensionConfig));
 }
 
 /**
@@ -175,13 +163,10 @@ HWTEST_F(InnerModelTest, inner_model_construct_nntensor_from_litegraph_004, Test
     m_dimInput = {3, -3};
 
     SetLiteGraph(liteGraph);
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
 
-    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    ExtensionConfig extensionConfig;
+
+    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, extensionConfig));
 }
 
 /**
@@ -196,14 +181,11 @@ HWTEST_F(InnerModelTest, inner_model_construct_nntensor_from_litegraph_005, Test
     m_outputIndices = {6};
 
     SetLiteGraph(liteGraph);
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+
+    ExtensionConfig extensionConfig;
 
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest
-        .BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+        .BuildFromLiteGraph(liteGraph, extensionConfig));
 }
 
 /**
@@ -220,30 +202,27 @@ HWTEST_F(InnerModelTest, inner_model_build_from_lite_graph_001, TestSize.Level1)
     };
     OH_NN_Extension *extensions = &on_exit;
     size_t extensionSize = 1;
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
+    ExtensionConfig extensionConfig;
     std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
     for (size_t i = 0; i < extensionSize; ++i) {
         std::string name = extensions[i].name;
         if (name == "QuantBuffer") {
-            buffer.data = extensions[i].value;
-            buffer.length = extensions[i].valueSize;
+            extensionConfig.quantBuffer.data = extensions[i].value;
+            extensionConfig.quantBuffer.length = extensions[i].valueSize;
         } else if (name == "ModelName") {
-            modelName.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
+            extensionConfig.modelName.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
         } else if (name == "Profiling") {
-            isProfiling.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
+            extensionConfig.isProfiling.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
             LOGI("OH_NNModel_BuildFromLiteGraph isProfiling enable.");
         } else if (name == "opLayout") {
             opLayout.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
-            opLayouts.insert({opLayout, "hiai::ExecuteDevice::CPU"});
+            extensionConfig.opLayout.insert({opLayout, "hiai::ExecuteDevice::CPU"});
             LOGI("OH_NNModel_BuildFromLiteGraph opLayout:%{public}s.", opLayout.c_str());
         }
     }
 
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, m_innerModelTest
-        .BuildFromLiteGraph(nullptr, buffer, modelName, isProfiling, opLayouts));
+        .BuildFromLiteGraph(nullptr, extensionConfig));
 }
 
 /**
@@ -257,15 +236,11 @@ HWTEST_F(InnerModelTest, inner_model_build_from_lite_graph_002, TestSize.Level1)
     EXPECT_NE(nullptr, liteGraph);
 
     SetLiteGraph(liteGraph);
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+    ExtensionConfig extensionConfig;
 
-    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, extensionConfig));
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest
-        .BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+        .BuildFromLiteGraph(liteGraph, extensionConfig));
 }
 
 /**
@@ -284,14 +259,10 @@ HWTEST_F(InnerModelTest, inner_model_build_from_lite_graph_003, TestSize.Level1)
     const int32_t dimInput[2] = {2, 2};
     const OH_NN_Tensor& tensor = {OH_NN_INT8, 2, dimInput, nullptr, OH_NN_TENSOR};
     EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.AddTensor(tensor));
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+    ExtensionConfig extensionConfig;
 
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest
-        .BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+        .BuildFromLiteGraph(liteGraph, extensionConfig));
 }
 
 
@@ -318,13 +289,9 @@ HWTEST_F(InnerModelTest, inner_model_add_tensor_002, TestSize.Level1)
     EXPECT_NE(nullptr, liteGraph);
     SetLiteGraph(liteGraph);
 
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+    ExtensionConfig extensionConfig;
 
-    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, extensionConfig));
 
     const int32_t dimInput[2] = {2, 2};
     const OH_NN_Tensor& tensor = {OH_NN_INT8, 2, dimInput, nullptr, OH_NN_TENSOR};
@@ -418,13 +385,8 @@ HWTEST_F(InnerModelTest, inner_model_set_tensor_value_005, TestSize.Level1)
     EXPECT_NE(nullptr, liteGraph);
     SetLiteGraph(liteGraph);
 
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
-
-    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    ExtensionConfig extensionConfig;
+    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, extensionConfig));
 
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.SetTensorValue(index,
        static_cast<const void *>(&activation), sizeof(int8_t)));
@@ -505,13 +467,9 @@ HWTEST_F(InnerModelTest, inner_model_add_operation_002, TestSize.Level1)
     EXPECT_NE(nullptr, liteGraph);
     SetLiteGraph(liteGraph);
 
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+    ExtensionConfig extensionConfig;
 
-    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, extensionConfig));
 
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.AddOperation(m_opType, m_params, m_inputs,
         m_outputs));
@@ -705,13 +663,9 @@ HWTEST_F(InnerModelTest, inner_model_specify_inputs_and_outputs_002, TestSize.Le
     EXPECT_NE(nullptr, liteGraph);
     SetLiteGraph(liteGraph);
 
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+    ExtensionConfig extensionConfig;
 
-    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, extensionConfig));
 
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.SpecifyInputsAndOutputs(inputs, outputs));
 }
@@ -876,13 +830,9 @@ HWTEST_F(InnerModelTest, inner_model_get_supported_operation_002, TestSize.Level
     EXPECT_NE(nullptr, liteGraph);
     SetLiteGraph(liteGraph);
 
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+    ExtensionConfig extensionConfig;
 
-    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, buffer, modelName, isProfiling, opLayouts));
+    EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.BuildFromLiteGraph(liteGraph, extensionConfig));
     EXPECT_EQ(OH_NN_FAILED, m_innerModelTest.GetSupportedOperations(deviceID, &isSupported, opCount));
 }
 
