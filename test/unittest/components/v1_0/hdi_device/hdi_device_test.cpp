@@ -111,8 +111,7 @@ OH_NN_ReturnCode HDIDeviceTest::PrepareModel(int32_t allocBufferType, int32_t pr
         ::testing::Return(prepareType)));
 
     ModelConfig config;
-    Buffer quantBuffer;
-    OH_NN_ReturnCode result = hdiDevice->PrepareModel(model, quantBuffer, config, preparedModel);
+    OH_NN_ReturnCode result = hdiDevice->PrepareModel(model, config, preparedModel);
     return result;
 }
 
@@ -600,9 +599,8 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodel_002, TestSize.Level0)
 
     std::shared_ptr<const mindspore::lite::LiteGraph> model = nullptr;
     ModelConfig config;
-    Buffer quantBuffer;
     std::shared_ptr<PreparedModel> preparedModel;
-    OH_NN_ReturnCode result = hdiDevice->PrepareModel(model, quantBuffer, config, preparedModel);
+    OH_NN_ReturnCode result = hdiDevice->PrepareModel(model, config, preparedModel);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, result);
 }
 
