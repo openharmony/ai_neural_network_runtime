@@ -27,6 +27,13 @@ using namespace OHOS::NeuralNetworkRuntime;
 
 #define NNRT_API __attribute__((visibility("default")))
 
+const std::string EXTENSION_KEY_QUANT_BUFFER = "QuantBuffer";
+const std::string EXTENSION_KEY_MODEL_NAME = "ModelName";
+const std::string EXTENSION_KEY_IS_PROFILING = "isProfiling";
+const std::string EXTENSION_KEY_OP_LAYOUT = "opLayout";
+const std::string EXTENSION_KEY_INPUT_DIMS = "InputDims";
+const std::string EXTENSION_KEY_DYNAMIC_DIMS = "DynamicDims";
+
 NNRT_API NN_QuantParam *OH_NNQuantParam_Create()
 {
     auto* quantParamImpl = new (std::nothrow) QuantParams();
@@ -294,6 +301,167 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_Finish(OH_NNModel *model)
     return innerModel->Build();
 }
 
+OH_NN_ReturnCode ParseInputDimsFromExtensions(char* data, size_t dataSize, const mindspore::lite::LiteGraph* liteGraph,
+    ExtensionConfig& extensionConfig, size_t& dynamicCount)
+{
+    extensionConfig.inputDims.clear();
+    int32_t* dimsValue = reinterpret_cast<int32_t*>(data);
+    size_t allDimsSize = dataSize / sizeof(int32_t);
+
+    size_t inputCount = liteGraph->input_indices_.size(); // LiteGraph输入个数
+    size_t allTensorSize = liteGraph->all_tensors_.size(); // LiteGraph所有tensor个数
+    size_t inputDimSize = 0; // 存放每个输入的维度
+    std::vector<int32_t> inputDim;
+    size_t dataIndex = 0;
+    for (size_t i = 0; i < inputCount; ++i) {
+        inputDim.clear();
+        if (liteGraph->input_indices_[i] >= allTensorSize) {
+            LOGE("ParseInputDimsFromExtensions failed, indice of input %u is out of range.",
+                liteGraph->input_indices_[i]);
+            extensionConfig.inputDims.clear();
+            return OH_NN_INVALID_PARAMETER;
+        }
+        //获取当前输入的维度
+        mindspore::lite::TensorPtr tensor = liteGraph->all_tensors_[liteGraph->input_indices_[i]];
+        auto tensorDims = mindspore::lite::MindIR_Tensor_GetDims(tensor);
+        inputDimSize = tensorDims.size();
+        if (allDimsSize < inputDimSize) {
+            LOGE("ParseInputDimsFromExtensions failed, dataSize is invalid.");
+            extensionConfig.inputDims.clear();
+            return OH_NN_INVALID_PARAMETER;
+        }
+        // 读取extensor中当前输入的dim值
+        for (size_t j = 0; j < inputDimSize; ++j) {
+            inputDim.emplace_back(dimsValue[dataIndex]);
+            if (dimsValue[dataIndex] == -1) {
+                ++dynamicCount;
+            }
+            ++dataIndex;
+        }
+        extensionConfig.inputDims.emplace_back(inputDim);
+        allDimsSize -= inputDimSize;
+    }
+    // allDimsSize应和模型一致，遍历完后，allDimsSize等于0
+    if (allDimsSize != 0) {
+        LOGE("ParseInputDimsFromExtensions failed, allDimsSize is not equal to liteGraph.");
+        extensionConfig.inputDims.clear();
+        return OH_NN_INVALID_PARAMETER;
+    }
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode ParseDynamicDimsFromExtensions(
+    const std::unordered_map<std::string, std::vector<std::pair<char*, size_t>>>& extensionMap,
+    const mindspore::lite::LiteGraph* liteGraph, ExtensionConfig& extensionConfig)
+{
+    const std::vector<std::pair<char*, size_t>>& inputDims = extensionMap.at(EXTENSION_KEY_INPUT_DIMS);
+    if (inputDims.empty()) {
+        LOGE("ParseDynamicDimsFromExtensions failed, input dims is empty.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    auto dynamicDims = extensionMap.at(EXTENSION_KEY_DYNAMIC_DIMS);
+    if (dynamicDims.empty()) {
+        LOGE("ParseDynamicDimsFromExtensions failed, dynamic dims is empty.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    if (inputDims[0].first == nullptr || inputDims[0].second == 0 ||
+        dynamicDims[0].first == nullptr || dynamicDims[0].second == 0) {
+        LOGE("ParseDynamicDimsFromExtensions failed, data or dataSize is invalid.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    size_t dynamicCount = 0;
+    auto returnCode = ParseInputDimsFromExtensions(
+        inputDims[0].first, inputDims[0].second, liteGraph, extensionConfig, dynamicCount);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("ParseDynamicDimsFromExtensions failed, failed to get input dims from extensions.");
+        return returnCode;
+    }
+    if (dynamicCount == 0) {
+        LOGE("ParseDynamicDimsFromExtensions failed, dynamic count is 0.");
+        extensionConfig.inputDims.clear();
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    extensionConfig.dynamicDims.clear();
+    int32_t* dynamicDimsValue = reinterpret_cast<int32_t*>(dynamicDims[0].first);
+    size_t dynamicDimsSize = dynamicDims[0].second / sizeof(int32_t);
+    if ((dynamicDimsSize % dynamicCount) != 0) {
+        LOGE("ParseDynamicDimsFromExtensions failed, dynamic dataSize is invalid.");
+        extensionConfig.inputDims.clear();
+        return OH_NN_INVALID_PARAMETER;
+    }
+    size_t dynamicSize = dynamicDimsSize / dynamicCount;
+    std::vector<int32_t> dynamicDim;
+    size_t dataIndex = 0;
+    for (size_t i = 0; i < dynamicSize; ++i) {
+        dynamicDim.clear();
+        for (size_t j = 0; j < dynamicCount; ++j) {
+            dynamicDim.emplace_back(dynamicDimsValue[dataIndex]);
+            ++dataIndex;
+        }
+        extensionConfig.dynamicDims.emplace_back(dynamicDim);
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode ParseExtensionConfigs(
+    const std::unordered_map<std::string, std::vector<std::pair<char*, size_t>>>& extensionMap,
+    const mindspore::lite::LiteGraph* pLiteGraph, ExtensionConfig& extensionConfig)
+{
+    extensionConfig.tuningStrategy = TuningStrategy::ON_DEVICE_PREPROCESS_TUNING;
+    if (extensionMap.find(EXTENSION_KEY_QUANT_BUFFER) != extensionMap.end()) {
+        const std::vector<std::pair<char*, size_t>>& value = extensionMap.at(EXTENSION_KEY_QUANT_BUFFER);
+        if (value.empty()) {
+            LOGE("ParseExtensionConfigs failed, get empty quant buffer value.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+        extensionConfig.quantBuffer.data = value[0].first;
+        extensionConfig.quantBuffer.length = value[0].second;
+    }
+    if (extensionMap.find(EXTENSION_KEY_MODEL_NAME) != extensionMap.end()) {
+        const std::vector<std::pair<char*, size_t>>& value = extensionMap.at(EXTENSION_KEY_MODEL_NAME);
+        if (value.empty()) {
+            LOGE("ParseExtensionConfigs failed, get empty model name value.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+        extensionConfig.modelName.assign(value[0].first, value[0].first + value[0].second);
+    }
+    if (extensionMap.find(EXTENSION_KEY_IS_PROFILING) != extensionMap.end()) {
+        const std::vector<std::pair<char*, size_t>>& value = extensionMap.at(EXTENSION_KEY_IS_PROFILING);
+        if (value.empty()) {
+            LOGE("ParseExtensionConfigs failed, get empty isProfiling value.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+        extensionConfig.isProfiling.assign(value[0].first, value[0].first + value[0].second);
+    }
+    if (extensionMap.find(EXTENSION_KEY_OP_LAYOUT) != extensionMap.end()) {
+        const std::vector<std::pair<char*, size_t>>& value = extensionMap.at(EXTENSION_KEY_OP_LAYOUT);
+        if (value.empty()) {
+            LOGE("ParseExtensionConfigs failed, get empty op layout value.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+        std::string ops;
+        for (auto singleValue : value) {
+            ops.assign(singleValue.first, singleValue.first + singleValue.second);
+            extensionConfig.opLayout.insert({ops, "hiai::ExecuteDevice::CPU"});
+            LOGI("ParseExtensionConfigs opLayout:%{public}s.", ops.c_str());
+        }
+    }
+    if (extensionMap.find(EXTENSION_KEY_INPUT_DIMS) != extensionMap.end() &&
+        extensionMap.find(EXTENSION_KEY_DYNAMIC_DIMS) != extensionMap.end()) {
+        auto returnCode = ParseDynamicDimsFromExtensions(extensionMap, pLiteGraph, extensionConfig);
+        if (returnCode != OH_NN_SUCCESS) {
+            LOGE("ParseExtensionConfigs failed, parse dynamic dims from extensions failed.");
+            return returnCode;
+        }
+        extensionConfig.tuningStrategy = TuningStrategy::OFF; // 分档shape不支持fftl
+    }
+
+    return OH_NN_SUCCESS;
+}
+
 NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const void *liteGraph,
     const OH_NN_Extension *extensions, size_t extensionSize)
 {
@@ -307,36 +475,29 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
         return OH_NN_INVALID_PARAMETER;
     }
 
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+    auto *pLiteGraph = reinterpret_cast<const mindspore::lite::LiteGraph*>(liteGraph);
+    ExtensionConfig extensionConfig;
+    std::unordered_map<std::string, std::vector<std::pair<char*, size_t>>> extensionMap;
     for (size_t i = 0; i < extensionSize; ++i) {
         std::string name = extensions[i].name;
-        if (name == "QuantBuffer") {
-            buffer.data = extensions[i].value;
-            buffer.length = extensions[i].valueSize;
-        } else if (name == "ModelName") {
-            modelName.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
-        } else if (name == "Profiling") {
-            isProfiling.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
-            LOGI("OH_NNModel_BuildFromLiteGraph isProfiling enable.");
-        } else if (name == "opLayout") {
-            opLayout.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
-            opLayouts.insert({opLayout, "hiai::ExecuteDevice::CPU"});
-            LOGI("OH_NNModel_BuildFromLiteGraph opLayout:%{public}s.", opLayout.c_str());
+        if (extensionMap.find(name) == extensionMap.end()) {
+            extensionMap.insert({name, {{extensions[i].value, extensions[i].valueSize}}});
+        } else {
+            extensionMap[name].push_back({extensions[i].value, extensions[i].valueSize});
         }
     }
+    auto returnCode = ParseExtensionConfigs(extensionMap, pLiteGraph, extensionConfig);
+    if (returnCode != OH_NN_SUCCESS) {
+        LOGE("OH_NNModel_BuildFromLiteGraph failed, parse extension configs failed.");
+        return returnCode;
+    }
 
-    auto *pLiteGraph = static_cast<const mindspore::lite::LiteGraph*>(liteGraph);
     InnerModel *innerModel = reinterpret_cast<InnerModel*>(model);
-    innerModel->SetTuningStrategy(TuningStrategy::ON_DEVICE_PREPROCESS_TUNING);
 
     // Once the innerModel built from the liteGraph successfully, the innerModel
     // owns the liteGraph, in which case, the invoker should not delete
     // the liteGraph actively. Otherwise, the invoker still has the ownership.
-    return innerModel->BuildFromLiteGraph(pLiteGraph, buffer, modelName, isProfiling, opLayouts);
+    return innerModel->BuildFromLiteGraph(pLiteGraph, extensionConfig);
 }
 
 NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromMetaGraph(OH_NNModel *model, const void *metaGraph,
@@ -352,30 +513,27 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromMetaGraph(OH_NNModel *model, const
         return OH_NN_INVALID_PARAMETER;
     }
 
-    Buffer buffer;
-    std::string modelName;
-    std::string isProfiling;
-    std::string opLayout;
-    std::map<std::string, std::string> opLayouts;
+    ExtensionConfig extensionConfig;
+    std::string ops;
     for (size_t i = 0; i < extensionSize; ++i) {
         std::string name = extensions[i].name;
         if (name == "QuantBuffer") {
-            buffer.data = extensions[i].value;
-            buffer.length = extensions[i].valueSize;
+            extensionConfig.quantBuffer.data = extensions[i].value;
+            extensionConfig.quantBuffer.length = extensions[i].valueSize;
         } else if (name == "ModelName") {
-            modelName.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
+            extensionConfig.modelName.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
         } else if (name == "Profiling") {
-            isProfiling.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
+            extensionConfig.isProfiling.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
             LOGI("OH_NNModel_BuildFromMetaGraph isProfiling enable.");
         } else if (name == "opLayout") {
-            opLayout.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
-            opLayouts.insert({opLayout, "hiai::ExecuteDevice::CPU"});
-            LOGI("OH_NNModel_BuildFromMetaGraph opLayout:%{public}s.", opLayout.c_str());
+            ops.assign(extensions[i].value, extensions[i].value + extensions[i].valueSize);
+            extensionConfig.opLayout.insert({ops, "hiai::ExecuteDevice::CPU"});
+            LOGI("OH_NNModel_BuildFromMetaGraph opLayout:%{public}s.", ops.c_str());
         }
     }
 
     InnerModel *innerModel = reinterpret_cast<InnerModel*>(model);
-    return innerModel->BuildFromMetaGraph(metaGraph, buffer, modelName, isProfiling, opLayouts);
+    return innerModel->BuildFromMetaGraph(metaGraph, extensionConfig);
 }
 
 NNRT_API OH_NN_ReturnCode OH_NNModel_SetInputsAndOutputsInfo(OH_NNModel *model, const OH_NN_TensorInfo *inputsInfo,

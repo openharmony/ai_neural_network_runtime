@@ -80,16 +80,12 @@ private:
     OH_NN_Priority m_priority {OH_NN_PRIORITY_NONE};
     OH_NN_PerformanceMode m_performance {OH_NN_PERFORMANCE_NONE};
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
-    Buffer m_quantBuffer {nullptr, 0};
-    std::string m_modelName;
-    std::string m_isProfiling;
-    std::map<std::string, std::string> m_opLayouts;
     void* m_metaGraph {nullptr};
     InnerModel* m_innerModel {nullptr};
     std::shared_ptr<mindspore::lite::LiteGraph> m_liteGraph {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
-    TuningStrategy m_tuningStrategy{TuningStrategy::OFF};
+    ExtensionConfig m_extensionConfig;
 };
 } // NeuralNetworkRuntime
 } // OHOS

@@ -109,8 +109,8 @@ bool InnerModel::IsBuild() const
     return ((m_liteGraph != nullptr) || (m_metaGraph != nullptr));
 }
 
-OH_NN_ReturnCode InnerModel::BuildFromLiteGraph(const MSLITE::LiteGraph* liteGraph, const Buffer& quantBuffer,
-    const std::string& modelName, const std::string& isProfiling, std::map<std::string, std::string>& opLayouts)
+OH_NN_ReturnCode InnerModel::BuildFromLiteGraph(const MSLITE::LiteGraph* liteGraph,
+    const ExtensionConfig& extensionConfig)
 {
     NNRT_TRACE_NAME("Build model from lite graph");
     if (liteGraph == nullptr) {
@@ -145,17 +145,12 @@ OH_NN_ReturnCode InnerModel::BuildFromLiteGraph(const MSLITE::LiteGraph* liteGra
     m_liteGraph.reset(const_cast<MSLITE::LiteGraph*>(liteGraph), LiteGraphDeleter());
     m_liteGraph->name_ = LOADED_NNR_MODEL;
 
-    m_quantBuffer = quantBuffer;
-    m_modelName = modelName;
-    m_isProfiling = isProfiling;
-    m_opLayouts = opLayouts;
+    m_extensionConfig = extensionConfig;
 
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode InnerModel::BuildFromMetaGraph(
-    const void* metaGraph, const Buffer& quantBuffer, const std::string& modelName, const std::string& isProfiling,
-    std::map<std::string, std::string>& opLayouts)
+OH_NN_ReturnCode InnerModel::BuildFromMetaGraph(const void* metaGraph, const ExtensionConfig& extensionConfig)
 {
     NNRT_TRACE_NAME("Build model from meta graph");
     if (metaGraph == nullptr) {
@@ -174,10 +169,7 @@ OH_NN_ReturnCode InnerModel::BuildFromMetaGraph(
     }
 
     m_metaGraph = const_cast<void*>(metaGraph);
-    m_quantBuffer = quantBuffer;
-    m_modelName = modelName;
-    m_isProfiling = isProfiling;
-    m_opLayouts = opLayouts;
+    m_extensionConfig = extensionConfig;
     return OH_NN_SUCCESS;
 }
 
@@ -761,34 +753,9 @@ void* InnerModel::GetMetaGraph() const
     return m_metaGraph;
 }
 
-Buffer InnerModel::GetQuantBuffer() const
+ExtensionConfig InnerModel::GetExtensionConfig() const
 {
-    return m_quantBuffer;
-}
-
-std::string InnerModel::GetModelName() const
-{
-    return m_modelName;
-}
-
-std::string InnerModel::GetProfiling() const
-{
-    return m_isProfiling;
-}
-
-std::map<std::string, std::string> InnerModel::GetOpLayouts() const
-{
-    return m_opLayouts;
-}
-
-TuningStrategy InnerModel::GetTuningStrategy() const
-{
-    return m_tuningStrategy;
-}
-
-void InnerModel::SetTuningStrategy(const TuningStrategy tuningStrategy)
-{
-    m_tuningStrategy = tuningStrategy;
+    return m_extensionConfig;
 }
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS

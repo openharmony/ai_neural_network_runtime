@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
-    const Buffer& quantBuffer, const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
+    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     if (model == nullptr) {
         return OH_NN_INVALID_PARAMETER;

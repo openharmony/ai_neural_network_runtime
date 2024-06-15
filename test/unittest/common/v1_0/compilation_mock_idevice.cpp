@@ -139,7 +139,7 @@ OH_NN_ReturnCode HDIDeviceV1_0::IsFloat16PrecisionSupported(bool& isSupported)
 }
 
 OH_NN_ReturnCode HDIDeviceV1_0::PrepareModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
-    const Buffer& quantBuffer, const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
+    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
 {
     if (model == nullptr) {
         LOGE("HDIDeviceV1_0 mock PrepareModel failed, the model is nullptr");
