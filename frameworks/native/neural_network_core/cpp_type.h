@@ -41,19 +41,28 @@ enum class TuningStrategy {
     ON_CLOUD_TUNING
 };
 
+struct Buffer {
+    void* data;
+    size_t length;
+};
+
+struct ExtensionConfig {
+    Buffer quantBuffer;
+    std::string modelName;
+    std::string isProfiling;
+    std::map<std::string, std::string> opLayout;
+    TuningStrategy tuningStrategy{TuningStrategy::OFF};
+    // inputDims and dynamicDims are used in hiai adapter
+    std::vector<std::vector<int32_t>> inputDims;
+    std::vector<std::vector<int32_t>> dynamicDims;
+};
+
 struct ModelConfig {
     bool enableFloat16;
     OH_NN_PerformanceMode mode;
     OH_NN_Priority priority;
-    std::string isProfiling;
     std::string cachePath;
-    std::map<std::string, std::string> opLayout;
-    TuningStrategy tuningStrategy{TuningStrategy::OFF};
-};
-
-struct Buffer {
-    void* data;
-    size_t length;
+    ExtensionConfig extensionConfig;
 };
 
 struct QuantParam {

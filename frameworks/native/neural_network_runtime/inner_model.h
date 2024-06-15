@@ -32,12 +32,9 @@ public:
     InnerModel();
 
     bool IsBuild() const;
-    OH_NN_ReturnCode BuildFromLiteGraph(const mindspore::lite::LiteGraph* liteGraph, const Buffer& quantBuffer,
-                                        const std::string& modelName, const std::string& isProfiling,
-                                        std::map<std::string, std::string>& opLayouts);
-    OH_NN_ReturnCode BuildFromMetaGraph(const void* metaGraph, const Buffer& quantBuffer,
-                                        const std::string& modelName, const std::string& isProfiling,
-                                        std::map<std::string, std::string>& opLayouts);
+    OH_NN_ReturnCode BuildFromLiteGraph(const mindspore::lite::LiteGraph* liteGraph,
+                                        const ExtensionConfig& extensionConfig);
+    OH_NN_ReturnCode BuildFromMetaGraph(const void* metaGraph, const ExtensionConfig& extensionConfig);
     OH_NN_ReturnCode AddTensor(const OH_NN_Tensor& nnTensor);
     OH_NN_ReturnCode AddTensorDesc(const NN_TensorDesc* nnTensorDesc);
     OH_NN_ReturnCode SetTensorQuantParam(uint32_t index, const NN_QuantParam* quantParam);
@@ -59,12 +56,7 @@ public:
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> GetOutputTensorDescs() const;
     std::shared_ptr<mindspore::lite::LiteGraph> GetLiteGraphs() const;
     void* GetMetaGraph() const;
-    Buffer GetQuantBuffer() const;
-    std::string GetModelName() const;
-    std::string GetProfiling() const;
-    std::map<std::string, std::string> GetOpLayouts() const;
-    TuningStrategy GetTuningStrategy() const;
-    void SetTuningStrategy(const TuningStrategy tuningStrategy);
+    ExtensionConfig GetExtensionConfig() const;
 
 private:
     void AddTensorsToLiteGraph(std::unordered_map<uint32_t, uint32_t>& modelIDToGraphID);
@@ -84,11 +76,7 @@ private:
     std::vector<std::shared_ptr<NNTensor>> m_outputTensors; // Used to pass output tensors to compilation.
     std::shared_ptr<mindspore::lite::LiteGraph> m_liteGraph {nullptr};
     void* m_metaGraph {nullptr};
-    Buffer m_quantBuffer = {nullptr, 0};
-    std::string m_modelName;
-    std::string m_isProfiling;
-    std::map<std::string, std::string> m_opLayouts;
-    TuningStrategy m_tuningStrategy{TuningStrategy::OFF};
+    ExtensionConfig m_extensionConfig;
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
