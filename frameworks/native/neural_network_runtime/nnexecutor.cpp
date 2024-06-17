@@ -205,7 +205,7 @@ OH_NN_ReturnCode NNExecutor::SetExtensionConfig(const std::unordered_map<std::st
         }
 
         if (!config.first.compare("isNeedModelLatency")) {
-            m_executorConfig->isNeedModelLatency = std::atoi(reinterpret_cast<char*>(config.second.data()));
+            m_executorConfig->isNeedModelLatency = static_cast<bool>(reinterpret_cast<char*>(config.second.data()));
             LOGD("[NNExecutor] SetExtensionConfig, isNeedModelLatency: %{public}d.",
                 m_executorConfig->isNeedModelLatency);
         }
@@ -320,7 +320,7 @@ OH_NN_ReturnCode NNExecutor::GetModelID(uint32_t& modelId) const
 {
     OH_NN_ReturnCode ret = m_preparedModel->GetModelID(modelId);
     if (ret != OH_NN_SUCCESS) {
-        LOGE("GetModelID failed, some error happend when get model if for device.");
+        LOGE("GetModelID failed, some error happen when get model id for device.");
         return ret;
     }
 

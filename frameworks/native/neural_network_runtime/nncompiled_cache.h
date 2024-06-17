@@ -52,7 +52,7 @@ public:
     OH_NN_ReturnCode WriteCacheInfo(uint32_t cacheSize,
                                     std::unique_ptr<int64_t[]>& cacheInfo,
                                     const std::string& cacheDir) const;
-    OH_NN_ReturnCode CheckCacheInfo(NNCompiledCacheInfo& modelCacheInfo, const std::string & cacheInfoPath) const;
+    OH_NN_ReturnCode CheckCacheInfo(NNCompiledCacheInfo& modelCacheInfo, const std::string& cacheInfoPath) const;
 
 private:
     OH_NN_ReturnCode GenerateCacheFiles(const std::vector<Buffer>& caches,

@@ -26,6 +26,6 @@ struct ExecutorConfig {
     uint32_t hiaiModelId {0};
 };
 } // namespace NeuralNetworkRuntime
-} // namspace OHOS
+} // namespace OHOS
 
 #endif // NEURAL_NETWORK_RUNTIME_EXECUTOR_CONFIG_H
