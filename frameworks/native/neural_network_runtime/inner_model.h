@@ -54,7 +54,11 @@ public:
     std::vector<std::shared_ptr<NNTensor>> GetOutputTensors() const;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> GetInputTensorDescs() const;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> GetOutputTensorDescs() const;
-    std::shared_ptr<mindspore::lite::LiteGraph> GetLiteGraphs() const;
+    std::shared_ptr<mindspore::lite::LiteGraph> GetLiteGraphs() const
+    {
+        return m_liteGraph;
+    }
+
     void* GetMetaGraph() const;
     ExtensionConfig GetExtensionConfig() const;
 

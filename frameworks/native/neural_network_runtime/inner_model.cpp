@@ -705,11 +705,6 @@ OH_NN_ReturnCode InnerModel::GetSupportedOperations(size_t deviceID, const bool*
     return OH_NN_SUCCESS;
 }
 
-std::shared_ptr<MSLITE::LiteGraph> InnerModel::GetLiteGraphs() const
-{
-    return m_liteGraph;
-}
-
 std::vector<std::shared_ptr<NNTensor>> InnerModel::GetInputTensors() const
 {
     return m_inputTensors;

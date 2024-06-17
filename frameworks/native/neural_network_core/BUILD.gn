@@ -31,6 +31,7 @@ nnrt_core_sources = [
   "tensor_desc.cpp",
   "utils.cpp",
   "validation.cpp",
+  "nnrt_client.cpp",
 ]
 
 ohos_shared_library("libneural_network_core") {

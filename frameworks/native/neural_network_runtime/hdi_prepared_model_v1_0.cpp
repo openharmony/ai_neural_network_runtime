@@ -280,5 +280,11 @@ OH_NN_ReturnCode HDIPreparedModelV1_0::Run(const std::vector<NN_Tensor*>& inputs
 
     return OH_NN_SUCCESS;
 }
+
+OH_NN_ReturnCode HDIPreparedModelV1_0::GetModelID(uint32_t& modelId) const
+{
+    LOGE("hdi prepareModel V1_0 not support get model ID");
+    return OH_NN_SUCCESS;
+}
 } // namespace NeuralNetworkRuntime
 } // OHOS

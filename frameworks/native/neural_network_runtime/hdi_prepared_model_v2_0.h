@@ -51,6 +51,8 @@ public:
     OH_NN_ReturnCode GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
                                        std::vector<std::vector<uint32_t>>& maxInputDims) override;
 
+    OH_NN_ReturnCode GetModelID(uint32_t& modelId) const override;
+
 private:
     // first: major version, second: minor version
     std::pair<uint32_t, uint32_t> m_hdiVersion;
