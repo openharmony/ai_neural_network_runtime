@@ -210,7 +210,6 @@ ohos_unittest("NeuralNetworkCoreV1_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir",
   ]
 }
 
