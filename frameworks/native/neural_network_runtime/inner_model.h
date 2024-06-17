@@ -58,7 +58,6 @@ public:
     {
         return m_liteGraph;
     }
-
     void* GetMetaGraph() const;
     ExtensionConfig GetExtensionConfig() const;
 
