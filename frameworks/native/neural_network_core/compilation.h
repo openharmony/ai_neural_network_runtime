@@ -40,6 +40,10 @@ struct Compilation {
     Compiler* compiler {nullptr};
     std::vector<std::shared_ptr<void>> options;
     std::unordered_map<std::string, std::vector<char>> configs;
+    size_t nnrtModelID {0};
+    uint32_t hiaiModelId {0};
+    int32_t callingPid {-1};
+    bool isNeedModelLatency {false};
 
     ~Compilation()
     {

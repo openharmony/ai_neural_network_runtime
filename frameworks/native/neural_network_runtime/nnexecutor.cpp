@@ -187,6 +187,38 @@ NN_TensorDesc* NNExecutor::CreateOutputTensorDesc(size_t index) const
     return reinterpret_cast<NN_TensorDesc*>(tensorDescImpl);
 }
 
+OH_NN_ReturnCode NNExecutor::SetExtensionConfig(const std::unordered_map<std::string, std::vector<char>>& configs)
+{
+    if (m_executorConfig == nullptr) {
+        m_executorConfig = new (std::nothrow) ExecutorConfig();
+    }
+
+    for (auto config : configs) {
+        if (!config.first.compare("callingPid")) {
+            m_executorConfig->callingPid = std::atoi(reinterpret_cast<char*>(config.second.data()));
+            LOGD("[NNExecutor] SetExtensionConfig, callingPid: %{public}d.", m_executorConfig->callingPid);
+        }
+
+        if (!config.first.compare("hiaiModelId")) {
+            m_executorConfig->hiaiModelId = std::atoi(reinterpret_cast<char*>(config.second.data()));
+            LOGD("[NNExecutor] SetExtensionConfig, hiaiModelId: %{public}d.", m_executorConfig->hiaiModelId);
+        }
+
+        if (!config.first.compare("isNeedModelLatency")) {
+            m_executorConfig->isNeedModelLatency = std::atoi(reinterpret_cast<char*>(config.second.data()));
+            LOGD("[NNExecutor] SetExtensionConfig, isNeedModelLatency: %{public}d.",
+                m_executorConfig->isNeedModelLatency);
+        }
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+ExecutorConfig* NNExecutor::GetExecutorConfig() const
+{
+    return m_executorConfig;
+}
+
 OH_NN_ReturnCode NNExecutor::SetOnRunDone(NN_OnRunDone onRunDone)
 {
     LOGE("NNExecutor::SetOnRunDone failed, SetOnRunDone is not supported.");
@@ -282,6 +314,17 @@ OH_NN_ReturnCode NNExecutor::RunAsync(NN_Tensor* inputTensors[], size_t inputSiz
 {
     LOGE("NNExecutor::RunAsync failed, RunAsync is not supported.");
     return OH_NN_OPERATION_FORBIDDEN;
+}
+
+OH_NN_ReturnCode NNExecutor::GetModelID(uint32_t& modelId) const
+{
+    OH_NN_ReturnCode ret = m_preparedModel->GetModelID(modelId);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("GetModelID failed, some error happend when get model if for device.");
+        return ret;
+    }
+
+    return OH_NN_SUCCESS;
 }
 
 size_t NNExecutor::GetBackendID()

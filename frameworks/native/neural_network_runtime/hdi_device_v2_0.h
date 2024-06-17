@@ -52,7 +52,8 @@ public:
                                   std::shared_ptr<PreparedModel>& preparedModel) override;
     OH_NN_ReturnCode PrepareModelFromModelCache(const std::vector<Buffer>& modelCache,
                                                 const ModelConfig& config,
-                                                std::shared_ptr<PreparedModel>& preparedModel) override;
+                                                std::shared_ptr<PreparedModel>& preparedModel,
+                                                bool& isUpdatable) override;
     OH_NN_ReturnCode PrepareOfflineModel(std::shared_ptr<const mindspore::lite::LiteGraph> model,
                                          const ModelConfig& config,
                                          std::shared_ptr<PreparedModel>& preparedModel) override;
