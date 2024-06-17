@@ -549,30 +549,6 @@ ohos_unittest("HDIDeviceV2_0Test") {
   ]
 }
 
-ohos_unittest("HDIDeviceV2_1Test") {
-  module_out_path = module_output_path
-
-  sources = [ "./v2_1/hdi_device/hdi_device_test.cpp" ]
-  sources += [ "../common/v2_1/mock_idevice.cpp" ]
-  sources += [ "../common/file_utils.cpp" ]
-  configs = [ ":module_private_config" ]
-
-  deps = [
-    "../../../frameworks/native/neural_network_core:libneural_network_core",
-    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_nnrt:libnnrt_proxy_2.0",
-    "hilog:libhilog",
-    "hitrace:libhitracechain",
-    "mindspore:mindir",
-  ]
-}
-
 ohos_unittest("HDIPreparedModelV2_0Test") {
   module_out_path = module_output_path
 
@@ -769,7 +745,6 @@ group("components_unittest") {
     ":ExecutorV2_0Test",
     ":HDIDeviceV1_0Test",
     ":HDIDeviceV2_0Test",
-    ":HDIDeviceV2_1Test",
     ":HDIPreparedModelV1_0Test",
     ":HDIPreparedModelV2_0Test",
     ":HDIPreparedModelV2_1Test",
