@@ -519,12 +519,12 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
         ret = nnrtService.CheckModelSizeFromBuffer(
             compilation->cacheBuffer.first, compilation->cacheBuffer.second, isExceedRamLimit);
     } else {
-        LOGE("CheckExceedRamLimit failed, no avaiable model to check.");
+        LOGE("CheckExceedRamLimit failed, no available model to check.");
         return OH_NN_INVALID_PARAMETER;
     }
 
     if (ret != static_cast<OH_NN_ReturnCode>(OH_NN_SUCCESS)) {
-        LOGE("CehckExceedRamLimit failed, some error happened when check if model exceed ram limit.");
+        LOGE("CheckExceedRamLimit failed, some error happened when check if model exceed ram limit.");
         return OH_NN_FAILED;
     }
 
@@ -536,7 +536,7 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation)
     bool isExceedRamLimit = false;
     OH_NN_ReturnCode retCode = CheckExceedRamLimit(compilation, isExceedRamLimit);
     if (retCode != OH_NN_SUCCESS) {
-        LOGE("AuthenticateModel failed, fail to check if model exceed ram limit");
+        LOGE("AuthenticateModel failed, fail to check if model exceed ram limit.");
         return retCode;
     }
 
@@ -569,7 +569,7 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation)
     }
 
     if (nnrtService.Authentication == nullptr) {
-        LOGW("Authentication failed, nnrtService Authentication func is nullptr.");
+        LOGE("Authentication failed, nnrtService Authentication func is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
     ret = nnrtService.Authentication(compilation->callingPid);
@@ -596,7 +596,7 @@ OH_NN_ReturnCode Authentication(Compilation** compilation)
 
     auto iter = compilationImpl->configs.find("callingPid");
     if (iter == compilationImpl->configs.end()) {
-        LOGW("missing 'callingPid' parameter in compilation configs.");
+        LOGE("missing 'callingPid' parameter in compilation configs.");
     } else {
         compilationImpl->callingPid = std::atoi((iter->second).data());
     }
@@ -637,17 +637,17 @@ OH_NN_ReturnCode GetModelId(Compilation** compilation)
     }
 
     if (nnrtService.GetNNRtModelIDFromPath == nullptr) {
-        LOGW("GetModelId failed, nnrtService GetNNRtModelIDFromPath func is nullptr");
+        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromPath func is nullptr");
         return OH_NN_INVALID_PARAMETER;
     }
 
     if (nnrtService.GetNNRtModelIDFromBuffer == nullptr) {
-        LOGW("GetModelId failed, nnrtService GetNNRtModelIDFromBuffer func is nullptr");
+        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromBuffer func is nullptr");
         return OH_NN_INVALID_PARAMETER;
     }
 
     if (nnrtService.GetNNRtModelIDFromModel == nullptr) {
-        LOGW("GetModelId failed, nnrtService GetNNRtModelIDFromModel func is nullptr");
+        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromModel func is nullptr");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -1231,7 +1231,7 @@ OH_NN_ReturnCode Scheduling(Compilation** compilation)
         return static_cast<OH_NN_ReturnCode>(ret);
     }
     if(!supportStat) {
-        LOGW("device not support schaduling, jumper over scheduling.");
+        LOGW("device not support scheduling, jumper over scheduling.");
         return OH_NN_SUCCESS;
     }
 
@@ -1312,9 +1312,9 @@ OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation)
     }
 
     LOGD("ExecutorPrepare parameter, callingPid: %{public}d, hiaiModelId: %{public}u, nnrtModelId: %{public}zu.",
-        compilationImpl->callingPid, compilationImpl->hiaiModelId, compilationImpl->nnrtModelID);
+         compilationImpl->callingPid, compilationImpl->hiaiModelId, compilationImpl->nnrtModelID);
 
-    ret = Schedling(&compilationImpl);
+    ret = Scheduling(&compilationImpl);
     if (ret != OH_NN_SUCCESS) {
         LOGE("ExecutorPrepare failed, failed to create executor.");
         return ret;
@@ -1364,7 +1364,7 @@ NNRT_API OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation)
 
     OH_NN_ReturnCode ret = executorImpl->GetModelID(compilationImpl->hiaiModelId);
     if (ret != OH_NN_SUCCESS) {
-        LOGE("OH_NNExecutor_construct failed, failed to get hiai modelId.");
+        LOGE("OH_NNExecutor_Construct failed, failed to get hiai modelId.");
         OH_NNExecutor_Destroy(reinterpret_cast<OH_NNExecutor **>(&executorImpl));
         return nullptr;
     }
@@ -1400,7 +1400,7 @@ OH_NN_ReturnCode Unload(const ExecutorConfig* config)
 
     int ret = nnrtService.Unload(config->hiaiModelId);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
-        LOGE("Unload failed, nnrtService is not exist. jump over Unload.");
+        LOGE("Unload failed, nnrtService is not exist, jump over Unload.");
         return static_cast<OH_NN_ReturnCode>(ret);
     }
 
@@ -1588,7 +1588,7 @@ OH_NN_ReturnCode UpdateModelLatency(const ExecutorConfig* config, int32_t modelL
 
     NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
     if (!nnrtService.IsServiceAvaliable()) {
-        LOGW("UpdateModelLatency failed, fail to get service, skip update model latency.");
+        LOGW("UpdateModelLatency failed, fail to get nnrt service, skip update model latency.");
         return OH_NN_SUCCESS;
     }
 
@@ -1645,7 +1645,7 @@ OH_NN_ReturnCode RunSync(Executor *executor,
 
         configPtr->isNeedModelLatency = false;
         std::unordered_map<std::string, std::vector<char>> configMap;
-        std::vector<char>vecNeedLatency(static_cast<char>(configPtr->isNeedModelLatency));
+        std::vector<char> vecNeedLatency(static_cast<char>(configPtr->isNeedModelLatency));
         configMap["isNeedModelLatency"] = vecNeedLatency;
 
         ret = executor->SetExtensionConfig(configMap);
@@ -1686,7 +1686,7 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunSync(OH_NNExecutor *executor,
     }
 
     Executor *executorImpl = reinterpret_cast<Executor *>(executor);
-    return executorImpl->RunSync(inputTensor, inputCount, outputTensor, outputCount);
+    return RunSync(executorImpl, inputTensor, inputCount, outputTensor, outputCount);
 }
 
 NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunAsync(OH_NNExecutor *executor,

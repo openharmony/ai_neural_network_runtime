@@ -300,7 +300,7 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::GetInputDimRanges(std::vector<std::vector
 
 OH_NN_ReturnCode HDIPreparedModelV2_0::GetModelID(uint32_t& modelId) const
 {
-    LOGE("hdi prepareModel V2_0 not support get model ID");
+    LOGE("hdi preparedModel V2_0 not support get model ID.");
     return OH_NN_SUCCESS;
 }
 } // namespace NeuralNetworkRuntime

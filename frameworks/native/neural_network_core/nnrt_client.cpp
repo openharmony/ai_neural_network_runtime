@@ -46,7 +46,7 @@ NNRtServiceApi& NNRtServiceApi::GetInstance()
 {
     static NNRtServiceApi nnrtService;
 
-    // Assumes there can be multiple instance of NN API
+    // Assumes there can be multiple instances of NN API
     std::string nnrtLibraryName = "libdllite_service_client.z.so";
     libNNRtService = dlopen(nnrtLibraryName.c_str(), RTLD_LAZY | RTLD_NODELETE);
     if (libNNRtService == nullptr) {

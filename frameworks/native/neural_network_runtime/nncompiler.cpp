@@ -29,7 +29,7 @@ namespace NeuralNetworkRuntime {
 namespace {
 const int CACHE_INPUT_TENSORDESC_OFFSET = 2;
 const int CACHE_OUTPUT_TENSORDESC_OFFSET = 1;
-constexpr int32_t NUMBER_CACHE_INFO_MEMBERS = 3;
+constexpr int32_t  NUMBER_CACHE_INFO_MEMBERS = 3;
 
 struct SerializedTensorDesc {
 public:
@@ -352,12 +352,12 @@ OH_NN_ReturnCode NNCompiler::BuildOfflineModel()
 OH_NN_ReturnCode NNCompiler::NormalBuild()
 {
     if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
-        LOGW("[NNCompiler] Build failed, both liteGraph and metaGraph are nullptr.");
+        LOGE("[NNCompiler] Build failed, both liteGraph and metaGraph are nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
     if ((m_liteGraph != nullptr) && (m_metaGraph != nullptr)) {
-        LOGW("[NNCompiler] Build failed, neither liteGraph nor metaGraph are nullptr.");
+        LOGE("[NNCompiler] Build failed, neither liteGraph nor metaGraph are nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -444,7 +444,8 @@ OH_NN_ReturnCode NNCompiler::Build()
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode NNCompiler::OnlineBuild() {
+OH_NN_ReturnCode NNCompiler::OnlineBuild()
+{
     // cache存在，从cache直接复原prepareModel、input/output TensorDesc
     OH_NN_ReturnCode ret = RestoreFromCacheFile();
     if (ret == OH_NN_OPERATION_FORBIDDEN) {
@@ -454,7 +455,6 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild() {
     if (ret == OH_NN_SUCCESS) {
         LOGI("[NNCompiler] Build success, restore from cache file.");
         m_isBuild = true;
-        return OH_NN_SUCCESS;
     }
 
     // cache不存在或cache restore失败，走在线构图
@@ -606,26 +606,26 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     config.mode = m_performance;
     config.priority = m_priority;
     std::vector<Buffer> modelOnlyCaches(caches.begin(), caches.end() - CACHE_INPUT_TENSORDESC_OFFSET);
-    bool isUpdateable = false;
-    ret = m_device->PrepareModelFromModelCache(modelOnlyCaches, config, m_preparedModel, isUpdateable);
+    bool isUpdatable = false;
+    ret = m_device->PrepareModelFromModelCache(modelOnlyCaches, config, m_preparedModel, isUpdatable);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when preparing model from cache.");
         ReleaseBufferByDevice(caches);
         return ret;
     }
 
-    if (isUpdateable) {
-        LOGI("isUpdateable is true");
+    if (isUpdatable) {
+        LOGI("isUpdatable is true");
 
         NNCompiledCacheInfo modelCacheInfo;
-        std::string cacheInfoPath = m_cachePath + "/" + m_modelName + "cache_info.nncache";
+        std::string cacheInfoPath = m_cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
         ret = compiledCache.CheckCacheInfo(modelCacheInfo, cacheInfoPath);
         if (ret != OH_NN_SUCCESS) {
-            LOGE("[NNCompiledCache] isUpdateable is true to check cache info failed.");
+            LOGE("[NNCompiledCache] isUpdatable is true to check cache info failed.");
             return ret;
         }
 
-        LOGI("isUpdateable modelCacheInfo--->%{public}lu", modelCacheInfo.version);
+        LOGI("isUpdatable modelCacheInfo--->%{public}lld", modelCacheInfo.version);
 
         const size_t cacheNumber = caches.size();
         uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber;
@@ -633,7 +633,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
 
         std::unique_ptr<int64_t[]> cacheInfo = CreateUniquePtr<int64_t[]>(cacheSize);
         if (cacheInfo == nullptr) {
-            LOGE("[NNCompiledCache] isUpdateable is true to create unique failed.");
+            LOGE("[NNCompiledCache] isUpdatable is true to create unique failed.");
             return OH_NN_MEMORY_ERROR;
         }
 
@@ -648,7 +648,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
 
         ret = compiledCache.WriteCacheInfo(infoCharNumber, cacheInfo, m_cachePath);
         if (ret != OH_NN_SUCCESS) {
-            LOGE("[NNCompiledCache] is Updateable is true to write cache info failed.");
+            LOGE("[NNCompiledCache] isUpdatable is true to write cache info failed.");
             return ret;
         }
     }
