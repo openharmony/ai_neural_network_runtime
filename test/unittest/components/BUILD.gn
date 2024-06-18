@@ -213,6 +213,86 @@ ohos_unittest("NeuralNetworkCoreV1_0Test") {
   ]
 }
 
+ohos_unittest("QuantParamsTest") {
+  module_out_path = module_output_path
+
+  sources = [ "./quant_param/quant_param_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+  ]
+}
+
+ohos_unittest("NNBackendTest") {
+  module_out_path = module_output_path
+
+  sources = [ "./nn_backend/nn_backend_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+  ]
+}
+
+ohos_unittest("NNCompiledCacheTest") {
+  module_out_path = module_output_path
+
+  sources = [ "./nn_compiled_cache/nn_compiled_cache_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+  ]
+}
+
+ohos_unittest("NNCompilerTest") {
+  module_out_path = module_output_path
+
+  sources = [ "./nn_compiler/nn_compiler_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+  ]
+}
+
 ohos_unittest("TransformV1_0Test") {
   module_out_path = module_output_path
 
@@ -493,6 +573,29 @@ ohos_unittest("HDIPreparedModelV2_0Test") {
   ]
 }
 
+ohos_unittest("HDIPreparedModelV2_1Test") {
+  module_out_path = module_output_path
+
+  sources = [ "./v2_1/hdi_prepared_model/hdi_prepared_model_test.cpp" ]
+  sources += [ "../common/v2_1/mock_idevice.cpp" ]
+  sources += [ "../common/file_utils.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_2.0",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+  ]
+}
+
 ohos_unittest("TransformV2_0Test") {
   module_out_path = module_output_path
 
@@ -644,9 +747,13 @@ group("components_unittest") {
     ":HDIDeviceV2_0Test",
     ":HDIPreparedModelV1_0Test",
     ":HDIPreparedModelV2_0Test",
+    ":HDIPreparedModelV2_1Test",
     ":InnerModelV1_0Test",
     ":InnerModelV2_0Test",
     ":MemoryManagerTest",
+    ":NNBackendTest",
+    ":NNCompiledCacheTest",
+    ":NNCompilerTest",
     ":NeuralNetworkCoreV1_0Test",
     ":NeuralNetworkRuntimeV1_0Test",
     ":NeuralNetworkRuntimeV2_0Test",
@@ -656,6 +763,7 @@ group("components_unittest") {
     ":NnValidationV2_0Test",
     ":OpsRegistryV1_0Test",
     ":OpsRegistryV2_0Test",
+    ":QuantParamsTest",
     ":TransformV1_0Test",
     ":TransformV2_0Test",
   ]
