@@ -223,7 +223,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::ReleaseBuffer(const void* buffer)
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<Buffer>& modelCache,
-    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
+    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel, bool& isUpdatable)
 {
     if (HDI::Nnrt::V2_0::MockIPreparedModel::m_ExpectRetCode == OH_NN_FAILED) {
         HDI::Nnrt::V2_0::MockIPreparedModel::m_ExpectRetCode = OH_NN_OPERATION_FORBIDDEN;

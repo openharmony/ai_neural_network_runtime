@@ -657,7 +657,8 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodelfrommodelcache_001, TestSize.Level
     EXPECT_CALL(*sp, PrepareModelFromModelCache(::testing::_, ::testing::_, ::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<2>(iPreparedModel), ::testing::Return(HDF_SUCCESS)));
 
-    OH_NN_ReturnCode result = hdiDevice->PrepareModelFromModelCache(modelCache, config, preparedModel);
+    bool isUpdatable = false;
+    OH_NN_ReturnCode result = hdiDevice->PrepareModelFromModelCache(modelCache, config, preparedModel, isUpdatable);
     const auto &memoryManager = MemoryManager::GetInstance();
     memoryManager->UnMapMemory(buffer);
     EXPECT_EQ(OH_NN_SUCCESS, result);
@@ -693,7 +694,8 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodelfrommodelcache_002, TestSize.Level
     EXPECT_CALL(*sp, PrepareModelFromModelCache(::testing::_, ::testing::_, ::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<2>(iPreparedModel), ::testing::Return(HDF_FAILURE)));
 
-    OH_NN_ReturnCode result = hdiDevice->PrepareModelFromModelCache(modelCache, config, preparedModel);
+    bool isUpdatable = false;
+    OH_NN_ReturnCode result = hdiDevice->PrepareModelFromModelCache(modelCache, config, preparedModel, isUpdatable);
     EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
 }
 
@@ -711,7 +713,8 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodelfrommodelcache_003, TestSize.Level
     std::vector<Buffer> modelCache = { { nullptr, 0 } };
     ModelConfig config;
     std::shared_ptr<PreparedModel> preparedModel;
-    OH_NN_ReturnCode result = hdiDevice->PrepareModelFromModelCache(modelCache, config, preparedModel);
+    bool isUpdatable = false;
+    OH_NN_ReturnCode result = hdiDevice->PrepareModelFromModelCache(modelCache, config, preparedModel, isUpdatable);
     EXPECT_EQ(OH_NN_NULL_PTR, result);
 }
 
