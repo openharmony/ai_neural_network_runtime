@@ -1230,7 +1230,7 @@ OH_NN_ReturnCode Scheduling(Compilation** compilation)
         LOGE("Scheduling failed, some error happened when judge if support scheduling.");
         return static_cast<OH_NN_ReturnCode>(ret);
     }
-    if(!supportStat) {
+    if (!supportStat) {
         LOGW("device not support scheduling, jumper over scheduling.");
         return OH_NN_SUCCESS;
     }

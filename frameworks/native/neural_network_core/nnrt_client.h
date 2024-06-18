@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-    
 class NNRtServiceApi {
 public:
     static NNRtServiceApi& GetInstance();
