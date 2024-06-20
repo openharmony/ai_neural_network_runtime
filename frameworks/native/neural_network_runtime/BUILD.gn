@@ -173,7 +173,7 @@ ohos_shared_library("libneural_network_runtime") {
     "updater",
   ]
 
-  include_dirs = [ "../../..", ]
+  include_dirs = [ "../../.." ]
 
   public_configs = [
     "../../../config:coverage_flags",
