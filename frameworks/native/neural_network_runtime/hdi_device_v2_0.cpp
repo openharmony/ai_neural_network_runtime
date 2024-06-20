@@ -336,7 +336,7 @@ OH_NN_ReturnCode HDIDeviceV2_0::PrepareModel(const void* metaGraph,
 }
 
 OH_NN_ReturnCode HDIDeviceV2_0::PrepareModelFromModelCache(const std::vector<Buffer>& modelCache,
-    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel)
+    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel, bool& isUpdatable)
 {
     std::vector<V2_0::SharedBuffer> iBuffers;
     auto memManager = MemoryManager::GetInstance();

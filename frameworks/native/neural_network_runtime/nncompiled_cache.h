@@ -29,9 +29,9 @@ namespace NeuralNetworkRuntime {
 const uint32_t INVALID_CAHCE_VERSION = UINT32_MAX; // UINT32_MAX is reserved for invalid cache version.
 
 struct NNCompiledCacheInfo {
-    uint64_t fileNumber{0};
-    uint64_t version{0};
-    uint64_t deviceId{0};
+    int64_t fileNumber{0};
+    int64_t version{0};
+    int64_t deviceId{0};
     std::vector<unsigned short> modelCheckSum;
 };
 
@@ -49,19 +49,19 @@ public:
 
     OH_NN_ReturnCode SetBackend(size_t backendID);
     void SetModelName(const std::string& modelName);
+    OH_NN_ReturnCode WriteCacheInfo(uint32_t cacheSize,
+                                    std::unique_ptr<int64_t[]>& cacheInfo,
+                                    const std::string& cacheDir) const;
+    OH_NN_ReturnCode CheckCacheInfo(NNCompiledCacheInfo& modelCacheInfo, const std::string& cacheInfoPath) const;
 
 private:
     OH_NN_ReturnCode GenerateCacheFiles(const std::vector<Buffer>& caches,
                                         const std::string& cacheDir,
                                         uint32_t version) const;
     OH_NN_ReturnCode GenerateCacheModel(const std::vector<Buffer>& caches,
-                                        std::unique_ptr<uint64_t[]>& cacheInfo,
+                                        std::unique_ptr<int64_t[]>& cacheInfo,
                                         const std::string& cacheDir,
                                         uint32_t version) const;
-    OH_NN_ReturnCode WriteCacheInfo(uint32_t cacheSize,
-                                    std::unique_ptr<uint64_t[]>& cacheInfo,
-                                    const std::string& cacheDir) const;
-    OH_NN_ReturnCode CheckCacheInfo(NNCompiledCacheInfo& modelCacheInfo, const std::string& cacheInfoPath) const;
     OH_NN_ReturnCode ReadCacheModelFile(const std::string& file, Buffer& cache) const;
     unsigned short GetCrc16(char* buffer, size_t length) const;
     OH_NN_ReturnCode GetCacheFileLength(std::ifstream& ifs, int& fileSize) const;
