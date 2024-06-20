@@ -18,9 +18,11 @@
 
 #include <string>
 #include <memory>
+#include <unordered_map>
 
 #include "compiler.h"
 #include "tensor_desc.h"
+#include "executor_config.h"
 #include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
 
 namespace OHOS {
@@ -54,7 +56,10 @@ public:
                                       size_t outputSize,
                                       int32_t timeout,
                                       void* userData) = 0;
+    virtual OH_NN_ReturnCode GetModelID(uint32_t& modelId) const = 0;
     virtual size_t GetBackendID() = 0;
+    virtual OH_NN_ReturnCode SetExtensionConfig(const std::unordered_map<std::string, std::vector<char>>& configs) = 0;
+    virtual ExecutorConfig* GetExecutorConfig() const = 0;
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS

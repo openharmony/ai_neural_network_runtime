@@ -28,6 +28,7 @@ nnrt_core_sources = [
   "backend_manager.cpp",
   "backend_registrar.cpp",
   "neural_network_core.cpp",
+  "nnrt_client.cpp",
   "tensor_desc.cpp",
   "utils.cpp",
   "validation.cpp",

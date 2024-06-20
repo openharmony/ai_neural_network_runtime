@@ -29,6 +29,7 @@ namespace NeuralNetworkRuntime {
 namespace {
 const int CACHE_INPUT_TENSORDESC_OFFSET = 2;
 const int CACHE_OUTPUT_TENSORDESC_OFFSET = 1;
+constexpr int32_t  NUMBER_CACHE_INFO_MEMBERS = 3;
 
 struct SerializedTensorDesc {
 public:
@@ -351,7 +352,7 @@ OH_NN_ReturnCode NNCompiler::BuildOfflineModel()
 OH_NN_ReturnCode NNCompiler::NormalBuild()
 {
     if ((m_liteGraph == nullptr) && (m_metaGraph == nullptr)) {
-        LOGW("[NNCompiler] Build failed, both liteGraph and metaGraph are nullptr.");
+        LOGE("[NNCompiler] Build failed, both liteGraph and metaGraph are nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -434,8 +435,19 @@ OH_NN_ReturnCode NNCompiler::Build()
         return OH_NN_SUCCESS;
     }
 
+    ret = OnlineBuild();
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNCompiler] OnlineBuild failed, Failed to build model online.");
+        return ret;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNCompiler::OnlineBuild()
+{
     // cache存在，从cache直接复原prepareModel、input/output TensorDesc
-    ret = RestoreFromCacheFile();
+    OH_NN_ReturnCode ret = RestoreFromCacheFile();
     if (ret == OH_NN_OPERATION_FORBIDDEN) {
         LOGE("[NNCompiler] Build failed, operation is forbidden.");
         return ret;
@@ -443,14 +455,15 @@ OH_NN_ReturnCode NNCompiler::Build()
     if (ret == OH_NN_SUCCESS) {
         LOGI("[NNCompiler] Build success, restore from cache file.");
         m_isBuild = true;
-        return OH_NN_SUCCESS;
     }
 
     // cache不存在或cache restore失败，走在线构图
-    ret = NormalBuild();
-    if (ret != OH_NN_SUCCESS) {
-        LOGE("[NNCompiler] Build failed, fail to build model online.");
-        return ret;
+    if (!m_isBuild) {
+        ret = NormalBuild();
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[NNCompiler] Build failed, fail to build model online.");
+            return ret;
+        }
     }
 
     return OH_NN_SUCCESS;
@@ -593,12 +606,53 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     config.mode = m_performance;
     config.priority = m_priority;
     std::vector<Buffer> modelOnlyCaches(caches.begin(), caches.end() - CACHE_INPUT_TENSORDESC_OFFSET);
-    ret = m_device->PrepareModelFromModelCache(modelOnlyCaches, config, m_preparedModel);
+    bool isUpdatable = false;
+    ret = m_device->PrepareModelFromModelCache(modelOnlyCaches, config, m_preparedModel, isUpdatable);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when preparing model from cache.");
         ReleaseBufferByDevice(caches);
         return ret;
     }
+
+    if (isUpdatable) {
+        LOGI("isUpdatable is true");
+
+        NNCompiledCacheInfo modelCacheInfo;
+        std::string cacheInfoPath = m_cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
+        ret = compiledCache.CheckCacheInfo(modelCacheInfo, cacheInfoPath);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[NNCompiledCache] isUpdatable is true to check cache info failed.");
+            return ret;
+        }
+
+        LOGI("isUpdatable modelCacheInfo--->%{public}lld", modelCacheInfo.version);
+
+        const size_t cacheNumber = caches.size();
+        uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber;
+        uint32_t infoCharNumber = cacheSize * sizeof(int64_t);
+
+        std::unique_ptr<int64_t[]> cacheInfo = CreateUniquePtr<int64_t[]>(cacheSize);
+        if (cacheInfo == nullptr) {
+            LOGE("[NNCompiledCache] isUpdatable is true to create unique failed.");
+            return OH_NN_MEMORY_ERROR;
+        }
+
+        auto cacheInfoPtr = cacheInfo.get();
+        *cacheInfoPtr++ = modelCacheInfo.fileNumber;
+        *cacheInfoPtr++ = modelCacheInfo.version - 1;
+        *cacheInfoPtr++ = modelCacheInfo.deviceId;
+
+        for (size_t i = 0; i < modelCacheInfo.modelCheckSum.size(); ++i) {
+            *cacheInfoPtr++ = static_cast<int64_t>(modelCacheInfo.modelCheckSum[i]);
+        }
+
+        ret = compiledCache.WriteCacheInfo(infoCharNumber, cacheInfo, m_cachePath);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[NNCompiledCache] isUpdatable is true to write cache info failed.");
+            return ret;
+        }
+    }
+
     ReleaseBufferByDevice(caches);
 
     m_inputTensorDescs = inputTensorDescs;

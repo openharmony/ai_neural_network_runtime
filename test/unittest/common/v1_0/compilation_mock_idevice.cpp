@@ -222,6 +222,31 @@ OH_NN_ReturnCode HDIDeviceV1_0::ReleaseBuffer(const void* buffer)
     return OH_NN_SUCCESS;
 }
 
+OH_NN_ReturnCode HDIDeviceV1_0::PrepareModelFromModelCache(const std::vector<Buffer>& modelCache,
+    const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel, bool& isUpdatable)
+{
+    if (HDI::Nnrt::V1_0::MockIPreparedModel::m_ExpectRetCode == OH_NN_FAILED) {
+        HDI::Nnrt::V1_0::MockIPreparedModel::m_ExpectRetCode = OH_NN_OPERATION_FORBIDDEN;
+        return OH_NN_FAILED;
+    }
+
+    if (modelCache.size() == 0 || config.enableFloat16 == false) {
+        LOGE("HDIDeviceV1_0 mock PrepareModel failed, the modelCache size equals 0 or enableFloat16 is false");
+        return OH_NN_FAILED;
+    }
+
+    sptr<OHOS::HDI::Nnrt::V1_0::IPreparedModel> hdiPreparedModel = sptr<OHOS::HDI::Nnrt::V1_0
+        ::MockIPreparedModel>(new (std::nothrow) OHOS::HDI::Nnrt::V1_0::MockIPreparedModel());
+    if (hdiPreparedModel == nullptr) {
+        LOGE("HDIDeviceV1_0 mock PrepareModelFromModelCache failed, error happened when new sptr");
+        return OH_NN_NULL_PTR;
+    }
+
+    preparedModel = CreateSharedPtr<HDIPreparedModelV1_0>(hdiPreparedModel);
+
+    return OH_NN_SUCCESS;
+}
+
 bool NNTensor::IsDynamicShape() const
 {
     if (HDI::Nnrt::V1_0::MockIPreparedModel::m_ExpectRetCode == OH_NN_FAILED) {

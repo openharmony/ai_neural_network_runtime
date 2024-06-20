@@ -55,7 +55,10 @@ public:
                               size_t outputSize,
                               int32_t timeout,
                               void* userData) override;
+    OH_NN_ReturnCode GetModelID(uint32_t& modelId) const override;
     size_t GetBackendID() override;
+    OH_NN_ReturnCode SetExtensionConfig(const std::unordered_map<std::string, std::vector<char>>& configs) override;
+    ExecutorConfig* GetExecutorConfig() const override;
 
     // The following APIs are compatible with older versions
     OH_NN_ReturnCode SetInput(uint32_t index, const OH_NN_Tensor& nnTensor, const void* buffer, size_t length);
@@ -104,6 +107,7 @@ private:
         bool isInnerMem {false};
     };
     bool m_isRun {false};
+    ExecutorConfig* m_executorConfig {nullptr};
     std::unordered_map<int, ExeTensor> m_inputTensors;
     std::unordered_map<int, ExeTensor> m_outputTensors;
     std::unordered_map<int, std::vector<void*>> m_inputCreatedMem;

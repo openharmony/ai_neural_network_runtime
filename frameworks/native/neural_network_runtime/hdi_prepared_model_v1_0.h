@@ -47,6 +47,8 @@ public:
                          std::vector<std::vector<int32_t>>& outputsDims,
                          std::vector<bool>& isOutputBufferEnough) override;
 
+    OH_NN_ReturnCode GetModelID(uint32_t& modelId) const override;
+
 private:
     // first: major version, second: minor version
     std::pair<uint32_t, uint32_t> m_hdiVersion;

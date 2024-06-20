@@ -63,6 +63,7 @@ private:
     OH_NN_ReturnCode DeserializedTensorsFromBuffer(
         const Buffer& buffer, std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& tensorDescs);
 
+    OH_NN_ReturnCode OnlineBuild();
     OH_NN_ReturnCode NormalBuild();
     OH_NN_ReturnCode BuildOfflineModel();
     OH_NN_ReturnCode CheckModelParameter() const;

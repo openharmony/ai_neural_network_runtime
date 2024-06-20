@@ -26,10 +26,10 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-constexpr int MAX_MODEL_SIZE = 200 * 1024 * 1024; // 200MB
-constexpr int NULL_PTR_LENGTH = 0;
-constexpr int NUMBER_CACHE_INFO_MEMBERS = 3;
-constexpr int HEX_UNIT = 16;
+constexpr int32_t MAX_MODEL_SIZE = 200 * 1024 * 1024; // 200MB
+constexpr int32_t NULL_PTR_LENGTH = 0;
+constexpr int32_t NUMBER_CACHE_INFO_MEMBERS = 3;
+constexpr int32_t HEX_UNIT = 16;
 constexpr char ROOT_DIR_STR = '/';
 constexpr char DOUBLE_SLASH_STR[] = "//";
 
@@ -94,15 +94,15 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
         return ret;
     }
 
-    if (static_cast<uint64_t>(version) > cacheInfo.version) {
+    if (static_cast<int64_t>(version) > cacheInfo.version) {
         LOGE("[NNCompiledCache] Restore failed, version is not match. The current version is %{public}u, "
-             "but the cache files version is %{public}zu.",
+             "but the cache files version is %{public}lld.",
              version,
-             static_cast<size_t>(cacheInfo.version));
+             cacheInfo.version);
         return OH_NN_INVALID_PARAMETER;
     }
 
-    if (static_cast<uint64_t>(version) < cacheInfo.version) {
+    if (static_cast<int64_t>(version) < cacheInfo.version) {
         LOGE("[NNCompiledCache] Restore failed, the current version is lower than the cache files, "
              "please set a higher version.");
         return OH_NN_OPERATION_FORBIDDEN;
@@ -166,7 +166,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheFiles(const std::vector<OHOS::Neu
 {
     const size_t cacheNumber = caches.size();
     uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber;
-    std::unique_ptr<uint64_t[]> cacheInfo = CreateUniquePtr<uint64_t[]>(cacheSize);
+    std::unique_ptr<int64_t[]> cacheInfo = CreateUniquePtr<int64_t[]>(cacheSize);
     if (cacheInfo == nullptr) {
         LOGE("[NNCompiledCache] GenerateCacheFiles failed, fail to create cacheInfo instance.");
         return OH_NN_MEMORY_ERROR;
@@ -189,16 +189,16 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheFiles(const std::vector<OHOS::Neu
 }
 
 OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
-                                                     std::unique_ptr<uint64_t[]>& cacheInfo,
+                                                     std::unique_ptr<int64_t[]>& cacheInfo,
                                                      const std::string& cacheDir,
                                                      uint32_t version) const
 {
     size_t cacheNumber = caches.size();
 
     auto cacheInfoPtr = cacheInfo.get();
-    *cacheInfoPtr++ = static_cast<uint64_t>(cacheNumber);
-    *cacheInfoPtr++ = static_cast<uint64_t>(version);
-    *cacheInfoPtr++ = static_cast<uint64_t>(m_backendID); // Should call SetBackend first.
+    *cacheInfoPtr++ = static_cast<int64_t>(cacheNumber);
+    *cacheInfoPtr++ = static_cast<int64_t>(version);
+    *cacheInfoPtr++ = static_cast<int64_t>(m_backendID); // Should call SetBackend first.
 
     // standardize the input dir
     OH_NN_ReturnCode ret = OH_NN_SUCCESS;
@@ -224,7 +224,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
         }
 
         uint64_t checkSum =
-            static_cast<uint64_t>(GetCrc16(static_cast<char*>(caches[i].data), caches[i].length));
+            static_cast<int64_t>(GetCrc16(static_cast<char*>(caches[i].data), caches[i].length));
         *cacheInfoPtr++ = checkSum;
         if (!cacheModelStream.write(static_cast<const char*>(caches[i].data), caches[i].length)) {
             LOGE("[NNCompiledCache] GenerateCacheModel failed, fail to write cache model.");
@@ -239,7 +239,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
 }
 
 OH_NN_ReturnCode NNCompiledCache::WriteCacheInfo(uint32_t cacheSize,
-                                                 std::unique_ptr<uint64_t[]>& cacheInfo,
+                                                 std::unique_ptr<int64_t[]>& cacheInfo,
                                                  const std::string& cacheDir) const
 {
     // standardize the input dir
@@ -303,7 +303,7 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
         return OH_NN_INVALID_PARAMETER;
     }
 
-    std::vector<uint64_t> modelCheckSum;
+    std::vector<int64_t> modelCheckSum;
     modelCheckSum.resize(modelCacheInfo.fileNumber);
     modelCacheInfo.modelCheckSum.resize(modelCacheInfo.fileNumber);
     if (!infoCacheFile.read(reinterpret_cast<char*>(&modelCheckSum[0]),
