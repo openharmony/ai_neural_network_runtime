@@ -55,9 +55,10 @@ public:
     MOCK_METHOD3(PrepareModel, OH_NN_ReturnCode(const void*,
                                           const ModelConfig&,
                                           std::shared_ptr<PreparedModel>&));
-    MOCK_METHOD3(PrepareModelFromModelCache, OH_NN_ReturnCode(const std::vector<Buffer>&,
-                                                        const ModelConfig&,
-                                                        std::shared_ptr<PreparedModel>&));
+    MOCK_METHOD4(PrepareModelFromModelCache, OH_NN_ReturnCode(const std::vector<Buffer>&,
+                                                              const ModelConfig&,
+                                                              std::shared_ptr<PreparedModel>&,
+                                                              bool&));
     MOCK_METHOD3(PrepareOfflineModel, OH_NN_ReturnCode(std::shared_ptr<const mindspore::lite::LiteGraph>,
                                                  const ModelConfig&,
                                                  std::shared_ptr<PreparedModel>&));
