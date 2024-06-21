@@ -293,6 +293,92 @@ ohos_unittest("NNCompilerTest") {
   ]
 }
 
+ohos_unittest("NNExecutorTest") {
+  module_out_path = module_output_path
+
+  sources = [ "./nn_executor/nn_executor_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+  ]
+}
+
+ohos_unittest("LiteGraphToHDIModelV1_0Test") {
+  module_out_path = module_output_path
+
+  sources =
+      [ "./v1_0/lite_graph_to_hdi_model/lite_graph_to_hdi_model_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+    "mindspore:mindir",
+  ]
+}
+
+ohos_unittest("LiteGraphToHDIModelV2_0Test") {
+  module_out_path = module_output_path
+
+  sources =
+      [ "./v2_0/lite_graph_to_hdi_model/lite_graph_to_hdi_model_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+    "mindspore:mindir",
+  ]
+}
+
+ohos_unittest("LiteGraphToHDIModelV2_1Test") {
+  module_out_path = module_output_path
+
+  sources =
+      [ "./v2_1/lite_graph_to_hdi_model/lite_graph_to_hdi_model_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+    "mindspore:mindir",
+  ]
+}
+
 ohos_unittest("TransformV1_0Test") {
   module_out_path = module_output_path
 
@@ -549,6 +635,30 @@ ohos_unittest("HDIDeviceV2_0Test") {
   ]
 }
 
+ohos_unittest("HDIDeviceV2_1Test") {
+  module_out_path = module_output_path
+
+  sources = [ "./v2_1/hdi_device/hdi_device_test.cpp" ]
+  sources += [ "../common/v2_1/mock_idevice.cpp" ]
+  sources += [ "../common/file_utils.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_2.0",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+    "mindspore:mindir",
+  ]
+}
+
 ohos_unittest("HDIPreparedModelV2_0Test") {
   module_out_path = module_output_path
 
@@ -739,12 +849,9 @@ ohos_unittest("NeuralNetworkRuntimeV2_0Test") {
 group("components_unittest") {
   testonly = true
   deps = [
-    ":CompilationV1_0Test",
-    ":CompilationV2_0Test",
-    ":ExecutorV1_0Test",
-    ":ExecutorV2_0Test",
     ":HDIDeviceV1_0Test",
     ":HDIDeviceV2_0Test",
+    ":HDIDeviceV2_1Test",
     ":HDIPreparedModelV1_0Test",
     ":HDIPreparedModelV2_0Test",
     ":HDIPreparedModelV2_1Test",
@@ -754,6 +861,7 @@ group("components_unittest") {
     ":NNBackendTest",
     ":NNCompiledCacheTest",
     ":NNCompilerTest",
+    ":NNExecutorTest",
     ":NeuralNetworkCoreV1_0Test",
     ":NeuralNetworkRuntimeV1_0Test",
     ":NeuralNetworkRuntimeV2_0Test",

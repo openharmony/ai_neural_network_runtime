@@ -55,10 +55,9 @@ public:
     MOCK_METHOD3(PrepareModel, OH_NN_ReturnCode(const void*,
                                           const ModelConfig&,
                                           std::shared_ptr<PreparedModel>&));
-    MOCK_METHOD4(PrepareModelFromModelCache, OH_NN_ReturnCode(const std::vector<Buffer>&,
+    MOCK_METHOD3(PrepareModelFromModelCache, OH_NN_ReturnCode(const std::vector<Buffer>&,
                                                         const ModelConfig&,
-                                                        std::shared_ptr<PreparedModel>&,
-                                                        bool&));
+                                                        std::shared_ptr<PreparedModel>&));
     MOCK_METHOD3(PrepareOfflineModel, OH_NN_ReturnCode(std::shared_ptr<const mindspore::lite::LiteGraph>,
                                                  const ModelConfig&,
                                                  std::shared_ptr<PreparedModel>&));
@@ -82,6 +81,8 @@ HWTEST_F(NNCompilerTest, nncompilertest_construct_001, TestSize.Level0)
 
     NNCompiler* nncompiler = new (std::nothrow) NNCompiler(device, backendID);
     EXPECT_NE(nullptr, nncompiler);
+
+    testing::Mock::AllowLeak(device.get());
 }
 } // namespace UnitTest
 } // namespace NeuralNetworkRuntime
