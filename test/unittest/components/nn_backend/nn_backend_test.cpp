@@ -80,6 +80,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_construct_001, TestSize.Level0)
     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_NE(hdiDevice, nullptr);
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -112,6 +114,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getbackendname_002, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(OH_NN_FAILED, hdiDevice->GetBackendName(backendName));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -133,6 +137,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getbackendname_005, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(OH_NN_FAILED, hdiDevice->GetBackendName(backendName));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -157,6 +163,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getbackendname_007, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(OH_NN_FAILED, hdiDevice->GetBackendName(backendName));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -181,6 +189,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getbackendname_008, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(OH_NN_SUCCESS, hdiDevice->GetBackendName(backendName));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -214,6 +224,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getgackendtype_002, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(OH_NN_FAILED, hdiDevice->GetBackendType(backendName));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -232,6 +244,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getgackendtype_003, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(OH_NN_SUCCESS, hdiDevice->GetBackendType(backendName));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -265,6 +279,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getbackendstatus_002, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(OH_NN_FAILED, hdiDevice->GetBackendStatus(backendName));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -283,6 +299,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getbackendstatus_003, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(OH_NN_SUCCESS, hdiDevice->GetBackendStatus(backendName));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -321,6 +339,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_createcompiler_002, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(nullptr, hdiDevice->CreateCompiler(compilation));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -350,6 +370,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_destroycompiler_002, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(OH_NN_SUCCESS, hdiDevice->DestroyCompiler(nncompiler));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -364,6 +386,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_CreateExecutor_001, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(nullptr, hdiDevice->CreateExecutor(nullptr));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -381,6 +405,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_CreateExecutor_002, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(nullptr, hdiDevice->CreateExecutor(compilation));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -397,6 +423,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_CreateExecutor_003, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(nullptr, hdiDevice->CreateExecutor(compilation));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -411,6 +439,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_DestroyExecutor_001, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, hdiDevice->DestroyExecutor(nullptr));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -425,6 +455,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_createtensor_001, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(nullptr, hdiDevice->CreateTensor(nullptr));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -441,6 +473,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_createtensor_002, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_NE(nullptr, hdiDevice->CreateTensor(tensorDesc));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -455,6 +489,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_destroytensor_001, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(device, backendID);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, hdiDevice->DestroyTensor(nullptr));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -469,6 +505,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getdevice_001, TestSize.Level0)
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(nullptr, backendID);
     EXPECT_EQ(nullptr, hdiDevice->GetDevice());
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -486,6 +524,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getsupportedoperation_001, TestSize.Level0
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(nullptr, backendID);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, hdiDevice->GetSupportedOperation(model, ops));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -503,6 +543,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getsupportedoperation_002, TestSize.Level0
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(nullptr, backendID);
     EXPECT_EQ(OH_NN_FAILED, hdiDevice->GetSupportedOperation(model, ops));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -523,6 +565,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getsupportedoperation_003, TestSize.Level0
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(nullptr, backendID);
     EXPECT_EQ(OH_NN_FAILED, hdiDevice->GetSupportedOperation(model, ops));
+
+    testing::Mock::AllowLeak(device.get());
 }
 
 /**
@@ -543,6 +587,8 @@ HWTEST_F(NNBackendTest, nnbackendtest_getsupportedoperation_004, TestSize.Level0
 
     std::unique_ptr<NNBackend> hdiDevice = std::make_unique<NNBackend>(nullptr, backendID);
     EXPECT_EQ(OH_NN_FAILED, hdiDevice->GetSupportedOperation(model, ops));
+
+    testing::Mock::AllowLeak(device.get());
 }
 } // namespace UnitTest
 } // namespace NeuralNetworkRuntime
