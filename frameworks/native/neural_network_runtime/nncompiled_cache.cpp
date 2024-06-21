@@ -95,10 +95,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
     }
 
     if (static_cast<int64_t>(version) > cacheInfo.version) {
-        LOGE("[NNCompiledCache] Restore failed, version is not match. The current version is %{public}u, "
-             "but the cache files version is %{public}lld.",
-             version,
-             cacheInfo.version);
+        LOGE("[NNCompiledCache] Restore failed, version is not match.");
         return OH_NN_INVALID_PARAMETER;
     }
 
