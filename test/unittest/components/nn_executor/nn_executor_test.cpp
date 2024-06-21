@@ -92,6 +92,7 @@ public:
                                  const std::vector<NN_Tensor*>&,
                                  std::vector<std::vector<int32_t>>&,
                                  std::vector<bool>&));
+    MOCK_METHOD1(GetModelID, OH_NN_ReturnCode(uint32_t&));
     MOCK_METHOD2(GetInputDimRanges, OH_NN_ReturnCode(std::vector<std::vector<uint32_t>>&,
                                                std::vector<std::vector<uint32_t>>&));
 };
@@ -189,7 +190,7 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_001, TestSize.Level0)
     LOGE("GetInputDimRange nnexecutortest_getinputdimrange_001");
     size_t m_backendID {0};
     std::shared_ptr<Device> m_device {nullptr};
-    
+
     std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
     EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
     .WillRepeatedly(::testing::Return(OH_NN_FAILED));
