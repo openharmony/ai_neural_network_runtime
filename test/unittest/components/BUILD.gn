@@ -589,7 +589,6 @@ ohos_unittest("HDIDeviceV2_1Test") {
     "drivers_interface_nnrt:libnnrt_proxy_2.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir",
   ]
 }
 
