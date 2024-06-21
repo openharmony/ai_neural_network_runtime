@@ -385,12 +385,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_007, TestSize.Level0)
     std::vector<std::vector<uint32_t>> minDims = {{1, 2}, {1, 2, 3}};
     std::vector<std::vector<uint32_t>> maxDims = {{4, 5, 6}};
     EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
-        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims, std::vector<std::vector<uint32_t>>& maxInputDims) {
-            // 这里直接修改传入的引用参数
-            minInputDims = minDims;
-            maxInputDims = maxDims;
-            return OH_NN_SUCCESS; // 假设成功的状态码
-        }));
+        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims,
+            std::vector<std::vector<uint32_t>>& maxInputDims) {
+                // 这里直接修改传入的引用参数
+                minInputDims = minDims;
+                maxInputDims = maxDims;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
@@ -424,12 +425,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_008, TestSize.Level0)
     std::vector<std::vector<uint32_t>> minDims = {{1, 2}};
     std::vector<std::vector<uint32_t>> maxDims = {{4, 5, 6}};
     EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
-        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims, std::vector<std::vector<uint32_t>>& maxInputDims) {
-            // 这里直接修改传入的引用参数
-            minInputDims = minDims;
-            maxInputDims = maxDims;
-            return OH_NN_SUCCESS; // 假设成功的状态码
-        }));
+        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims,
+            std::vector<std::vector<uint32_t>>& maxInputDims) {
+                // 这里直接修改传入的引用参数
+                minInputDims = minDims;
+                maxInputDims = maxDims;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
@@ -893,12 +895,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runsync_003, TestSize.Level0)
     std::vector<std::vector<uint32_t>> minDims = {{1, 2, 3}};
     std::vector<std::vector<uint32_t>> maxDims = {{4, 5, 6}};
     EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
-        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims, std::vector<std::vector<uint32_t>>& maxInputDims) {
-            // 这里直接修改传入的引用参数
-            minInputDims = minDims;
-            maxInputDims = maxDims;
-            return OH_NN_OPERATION_FORBIDDEN; // 假设成功的状态码
-        }));
+        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims,
+            std::vector<std::vector<uint32_t>>& maxInputDims) {
+                // 这里直接修改传入的引用参数
+                minInputDims = minDims;
+                maxInputDims = maxDims;
+                return OH_NN_OPERATION_FORBIDDEN; // 假设成功的状态码
+            }));
 
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
@@ -953,12 +956,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runsync_004, TestSize.Level0)
     std::vector<std::vector<uint32_t>> minDims = {{1, 2, 3}};
     std::vector<std::vector<uint32_t>> maxDims = {{4, 5, 6}};
     EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
-        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims, std::vector<std::vector<uint32_t>>& maxInputDims) {
-            // 这里直接修改传入的引用参数
-            minInputDims = minDims;
-            maxInputDims = maxDims;
-            return OH_NN_SUCCESS; // 假设成功的状态码
-        }));
+        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims,
+            std::vector<std::vector<uint32_t>>& maxInputDims) {
+                // 这里直接修改传入的引用参数
+                minInputDims = minDims;
+                maxInputDims = maxDims;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
 
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
@@ -1012,12 +1016,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runsync_005, TestSize.Level0)
     std::vector<std::vector<uint32_t>> minDims = {{1, 2, 3}, {1, 2, 3}};
     std::vector<std::vector<uint32_t>> maxDims = {{4, 5, 6}};
     EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
-        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims, std::vector<std::vector<uint32_t>>& maxInputDims) {
-            // 这里直接修改传入的引用参数
-            minInputDims = minDims;
-            maxInputDims = maxDims;
-            return OH_NN_SUCCESS; // 假设成功的状态码
-        }));
+        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims,
+            std::vector<std::vector<uint32_t>>& maxInputDims) {
+                // 这里直接修改传入的引用参数
+                minInputDims = minDims;
+                maxInputDims = maxDims;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
 
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
@@ -1119,12 +1124,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runasync_003, TestSize.Level0)
     std::vector<std::vector<uint32_t>> minDims = {{1, 2, 3}};
     std::vector<std::vector<uint32_t>> maxDims = {{4, 5, 6}};
     EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
-        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims, std::vector<std::vector<uint32_t>>& maxInputDims) {
-            // 这里直接修改传入的引用参数
-            minInputDims = minDims;
-            maxInputDims = maxDims;
-            return OH_NN_OPERATION_FORBIDDEN; // 假设成功的状态码
-        }));
+        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims,
+            std::vector<std::vector<uint32_t>>& maxInputDims) {
+                // 这里直接修改传入的引用参数
+                minInputDims = minDims;
+                maxInputDims = maxDims;
+                return OH_NN_OPERATION_FORBIDDEN; // 假设成功的状态码
+            }));
 
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
