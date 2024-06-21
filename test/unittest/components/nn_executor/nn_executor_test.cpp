@@ -345,12 +345,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_006, TestSize.Level0)
     std::vector<std::vector<uint32_t>> minDims = {{1, 2, 3}};
     std::vector<std::vector<uint32_t>> maxDims = {{4, 5, 6}};
     EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
-        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims, std::vector<std::vector<uint32_t>>& maxInputDims) {
-            // 这里直接修改传入的引用参数
-            minInputDims = minDims;
-            maxInputDims = maxDims;
-            return OH_NN_SUCCESS; // 假设成功的状态码
-        }));
+        .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims,
+            std::vector<std::vector<uint32_t>>& maxInputDims) {
+                // 这里直接修改传入的引用参数
+                minInputDims = minDims;
+                maxInputDims = maxDims;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
@@ -773,7 +774,8 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createoutputtensordesc_003, TestSize.Lev
     EXPECT_NE(nullptr, ret);
 }
 
-void MyOnRunDone(void *userData, OH_NN_ReturnCode errCode, void *outputTensor[], int32_t outputCount) {
+void MyOnRunDone(void *userData, OH_NN_ReturnCode errCode, void *outputTensor[], int32_t outputCount)
+{
     LOGE("MyOnRunDone");
     // 在这里处理你的逻辑，例如：
     if (errCode != OH_NN_SUCCESS) {
@@ -806,7 +808,8 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setonrundone_001, TestSize.Level0)
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, ret);
 }
 
-void MyOnServiceDied(void *userData) {
+void MyOnServiceDied(void *userData)
+{
     LOGE("MyOnServiceDied");
 }
 
@@ -1006,7 +1009,7 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runsync_005, TestSize.Level0)
     
     std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
 
-    std::vector<std::vector<uint32_t>> minDims = {{1, 2, 3},{1, 2, 3}};
+    std::vector<std::vector<uint32_t>> minDims = {{1, 2, 3}, {1, 2, 3}};
     std::vector<std::vector<uint32_t>> maxDims = {{4, 5, 6}};
     EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
         .WillOnce(Invoke([&minDims, &maxDims](std::vector<std::vector<uint32_t>>& minInputDims, std::vector<std::vector<uint32_t>>& maxInputDims) {
