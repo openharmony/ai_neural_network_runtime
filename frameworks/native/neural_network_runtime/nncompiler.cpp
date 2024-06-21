@@ -625,7 +625,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
             return ret;
         }
 
-        LOGI("isUpdatable modelCacheInfo--->%{public}lld", modelCacheInfo.version);
+        LOGI("isUpdatable modelCacheInfo");
 
         const size_t cacheNumber = caches.size();
         uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber;
