@@ -16,6 +16,9 @@ import("//build/ohos.gni")
 config("nnrt_config") {
   cflags = [ "-fstack-protector-all" ]
   cflags_cc = [ "-fexceptions" ]
+}
+
+config("nnrt_public_config") {
   include_dirs = [
     "./",
     "../neural_network_runtime",
@@ -45,9 +48,10 @@ ohos_shared_library("libneural_network_core") {
 
   include_dirs = [ "../../.." ]
 
+  configs = [ ":nnrt_config" ]
   public_configs = [
     "../../../config:coverage_flags",
-    ":nnrt_config",
+    ":nnrt_public_config",
   ]
 
   external_deps = [
