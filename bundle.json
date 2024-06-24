@@ -37,14 +37,6 @@
             "sub_component": [
                  "//foundation/ai/neural_network_runtime:nnrt_target"
              ],
-            "inner_kits":[
-                {
-                    "name":"//foundation/ai/neural_network_runtime:nnrt_target"
-                },
-                {
-                    "name":"//third_party/mindspore:mindir"
-                }
-            ],
             "inner_api": [
                 {
                     "type": "so",
