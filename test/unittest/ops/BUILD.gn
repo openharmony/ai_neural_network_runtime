@@ -146,7 +146,7 @@ ohos_unittest("OpsUnittest") {
   sources += [ "./transpose_builder_test.cpp" ]
   sources += [ "./unsqueeze_builder_test.cpp" ]
   sources += [ "./unstack_test.cpp" ]
-  sources += [ "./where_test.cpp" ]gi
+  sources += [ "./where_test.cpp" ]
   sources += [ "./ops_test.cpp" ]
   sources += [ "../common/base_test.cpp" ]
 
