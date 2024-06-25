@@ -166,7 +166,7 @@ ohos_unittest("OpsUnittest") {
     "drivers_interface_nnrt:libnnrt_proxy_2.1",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
-    "mindspore:mindir",
+    "mindspore:mindir_lib",
   ]
 }
 
