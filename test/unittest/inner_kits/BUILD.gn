@@ -55,7 +55,7 @@ ohos_unittest("NeuralNetworkRuntimeInnerTest") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir",
+    "mindspore:mindir_lib",
   ]
 }
 
