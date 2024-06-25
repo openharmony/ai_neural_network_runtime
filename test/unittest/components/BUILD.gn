@@ -25,7 +25,7 @@ config("module_private_config") {
     "../../../frameworks/native/neural_network_runtime",
     "../../../frameworks/native/neural_network_core",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//third_party/mindspore/mindspore-src/source/mindspore/lite/mindir/include",
+    "//third_party/mindspore",
   ]
 }
 
