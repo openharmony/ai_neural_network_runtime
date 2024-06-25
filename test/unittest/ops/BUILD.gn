@@ -146,7 +146,7 @@ ohos_unittest("OpsUnittest") {
   sources += [ "./transpose_builder_test.cpp" ]
   sources += [ "./unsqueeze_builder_test.cpp" ]
   sources += [ "./unstack_test.cpp" ]
-  sources += [ "./where_test.cpp" ]
+  sources += [ "./where_test.cpp" ]gi
   sources += [ "./ops_test.cpp" ]
   sources += [ "../common/base_test.cpp" ]
 
@@ -166,7 +166,7 @@ ohos_unittest("OpsUnittest") {
     "drivers_interface_nnrt:libnnrt_proxy_2.1",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
-    "mindspore:mindir",
+    "mindspore:mindir_lib",
   ]
 }
 
