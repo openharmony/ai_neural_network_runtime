@@ -211,7 +211,7 @@ OH_NN_ReturnCode NNExecutor::SetExtensionConfig(const std::unordered_map<std::st
         }
 
         if (!config.first.compare("isNeedModelLatency")) {
-            m_executorConfig->isNeedModelLatency = static_cast<bool>(configData);
+            m_executorConfig->isNeedModelLatency = static_cast<bool>(*configData);
             LOGD("[NNExecutor] SetExtensionConfig, isNeedModelLatency: %{public}d.",
                 m_executorConfig->isNeedModelLatency);
         }
