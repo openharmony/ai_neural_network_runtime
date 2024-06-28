@@ -1329,7 +1329,7 @@ OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation)
     std::vector<char> vechiaiModelId(hiaiModelIdStr.begin(), hiaiModelIdStr.end());
     configMap["hiaiModelId"] = vechiaiModelId;
 
-    std::vector<char> vecNeedLatency(static_cast<char>(compilationImpl->isNeedModelLatency));
+    std::vector<char> vecNeedLatency = { static_cast<char>(compilationImpl->isNeedModelLatency) };
     configMap["isNeedModelLatency"] = vecNeedLatency;
 
     executorImpl->SetExtensionConfig(configMap);
@@ -1400,7 +1400,7 @@ OH_NN_ReturnCode Unload(const ExecutorConfig* config)
 
     int ret = nnrtService.Unload(config->hiaiModelId);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
-        LOGE("Unload failed, nnrtService is not exist, jump over Unload.");
+        LOGE("Unload failed, some error happen when unload hiaiModelId.");
         return static_cast<OH_NN_ReturnCode>(ret);
     }
 
@@ -1645,7 +1645,7 @@ OH_NN_ReturnCode RunSync(Executor *executor,
 
         configPtr->isNeedModelLatency = false;
         std::unordered_map<std::string, std::vector<char>> configMap;
-        std::vector<char> vecNeedLatency(static_cast<char>(configPtr->isNeedModelLatency));
+        std::vector<char> vecNeedLatency = { static_cast<char>(configPtr->isNeedModelLatency) };
         configMap["isNeedModelLatency"] = vecNeedLatency;
 
         ret = executor->SetExtensionConfig(configMap);
