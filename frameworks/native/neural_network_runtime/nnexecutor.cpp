@@ -194,18 +194,24 @@ OH_NN_ReturnCode NNExecutor::SetExtensionConfig(const std::unordered_map<std::st
     }
 
     for (auto config : configs) {
+        char* configData = reinterpret_cast<char*>(config.second.data());
+        if (configData == nullptr) {
+            LOGD("[NNExecutor] SetExtensionConfig, key: %s, configData is nullptr.", config.first.c_str());
+            return OH_NN_FAILED;
+        }
+
         if (!config.first.compare("callingPid")) {
-            m_executorConfig->callingPid = std::atoi(reinterpret_cast<char*>(config.second.data()));
+            m_executorConfig->callingPid = std::atoi(configData);
             LOGD("[NNExecutor] SetExtensionConfig, callingPid: %{public}d.", m_executorConfig->callingPid);
         }
 
         if (!config.first.compare("hiaiModelId")) {
-            m_executorConfig->hiaiModelId = std::atoi(reinterpret_cast<char*>(config.second.data()));
+            m_executorConfig->hiaiModelId = std::atoi(configData);
             LOGD("[NNExecutor] SetExtensionConfig, hiaiModelId: %{public}d.", m_executorConfig->hiaiModelId);
         }
 
         if (!config.first.compare("isNeedModelLatency")) {
-            m_executorConfig->isNeedModelLatency = static_cast<bool>(reinterpret_cast<char*>(config.second.data()));
+            m_executorConfig->isNeedModelLatency = static_cast<bool>(configData);
             LOGD("[NNExecutor] SetExtensionConfig, isNeedModelLatency: %{public}d.",
                 m_executorConfig->isNeedModelLatency);
         }
