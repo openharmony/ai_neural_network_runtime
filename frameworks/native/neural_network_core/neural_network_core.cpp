@@ -1328,7 +1328,7 @@ OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation)
 
     std::string hiaiModelIdStr = std::to_string(compilationImpl->hiaiModelId);
     std::vector<char> vechiaiModelId(hiaiModelIdStr.begin(), hiaiModelIdStr.end());
-    vecCallingPid.emplace_back('\0');
+    vechiaiModelId.emplace_back('\0');
     configMap["hiaiModelId"] = vechiaiModelId;
 
     std::vector<char> vecNeedLatency = { static_cast<char>(compilationImpl->isNeedModelLatency) };
