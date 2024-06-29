@@ -1323,10 +1323,12 @@ OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation)
     std::unordered_map<std::string, std::vector<char>> configMap;
     std::string callingPidStr = std::to_string(compilationImpl->callingPid);
     std::vector<char> vecCallingPid(callingPidStr.begin(), callingPidStr.end());
+    vecCallingPid.emplace_back('\0');
     configMap["callingPid"] = vecCallingPid;
 
     std::string hiaiModelIdStr = std::to_string(compilationImpl->hiaiModelId);
     std::vector<char> vechiaiModelId(hiaiModelIdStr.begin(), hiaiModelIdStr.end());
+    vecCallingPid.emplace_back('\0');
     configMap["hiaiModelId"] = vechiaiModelId;
 
     std::vector<char> vecNeedLatency = { static_cast<char>(compilationImpl->isNeedModelLatency) };
