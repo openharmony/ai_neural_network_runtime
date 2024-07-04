@@ -73,7 +73,7 @@ NNRtServiceApi& NNRtServiceApi::GetInstance()
     return nnrtService;
 }
 
-bool NNRtServiceApi::IsServiceAvaliable()
+bool NNRtServiceApi::IsServiceAvaliable() const
 {
     return m_serviceAvailable;
 }
