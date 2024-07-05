@@ -1704,7 +1704,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_002, testing::ex
     &minInputDims, &maxInputDims, shapeLength);
     delete executor;
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
- }
+}
 
  /*
  * @tc.name: nnt_nnexecutor_getinputdimRange_003
@@ -1712,25 +1712,25 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_002, testing::ex
  * @tc.type: FUNC
  */
 HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_003, testing::ext::TestSize.Level0)
- {
-     size_t index = 1;
-     size_t mindims = 1;
-     size_t* minInputDims = &mindims;
-     size_t* maxInputDims = nullptr;
-     size_t* shapeLength = nullptr;
-     size_t m_backendID {0};
-     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
-     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
-     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
-     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
-     NNExecutor* executor = new (std::nothrow) NNExecutor(
-         m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+{
+    size_t index = 1;
+    size_t mindims = 1;
+    size_t* minInputDims = &mindims;
+    size_t* maxInputDims = nullptr;
+    size_t* shapeLength = nullptr;
+    size_t m_backendID {0};
+    std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+    m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
 
-     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
-     OH_NN_ReturnCode ret = OH_NNExecutor_GetInputDimRange(nnExecutor, index,
-         &minInputDims, &maxInputDims, shapeLength);
-     delete executor;
-     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
+    OH_NN_ReturnCode ret = OH_NNExecutor_GetInputDimRange(nnExecutor, index,
+    &minInputDims, &maxInputDims, shapeLength);
+    delete executor;
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
  }
 
 /*
