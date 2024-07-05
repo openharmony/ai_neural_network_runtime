@@ -192,22 +192,22 @@ sptr<IRegisterDevice> IRegisterDevice::Get(const std::string& serviceName, bool 
         return nullptr;
     }
 
-    sptr<IRegisterDevice> mockIDevice = sptr<MockIDeviceImp>(new (std::nothrow) MockIDeviceImp());
-    if (mockIDevice.GetRefPtr() == nullptr) {
+    auto mockIDevice = std::make_shared<MockIDeviceImp>();
+    if (!mockIDevice) {
         LOGE("Failed to new MockIDeviceImp object.");
         return nullptr;
     }
 
     std::string deviceName = "MockIDeviceA";
-    EXPECT_CALL(*((MockIDeviceImp *)mockIDevice.GetRefPtr()), GetDeviceName(::testing::_))
+    EXPECT_CALL(*mockIDevice, GetDeviceName(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(deviceName), ::testing::Return(HDF_SUCCESS)));
 
     std::string vendorName = "MockVendorA";
-    EXPECT_CALL(*((MockIDeviceImp *)mockIDevice.GetRefPtr()), GetVendorName(::testing::_))
+    EXPECT_CALL(*mockIDevice, GetVendorName(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(vendorName), ::testing::Return(HDF_SUCCESS)));
 
     V1_0::DeviceStatus deviceStatus = V1_0::DeviceStatus::AVAILABLE;
-    EXPECT_CALL(*((MockIDeviceImp *)mockIDevice.GetRefPtr()), GetDeviceStatus(::testing::_))
+    EXPECT_CALL(*mockIDevice, GetDeviceStatus(::testing::_))
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(deviceStatus), ::testing::Return(HDF_SUCCESS)));
     return mockIDevice;
 }

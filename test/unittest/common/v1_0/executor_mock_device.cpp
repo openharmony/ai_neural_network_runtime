@@ -29,7 +29,7 @@ void* HDIDeviceV1_0::AllocateBuffer(size_t length)
         return nullptr;
     }
 
-    void* buffer = (void*)malloc(length);
+    void* buffer = malloc(length);
     if (buffer == nullptr) {
         LOGE("alloct buffer failed");
         return nullptr;
@@ -37,6 +37,7 @@ void* HDIDeviceV1_0::AllocateBuffer(size_t length)
 
     if (OHOS::HDI::Nnrt::V1_0::MockIPreparedModel::m_ExpectRetCode == OH_NN_INVALID_PARAMETER) {
         OHOS::HDI::Nnrt::V1_0::MockIPreparedModel::m_ExpectRetCode = OH_NN_OPERATION_FORBIDDEN;
+        free(buffer);
         return nullptr;
     }
     return buffer;
