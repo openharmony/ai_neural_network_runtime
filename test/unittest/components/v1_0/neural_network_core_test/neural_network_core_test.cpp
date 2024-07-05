@@ -1731,7 +1731,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_003, testing::ex
     &minInputDims, &maxInputDims, shapeLength);
     delete executor;
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
- }
+}
 
 /*
  * @tc.name: nnt_nnexecutor_setonrundone_001
