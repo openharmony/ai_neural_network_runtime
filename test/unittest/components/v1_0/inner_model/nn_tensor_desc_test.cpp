@@ -152,7 +152,7 @@ HWTEST_F(NnTensorDescTest, nn_set_shape_001, TestSize.Level1)
 HWTEST_F(NnTensorDescTest, nn_set_shape_002, TestSize.Level1)
 {
     TensorDesc tensordesc;
-    const int32_t testShape[] = {2, 3, 5}; 
+    const int32_t testShape[] = { 2, 3, 5 };
     size_t shapenum = 0;
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, tensordesc.SetShape(testShape, shapenum));
 }

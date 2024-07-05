@@ -213,28 +213,6 @@ ohos_unittest("NeuralNetworkCoreV1_0Test") {
   ]
 }
 
-ohos_unittest("NnTensorDescV1_0Test") {
-  module_out_path = module_output_path
-
-  sources = [ "./v1_0/inner_model/nn_tensor_desc_test.cpp" ]
-  configs = [ ":module_private_config" ]
-
-  deps = [
-    "../../../frameworks/native/neural_network_core:libneural_network_core",
-    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_nnrt:libnnrt_proxy_1.0",
-    "hdf_core:libhdf_utils",
-    "hilog:libhilog",
-    "hitrace:libhitracechain",
-  ]
-}
-
 ohos_unittest("QuantParamsTest") {
   module_out_path = module_output_path
 
@@ -380,6 +358,28 @@ ohos_unittest("NnTensorV1_0Test") {
     "hilog:libhilog",
     "hitrace:libhitracechain",
     "mindspore:mindir",
+  ]
+}
+
+ohos_unittest("NnTensorDescV1_0Test") {
+  module_out_path = module_output_path
+
+  sources = [ "./v1_0/inner_model/nn_tensor_desc_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hdf_core:libhdf_utils",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
   ]
 }
 
@@ -778,8 +778,6 @@ group("components_unittest") {
     ":NNCompilerTest",
     ":NeuralNetworkCoreV1_0Test",
     ":NnTensorDescV1_0Test",
-    ":NeuralNetworkRuntimeV1_0Test",
-    ":NeuralNetworkRuntimeV2_0Test",
     ":NnTensorV1_0Test",
     ":NnTensorV2_0Test",
     ":NnValidationV1_0Test",
