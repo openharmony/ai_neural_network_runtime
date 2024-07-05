@@ -1685,7 +1685,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_001, testing::ex
  * @tc.desc: Verify the NN_Tensor is nullptr of the OH_NNTensorDesc_SetShape function.
  * @tc.type: FUNC
  */
- HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_002, testing::ext::TestSize.Level0)
+HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_002, testing::ext::TestSize.Level0)
  {
      size_t index = 1;
      size_t* minInputDims = nullptr;
@@ -1700,7 +1700,8 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_001, testing::ex
          m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
 
      OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
-     OH_NN_ReturnCode ret = OH_NNExecutor_GetInputDimRange(nnExecutor, index, &minInputDims, &maxInputDims, shapeLength);
+     OH_NN_ReturnCode ret = OH_NNExecutor_GetInputDimRange(nnExecutor, index,
+         &minInputDims, &maxInputDims, shapeLength);
      delete executor;
      EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
  }
@@ -1710,7 +1711,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_001, testing::ex
  * @tc.desc: Verify the NN_Tensor is nullptr of the OH_NNTensorDesc_SetShape function.
  * @tc.type: FUNC
  */
- HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_003, testing::ext::TestSize.Level0)
+HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_003, testing::ext::TestSize.Level0)
  {
      size_t index = 1;
      size_t mindims = 1;
@@ -1726,7 +1727,8 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_001, testing::ex
          m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
 
      OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(&executor);
-     OH_NN_ReturnCode ret = OH_NNExecutor_GetInputDimRange(nnExecutor, index, &minInputDims, &maxInputDims, shapeLength);
+     OH_NN_ReturnCode ret = OH_NNExecutor_GetInputDimRange(nnExecutor, index,
+         &minInputDims, &maxInputDims, shapeLength);
      delete executor;
      EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
  }
