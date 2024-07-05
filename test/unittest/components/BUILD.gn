@@ -777,6 +777,8 @@ group("components_unittest") {
     ":NNCompiledCacheTest",
     ":NNCompilerTest",
     ":NeuralNetworkCoreV1_0Test",
+    ":NeuralNetworkRuntimeV1_0Test",
+    ":NeuralNetworkRuntimeV2_0Test",
     ":NnTensorDescV1_0Test",
     ":NnTensorV1_0Test",
     ":NnTensorV2_0Test",
