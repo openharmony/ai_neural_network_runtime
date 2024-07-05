@@ -65,6 +65,18 @@ HWTEST_F(NnValidationTest, nn_validation_validate_tensor_datatype_003, TestSize.
 }
 
 /**
+ * @tc.name: nn_validation_validate_tensor_Format_001
+ * @tc.desc: Verify the success of the validate_tensor_datatype function
+ * @tc.type: FUNC
+ */
+HWTEST_F(NnValidationTest, nn_validation_validate_tensor_Format_001, TestSize.Level1)
+{
+    int forMatTest = 2;
+    OH_NN_Format forMat = (OH_NN_Format)forMatTest;
+    EXPECT_EQ(true, ValidateTensorFormat(forMat));
+}
+
+/**
  * @tc.name: nn_validation_validate_preformance_mode_001
  * @tc.desc: Verify the success of the validate_preformance_mode function
  * @tc.type: FUNC
@@ -170,6 +182,30 @@ HWTEST_F(NnValidationTest, nn_validation_fusetype_003, TestSize.Level1)
     int fuseTypeTest = -1;
     OH_NN_FuseType fuseType = (OH_NN_FuseType)fuseTypeTest;
     EXPECT_EQ(false, ValidateFuseType(fuseType));
+}
+
+/**
+ * @tc.name: nn_validation_tensortype_001
+ * @tc.desc: Verify the success of the validate_fusetype function
+ * @tc.type: FUNC
+ */
+HWTEST_F(NnValidationTest, nn_validation_tensortype_001, TestSize.Level1)
+{
+    int tensorTyepTest = 1;
+    OH_NN_TensorType tensorTyep = (OH_NN_TensorType)tensorTyepTest;
+    EXPECT_EQ(true, ValidateTensorType(tensorTyep));
+}
+
+/**
+ * @tc.name: nn_validation_tensortype_002
+ * @tc.desc: Verify the success of the validate_fusetype function
+ * @tc.type: FUNC
+ */
+HWTEST_F(NnValidationTest, nn_validation_tensortype_002, TestSize.Level1)
+{
+    int tensorTyepTest = 163;
+    OH_NN_TensorType tensorTyep = (OH_NN_TensorType)tensorTyepTest;
+    EXPECT_EQ(false, ValidateTensorType(tensorTyep));
 }
 } // namespace UnitTest
 } // namespace NNRT

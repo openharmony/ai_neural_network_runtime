@@ -177,13 +177,13 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::ExportModelCache(std::vector<Buffer>& mod
     int bufferSize = 13;
     Buffer buffer;
     std::string aBuffer = "mock_buffer_a";
-    buffer.data = (void*)aBuffer.c_str();
+    buffer.data = const_cast<void*>(static_cast<const void*>(aBuffer.c_str()));
     buffer.length = bufferSize;
     modelCache.emplace_back(buffer);
 
     Buffer buffer2;
     std::string bBuffer = "mock_buffer_b";
-    buffer2.data = (void*)bBuffer.c_str();
+    buffer2.data = const_cast<void*>(static_cast<const void*>(bBuffer.c_str()));
     buffer2.length = bufferSize;
     modelCache.emplace_back(buffer2);
 
