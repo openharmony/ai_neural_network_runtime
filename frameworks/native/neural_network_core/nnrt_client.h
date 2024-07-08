@@ -24,21 +24,21 @@ namespace NeuralNetworkRuntime {
 class NNRtServiceApi {
 public:
     static NNRtServiceApi& GetInstance();
-    bool IsServiceAvaliable();
+    bool IsServiceAvaliable() const;
 
-    int (*CheckModelSizeFromPath)(const char* path, bool& exceedLimit);
-    int (*CheckModelSizeFromBuffer)(const void* buffer, size_t size, bool& exceedLimit);
-    int (*CheckModelSizeFromModel)(void* model, bool& exceedLimit);
-    size_t (*GetNNRtModelIDFromPath)(const char*);
-    size_t (*GetNNRtModelIDFromBuffer)(const void* buffer, size_t size);
-    size_t (*GetNNRtModelIDFromModel)(void* model);
-    int (*SetModelID)(int callingPid, uint32_t hiaimodelID, size_t nnrtModelID);
-    int (*IsSupportAuthentication)(bool* supportStat);
-    int (*IsSupportScheduling)(bool* supportStat);
-    int (*Authentication)(int callingPid);
-    int (*Scheduling)(uint32_t hiaiModelId, bool* needModelLatency);
-    int (*UpdateModelLatency)(uint32_t hiaiModelId, int modelLatency);
-    int (*Unload)(uint32_t hiaiModelId);
+    int (*CheckModelSizeFromPath)(const char* path, bool& exceedLimit) = nullptr;
+    int (*CheckModelSizeFromBuffer)(const void* buffer, size_t size, bool& exceedLimit) = nullptr;
+    int (*CheckModelSizeFromModel)(void* model, bool& exceedLimit) = nullptr;
+    size_t (*GetNNRtModelIDFromPath)(const char*) = nullptr;
+    size_t (*GetNNRtModelIDFromBuffer)(const void* buffer, size_t size) = nullptr;
+    size_t (*GetNNRtModelIDFromModel)(void* model) = nullptr;
+    int (*SetModelID)(int callingPid, uint32_t hiaimodelID, size_t nnrtModelID) = nullptr;
+    int (*IsSupportAuthentication)(bool* supportStat) = nullptr;
+    int (*IsSupportScheduling)(bool* supportStat) = nullptr;
+    int (*Authentication)(int callingPid) = nullptr;
+    int (*Scheduling)(uint32_t hiaiModelId, bool* needModelLatency) = nullptr;
+    int (*UpdateModelLatency)(uint32_t hiaiModelId, int modelLatency) = nullptr;
+    int (*Unload)(uint32_t hiaiModelId) = nullptr;
 
 private:
     bool m_serviceAvailable = false;
