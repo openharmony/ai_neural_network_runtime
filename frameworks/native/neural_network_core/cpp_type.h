@@ -42,8 +42,8 @@ enum class TuningStrategy {
 };
 
 struct Buffer {
-    void* data;
-    size_t length;
+    void* data = nullptr;
+    size_t length = 0;
 };
 
 struct ExtensionConfig {
