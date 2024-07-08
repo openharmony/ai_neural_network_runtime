@@ -23,6 +23,10 @@
 #include "quant_param.h"
 #include "validation.h"
 
+#include <fstream>
+#include <sys/stat.h>
+#include <unistd.h>
+
 using namespace OHOS::NeuralNetworkRuntime;
 
 #define NNRT_API __attribute__((visibility("default")))
@@ -498,6 +502,63 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
     // owns the liteGraph, in which case, the invoker should not delete
     // the liteGraph actively. Otherwise, the invoker still has the ownership.
     return innerModel->BuildFromLiteGraph(pLiteGraph, extensionConfig);
+}
+
+NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName)
+{
+    if (cacheDir == nullptr) {
+        LOGI("OH_NNModel_HasCache get empty cache directory.");
+        return false;
+    }
+
+    if (modelName == nullptr) {
+        LOGI("OH_NNModel_HasCache get empty model name.");
+        return false;
+    }
+
+    std::string cacheInfoPath = std::string(cacheDir) + "/" + std::string(modelName) + "cache_info.nncache";
+
+    // determine whether cache info file exists
+    struct stat buffer;
+    bool exist = (stat(cacheInfoPath.c_str(), &buffer) == 0);
+    if (!exist) {
+        return false;
+    }
+
+    // read number of cache models
+    char path[PATH_MAX];
+    if (realpath(cacheInfoPath.c_str(), path) == nullptr) {
+        LOGI("OH_NNModel_HasCache get real path of cache info failed.");
+        return false;
+    }
+
+    if (access(path, F_OK) != 0) {
+        LOGI("OH_NNModel_HasCache access cache info file failed.");
+        return false;
+    }
+
+    std::ifstream ifs(path, std::ios::in | std::ios::binary);
+    if (!ifs) {
+        LOGI("OH_NNModel_HasCache open cache info file failed.");
+        return false;
+    }
+
+    int64_t fileNumber{0};
+    if (!ifs.read(reinterpret_cast<char*>(&(fileNumber)), sizeof(fileNumber))) {
+        LOGI("OH_NNModel_HasCache read cache info file failed.");
+        ifs.close();
+        return false;
+    }
+    ifs.close();
+
+    // determine whether cache model files exist
+    std::string cacheModelPath;
+    for (int64_t i = 0; i < fileNumber; ++i) {
+        cacheModelPath = std::string(cacheDir) + "/" + std::string(modelName) + std::to_string(i) + ".nncache";
+        exist = (exist && (stat(cacheModelPath.c_str(), &buffer) == 0));
+    }
+
+    return exist;
 }
 
 NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromMetaGraph(OH_NNModel *model, const void *metaGraph,
