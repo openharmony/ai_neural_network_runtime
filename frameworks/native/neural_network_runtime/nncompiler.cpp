@@ -30,6 +30,7 @@ namespace {
 const int CACHE_INPUT_TENSORDESC_OFFSET = 2;
 const int CACHE_OUTPUT_TENSORDESC_OFFSET = 1;
 constexpr int32_t  NUMBER_CACHE_INFO_MEMBERS = 3;
+const std::string EXTENSION_KEY_MODEL_NAME = "ModelName";
 
 struct SerializedTensorDesc {
 public:
@@ -675,7 +676,15 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheBuffer(const void* buffer, size_t l
 
 OH_NN_ReturnCode NNCompiler::SetExtensionConfig(const std::unordered_map<std::string, std::vector<char>>& configs)
 {
-    LOGI("[NNCompiler] SetExtensionConfig successfully.");
+    if (configs.find(EXTENSION_KEY_MODEL_NAME) != configs.end()) {
+        std::vector<char> value = configs.at(EXTENSION_KEY_MODEL_NAME);
+        if (value.empty()) {
+            LOGE("[NNCompiler] SetExtensionConfig get empty model name from configs");
+            return OH_NN_INVALID_PARAMETER;
+        }
+        m_extensionConfig.modelName.assign(value.data(), value.data() + value.size());
+        LOGI("[NNCompiler] SetExtensionConfig get model name:%{public}s.", m_extensionConfig.modelName.c_str());
+    }
     return OH_NN_SUCCESS;
 }
 
