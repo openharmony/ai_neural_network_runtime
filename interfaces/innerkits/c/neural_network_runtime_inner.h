@@ -128,6 +128,19 @@ OH_NN_ReturnCode OH_NNModel_SetInputsAndOutputsInfo(OH_NNModel *model, const OH_
 OH_NN_ReturnCode OH_NNModel_BuildFromMetaGraph(OH_NNModel *model, const void *metaGraph,
     const OH_NN_Extension *extensions, size_t extensionSize);
 
+/**
+ * @brief 判断cache文件是否存在。
+ *
+ * 本接口不作为Neural Network Runtime接口对外开放。\n
+ *
+ * @param cacheDir cache文件所在文件夹。
+ * @param modelName 模型名字，与构图时传入的一致。
+ * @return bool值，true表示cache文件存在，false表示cache文件不存在。
+ * @since 11
+ * @version 1.0
+ */
+bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName);
+
 #ifdef __cplusplus
 }
 #endif // __cpluscplus
