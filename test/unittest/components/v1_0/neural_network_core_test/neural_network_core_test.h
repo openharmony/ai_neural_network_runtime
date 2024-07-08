@@ -40,7 +40,13 @@ public:
     OH_NN_UInt32Array m_outputIndices;
     OH_NN_UInt32Array m_paramIndices;
     OH_NN_Tensor m_tensor;
+    TensorDesc desc;
+    TensorDesc* tensorDesc = &desc;
+    Compilation ation;
+    Compilation* compilation = &ation;
 
+    size_t backendID = 1;
+    size_t sizetensor = 3;
     uint32_t m_inputIndexs[2] {0, 1};
     uint32_t m_outputIndexs[1] {2};
     uint32_t m_paramIndexs[1] {3};
