@@ -48,7 +48,7 @@ ohos_unittest("CompilationV1_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -71,7 +71,7 @@ ohos_unittest("ExecutorV1_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -94,7 +94,7 @@ ohos_unittest("DeviceManagerV1_0Test") {
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -117,7 +117,7 @@ ohos_unittest("DeviceRegistrarV1_0Test") {
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -141,7 +141,7 @@ ohos_unittest("HDIDeviceV1_0Test") {
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -165,7 +165,7 @@ ohos_unittest("HDIPreparedModelV1_0Test") {
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -187,7 +187,7 @@ ohos_unittest("MemoryManagerTest") {
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -330,7 +330,7 @@ ohos_unittest("TransformV1_0Test") {
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -354,7 +354,7 @@ ohos_unittest("InnerModelV1_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -377,7 +377,7 @@ ohos_unittest("NnTensorV1_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -400,7 +400,7 @@ ohos_unittest("NnValidationV1_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -423,7 +423,7 @@ ohos_unittest("OpsRegistryV1_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -449,7 +449,7 @@ ohos_unittest("NeuralNetworkRuntimeV1_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -472,7 +472,7 @@ ohos_unittest("CompilationV2_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -495,7 +495,7 @@ ohos_unittest("ExecutorV2_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -518,7 +518,7 @@ ohos_unittest("DeviceManagerV2_0Test") {
     "drivers_interface_nnrt:libnnrt_proxy_2.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -541,7 +541,7 @@ ohos_unittest("DeviceRegistrarV2_0Test") {
     "drivers_interface_nnrt:libnnrt_proxy_2.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -565,31 +565,7 @@ ohos_unittest("HDIDeviceV2_0Test") {
     "drivers_interface_nnrt:libnnrt_proxy_2.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
-  ]
-}
-
-ohos_unittest("HDIDeviceV2_1Test") {
-  module_out_path = module_output_path
-
-  sources = [ "./v2_1/hdi_device/hdi_device_test.cpp" ]
-  sources += [ "../common/v2_1/mock_idevice.cpp" ]
-  sources += [ "../common/file_utils.cpp" ]
-  configs = [ ":module_private_config" ]
-
-  deps = [
-    "../../../frameworks/native/neural_network_core:libneural_network_core",
-    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_nnrt:libnnrt_proxy_2.0",
-    "hilog:libhilog",
-    "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -613,7 +589,7 @@ ohos_unittest("HDIPreparedModelV2_0Test") {
     "drivers_interface_nnrt:libnnrt_proxy_2.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -657,7 +633,7 @@ ohos_unittest("TransformV2_0Test") {
     "drivers_interface_nnrt:libnnrt_proxy_2.0",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -681,7 +657,7 @@ ohos_unittest("InnerModelV2_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -704,7 +680,7 @@ ohos_unittest("NnTensorV2_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -727,7 +703,7 @@ ohos_unittest("NnValidationV2_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -750,7 +726,7 @@ ohos_unittest("OpsRegistryV2_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -776,7 +752,7 @@ ohos_unittest("NeuralNetworkRuntimeV2_0Test") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
@@ -785,7 +761,6 @@ group("components_unittest") {
   deps = [
     ":HDIDeviceV1_0Test",
     ":HDIDeviceV2_0Test",
-    ":HDIDeviceV2_1Test",
     ":HDIPreparedModelV1_0Test",
     ":HDIPreparedModelV2_0Test",
     ":HDIPreparedModelV2_1Test",
