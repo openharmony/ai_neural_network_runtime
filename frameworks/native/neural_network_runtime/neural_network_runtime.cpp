@@ -552,7 +552,8 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName)
 
     // determine whether cache model files exist
     for (int64_t i = 0; i < fileNumber; ++i) {
-        std::string cacheModelPath = std::string(cacheDir) + "/" + std::string(modelName) + std::to_string(i) + ".nncache";
+        std::string cacheModelPath =
+            std::string(cacheDir) + "/" + std::string(modelName) + std::to_string(i) + ".nncache";
         exist = (exist && (stat(cacheModelPath.c_str(), &buffer) == 0));
     }
 
