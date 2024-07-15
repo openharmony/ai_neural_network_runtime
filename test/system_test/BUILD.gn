@@ -74,7 +74,7 @@ ohos_systemtest("End2EndTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
-    "mindspore:mindir_lib",
+    "mindspore:mindir",
   ]
 }
 
