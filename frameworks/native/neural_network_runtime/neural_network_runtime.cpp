@@ -314,7 +314,6 @@ OH_NN_ReturnCode ParseInputDimsFromExtensions(char* data, size_t dataSize, const
 
     size_t inputCount = liteGraph->input_indices_.size(); // LiteGraph输入个数
     size_t allTensorSize = liteGraph->all_tensors_.size(); // LiteGraph所有tensor个数
-    size_t inputDimSize = 0; // 存放每个输入的维度
     std::vector<int32_t> inputDim;
     size_t dataIndex = 0;
     for (size_t i = 0; i < inputCount; ++i) {
@@ -328,7 +327,7 @@ OH_NN_ReturnCode ParseInputDimsFromExtensions(char* data, size_t dataSize, const
         //获取当前输入的维度
         mindspore::lite::TensorPtr tensor = liteGraph->all_tensors_[liteGraph->input_indices_[i]];
         auto tensorDims = mindspore::lite::MindIR_Tensor_GetDims(tensor);
-        inputDimSize = tensorDims.size();
+        size_t inputDimSize = tensorDims.size();
         if (allDimsSize < inputDimSize) {
             LOGE("ParseInputDimsFromExtensions failed, dataSize is invalid.");
             extensionConfig.inputDims.clear();
@@ -552,9 +551,8 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName)
     ifs.close();
 
     // determine whether cache model files exist
-    std::string cacheModelPath;
     for (int64_t i = 0; i < fileNumber; ++i) {
-        cacheModelPath = std::string(cacheDir) + "/" + std::string(modelName) + std::to_string(i) + ".nncache";
+        std::string cacheModelPath = std::string(cacheDir) + "/" + std::string(modelName) + std::to_string(i) + ".nncache";
         exist = (exist && (stat(cacheModelPath.c_str(), &buffer) == 0));
     }
 
