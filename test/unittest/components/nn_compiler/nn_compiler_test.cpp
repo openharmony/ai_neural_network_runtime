@@ -82,6 +82,8 @@ HWTEST_F(NNCompilerTest, nncompilertest_construct_001, TestSize.Level0)
 
     NNCompiler* nncompiler = new (std::nothrow) NNCompiler(device, backendID);
     EXPECT_NE(nullptr, nncompiler);
+
+    testing::Mock::AllowLeak(device.get());
 }
 } // namespace UnitTest
 } // namespace NeuralNetworkRuntime
