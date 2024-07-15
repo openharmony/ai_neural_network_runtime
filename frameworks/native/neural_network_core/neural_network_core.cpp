@@ -601,7 +601,7 @@ OH_NN_ReturnCode Authentication(Compilation** compilation)
         compilationImpl->callingPid = std::atoi((iter->second).data());
     }
 
-    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+    const NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
     if (!nnrtService.IsServiceAvaliable()) {
         LOGW("Authentication failed, fail to get nnrt service, skip Authentication.");
         return OH_NN_SUCCESS;
@@ -1624,8 +1624,6 @@ OH_NN_ReturnCode RunSync(Executor *executor,
     }
 
     long timeStart = 0;
-    long timeEnd = 0;
-    int32_t modelLatency = 0;
     if (configPtr->isNeedModelLatency) {
         timeStart = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
@@ -1638,9 +1636,9 @@ OH_NN_ReturnCode RunSync(Executor *executor,
     }
 
     if (configPtr->isNeedModelLatency) {
-        timeEnd = std::chrono::duration_cast<std::chrono::milliseconds>(
+        long timeEnd = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
-        modelLatency = static_cast<int32_t>((timeEnd - timeStart));
+        int32_t modelLatency = static_cast<int32_t>((timeEnd - timeStart));
         std::thread t(UpdateModelLatency, configPtr, modelLatency);
         t.detach();
         LOGE("update async start.");
