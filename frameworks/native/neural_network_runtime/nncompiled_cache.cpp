@@ -327,7 +327,7 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
     }
 
     if (!infoCacheFile.read(reinterpret_cast<char*>(&(modelCacheInfo.opVersion)), sizeof(uint64_t))) {
-        LOGW("[NNComoiledCache] opVersion failed.");
+        LOGW("[NNCompiledCache] opVersion failed.");
     }
 
     infoCacheFile.close();
