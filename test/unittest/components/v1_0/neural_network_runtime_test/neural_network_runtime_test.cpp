@@ -21,6 +21,7 @@
 #include "compilation.h"
 #include "hdi_device_v1_0.h"
 #include "test/unittest/common/v1_0/mock_idevice.h"
+#include "nnexecutor.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -244,6 +245,57 @@ void NeuralNetworkRuntimeTest::SetInputAndOutput(Executor& executor)
     uint32_t* shapeNum = &outputIndex;
     EXPECT_EQ(OH_NN_SUCCESS, executor.GetOutputShape(outputIndex, shapeAA, shapeNum));
 }
+
+class MockIPreparedModel : public PreparedModel {
+public:
+    MOCK_METHOD1(ExportModelCache, OH_NN_ReturnCode(std::vector<Buffer>&));
+    MOCK_METHOD4(Run, OH_NN_ReturnCode(const std::vector<IOTensor>&,
+                                 const std::vector<IOTensor>&,
+                                 std::vector<std::vector<int32_t>>&,
+                                 std::vector<bool>&));
+    MOCK_METHOD4(Run, OH_NN_ReturnCode(const std::vector<NN_Tensor*>&,
+                                 const std::vector<NN_Tensor*>&,
+                                 std::vector<std::vector<int32_t>>&,
+                                 std::vector<bool>&));
+    MOCK_CONST_METHOD1(GetModelID, OH_NN_ReturnCode(uint32_t&));
+    MOCK_METHOD2(GetInputDimRanges, OH_NN_ReturnCode(std::vector<std::vector<uint32_t>>&,
+                                               std::vector<std::vector<uint32_t>>&));
+};
+
+class MockIDevice : public Device {
+public:
+    MOCK_METHOD1(GetDeviceName, OH_NN_ReturnCode(std::string&));
+    MOCK_METHOD1(GetVendorName, OH_NN_ReturnCode(std::string&));
+    MOCK_METHOD1(GetVersion, OH_NN_ReturnCode(std::string&));
+    MOCK_METHOD1(GetDeviceType, OH_NN_ReturnCode(OH_NN_DeviceType&));
+    MOCK_METHOD1(GetDeviceStatus, OH_NN_ReturnCode(DeviceStatus&));
+    MOCK_METHOD2(GetSupportedOperation, OH_NN_ReturnCode(std::shared_ptr<const mindspore::lite::LiteGraph>,
+        std::vector<bool>&));
+    MOCK_METHOD1(IsFloat16PrecisionSupported, OH_NN_ReturnCode(bool&));
+    MOCK_METHOD1(IsPerformanceModeSupported, OH_NN_ReturnCode(bool&));
+    MOCK_METHOD1(IsPrioritySupported, OH_NN_ReturnCode(bool&));
+    MOCK_METHOD1(IsDynamicInputSupported, OH_NN_ReturnCode(bool&));
+    MOCK_METHOD1(IsModelCacheSupported, OH_NN_ReturnCode(bool&));
+    MOCK_METHOD3(PrepareModel, OH_NN_ReturnCode(std::shared_ptr<const mindspore::lite::LiteGraph>,
+                                          const ModelConfig&,
+                                          std::shared_ptr<PreparedModel>&));
+    MOCK_METHOD3(PrepareModel, OH_NN_ReturnCode(const void*,
+                                          const ModelConfig&,
+                                          std::shared_ptr<PreparedModel>&));
+    MOCK_METHOD4(PrepareModelFromModelCache, OH_NN_ReturnCode(const std::vector<Buffer>&,
+                                                              const ModelConfig&,
+                                                              std::shared_ptr<PreparedModel>&,
+                                                              bool&));
+    MOCK_METHOD3(PrepareOfflineModel, OH_NN_ReturnCode(std::shared_ptr<const mindspore::lite::LiteGraph>,
+                                                 const ModelConfig&,
+                                                 std::shared_ptr<PreparedModel>&));
+    MOCK_METHOD1(AllocateBuffer, void*(size_t));
+    MOCK_METHOD2(AllocateTensorBuffer, void*(size_t, std::shared_ptr<TensorDesc>));
+    MOCK_METHOD2(AllocateTensorBuffer, void*(size_t, std::shared_ptr<NNTensor>));
+    MOCK_METHOD1(ReleaseBuffer, OH_NN_ReturnCode(const void*));
+    MOCK_METHOD2(AllocateBuffer, OH_NN_ReturnCode(size_t, int&));
+    MOCK_METHOD2(ReleaseBuffer, OH_NN_ReturnCode(int, size_t));
+};
 
 /*
  * @tc.name: model_construct_001
@@ -1226,12 +1278,137 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_005, testing::ext::TestSize.
 }
 
 /**
+ * @tc.name: excutor_setinput_006
+ * @tc.desc: Verify the success of the OH_NNExecutor_SetInput function
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_006, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_SetInput excutor_setinput_006");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t inputIndex = 0;
+    int32_t dims[2] = {3, 4};
+    m_tensor = {OH_NN_FLOAT32, 2, dims, nullptr, OH_NN_TENSOR};
+
+    float input[12] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    const void *buffer = input;
+    size_t length = 12 * sizeof(float);
+    OH_NN_ReturnCode ret = OH_NNExecutor_SetInput(nnExecutor, inputIndex, &m_tensor, buffer, length);
+    EXPECT_EQ(OH_NN_FAILED, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
+}
+
+/**
+ * @tc.name: excutor_setinput_007
+ * @tc.desc: Verify the success of the OH_NNExecutor_SetInput function
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_007, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_SetInput excutor_setinput_007");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t inputIndex = 0;
+
+    float input[12] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    const void *buffer = input;
+    size_t length = 12 * sizeof(float);
+    OH_NN_ReturnCode ret = OH_NNExecutor_SetInput(nnExecutor, inputIndex, nullptr, buffer, length);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
+}
+
+/**
+ * @tc.name: excutor_setinput_008
+ * @tc.desc: Verify the success of the OH_NNExecutor_SetInput function
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_008, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_SetInput excutor_setinput_008");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t inputIndex = 0;
+    int32_t dims[2] = {3, 4};
+    m_tensor = {OH_NN_FLOAT32, 2, dims, nullptr, OH_NN_TENSOR};
+
+    size_t length = 12 * sizeof(float);
+    OH_NN_ReturnCode ret = OH_NNExecutor_SetInput(nnExecutor, inputIndex, &m_tensor, nullptr, length);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
+}
+
+/**
+ * @tc.name: excutor_setinput_009
+ * @tc.desc: Verify the success of the OH_NNExecutor_SetInput function
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_009, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_SetInput excutor_setinput_009");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t inputIndex = 0;
+    int32_t dims[2] = {3, 4};
+    m_tensor = {OH_NN_FLOAT32, 2, dims, nullptr, OH_NN_TENSOR};
+
+    float input[12] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    const void *buffer = input;
+    size_t length = 0;
+    OH_NN_ReturnCode ret = OH_NNExecutor_SetInput(nnExecutor, inputIndex, &m_tensor, buffer, length);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
+}
+
+/**
  * @tc.name: excutor_setoutput_001
  * @tc.desc: Verify the OH_NNExecutor is nullptr of the OH_NNExecutor_SetOutput function
  * @tc.type: FUNC
  */
 HWTEST_F(NeuralNetworkRuntimeTest, excutor_setoutput_001, testing::ext::TestSize.Level0)
 {
+    LOGE("OH_NNExecutor_SetOutput excutor_setoutput_001");
     uint32_t outputIndex = 0;
     float input[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     void *buffer = input;
@@ -1298,6 +1475,86 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setoutput_004, testing::ext::TestSize
     float output[12];
     size_t length = 12 * sizeof(float);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, OH_NNExecutor_SetOutput(nnExecutor, outputIndex, output, length));
+}
+
+/**
+ * @tc.name: excutor_setoutput_005
+ * @tc.desc: Verify the success of the OH_NNExecutor_SetOutput function
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, excutor_setoutput_005, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_SetOutput excutor_setinput_006");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t outputIndex = 0;
+    float output[12];
+    size_t length = 12 * sizeof(float);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, OH_NNExecutor_SetOutput(nnExecutor, outputIndex, output, length));
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
+}
+
+/**
+ * @tc.name: excutor_setoutput_006
+ * @tc.desc: Verify the success of the OH_NNExecutor_SetOutput function
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, excutor_setoutput_006, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_SetOutput excutor_setinput_006");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t outputIndex = 0;
+    size_t length = 12 * sizeof(float);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, OH_NNExecutor_SetOutput(nnExecutor, outputIndex, nullptr, length));
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
+}
+
+/**
+ * @tc.name: excutor_setoutput_007
+ * @tc.desc: Verify the success of the OH_NNExecutor_SetOutput function
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, excutor_setoutput_007, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_SetOutput excutor_setoutput_007");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t outputIndex = 0;
+    float output[12];
+    size_t length = 0;
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, OH_NNExecutor_SetOutput(nnExecutor, outputIndex, output, length));
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /**
@@ -1434,6 +1691,33 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_run_002, testing::ext::TestSize.Level
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, OH_NNExecutor_Run(nnExecutor));
 }
 
+/**
+ * @tc.name: excutor_run_003
+ * @tc.desc: Verify the success of the OH_NNExecutor_Run function
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, excutor_run_003, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_Run excutor_run_003");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    int32_t inputDims[2] = {3, 4};
+    m_tensor = {OH_NN_FLOAT32, 2, inputDims, nullptr, OH_NN_TENSOR};
+    OH_NN_ReturnCode ret = OH_NNExecutor_Run(nnExecutor);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
+}
+
 /*
  * @tc.name: executor_allocate_input_memory_001
  * @tc.desc: Verify the OH_NNExecutor is nullptr of the OH_NNExecutor_AllocateInputMemory function.
@@ -1510,6 +1794,108 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_input_memory_004, testing::
 
     OH_NN_Memory* ret = OH_NNExecutor_AllocateInputMemory(nnExecutor, outputIndex, length);
     EXPECT_EQ(nullptr, ret);
+}
+
+/*
+ * @tc.name: executor_allocate_input_memory_005
+ * @tc.desc: Verify the success of the OH_NNExecutor_AllocateInputMemory function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_input_memory_005, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_AllocateInputMemory executor_allocate_input_memory_005");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t outputIndex = 0;
+    size_t length = 9 * sizeof(float);
+
+    OH_NN_Memory* ret = OH_NNExecutor_AllocateInputMemory(nnExecutor, outputIndex, length);
+    EXPECT_EQ(nullptr, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
+}
+
+/*
+ * @tc.name: executor_allocate_input_memory_006
+ * @tc.desc: Verify the success of the OH_NNExecutor_AllocateInputMemory function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_input_memory_006, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_AllocateInputMemory executor_allocate_input_memory_006");
+    size_t m_backendID {0};
+    std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
+
+    std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+
+    std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair1;
+    std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
+    std::shared_ptr<TensorDesc> tensorDesr = std::make_shared<TensorDesc>();
+    int32_t expectDim[2] = {3, 3};
+    int32_t* ptr = expectDim;
+    uint32_t dimensionCount = 2;
+    tensorDesr->SetShape(ptr, dimensionCount);
+    pair1.first = tensorDesr;
+    pair2.first = tensorDesr;
+    m_inputTensorDescs.emplace_back(pair1);
+    m_inputTensorDescs.emplace_back(pair2);
+    m_outputTensorDescs.emplace_back(pair1);
+    m_outputTensorDescs.emplace_back(pair2);
+
+    size_t length = 9 * sizeof(float);
+    EXPECT_CALL(*((MockIDevice *) device.get()), AllocateTensorBuffer(length, m_inputTensorDescs[0].first))
+        .WillRepeatedly(::testing::Return(reinterpret_cast<void*>(0x1000)));
+
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+    EXPECT_NE(nullptr, executor);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t outputIndex = 0;
+
+    OH_NN_Memory* ret = OH_NNExecutor_AllocateInputMemory(nnExecutor, outputIndex, length);
+    EXPECT_NE(nullptr, ret);
+
+    testing::Mock::AllowLeak(device.get());
+}
+
+/*
+ * @tc.name: executor_allocate_input_memory_007
+ * @tc.desc: Verify the success of the OH_NNExecutor_AllocateInputMemory function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_input_memory_007, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_AllocateInputMemory executor_allocate_input_memory_007");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t outputIndex = 0;
+    size_t length = 0;
+
+    OH_NN_Memory* ret = OH_NNExecutor_AllocateInputMemory(nnExecutor, outputIndex, length);
+    EXPECT_EQ(nullptr, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -1590,6 +1976,107 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_output_memory_004, testing:
     EXPECT_EQ(nullptr, ret);
 }
 
+/*
+ * @tc.name: executor_allocate_output_memory_005
+ * @tc.desc: Verify the success of the OH_NNExecutor_AllocateInputMemory function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_output_memory_005, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_AllocateOutputMemory executor_allocate_output_memory_005");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t outputIndex = 0;
+    size_t length = 9 * sizeof(float);
+
+    OH_NN_Memory* ret = OH_NNExecutor_AllocateOutputMemory(nnExecutor, outputIndex, length);
+    EXPECT_EQ(nullptr, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
+}
+
+/*
+ * @tc.name: executor_allocate_output_memory_006
+ * @tc.desc: Verify the success of the OH_NNExecutor_AllocateInputMemory function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_output_memory_006, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_AllocateInputMemory executor_allocate_output_memory_006");
+    size_t m_backendID {0};
+    std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
+
+    std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+
+    std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair1;
+    std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
+    std::shared_ptr<TensorDesc> tensorDesr = std::make_shared<TensorDesc>();
+    int32_t expectDim[2] = {3, 3};
+    int32_t* ptr = expectDim;
+    uint32_t dimensionCount = 2;
+    tensorDesr->SetShape(ptr, dimensionCount);
+    pair1.first = tensorDesr;
+    pair2.first = tensorDesr;
+    m_inputTensorDescs.emplace_back(pair1);
+    m_inputTensorDescs.emplace_back(pair2);
+    m_outputTensorDescs.emplace_back(pair1);
+    m_outputTensorDescs.emplace_back(pair2);
+
+    size_t length = 9 * sizeof(float);
+    EXPECT_CALL(*((MockIDevice *) device.get()), AllocateTensorBuffer(length, m_outputTensorDescs[0].first))
+        .WillRepeatedly(::testing::Return(reinterpret_cast<void*>(0x1000)));
+
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+    EXPECT_NE(nullptr, executor);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t outputIndex = 0;
+
+    OH_NN_Memory* ret = OH_NNExecutor_AllocateOutputMemory(nnExecutor, outputIndex, length);
+    EXPECT_NE(nullptr, ret);
+
+    testing::Mock::AllowLeak(device.get());
+}
+
+/*
+ * @tc.name: executor_allocate_output_memory_007
+ * @tc.desc: Verify the success of the OH_NNExecutor_AllocateInputMemory function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_output_memory_007, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNExecutor_AllocateInputMemory executor_allocate_output_memory_007");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
+
+    uint32_t outputIndex = 0;
+    size_t length = 0;
+
+    OH_NN_Memory* ret = OH_NNExecutor_AllocateOutputMemory(nnExecutor, outputIndex, length);
+    EXPECT_EQ(nullptr, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
+}
 
 /*
  * @tc.name: executor_destroy_input_memory_001
@@ -1618,17 +2105,24 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_001, testing::e
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_002, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    BuildModel(innerModel);
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_DestroyInputMemory executor_destroy_input_memory_002");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t inputIndex = 0;
     OH_NN_Memory** memory = nullptr;
     OH_NNExecutor_DestroyInputMemory(nnExecutor, inputIndex, memory);
     EXPECT_EQ(nullptr, memory);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -1638,18 +2132,25 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_002, testing::e
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_003, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    BuildModel(innerModel);
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_DestroyInputMemory executor_destroy_input_memory_003");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t inputIndex = 0;
     OH_NN_Memory* memory = nullptr;
     OH_NN_Memory** pMemory = &memory;
     OH_NNExecutor_DestroyInputMemory(nnExecutor, inputIndex, pMemory);
     EXPECT_EQ(nullptr, memory);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -1659,12 +2160,17 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_003, testing::e
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_004, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    BuildModel(innerModel);
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_DestroyInputMemory executor_destroy_input_memory_004");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t inputIndex = 6;
     float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -1673,29 +2179,8 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_004, testing::e
     OH_NN_Memory* pMemory = &memory;
     OH_NNExecutor_DestroyInputMemory(nnExecutor, inputIndex, &pMemory);
     EXPECT_NE(nullptr, pMemory);
-}
 
-/*
- * @tc.name: executor_destroy_input_memory_005
- * @tc.desc: Verify the success of the OH_NNExecutor_DestroyInputMemory function.
- * @tc.type: FUNC
- */
-HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_005, testing::ext::TestSize.Level0)
-{
-    InnerModel innerModel;
-    BuildModel(innerModel);
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
-
-    uint32_t inputIndex = 0;
-    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* const data = dataArry;
-    OH_NN_Memory memory = {data, 9 * sizeof(float)};
-    OH_NN_Memory* pMemory = &memory;
-    OH_NNExecutor_DestroyInputMemory(nnExecutor, inputIndex, &pMemory);
-    EXPECT_NE(nullptr, pMemory);
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -1722,17 +2207,24 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_001, testing::
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_002, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_DestroyOutputMemory executor_destroy_output_memory_002");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
     OH_NN_Memory** memory = nullptr;
     OH_NNExecutor_DestroyOutputMemory(nnExecutor, outputIndex, memory);
     EXPECT_EQ(nullptr, memory);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -1742,18 +2234,25 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_002, testing::
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_003, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_DestroyOutputMemory executor_destroy_output_memory_003");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
     OH_NN_Memory* memory = nullptr;
     OH_NN_Memory** pMemory = &memory;
     OH_NNExecutor_DestroyOutputMemory(nnExecutor, outputIndex, pMemory);
     EXPECT_EQ(nullptr, memory);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -1763,12 +2262,17 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_003, testing::
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_004, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_DestroyOutputMemory executor_destroy_output_memory_004");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 6;
     float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -1777,6 +2281,8 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_004, testing::
     OH_NN_Memory* pMemory = &memory;
     OH_NNExecutor_DestroyOutputMemory(nnExecutor, outputIndex, &pMemory);
     EXPECT_NE(nullptr, pMemory);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -1786,12 +2292,17 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_004, testing::
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_005, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_DestroyOutputMemory executor_destroy_output_memory_005");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
     void* const data = dataArry;
@@ -1800,6 +2311,8 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_005, testing::
     uint32_t outputIndex = 0;
     OH_NNExecutor_DestroyOutputMemory(nnExecutor, outputIndex, &pMemory);
     EXPECT_NE(nullptr, pMemory);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -1829,12 +2342,17 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_001, testing::
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_002, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_SetInputWithMemory executor_set_input_with_memory_002");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     OH_NN_Tensor* operand = nullptr;
 
@@ -1845,6 +2363,8 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_002, testing::
 
     OH_NN_ReturnCode ret = OH_NNExecutor_SetInputWithMemory(nnExecutor, inputIndex, operand, &memory);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -1854,12 +2374,17 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_002, testing::
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_003, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_SetInputWithMemory executor_set_input_with_memory_003");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     SetTensor();
 
@@ -1867,6 +2392,8 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_003, testing::
     OH_NN_Memory* memory = nullptr;
     OH_NN_ReturnCode ret = OH_NNExecutor_SetInputWithMemory(nnExecutor, inputIndex, &m_tensor, memory);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -1876,12 +2403,17 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_003, testing::
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_004, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_SetInputWithMemory executor_set_input_with_memory_004");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t inputIndex = 0;
     int32_t dims[2] = {3, 4};
@@ -1892,7 +2424,9 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_004, testing::
     OH_NN_Memory memory = {data, 12 * sizeof(float)};
 
     OH_NN_ReturnCode ret = OH_NNExecutor_SetInputWithMemory(nnExecutor, inputIndex, &m_tensor, &memory);
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    EXPECT_EQ(OH_NN_FAILED, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 
@@ -1919,17 +2453,24 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_output_with_memory_001, testing:
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_set_output_with_memory_002, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_SetOutputWithMemory executor_set_output_with_memory_002");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
     OH_NN_Memory* memory = nullptr;
     OH_NN_ReturnCode ret = OH_NNExecutor_SetOutputWithMemory(nnExecutor, outputIndex, memory);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -1939,12 +2480,17 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_output_with_memory_002, testing:
  */
 HWTEST_F(NeuralNetworkRuntimeTest, executor_set_output_with_memory_003, testing::ext::TestSize.Level0)
 {
-    InnerModel innerModel;
-    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-    OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    LOGE("OH_NNExecutor_SetOutputWithMemory executor_set_output_with_memory_003");
+    size_t m_backendID {0};
+    std::shared_ptr<Device> m_device {nullptr};
+    std::shared_ptr<MockIPreparedModel> mockIPreparedMode = std::make_shared<MockIPreparedModel>();
+    EXPECT_CALL(*((MockIPreparedModel *) mockIPreparedMode.get()), GetInputDimRanges(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(OH_NN_FAILED));
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    NNExecutor* executor = new (std::nothrow) NNExecutor(
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+    OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
     float dataArry[12] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
@@ -1952,6 +2498,8 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_output_with_memory_003, testing:
     OH_NN_Memory memory = {data, 12 * sizeof(float)};
     OH_NN_ReturnCode ret = OH_NNExecutor_SetOutputWithMemory(nnExecutor, outputIndex, &memory);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+
+    testing::Mock::AllowLeak(mockIPreparedMode.get());
 }
 
 /*
@@ -2161,6 +2709,344 @@ HWTEST_F(NeuralNetworkRuntimeTest, device_get_type_004, testing::ext::TestSize.L
     OH_NN_DeviceType deviceType = OH_NN_CPU;
     OH_NN_DeviceType* pDeviceType = &deviceType;
     OH_NN_ReturnCode ret = OH_NNDevice_GetType(deviceID, pDeviceType);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_create_001
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_create_001, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_Create oh_nnquantparam_create_001");
+    NN_QuantParam* ret = OH_NNQuantParam_Create();
+    EXPECT_NE(nullptr, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setscales_001
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setscales_001, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetScales oh_nnquantparam_setscales_001");
+    size_t quantNum = 1;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetScales(nullptr, nullptr, quantNum);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setscales_002
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setscales_002, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetScales oh_nnquantparam_setscales_002");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    size_t quantNum = 1;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetScales(quantParams, nullptr, quantNum);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setscales_003
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setscales_003, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetScales oh_nnquantparam_setscales_003");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    double scale = 2;
+    size_t quantNum = 0;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetScales(quantParams, &scale, quantNum);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setscales_004
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setscales_004, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetScales oh_nnquantparam_setscales_004");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    double scale = 2;
+    size_t quantNum = 2;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetScales(quantParams, &scale, quantNum);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setzeropoints_001
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setzeropoints_001, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetZeroPoints oh_nnquantparam_setzeropoints_001");
+    size_t quantNum = 2;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetZeroPoints(nullptr, nullptr, quantNum);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setzeropoints_002
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setzeropoints_002, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetZeroPoints oh_nnquantparam_setzeropoints_002");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    size_t quantNum = 2;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetZeroPoints(quantParams, nullptr, quantNum);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setzeropoints_003
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setzeropoints_003, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetZeroPoints oh_nnquantparam_setzeropoints_003");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    int32_t zeroPoints = 2;
+    size_t quantNum = 0;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetZeroPoints(quantParams, &zeroPoints, quantNum);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setzeropoints_004
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setzeropoints_004, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetZeroPoints oh_nnquantparam_setzeropoints_004");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    int32_t zeroPoints = 2;
+    size_t quantNum = 2;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetZeroPoints(quantParams, &zeroPoints, quantNum);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setnumbits_001
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setnumbits_001, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetNumBits oh_nnquantparam_setnumbits_001");
+    size_t quantNum = 2;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetNumBits(nullptr, nullptr, quantNum);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setnumbits_002
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setnumbits_002, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetNumBits oh_nnquantparam_setnumbits_002");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    size_t quantNum = 2;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetNumBits(quantParams, nullptr, quantNum);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setnumbits_003
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setnumbits_003, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetNumBits oh_nnquantparam_setnumbits_003");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    uint32_t zeroPoints = 2;
+    size_t quantNum = 0;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetNumBits(quantParams, &zeroPoints, quantNum);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_setnumbits_004
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_setnumbits_004, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_SetNumBits oh_nnquantparam_setnumbits_004");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    uint32_t zeroPoints = 2;
+    size_t quantNum = 2;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_SetNumBits(quantParams, &zeroPoints, quantNum);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_destroy_001
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_destroy_001, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_Destroy oh_nnquantparam_destroy_001");
+    OH_NN_ReturnCode ret = OH_NNQuantParam_Destroy(nullptr);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_destroy_002
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_destroy_002, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_Destroy oh_nnquantparam_destroy_002");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    NN_QuantParam** quantParamsDex = &quantParams;
+    *quantParamsDex = nullptr;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_Destroy(quantParamsDex);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnquantparam_destroy_003
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnquantparam_destroy_003, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNQuantParam_Destroy oh_nnquantparam_destroy_003");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    NN_QuantParam** quantParamsDex = &quantParams;
+    OH_NN_ReturnCode ret = OH_NNQuantParam_Destroy(quantParamsDex);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
+}
+
+/*
+ * @tc.name: oh_nnmodel_addtensortomodel_001
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnmodel_addtensortomodel_001, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNModel_AddTensorToModel oh_nnmodel_addtensortomodel_001");
+    TensorDesc* tensorDescImpl = new (std::nothrow) TensorDesc();
+    NN_TensorDesc* tensor = reinterpret_cast<NN_TensorDesc*>(tensorDescImpl);
+    OH_NN_ReturnCode ret = OH_NNModel_AddTensorToModel(nullptr, tensor);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnmodel_addtensortomodel_002
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnmodel_addtensortomodel_002, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNModel_AddTensorToModel oh_nnmodel_addtensortomodel_002");
+    OH_NNModel* model = OH_NNModel_Construct();
+    OH_NN_ReturnCode ret = OH_NNModel_AddTensorToModel(model, nullptr);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnmodel_addtensortomodel_003
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnmodel_addtensortomodel_003, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNModel_AddTensorToModel oh_nnmodel_addtensortomodel_003");
+    OH_NNModel* model = OH_NNModel_Construct();
+    TensorDesc* tensorDescImpl = new (std::nothrow) TensorDesc();
+    NN_TensorDesc* tensor = reinterpret_cast<NN_TensorDesc*>(tensorDescImpl);
+    OH_NN_ReturnCode ret = OH_NNModel_AddTensorToModel(model, tensor);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
+}
+
+/*
+ * @tc.name: oh_nnmodel_settensorquantparams_001
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnmodel_settensorquantparams_001, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNModel_SetTensorQuantParams oh_nnmodel_settensorquantparams_001");
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    uint32_t index = 10;
+    OH_NN_ReturnCode ret = OH_NNModel_SetTensorQuantParams(nullptr, index, quantParams);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnmodel_settensorquantparams_002
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnmodel_settensorquantparams_002, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNModel_SetTensorQuantParams oh_nnmodel_settensorquantparams_002");
+    OH_NNModel* model = OH_NNModel_Construct();
+    uint32_t index = 10;
+    OH_NN_ReturnCode ret = OH_NNModel_SetTensorQuantParams(model, index, nullptr);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnmodel_settensorquantparams_003
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnmodel_settensorquantparams_003, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNModel_SetTensorQuantParams oh_nnmodel_settensorquantparams_003");
+    OH_NNModel* model = OH_NNModel_Construct();
+    NN_QuantParam* quantParams = OH_NNQuantParam_Create();
+    uint32_t index = 10;
+    OH_NN_ReturnCode ret = OH_NNModel_SetTensorQuantParams(model, index, quantParams);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnmodel_settensortype_001
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnmodel_settensortype_001, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNModel_SetTensorType oh_nnmodel_settensortype_001");
+    OH_NN_TensorType tensorType = OH_NN_REDUCE_MIN_KEEP_DIMS;
+    uint32_t index = 10;
+    OH_NN_ReturnCode ret = OH_NNModel_SetTensorType(nullptr, index, tensorType);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: oh_nnmodel_settensortype_002
+ * @tc.desc: Verify the success of the OH_NNDevice_GetType function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkRuntimeTest, oh_nnmodel_settensortype_002, testing::ext::TestSize.Level0)
+{
+    LOGE("OH_NNModel_SetTensorType oh_nnmodel_settensortype_002");
+    OH_NNModel* model = OH_NNModel_Construct();
+    OH_NN_TensorType tensorType = OH_NN_REDUCE_MIN_COEFF;
+    uint32_t index = 10;
+    OH_NN_ReturnCode ret = OH_NNModel_SetTensorType(model, index, tensorType);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 } // namespace Unittest
