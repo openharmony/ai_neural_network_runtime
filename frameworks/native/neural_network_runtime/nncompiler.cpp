@@ -637,8 +637,8 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
             return ret;
         }
 
-        LOGI("isUpdatable currentOpVersion is: %{public}d", currentVersion);
-        LOGI("isUpdatable modelCacheInfo opVersion is %{public}ld", modelCacheInfo.opVersion);
+        LOGD("currentOpVersion is: %{public}d", currentOpVersion);
+        LOGD("modelCacheInfo opVersion is %{public}ld", modelCacheInfo.opVersion);
 
         if (currentOpVersion > modelCacheInfo.opVersion) {
             const size_t cacheNumber = caches.size();
