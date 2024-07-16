@@ -313,6 +313,26 @@ ohos_unittest("NNExecutorTest") {
   ]
 }
 
+ohos_unittest("NNTensor2_0Test") {
+  module_out_path = module_output_path
+
+  sources = [ "./nn_tensor/nn_tensor_test.cpp" ]
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "../../../frameworks/native/neural_network_core:libneural_network_core",
+    "../../../frameworks/native/neural_network_runtime:libneural_network_runtime",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "hilog:libhilog",
+    "hitrace:libhitracechain",
+  ]
+}
+
 ohos_unittest("TransformV1_0Test") {
   module_out_path = module_output_path
 
@@ -771,6 +791,7 @@ group("components_unittest") {
     ":NNCompiledCacheTest",
     ":NNCompilerTest",
     ":NNExecutorTest",
+    ":NNTensor2_0Test",
     ":NeuralNetworkCoreV1_0Test",
     ":NeuralNetworkRuntimeV1_0Test",
     ":NeuralNetworkRuntimeV2_0Test",

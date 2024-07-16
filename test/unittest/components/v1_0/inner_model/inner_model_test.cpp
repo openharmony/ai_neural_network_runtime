@@ -189,6 +189,62 @@ HWTEST_F(InnerModelTest, inner_model_construct_nntensor_from_litegraph_005, Test
 }
 
 /**
+ * @tc.name: inner_model_buildfrommetagraph_001
+ * @tc.desc: Verify the nntensor build failed nullptr return of the construct_nntensor_from_litegraph function
+ * @tc.type: FUNC
+ */
+HWTEST_F(InnerModelTest, inner_model_buildfrommetagraph_001, TestSize.Level1)
+{
+    LOGE("BuildFromMetaGraph inner_model_buildfrommetagraph_001");
+    mindspore::lite::LiteGraph* liteGraph = new (std::nothrow) mindspore::lite::LiteGraph();
+    EXPECT_NE(nullptr, liteGraph);
+    m_dimInput = {3, -3};
+
+    SetLiteGraph(liteGraph);
+
+    ExtensionConfig extensionConfig;
+    InnerModel InnerModel;
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, InnerModel.BuildFromMetaGraph(nullptr, extensionConfig));
+}
+
+/**
+ * @tc.name: inner_model_buildfrommetagraph_002
+ * @tc.desc: Verify the nntensor build failed nullptr return of the construct_nntensor_from_litegraph function
+ * @tc.type: FUNC
+ */
+HWTEST_F(InnerModelTest, inner_model_buildfrommetagraph_002, TestSize.Level1)
+{
+    LOGE("BuildFromMetaGraph inner_model_buildfrommetagraph_002");
+    mindspore::lite::LiteGraph* liteGraph = new (std::nothrow) mindspore::lite::LiteGraph();
+    EXPECT_NE(nullptr, liteGraph);
+    m_dimInput = {3, -3};
+
+    SetLiteGraph(liteGraph);
+
+    ExtensionConfig extensionConfig;
+    EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.BuildFromMetaGraph(liteGraph, extensionConfig));
+}
+
+/**
+ * @tc.name: inner_model_buildfrommetagraph_003
+ * @tc.desc: Verify the nntensor build failed nullptr return of the construct_nntensor_from_litegraph function
+ * @tc.type: FUNC
+ */
+HWTEST_F(InnerModelTest, inner_model_buildfrommetagraph_003, TestSize.Level1)
+{
+    LOGE("BuildFromMetaGraph inner_model_buildfrommetagraph_003");
+    mindspore::lite::LiteGraph* liteGraph = new (std::nothrow) mindspore::lite::LiteGraph();
+    EXPECT_NE(nullptr, liteGraph);
+    m_dimInput = {3, -3};
+
+    SetLiteGraph(liteGraph);
+
+    ExtensionConfig extensionConfig;
+    InnerModel InnerModel;
+    EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, m_innerModelTest.BuildFromMetaGraph(liteGraph, extensionConfig));
+}
+
+/**
  * @tc.name: inner_model_build_from_lite_graph_001
  * @tc.desc: Verify the litegraph is nullptr of the build_from_lite_graph function
  * @tc.type: FUNC

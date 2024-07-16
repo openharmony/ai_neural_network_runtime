@@ -693,7 +693,7 @@ NNExecutor* NNCompiler::CreateExecutor()
     }
 
     if (m_preparedModel == nullptr) {
-        LOGE("[NNCompiler] CreateExecutor failed, m_device is nullptr");
+        LOGE("[NNCompiler] CreateExecutor failed, m_preparedModel is nullptr");
         return nullptr;
     }
 

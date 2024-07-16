@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <sys/mman.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -28,9 +29,20 @@
 #include "test/unittest/common/v1_0/mock_idevice.h"
 #include "test/unittest/common/file_utils.h"
 
+#include "lite_graph_to_hdi_model_v1_0.h"
+#include "device.h"
+#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
+#include "common/log.h"
+#include "nnbackend.h"
+#include "ops_registry.h"
+#include "transform.h"
+
 using namespace testing;
 using namespace testing::ext;
 using namespace OHOS::NeuralNetworkRuntime;
+
+namespace MSLITE = mindspore::lite;
+
 namespace mindspore {
 namespace lite {
 OHOS::HDI::Nnrt::V1_0::Model* MindIR_LiteGraph_To_Model(const LiteGraph* lite_graph,
@@ -205,6 +217,45 @@ HWTEST_F(HDIDeviceTest, hdidevice_getvendorname_002, TestSize.Level0)
 }
 
 /* *
+ * @tc.name: hdidevice_getversion_001
+ * @tc.desc: Verify the GetVersion function validate vendor name success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_getversion_001, TestSize.Level0)
+{
+    LOGE("GetVersion hdidevice_getversion_001");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+    std::string vendorName = "MockVendor";
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), GetVersion(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(HDF_SUCCESS));
+
+    const std::string expectDeviceName = "MockVendor";
+    std::string newVendorName = "";
+    OH_NN_ReturnCode result = hdiDevice->GetVersion(newVendorName);
+    EXPECT_EQ(OH_NN_SUCCESS, result);
+}
+
+/* *
+ * @tc.name: hdidevice_getversion_002
+ * @tc.desc: Verify the GetVersion function return unavailable device.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_getversion_002, TestSize.Level0)
+{
+    LOGE("GetVersion hdidevice_getversion_002");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+    std::string vendorName = "MockVendor";
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), GetVersion(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(HDF_FAILURE));
+    OH_NN_ReturnCode result = hdiDevice->GetVersion(vendorName);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
+}
+
+/* *
  * @tc.name: hdidevice_getdevicetype_001
  * @tc.desc: Verify the GetDeviceType function validate device type success.
  * @tc.type: FUNC
@@ -245,6 +296,75 @@ HWTEST_F(HDIDeviceTest, hdidevice_getdevicetype_002, TestSize.Level0)
 }
 
 /* *
+ * @tc.name: hdidevice_getdevicetype_003
+ * @tc.desc: Verify the GetDeviceType function return unavailable device.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_getdevicetype_003, TestSize.Level0)
+{
+    LOGE("GetDeviceType hdidevice_getdevicetype_003");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    OH_NN_DeviceType deviceType = OH_NN_CPU;
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), GetDeviceType(::testing::_))
+        .WillRepeatedly(Invoke([](V1_0::DeviceType& type) {
+                // 这里直接修改传入的引用参数
+                type = V1_0::DeviceType::GPU;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
+    OH_NN_ReturnCode result = hdiDevice->GetDeviceType(deviceType);
+    EXPECT_EQ(OH_NN_SUCCESS, result);
+}
+
+/* *
+ * @tc.name: hdidevice_getdevicetype_004
+ * @tc.desc: Verify the GetDeviceType function return unavailable device.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_getdevicetype_004, TestSize.Level0)
+{
+    LOGE("GetDeviceType hdidevice_getdevicetype_004");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    OH_NN_DeviceType deviceType = OH_NN_CPU;
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), GetDeviceType(::testing::_))
+        .WillRepeatedly(Invoke([](V1_0::DeviceType& type) {
+                // 这里直接修改传入的引用参数
+                type = V1_0::DeviceType::ACCELERATOR;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
+    OH_NN_ReturnCode result = hdiDevice->GetDeviceType(deviceType);
+    EXPECT_EQ(OH_NN_SUCCESS, result);
+}
+
+/* *
+ * @tc.name: hdidevice_getdevicetype_005
+ * @tc.desc: Verify the GetDeviceType function return unavailable device.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_getdevicetype_005, TestSize.Level0)
+{
+    LOGE("GetDeviceType hdidevice_getdevicetype_005");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    OH_NN_DeviceType deviceType = OH_NN_CPU;
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), GetDeviceType(::testing::_))
+        .WillRepeatedly(Invoke([](V1_0::DeviceType& type) {
+                // 这里直接修改传入的引用参数
+                type = V1_0::DeviceType::OTHER;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
+    OH_NN_ReturnCode result = hdiDevice->GetDeviceType(deviceType);
+    EXPECT_EQ(OH_NN_SUCCESS, result);
+}
+
+/* *
  * @tc.name: hdidevice_getdevicestatus_001
  * @tc.desc: Verify the GetDeviceStatus function validate device status success.
  * @tc.type: FUNC
@@ -282,6 +402,78 @@ HWTEST_F(HDIDeviceTest, hdidevice_getdevicestatus_002, TestSize.Level0)
         .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(iDeviceStatus), ::testing::Return(HDF_FAILURE)));
     OH_NN_ReturnCode result = hdiDevice->GetDeviceStatus(deviceStatus);
     EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
+}
+
+/* *
+ * @tc.name: hdidevice_getdevicestatus_003
+ * @tc.desc: Verify the GetDeviceStatus function validate device status success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_getdevicestatus_003, TestSize.Level0)
+{
+    LOGE("GetDeviceStatus hdidevice_getdevicestatus_003");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), GetDeviceStatus(::testing::_))
+        .WillRepeatedly(Invoke([](V1_0::DeviceStatus& status) {
+                // 这里直接修改传入的引用参数
+                status = V1_0::DeviceStatus::BUSY;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
+
+    DeviceStatus newDeviceStatus = AVAILABLE;
+    OH_NN_ReturnCode result = hdiDevice->GetDeviceStatus(newDeviceStatus);
+    EXPECT_EQ(OH_NN_SUCCESS, result);
+}
+
+/* *
+ * @tc.name: hdidevice_getdevicestatus_004
+ * @tc.desc: Verify the GetDeviceStatus function validate device status success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_getdevicestatus_004, TestSize.Level0)
+{
+    LOGE("GetDeviceStatus hdidevice_getdevicestatus_004");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), GetDeviceStatus(::testing::_))
+        .WillRepeatedly(Invoke([](V1_0::DeviceStatus& status) {
+                // 这里直接修改传入的引用参数
+                status = V1_0::DeviceStatus::OFFLINE;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
+
+    DeviceStatus newDeviceStatus = AVAILABLE;
+    OH_NN_ReturnCode result = hdiDevice->GetDeviceStatus(newDeviceStatus);
+    EXPECT_EQ(OH_NN_SUCCESS, result);
+}
+
+/* *
+ * @tc.name: hdidevice_getdevicestatus_005
+ * @tc.desc: Verify the GetDeviceStatus function validate device status success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_getdevicestatus_005, TestSize.Level0)
+{
+    LOGE("GetDeviceStatus hdidevice_getdevicestatus_005");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), GetDeviceStatus(::testing::_))
+        .WillRepeatedly(Invoke([](V1_0::DeviceStatus& status) {
+                // 这里直接修改传入的引用参数
+                status = V1_0::DeviceStatus::UNKNOWN;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
+
+    DeviceStatus newDeviceStatus = AVAILABLE;
+    OH_NN_ReturnCode result = hdiDevice->GetDeviceStatus(newDeviceStatus);
+    EXPECT_EQ(OH_NN_SUCCESS, result);
 }
 
 /* *
@@ -631,6 +823,28 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodel_004, TestSize.Level0)
 }
 
 /* *
+ * @tc.name: hdidevice_preparemodel_005
+ * @tc.desc: Verify the PrepareModel function return failed.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_preparemodel_005, TestSize.Level0)
+{
+    LOGE("PrepareModel hdidevice_preparemodel_005");
+    OHOS::sptr<V1_0::MockIDevice> sp = OHOS::sptr<V1_0::MockIDevice>(new (std::nothrow) V1_0::MockIDevice());
+    EXPECT_NE(sp, nullptr);
+
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(sp);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* data = m_dataArry;
+    ModelConfig config;
+    std::shared_ptr<PreparedModel> preparedModel;
+    OH_NN_ReturnCode result = hdiDevice->PrepareModel(data, config, preparedModel);
+    EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, result);
+}
+
+/* *
  * @tc.name: hdidevice_preparemodelfrommodelcache_001
  * @tc.desc: Verify the PrepareModelFromModelCache function return success.
  * @tc.type: FUNC
@@ -719,6 +933,157 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodelfrommodelcache_003, TestSize.Level
 }
 
 /* *
+ * @tc.name: hdidevice_preparemodelfrommodelcache_004
+ * @tc.desc: Verify the PrepareModelFromModelCache function return success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_preparemodelfrommodelcache_004, TestSize.Level0)
+{
+    LOGE("GetDeviceStatus hdidevice_getdevicestatus_005");
+    size_t length = 100;
+    void *buffer = nullptr;
+    GetBuffer(buffer, length);
+
+    OHOS::sptr<V1_0::MockIDevice> sp = OHOS::sptr<V1_0::MockIDevice>(new (std::nothrow) V1_0::MockIDevice());
+    EXPECT_NE(sp, nullptr);
+
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(sp);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    std::vector<Buffer> modelCache = { { buffer, 100 } };
+    ModelConfig config;
+    config.mode = OH_NN_PERFORMANCE_LOW;
+    config.priority = OH_NN_PRIORITY_LOW;
+    OHOS::sptr<V1_0::IPreparedModel> preModel =
+        OHOS::sptr<V1_0::MockIPreparedModel>(new (std::nothrow) V1_0::MockIPreparedModel());
+    EXPECT_NE(preModel, nullptr);
+
+    std::shared_ptr<PreparedModel> preparedModel = std::make_shared<HDIPreparedModelV1_0>(preModel);
+
+    OHOS::sptr<V1_0::IPreparedModel> iPreparedModel =
+        OHOS::sptr<V1_0::MockIPreparedModel>(new (std::nothrow) V1_0::MockIPreparedModel);
+    EXPECT_CALL(*sp, PrepareModelFromModelCache(::testing::_, ::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<2>(iPreparedModel), ::testing::Return(HDF_FAILURE)));
+
+    bool isUpdatable = false;
+    OH_NN_ReturnCode result = hdiDevice->PrepareModelFromModelCache(modelCache, config, preparedModel, isUpdatable);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
+}
+
+/* *
+ * @tc.name: hdidevice_preparemodelfrommodelcache_005
+ * @tc.desc: Verify the PrepareModelFromModelCache function return success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_preparemodelfrommodelcache_005, TestSize.Level0)
+{
+    LOGE("GetDeviceStatus hdidevice_preparemodelfrommodelcache_005");
+    size_t length = 100;
+    void *buffer = nullptr;
+    GetBuffer(buffer, length);
+
+    OHOS::sptr<V1_0::MockIDevice> sp = OHOS::sptr<V1_0::MockIDevice>(new (std::nothrow) V1_0::MockIDevice());
+    EXPECT_NE(sp, nullptr);
+
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(sp);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    std::vector<Buffer> modelCache = { { buffer, 100 } };
+    ModelConfig config;
+    config.mode = OH_NN_PERFORMANCE_MEDIUM;
+    config.priority = OH_NN_PRIORITY_MEDIUM;
+    OHOS::sptr<V1_0::IPreparedModel> preModel =
+        OHOS::sptr<V1_0::MockIPreparedModel>(new (std::nothrow) V1_0::MockIPreparedModel());
+    EXPECT_NE(preModel, nullptr);
+
+    std::shared_ptr<PreparedModel> preparedModel = std::make_shared<HDIPreparedModelV1_0>(preModel);
+
+    OHOS::sptr<V1_0::IPreparedModel> iPreparedModel =
+        OHOS::sptr<V1_0::MockIPreparedModel>(new (std::nothrow) V1_0::MockIPreparedModel);
+    EXPECT_CALL(*sp, PrepareModelFromModelCache(::testing::_, ::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<2>(iPreparedModel), ::testing::Return(HDF_FAILURE)));
+
+    bool isUpdatable = false;
+    OH_NN_ReturnCode result = hdiDevice->PrepareModelFromModelCache(modelCache, config, preparedModel, isUpdatable);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
+}
+
+/* *
+ * @tc.name: hdidevice_preparemodelfrommodelcache_006
+ * @tc.desc: Verify the PrepareModelFromModelCache function return success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_preparemodelfrommodelcache_006, TestSize.Level0)
+{
+    LOGE("GetDeviceStatus hdidevice_preparemodelfrommodelcache_006");
+    size_t length = 100;
+    void *buffer = nullptr;
+    GetBuffer(buffer, length);
+
+    OHOS::sptr<V1_0::MockIDevice> sp = OHOS::sptr<V1_0::MockIDevice>(new (std::nothrow) V1_0::MockIDevice());
+    EXPECT_NE(sp, nullptr);
+
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(sp);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    std::vector<Buffer> modelCache = { { buffer, 100 } };
+    ModelConfig config;
+    config.mode = OH_NN_PERFORMANCE_HIGH;
+    config.priority = OH_NN_PRIORITY_HIGH;
+    OHOS::sptr<V1_0::IPreparedModel> preModel =
+        OHOS::sptr<V1_0::MockIPreparedModel>(new (std::nothrow) V1_0::MockIPreparedModel());
+    EXPECT_NE(preModel, nullptr);
+
+    std::shared_ptr<PreparedModel> preparedModel = std::make_shared<HDIPreparedModelV1_0>(preModel);
+
+    OHOS::sptr<V1_0::IPreparedModel> iPreparedModel =
+        OHOS::sptr<V1_0::MockIPreparedModel>(new (std::nothrow) V1_0::MockIPreparedModel);
+    EXPECT_CALL(*sp, PrepareModelFromModelCache(::testing::_, ::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<2>(iPreparedModel), ::testing::Return(HDF_FAILURE)));
+
+    bool isUpdatable = false;
+    OH_NN_ReturnCode result = hdiDevice->PrepareModelFromModelCache(modelCache, config, preparedModel, isUpdatable);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
+}
+
+/* *
+ * @tc.name: hdidevice_preparemodelfrommodelcache_007
+ * @tc.desc: Verify the PrepareModelFromModelCache function return success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_preparemodelfrommodelcache_007, TestSize.Level0)
+{
+    LOGE("GetDeviceStatus hdidevice_preparemodelfrommodelcache_007");
+    size_t length = 100;
+    void *buffer = nullptr;
+    GetBuffer(buffer, length);
+
+    OHOS::sptr<V1_0::MockIDevice> sp = OHOS::sptr<V1_0::MockIDevice>(new (std::nothrow) V1_0::MockIDevice());
+    EXPECT_NE(sp, nullptr);
+
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(sp);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    std::vector<Buffer> modelCache = { { buffer, 100 } };
+    ModelConfig config;
+    config.mode = OH_NN_PERFORMANCE_EXTREME;
+    OHOS::sptr<V1_0::IPreparedModel> preModel =
+        OHOS::sptr<V1_0::MockIPreparedModel>(new (std::nothrow) V1_0::MockIPreparedModel());
+    EXPECT_NE(preModel, nullptr);
+
+    std::shared_ptr<PreparedModel> preparedModel = std::make_shared<HDIPreparedModelV1_0>(preModel);
+
+    OHOS::sptr<V1_0::IPreparedModel> iPreparedModel =
+        OHOS::sptr<V1_0::MockIPreparedModel>(new (std::nothrow) V1_0::MockIPreparedModel);
+    EXPECT_CALL(*sp, PrepareModelFromModelCache(::testing::_, ::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<2>(iPreparedModel), ::testing::Return(HDF_FAILURE)));
+
+    bool isUpdatable = false;
+    OH_NN_ReturnCode result = hdiDevice->PrepareModelFromModelCache(modelCache, config, preparedModel, isUpdatable);
+    EXPECT_EQ(OH_NN_UNAVAILABLE_DEVICE, result);
+}
+
+/* *
  * @tc.name: hdidevice_allocatebuffer_001
  * @tc.desc: Verify the AllocateBuffer function return nullptr.
  * @tc.type: FUNC
@@ -770,6 +1135,66 @@ HWTEST_F(HDIDeviceTest, hdidevice_allocatebuffer_003, TestSize.Level0)
     size_t length = 0;
     void *result = hdiDevice->AllocateBuffer(length);
     EXPECT_EQ(nullptr, result);
+}
+
+/* *
+ * @tc.name: hdidevice_allocatebuffer_004
+ * @tc.desc: Verify the AllocateBuffer function return nullptr in case of 0 size.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_allocatebuffer_004, TestSize.Level0)
+{
+    LOGE("AllocateBuffer hdidevice_preparemodelfrommodelcache_007");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    size_t length = 0;
+    int fd = 0;
+    OH_NN_ReturnCode result = hdiDevice->AllocateBuffer(length, fd);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, result);
+}
+
+/* *
+ * @tc.name: hdidevice_allocatebuffer_005
+ * @tc.desc: Verify the AllocateBuffer function return nullptr in case of 0 size.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_allocatebuffer_005, TestSize.Level0)
+{
+    LOGE("AllocateBuffer hdidevice_allocatebuffer_005");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), AllocateBuffer(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(HDF_FAILURE));
+
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    size_t length = 1;
+    int fd = 0;
+    OH_NN_ReturnCode result = hdiDevice->AllocateBuffer(length, fd);
+    EXPECT_EQ(OH_NN_MEMORY_ERROR, result);
+}
+
+/* *
+ * @tc.name: hdidevice_allocatebuffer_006
+ * @tc.desc: Verify the AllocateBuffer function return nullptr in case of 0 size.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_allocatebuffer_006, TestSize.Level0)
+{
+    LOGE("AllocateBuffer hdidevice_allocatebuffer_006");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), AllocateBuffer(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Return(HDF_SUCCESS));
+
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    size_t length = 1;
+    int fd = 0;
+    OH_NN_ReturnCode result = hdiDevice->AllocateBuffer(length, fd);
+    EXPECT_EQ(OH_NN_SUCCESS, result);
 }
 
 /* *
@@ -873,6 +1298,3120 @@ HWTEST_F(HDIDeviceTest, hdidevice_releasebuffer_005, TestSize.Level0)
     const auto &memoryManager = MemoryManager::GetInstance();
     memoryManager->UnMapMemory(buffer);
 }
+
+/* *
+ * @tc.name: hdidevice_releasebuffer_007
+ * @tc.desc: Verify the ReleaseBuffer function validate moc object's ReleaseBuffer return failure.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_releasebuffer_007, TestSize.Level0)
+{
+    LOGE("ReleaseBuffer hdidevice_releasebuffer_007");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), ReleaseBuffer(::testing::_))
+        .WillRepeatedly(::testing::Return(HDF_FAILURE));
+
+    int fd = 0;
+    size_t length = 1;
+    OH_NN_ReturnCode ret = hdiDevice->ReleaseBuffer(fd, length);
+    EXPECT_EQ(OH_NN_MEMORY_ERROR, ret);
+}
+
+/* *
+ * @tc.name: hdidevice_releasebuffer_008
+ * @tc.desc: Verify the ReleaseBuffer function validate moc object's ReleaseBuffer return failure.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_releasebuffer_008, TestSize.Level0)
+{
+    LOGE("ReleaseBuffer hdidevice_releasebuffer_008");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    EXPECT_CALL(*((V1_0::MockIDevice *)device.GetRefPtr()), ReleaseBuffer(::testing::_))
+        .WillRepeatedly(::testing::Return(HDF_SUCCESS));
+
+    int fd = 0;
+    size_t length = 1;
+    OH_NN_ReturnCode ret = hdiDevice->ReleaseBuffer(fd, length);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
+}
+
+/* *
+ * @tc.name: hdidevice_allocatetensorbuffer_001
+ * @tc.desc: Verify the ReleaseBuffer function validate moc object's ReleaseBuffer return failure.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_allocatetensorbuffer_001, TestSize.Level0)
+{
+    LOGE("AllocateTensorBuffer hdidevice_allocatetensorbuffer_001");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    size_t length = 0;
+    std::shared_ptr<TensorDesc> tensor;
+    void* ret = hdiDevice->AllocateTensorBuffer(length, tensor);
+    EXPECT_EQ(nullptr, ret);
+}
+
+/* *
+ * @tc.name: hdidevice_allocatetensorbuffer_002
+ * @tc.desc: Verify the ReleaseBuffer function validate moc object's ReleaseBuffer return failure.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_allocatetensorbuffer_002, TestSize.Level0)
+{
+    LOGE("AllocateTensorBuffer hdidevice_allocatetensorbuffer_002");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+
+    size_t length = 0;
+    std::shared_ptr<NNTensor> tensor;
+    void* ret = hdiDevice->AllocateTensorBuffer(length, tensor);
+    EXPECT_EQ(nullptr, ret);
+}
+
+/* *
+ * @tc.name: hdidevice_prepareofflinemodel_001
+ * @tc.desc: Verify the ReleaseBuffer function validate moc object's ReleaseBuffer return failure.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_prepareofflinemodel_001, TestSize.Level0)
+{
+    LOGE("PrepareOfflineModel hdidevice_prepareofflinemodel_001");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+    
+    ModelConfig config;
+    std::shared_ptr<PreparedModel> preparedModel;
+    OH_NN_ReturnCode ret = hdiDevice->PrepareOfflineModel(nullptr, config, preparedModel);
+    EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, ret);
+}
+
+/* *
+ * @tc.name: hdidevice_prepareofflinemodel_002
+ * @tc.desc: Verify the ReleaseBuffer function validate moc object's ReleaseBuffer return failure.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_prepareofflinemodel_002, TestSize.Level0)
+{
+    LOGE("PrepareOfflineModel hdidevice_prepareofflinemodel_002");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+    
+    std::shared_ptr<mindspore::lite::LiteGraph> model = std::make_shared<mindspore::lite::LiteGraph>();
+    mindspore::lite::LiteGraph::Node node;
+    mindspore::lite::LiteGraph::Node* testNode = &node;
+    model->all_nodes_.emplace_back(testNode);
+    ModelConfig config;
+    std::shared_ptr<PreparedModel> preparedModel;
+    OH_NN_ReturnCode ret = hdiDevice->PrepareOfflineModel(model, config, preparedModel);
+    EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, ret);
+}
+
+/* *
+ * @tc.name: hdidevice_prepareofflinemodel_003
+ * @tc.desc: Verify the ReleaseBuffer function validate moc object's ReleaseBuffer return failure.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_prepareofflinemodel_003, TestSize.Level0)
+{
+    LOGE("PrepareOfflineModel hdidevice_prepareofflinemodel_003");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+    
+    std::shared_ptr<mindspore::lite::LiteGraph> model = std::make_shared<mindspore::lite::LiteGraph>();
+    mindspore::lite::LiteGraph::Node node;
+    uint32_t indice = 0;
+    node.input_indices_.emplace_back(indice);
+    node.input_indices_.emplace_back(indice);
+    mindspore::lite::LiteGraph::Node* testNode = &node;
+    model->all_nodes_.emplace_back(testNode);
+    model->all_tensors_.emplace_back(mindspore::lite::MindIR_Tensor_Create());
+    model->all_tensors_.emplace_back(mindspore::lite::MindIR_Tensor_Create());
+    ModelConfig config;
+    std::shared_ptr<PreparedModel> preparedModel;
+    OH_NN_ReturnCode ret = hdiDevice->PrepareOfflineModel(model, config, preparedModel);
+    EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, ret);
+}
+
+/* *
+ * @tc.name: hdidevice_prepareofflinemodel_004
+ * @tc.desc: Verify the ReleaseBuffer function validate moc object's ReleaseBuffer return failure.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HDIDeviceTest, hdidevice_prepareofflinemodel_004, TestSize.Level0)
+{
+    LOGE("PrepareOfflineModel hdidevice_prepareofflinemodel_004");
+    OHOS::sptr<V1_0::INnrtDevice> device = V1_0::INnrtDevice::Get(false);
+    std::unique_ptr<HDIDeviceV1_0> hdiDevice = std::make_unique<HDIDeviceV1_0>(device);
+    EXPECT_NE(hdiDevice, nullptr);
+    
+    std::shared_ptr<mindspore::lite::LiteGraph> model = std::make_shared<mindspore::lite::LiteGraph>();
+    mindspore::lite::LiteGraph::Node node;
+    uint32_t indice = 0;
+    node.input_indices_.emplace_back(indice);
+    node.input_indices_.emplace_back(indice);
+    mindspore::lite::LiteGraph::Node* testNode = &node;
+    model->all_nodes_.emplace_back(testNode);
+    model->all_tensors_.emplace_back(mindspore::lite::MindIR_Tensor_Create());
+    model->all_tensors_.emplace_back(mindspore::lite::MindIR_Tensor_Create());
+    ModelConfig config;
+    std::shared_ptr<PreparedModel> preparedModel;
+    OH_NN_ReturnCode ret = hdiDevice->PrepareOfflineModel(model, config, preparedModel);
+    EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, ret);
+}
 } // namespace UnitTest
+} // namespace NeuralNetworkRuntime
+} // namespace OHOS
+
+namespace OHOS {
+namespace NeuralNetworkRuntime {
+namespace V1 {
+namespace UnitTest {
+class LiteGraphToHDIModelTest : public testing::Test {
+public:
+    LiteGraphToHDIModelTest() = default;
+    ~LiteGraphToHDIModelTest() = default;
+public:
+    std::vector<uint32_t> m_inputs{0, 1};
+    std::vector<uint32_t> m_outputs{2};
+    std::vector<uint32_t> m_param{3};
+    std::vector<int32_t> m_input_dim{3, 3};
+    std::vector<int32_t> m_output_dim{3, 3};
+    std::vector<int32_t> m_param_dim{};
+};
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_001
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_001, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_001");
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(nullptr, tensorBuffer);
+    EXPECT_EQ(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_002
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_002, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_002");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {0, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_EQ(nullptr, model);
+
+    uint8_t *mmapPtr = static_cast<uint8_t *>(mmap(nullptr, tensorBuffer.bufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, tensorBuffer.fd, 0));
+    EXPECT_EQ(MAP_FAILED, mmapPtr);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_003
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_003, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_003");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::SubGraph* subGraph = new (std::nothrow) MSLITE::LiteGraph::SubGraph();
+    subGraph->name_ = "NNRt_SubGraph";
+    subGraph->input_indices_ = {1,1,1,1};
+    subGraph->output_indices_ = {1,1,1,1};
+    subGraph->node_indices_ = {1,1,1,1};
+
+    void* tp = MSLITE::MindIR_Tensor_Create();
+
+    liteGraph.get()->all_tensors_.emplace_back(tp);
+    liteGraph.get()->sub_graphs_.emplace_back(subGraph);
+
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 1, 1, 1};
+
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+
+    uint8_t *mmapPtr = static_cast<uint8_t *>(mmap(nullptr, tensorBuffer.bufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, tensorBuffer.fd, 0));
+    EXPECT_EQ(MAP_FAILED, mmapPtr);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_004
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_004, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_004");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    liteGraph.get()->all_nodes_.emplace_back(nullptr);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_EQ(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_005
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_005, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_005");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_EQ(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_006
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_006, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_006");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float alpha {0.0f};
+    float minVal {0.0f};
+    float maxVal {0.0f};
+    bool approximate {false};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_ABS};
+
+    void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType, alpha,
+        minVal, maxVal, approximate);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_007
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_007, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_007");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int8_t num = 1;
+    int8_t* fuseData = &num;
+    mindspore::lite::ActivationType m_activationType = NNToMS::TransfromFusionType(static_cast<OH_NN_FuseType>(*fuseData));
+    void* primitive = mindspore::lite::MindIR_AddFusion_CreatePrimitive(m_activationType);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_008
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_008, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_008");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_keepDims {0};
+    void* primitive = mindspore::lite::MindIR_All_CreatePrimitive(m_keepDims);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_009
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_009, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_009");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_axis {-1};
+    int64_t m_topK {1};
+    bool m_keepDims {false};
+    bool m_outMaxValue {false};
+    void* primitive = mindspore::lite::MindIR_ArgMaxFusion_CreatePrimitive(m_axis, m_topK, m_keepDims, m_outMaxValue);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_010
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_010, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_010");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_summarize {0};
+    void* primitive = mindspore::lite::MindIR_Assert_CreatePrimitive(m_summarize);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_011
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_011, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_011");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_kernelSize;
+    std::vector<int64_t> m_pad;
+    std::vector<int64_t> m_strides;
+    mindspore::lite::PadMode m_padMode {mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    mindspore::lite::RoundMode m_roundMode {mindspore::lite::ROUND_MODE_FLOOR};
+    mindspore::lite::Format m_format {mindspore::lite::FORMAT_NCHW};
+    bool m_global {false};
+    void* primitive = mindspore::lite::MindIR_AvgPoolFusion_CreatePrimitive(m_kernelSize, m_strides, m_pad,
+        m_padMode, m_roundMode, m_format, m_global, m_activationType);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_012
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_012, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_012");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_blockSize;
+    std::vector<std::vector<int64_t>> m_crops;
+    void* primitive = mindspore::lite::MindIR_BatchToSpaceND_CreatePrimitive(m_blockSize, m_crops);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_013
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_013, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_013");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float m_epsilon {0.0001f};
+    void* primitive = mindspore::lite::MindIR_FusedBatchNorm_CreatePrimitive(m_epsilon);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_014
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_014, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_014");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float m_epsilon {0.0001f};
+    void* primitive = mindspore::lite::MindIR_FusedBatchNorm_CreatePrimitive(m_epsilon);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_015
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_015, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_015");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_BiasAdd_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_016
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_016, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_016");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_shape;
+    void* primitive = mindspore::lite::MindIR_BroadcastTo_CreatePrimitive(m_shape);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_017
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_017, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_017");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Cast_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_018
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_018, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_018");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Ceil_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_019
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_019, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_019");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float m_max {0.0f};
+    float m_min {0.0f};
+    void* primitive = mindspore::lite::MindIR_Clip_CreatePrimitive(m_max, m_min);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_020
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_020, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_020");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_axis{0};
+    void* primitive = mindspore::lite::MindIR_Concat_CreatePrimitive(m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_021
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_021, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_021");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_dataType {0};
+    std::vector<float> m_value;
+    void* primitive = mindspore::lite::MindIR_ConstantOfShape_CreatePrimitive(m_dataType, m_value);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_022
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_022, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_022");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_group {1};
+    int64_t m_inChannel {0};
+    int64_t m_outChannel {0};
+    std::vector<int64_t> m_kernelSize;
+    std::vector<int64_t> m_strides;
+    std::vector<int64_t> m_padList;
+    std::vector<int64_t> m_dilation;
+    std::vector<int64_t> m_outputPaddings;
+    mindspore::lite::PadMode m_padMode{mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = MindIR_Conv2dTransposeFusion_CreatePrimitive(m_kernelSize,
+        m_strides, m_dilation, m_padMode, m_padList, m_group, m_inChannel, m_outChannel,
+        m_activationType, m_outputPaddings);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_023
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_023, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_023");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Cos_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_024
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_024, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_024");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_axis {0};
+    std::vector<int64_t> m_offset;
+    void* primitive = mindspore::lite::MindIR_Crop_CreatePrimitive(m_axis, m_offset);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_025
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_025, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_025");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_blockSize {0};
+    std::string m_mode;
+    mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
+    void* primitive = mindspore::lite::MindIR_DepthToSpace_CreatePrimitive(m_blockSize, format, m_mode);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_026
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_026, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_026");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_inputSize {0};
+    std::vector<float> m_scale;
+    float m_nmsIoUThreshold {0.0f};
+    float m_nmsScoreThreshold {0.0f};
+    int64_t m_maxDetections {0};
+    int64_t m_detectionsPerClass {0};
+    int64_t m_maxClassesPerDetection {0};
+    int64_t m_numClasses {0};
+    bool m_useRegularNms {false};
+    bool m_outQuantized {false};
+    mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
+    void* primitive = mindspore::lite::MindIR_DetectionPostProcess_CreatePrimitive(format, m_inputSize, m_scale,
+        m_nmsIoUThreshold, m_nmsScoreThreshold, m_maxDetections, m_detectionsPerClass, m_maxClassesPerDetection,
+        m_numClasses, m_useRegularNms, m_outQuantized);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_027
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_027, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_027");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    mindspore::lite::EltwiseMode m_mode {mindspore::lite::ELTWISE_MODE_PROD};
+    void* primitive = mindspore::lite::MindIR_Eltwise_CreatePrimitive(m_mode);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_028
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_028, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_028");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Equal_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_029
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_029, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_029");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Erf_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_030
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_030, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_030");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float m_base {-1.0f};
+    float m_scale {1.0f};
+    float m_shift {0.0f};
+    void* primitive = mindspore::lite::MindIR_ExpFusion_CreatePrimitive(m_base, m_scale, m_shift);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_031
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_031, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_031");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_ExpandDims_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_032
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_032, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_032");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Fill_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_033
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_033, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_033");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_axis {1};
+    void* primitive = mindspore::lite::MindIR_Flatten_CreatePrimitive(m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_034
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_034, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_034");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Floor_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_035
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_035, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_035");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    bool m_hasBias {false};
+    bool m_useAxis {false};
+    int64_t m_axis {0};
+    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_FullConnection_CreatePrimitive(m_hasBias, m_useAxis,
+        m_axis, m_activationType);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_036
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_036, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_036");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Gather_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_037
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_037, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_037");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_GatherNd_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_038
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_038, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_038");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    mindspore::lite::ActivationType activationType = mindspore::lite::ACTIVATION_TYPE_GELU;
+    float alpha = 0.0f;
+    float minVal = 0.0f;
+    float maxVal = 0.0f;
+    bool m_approximate = false;
+    void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType,
+        alpha, minVal, maxVal, m_approximate);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_039
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_039, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_039");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Greater_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_040
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_040, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_040");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_GreaterEqual_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_041
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_041, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_041");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    mindspore::lite::ActivationType activationType = mindspore::lite::ACTIVATION_TYPE_HSIGMOID;
+    float alpha = 0.0f;
+    float minVal = 0.0f;
+    float maxVal = 0.0f;
+    bool approximate = false;
+    void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType,
+        alpha, minVal, maxVal, approximate);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_042
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_042, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_042");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float m_epsilon {0.0f};
+    void* primitive = mindspore::lite::MindIR_InstanceNorm_CreatePrimitive(m_epsilon);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_043
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_043, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_043");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float m_epsilon {0.0f};
+    void* primitive = mindspore::lite::MindIR_InstanceNorm_CreatePrimitive(m_epsilon);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_044
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_044, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_044");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_axis;
+    float m_epsilon {1e-6};
+    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_L2NormalizeFusion_CreatePrimitive(m_axis, m_epsilon, m_activationType);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_045
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_045, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_045");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_beginNormAxis {1};
+    float m_epsilon {1e-7};
+    bool m_elementwiseAffine {true};
+    int64_t m_beginParamsAxis {1};
+    void* primitive = mindspore::lite::MindIR_LayerNormFusion_CreatePrimitive(m_beginNormAxis,
+        m_epsilon, m_elementwiseAffine, m_beginParamsAxis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_046
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_046, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_046");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float alpha {0.0f};
+    float minVal {0.0f};
+    float maxVal {0.0f};
+    bool approximate {false};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_LEAKY_RELU};
+    void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType, alpha,
+        minVal, maxVal, approximate);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_047
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_047, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_047");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Less_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_048
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_048, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_048");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_LessEqual_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_049
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_049, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_049");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Log_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_050
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_050, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_050");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_axis {0};
+    void* primitive = mindspore::lite::MindIR_LogSoftmax_CreatePrimitive(m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_051
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_051, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_051");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_LogicalAnd_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_052
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_052, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_052");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_LogicalNot_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_053
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_053, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_053");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_LogicalOr_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_054
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_054, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_054");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_depthRadius {0};
+    float m_bias {0.0f};
+    float m_alpha {0.0f};
+    float m_beta {0.0f};
+    std::string m_normRegion {"ACROSS_CHANNELS"};
+    void* primitive = mindspore::lite::MindIR_LRN_CreatePrimitive(m_depthRadius, m_bias, m_alpha,
+        m_beta, m_normRegion);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_055
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_055, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_055");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    bool m_bidirectional {false};
+    bool m_hasBias {false};
+    int64_t m_inputSize {0};
+    int64_t m_hiddenSize {0};
+    int64_t m_numLayers {0};
+    int64_t m_numDirections {0};
+    float m_dropout {0.0f};
+    float m_zoneoutCell {0.0f};
+    float m_zoneoutHidden {0.0f};
+    int64_t m_projSize {0};
+    void* primitive = mindspore::lite::MindIR_LSTM_CreatePrimitive(m_bidirectional, m_hasBias, m_inputSize,
+        m_hiddenSize, m_numLayers, m_numDirections, m_dropout, m_zoneoutCell, m_zoneoutHidden, m_projSize);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_056
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_056, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_056");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Maximum_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_057
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_057, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_057");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_kernelSize;
+    std::vector<int64_t> m_pad;
+    std::vector<int64_t> m_strides;
+    mindspore::lite::PadMode m_padMode {mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    mindspore::lite::Format m_format {mindspore::lite::FORMAT_NCHW};
+    bool m_global {false};
+    void* primitive = MindIR_MaxPoolFusion_CreatePrimitive(m_kernelSize, m_strides, m_pad,
+        m_padMode, m_format, m_global, m_activationType);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_058
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_058, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_058");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Minimum_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_059
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_059, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_059");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Mod_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_060
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_060, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_060");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_MulFusion_CreatePrimitive(m_activationType);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_061
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_061, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_061");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Neg_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_062
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_062, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_062");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_NotEqual_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_063
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_063, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_063");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_axis {-1};
+    void* primitive = mindspore::lite::MindIR_OneHot_CreatePrimitive(m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_064
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_064, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_064");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<std::vector<int64_t>> paddings;
+    float m_constantValue {0.0f};
+    mindspore::lite::PaddingMode m_paddingMode {mindspore::lite::PADDING_MODE_CONSTANT};
+    void* primitive = MindIR_PadFusion_CreatePrimitive(paddings, m_paddingMode, m_constantValue);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_065
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_065, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_065");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float m_scale {1.0f};
+    float m_shift {0.0f};
+    void* primitive = mindspore::lite::MindIR_PowFusion_CreatePrimitive(m_scale, m_shift);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_066
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_066, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_066");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    bool channelShared{false};
+    void* primitive = mindspore::lite::MindIR_PReLUFusion_CreatePrimitive(channelShared);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_067
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_067, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_067");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    const uint64_t* m_src_t{nullptr};
+    const uint64_t* m_dst_t{nullptr};
+    int64_t m_axis {0};
+    void* primitive = mindspore::lite::MindIR_QuantDTypeCast_CreatePrimitive(*m_src_t, *m_dst_t, m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_068
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_068, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_068");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t dType {0.0f};
+    int64_t m_start {0};
+    int64_t m_limit {0};
+    int64_t m_delta {1};
+    void* primitive = mindspore::lite::MindIR_Range_CreatePrimitive(dType, m_start, m_limit, m_delta);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_069
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_069, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_069");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Rank_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_070
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_070, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_070");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Reciprocal_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_071
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_071, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_071");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    mindspore::lite::ReduceMode mode {mindspore::lite::REDUCE_MODE_ALL};
+    float m_coeff {0.0f};
+    bool m_reduceToEnd {false};
+    bool m_keepDims {false};
+    void* primitive = mindspore::lite::MindIR_ReduceFusion_CreatePrimitive(m_keepDims, mode, m_reduceToEnd, m_coeff);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_072
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_072, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_072");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float alpha{0.0f};
+    float minVal{0.0f};
+    float maxVal{0.0f};
+    bool approximate{false};
+    mindspore::lite::ActivationType activationType{mindspore::lite::ACTIVATION_TYPE_RELU6};
+    void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType, alpha,
+        minVal, maxVal, approximate);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_073
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_073, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_073");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Reshape_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_074
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_074, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_074");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float cubicCoeff{0.0f};
+    float extrapolationValue{0.0f};
+    mindspore::lite::NearestMode nearestMode{mindspore::lite::NEAREST_MODE_NORMAL};
+    mindspore::lite::ResizeMethod m_method {mindspore::lite::RESIZE_METHOD_LINEAR};
+    uint64_t m_newHeight{0};
+    uint64_t m_newWidth{0};
+    bool m_preserveAspectRatio{false};
+    mindspore::lite::CoordinateTransformMode m_coordinateTransformMode {
+        mindspore::lite::COORDINATE_TRANSFORM_MODE_ASYMMETRIC};
+    uint64_t m_excludeOutside{0};
+    void* primitive = mindspore::lite::MindIR_Resize_CreatePrimitive(m_method, m_newHeight, m_newWidth,
+        m_preserveAspectRatio, m_coordinateTransformMode, cubicCoeff, m_excludeOutside,
+        extrapolationValue, nearestMode);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_075
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_075, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_075");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Round_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_076
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_076, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_076");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Rsqrt_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_077
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_077, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_077");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    const uint64_t* m_axis{nullptr};
+    void* primitive = mindspore::lite::MindIR_ScaleFusion_CreatePrimitive(*m_axis, m_activationType);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_078
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_078, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_078");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_ScatterNd_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_079
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_079, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_079");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Select_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_080
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_080, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_080");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float alpha{0.0f};
+    float minVal{0.0f};
+    float maxVal{0.0f};
+    bool approximate{false};
+    mindspore::lite::ActivationType activationType{mindspore::lite::ACTIVATION_TYPE_SIGMOID};
+    void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType, alpha, minVal,
+        maxVal, approximate);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_081
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_081, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_081");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Sin_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_082
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_082, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_082");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
+    int64_t m_blockSize {0};
+    void* primitive = mindspore::lite::MindIR_SpaceToDepth_CreatePrimitive(m_blockSize, format);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_083
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_083, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_083");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_SparseToDense_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_084
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_084, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_084");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Square_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_085
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_085, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_085");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float alpha {0.0f};
+    float minVal {0.0f};
+    float maxVal {0.0f};
+    bool approximate {false};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_SWISH};
+    void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType, alpha,
+        minVal, maxVal, approximate);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_086
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_086, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_086");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_axis {0};
+    void* primitive = mindspore::lite::MindIR_Unstack_CreatePrimitive(m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_087
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_087, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_087");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Where_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_088
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_088, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_088");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Shape_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_089
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_089, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_089");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_axis;
+    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_090
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_090, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_090");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_inChannel{0};
+    int64_t m_outChannel{0};
+    std::vector<int64_t> m_kernelSize;
+    std::vector<int64_t> m_strides;
+    std::vector<int64_t> m_pad;
+    std::vector<int64_t> m_dilation;
+    mindspore::lite::PadMode m_padMode{mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_Conv2DFusion_CreatePrimitive(m_kernelSize, m_strides,
+        m_dilation, m_padMode, m_pad, m_inChannel, m_inChannel, m_outChannel, m_activationType);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_091
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_091, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_091");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_DivFusion_CreatePrimitive(m_activationType);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_092
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_092, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_092");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    bool m_transposeA{false};
+    bool m_transposeB{false};
+    void* primitive = mindspore::lite::MindIR_MatMulFusion_CreatePrimitive(m_transposeA, m_transposeB, m_activationType);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_093
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_093, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_093");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_axes;
+    void* primitive = mindspore::lite::MindIR_SliceFusion_CreatePrimitive(m_axes);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_094
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_094, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_094");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_axis;
+    void* primitive = mindspore::lite::MindIR_Softmax_CreatePrimitive(m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_095
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_095, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_095");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<std::vector<int64_t>> paddings;
+    std::vector<int64_t> block_shape {};
+    void* primitive = mindspore::lite::MindIR_SpaceToBatchND_CreatePrimitive(block_shape, paddings);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_096
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_096, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_096");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_output_num {0};
+    std::vector<int64_t> m_size_splits;
+    int64_t m_axis {0};
+    void* primitive = mindspore::lite::MindIR_Split_CreatePrimitive(m_output_num, m_size_splits, m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_097
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_097, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_097");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Sqrt_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_098
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_098, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_098");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_SquaredDifference_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_099
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_099, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_099");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_axis;
+    void* primitive = mindspore::lite::MindIR_Squeeze_CreatePrimitive(m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_100
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_100, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_100");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_axis = {0};
+    void* primitive = mindspore::lite::MindIR_Stack_CreatePrimitive(m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_101
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_101, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_101");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_begin_mask = {0};
+    int64_t m_end_mask = {0};
+    int64_t m_ellipsis_mask = {0};
+    int64_t m_new_axis_mask = {0};
+    int64_t m_shrink_axis_mask = {0};
+    void* primitive = mindspore::lite::MindIR_StridedSlice_CreatePrimitive(m_begin_mask, m_end_mask, m_ellipsis_mask,
+        m_new_axis_mask, m_shrink_axis_mask);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_102
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_102, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_102");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    mindspore::lite::ActivationType  m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_SubFusion_CreatePrimitive(m_activationType);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_103
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_103, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_103");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_dims {0};
+    void* primitive = mindspore::lite::MindIR_TileFusion_CreatePrimitive(m_dims);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_104
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_104, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_104");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    int64_t m_axis {0};
+    bool m_sorted {true};
+    void* primitive = mindspore::lite::MindIR_TopKFusion_CreatePrimitive(m_sorted, m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_105
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_105, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_105");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    void* primitive = mindspore::lite::MindIR_Transpose_CreatePrimitive();
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_106
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_106, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_106");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_axis;
+    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_107
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_107, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_107");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    std::vector<int64_t> m_axis;
+    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(m_axis);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_108
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_108, TestSize.Level0)
+{
+    LOGE("LiteGraph_To_HDIModel litegraphtohdimodeltest_litegraph_to_hdimodel_108");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::SubGraph* subGraph = new (std::nothrow) MSLITE::LiteGraph::SubGraph();
+    subGraph->name_ = "NNRt_SubGraph";
+    subGraph->input_indices_ = {1,1,1,1};
+    subGraph->output_indices_ = {1,1,1,1};
+    subGraph->node_indices_ = {1,1,1,1};
+
+    void* tp = MSLITE::MindIR_Tensor_Create();
+
+    liteGraph.get()->all_tensors_.emplace_back(tp);
+    liteGraph.get()->all_tensors_.emplace_back(nullptr);
+    liteGraph.get()->sub_graphs_.emplace_back(subGraph);
+
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 1, 1, 1};
+
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+
+    uint8_t *mmapPtr = static_cast<uint8_t *>(mmap(nullptr, tensorBuffer.bufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, tensorBuffer.fd, 0));
+    EXPECT_EQ(MAP_FAILED, mmapPtr);
+}
+
+/**
+ * @tc.name: litegraphtohdimodeltest_hdimodel_destroy_001
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_hdimodel_destroy_001, TestSize.Level0)
+{
+    LOGE("HDIModel_Destroy litegraphtohdimodeltest_hdimodel_destroy_001");
+    std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+
+    float alpha {0.0f};
+    float minVal {0.0f};
+    float maxVal {0.0f};
+    bool approximate {false};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_ABS};
+
+    void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType, alpha,
+        minVal, maxVal, approximate);
+
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1,1,1,1};
+    node->output_indices_ = {1,1,1,1};
+
+    liteGraph.get()->all_nodes_.emplace_back(node);
+    OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
+    OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
+    EXPECT_NE(nullptr, model);
+    HDIModel_Destroy(&model);
+}
+} // namespace UnitTest
+} // namespace V1
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS

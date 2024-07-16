@@ -36,6 +36,10 @@ public:
     int GetFd() const override;
     size_t GetSize() const override;
     size_t GetOffset() const override;
+    void SetData(void* data);
+    void SetFd(int fd);
+    void SetSize(size_t size);
+    void SetOffset(size_t offset);
     size_t GetBackendID() const override;
 
     bool CheckTensorData() const;
