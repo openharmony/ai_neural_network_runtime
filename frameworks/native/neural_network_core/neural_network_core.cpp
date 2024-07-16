@@ -293,11 +293,12 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_AddExtensionConfig(OH_NNCompilation *
         return OH_NN_FAILED;
     }
 
-    auto emplaceResult = compilationImpl->configs.emplace(configNameStr, configValueVec);
-    if (!emplaceResult.second) {
-        LOGE("OH_NNCompilation_AddExtensionConfig failed, configName %{public}s already exists,"
-             "don't set again.", configName);
-        return OH_NN_FAILED;
+    auto iter = compilationImpl->configs.find(configNameStr);
+    if (iter == compilationImpl->configs.end()) {
+        compilationImpl->configs.emplace(configNameStr, configValueVec);
+    } else {
+        iter->second.emplace_back('|');
+        iter->second.insert(iter->second.end(), configValueVec.begin(), configValueVec.end());
     }
 
     return OH_NN_SUCCESS;
