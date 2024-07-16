@@ -31,6 +31,7 @@ const int CACHE_INPUT_TENSORDESC_OFFSET = 2;
 const int CACHE_OUTPUT_TENSORDESC_OFFSET = 1;
 constexpr int32_t  NUMBER_CACHE_INFO_MEMBERS = 3;
 const std::string EXTENSION_KEY_MODEL_NAME = "ModelName";
+const int OPVERSION_SUBSTR_NUM = 2;
 
 struct SerializedTensorDesc {
 public:
@@ -618,6 +619,16 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     if (isUpdatable) {
         LOGI("isUpdatable is true");
 
+        std::string currentVersion = "0x00000000";
+        std::string path = "/data/data/hiai/version";
+        std::ifstream inf(path.c_str());
+        if (inf.is_open()) {
+            getline(inf, currentVersion);
+        }
+
+        int currentOpVersion = std::stoi(currentVersion.substr(OPVERSION_SUBSTR_NUM));
+        inf.close();
+
         NNCompiledCacheInfo modelCacheInfo;
         std::string cacheInfoPath = m_cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
         ret = compiledCache.CheckCacheInfo(modelCacheInfo, cacheInfoPath);
@@ -626,31 +637,36 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
             return ret;
         }
 
-        LOGI("isUpdatable modelCacheInfo");
+        LOGI("isUpdatable currentOpVersion is: %{public}d", currentVersion);
+        LOGI("isUpdatable modelCacheInfo opVersion is %{public}ld", modelCacheInfo.opVersion);
 
-        const size_t cacheNumber = caches.size();
-        uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber;
-        uint32_t infoCharNumber = cacheSize * sizeof(int64_t);
+        if (currentOpVersion > modelCacheInfo.opVersion) {
+            const size_t cacheNumber = caches.size();
+            uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber + 1;
+            uint32_t infoCharNumber = cacheSize * sizeof(int64_t);
 
-        std::unique_ptr<int64_t[]> cacheInfo = CreateUniquePtr<int64_t[]>(cacheSize);
-        if (cacheInfo == nullptr) {
-            LOGE("[NNCompiledCache] isUpdatable is true to create unique failed.");
-            return OH_NN_MEMORY_ERROR;
-        }
+            std::unique_ptr<int64_t[]> cacheInfo = CreateUniquePtr<int64_t[]>(cacheSize);
+            if (cacheInfo == nullptr) {
+                LOGE("[NNCompiledCache] isUpdatable is true to create unique failed.");
+                return OH_NN_MEMORY_ERROR;
+            }
 
-        auto cacheInfoPtr = cacheInfo.get();
-        *cacheInfoPtr++ = modelCacheInfo.fileNumber;
-        *cacheInfoPtr++ = modelCacheInfo.version - 1;
-        *cacheInfoPtr++ = modelCacheInfo.deviceId;
+            auto cacheInfoPtr = cacheInfo.get();
+            *cacheInfoPtr++ = modelCacheInfo.fileNumber;
+            *cacheInfoPtr++ = modelCacheInfo.version - 1;
+            *cacheInfoPtr++ = modelCacheInfo.deviceId;
 
-        for (size_t i = 0; i < modelCacheInfo.modelCheckSum.size(); ++i) {
-            *cacheInfoPtr++ = static_cast<int64_t>(modelCacheInfo.modelCheckSum[i]);
-        }
+            for (size_t i = 0; i < modelCacheInfo.modelCheckSum.size(); ++i) {
+                *cacheInfoPtr++ = static_cast<int64_t>(modelCacheInfo.modelCheckSum[i]);
+            }
 
-        ret = compiledCache.WriteCacheInfo(infoCharNumber, cacheInfo, m_cachePath);
-        if (ret != OH_NN_SUCCESS) {
-            LOGE("[NNCompiledCache] isUpdatable is true to write cache info failed.");
-            return ret;
+            *cacheInfoPtr++ = currentOpVersion;
+
+            ret = compiledCache.WriteCacheInfo(infoCharNumber, cacheInfo, m_cachePath);
+            if (ret != OH_NN_SUCCESS) {
+                LOGE("[NNCompiledCache] isUpdatable is true to write cache info failed.");
+                return ret;
+            }
         }
     }
 
