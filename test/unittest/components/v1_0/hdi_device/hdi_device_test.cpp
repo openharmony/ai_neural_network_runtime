@@ -1517,7 +1517,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
     EXPECT_EQ(nullptr, model);
 
-    uint8_t *mmapPtr = static_cast<uint8_t *>(mmap(nullptr, tensorBuffer.bufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, tensorBuffer.fd, 0));
+    uint8_t *mmapPtr = static_cast<uint8_t *>(mmap(nullptr,
+        tensorBuffer.bufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, tensorBuffer.fd, 0));
     EXPECT_EQ(MAP_FAILED, mmapPtr);
 }
 
@@ -1546,7 +1547,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     OHOS::HDI::Nnrt::V1_0::Model * model = LiteGraph_To_HDIModel(liteGraph.get(), tensorBuffer);
     EXPECT_NE(nullptr, model);
 
-    uint8_t *mmapPtr = static_cast<uint8_t *>(mmap(nullptr, tensorBuffer.bufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, tensorBuffer.fd, 0));
+    uint8_t *mmapPtr = static_cast<uint8_t *>(mmap(nullptr,
+        tensorBuffer.bufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, tensorBuffer.fd, 0));
     EXPECT_EQ(MAP_FAILED, mmapPtr);
 }
 
