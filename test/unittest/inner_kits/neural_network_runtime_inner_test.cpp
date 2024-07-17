@@ -316,7 +316,8 @@ HWTEST_F(NeuralNetworkRuntimeInnerTest, oh_nnmodel_setinputsandoutputsinfo_002, 
     size_t inputSize = 1;
     OH_NN_TensorInfo outputsInfo;
     size_t outputSize = 1 ;
-    OH_NN_ReturnCode ret = OH_NNModel_SetInputsAndOutputsInfo(nullptr, &inputsInfo, inputSize, &outputsInfo, outputSize);
+    OH_NN_ReturnCode ret = OH_NNModel_SetInputsAndOutputsInfo(nullptr,
+        &inputsInfo, inputSize, &outputsInfo, outputSize);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 

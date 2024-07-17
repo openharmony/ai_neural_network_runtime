@@ -104,13 +104,13 @@ public:
     MOCK_METHOD1(CreateTensor, Tensor*(TensorDesc*));
     MOCK_METHOD1(DestroyTensor, OH_NN_ReturnCode(Tensor*));
 
-    std::shared_ptr<Device> GetDevice() {
+    std::shared_ptr<Device> GetDevice()
+    {
         std::shared_ptr<Device> device = std::make_shared<MockIDevice>();
     EXPECT_CALL(*((MockIDevice *) device.get()), AllocateBuffer(::testing::_, ::testing::_))
         .WillRepeatedly(::testing::Return(OH_NN_SUCCESS));
         return device;
     }
-    // MOCK_CONST_METHOD0(GetDevice, std::shared_ptr<Device>());
     MOCK_METHOD2(GetSupportedOperation, OH_NN_ReturnCode(std::shared_ptr<const mindspore::lite::LiteGraph>,
                                            std::vector<bool>&));
 };
@@ -145,8 +145,8 @@ HWTEST_F(NNTensor2_0Test, nntensor2_0test_construct_002, TestSize.Level0)
     EXPECT_NE(nullptr, nnTensor);
 
     nnTensor->SetSize(1);
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* buffer = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* buffer = dataArry;
     nnTensor->SetData(buffer);
     nnTensor->SetFd(-1);
     delete nnTensor;
@@ -166,8 +166,8 @@ HWTEST_F(NNTensor2_0Test, nntensor2_0test_construct_003, TestSize.Level0)
     EXPECT_NE(nullptr, nnTensor);
 
     nnTensor->SetSize(1);
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* buffer = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* buffer = dataArry;
     nnTensor->SetData(buffer);
     nnTensor->SetFd(0);
     delete nnTensor;
@@ -238,7 +238,8 @@ HWTEST_F(NNTensor2_0Test, nntensor2_0test_createdata_002, TestSize.Level0)
     testing::Mock::AllowLeak(tensorDesc.get());
 }
 
-std::shared_ptr<Backend> Creator() {
+std::shared_ptr<Backend> Creator()
+{
     size_t backendID = 1;
     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
 
@@ -361,7 +362,8 @@ HWTEST_F(NNTensor2_0Test, nntensor2_0test_createdata_005, TestSize.Level0)
     testing::Mock::AllowLeak(tensorDesc.get());
 }
 
-std::shared_ptr<Backend> Creator2() {
+std::shared_ptr<Backend> Creator2()
+{
     size_t backendID = 2;
 
     std::shared_ptr<Backend> backend = std::make_unique<NNBackend>(nullptr, backendID);
@@ -403,7 +405,8 @@ HWTEST_F(NNTensor2_0Test, nntensor2_0test_createdata_006, TestSize.Level0)
     EXPECT_EQ(OH_NN_NULL_PTR, ret);
 }
 
-std::shared_ptr<Backend> Creator3() {
+std::shared_ptr<Backend> Creator3()
+{
     size_t backendID = 3;
     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
 
@@ -429,7 +432,6 @@ std::shared_ptr<Backend> Creator3() {
 
     std::shared_ptr<Backend> backend = std::make_unique<NNBackend>(device, backendID);
 
-    // LOGE("CreateData Creator [%{public}zu]",backend->GetBackendID());
     return backend;
 }
 
@@ -468,7 +470,8 @@ HWTEST_F(NNTensor2_0Test, nntensor2_0test_createdata_007, TestSize.Level0)
     EXPECT_EQ(OH_NN_MEMORY_ERROR, ret);
 }
 
-std::shared_ptr<Backend> Creator4() {
+std::shared_ptr<Backend> Creator4()
+{
     size_t backendID = 4;
     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
 
@@ -498,7 +501,6 @@ std::shared_ptr<Backend> Creator4() {
 
     std::shared_ptr<Backend> backend = std::make_unique<NNBackend>(device, backendID);
 
-    // LOGE("CreateData Creator [%{public}zu]",backend->GetBackendID());
     return backend;
 }
 
@@ -550,8 +552,8 @@ HWTEST_F(NNTensor2_0Test, nntensor2_0test_createdata_009, TestSize.Level0)
     NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
     EXPECT_NE(nullptr, nnTensor);
 
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* buffer = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* buffer = dataArry;
     nnTensor->SetData(buffer);
 
     OH_NN_ReturnCode ret = nnTensor->CreateData();
@@ -674,8 +676,8 @@ HWTEST_F(NNTensor2_0Test, nntensor2_0test_createdata_024, TestSize.Level0)
     NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
     EXPECT_NE(nullptr, nnTensor);
 
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* buffer = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* buffer = dataArry;
     nnTensor->SetData(buffer);
 
     size_t size = 1;
@@ -696,8 +698,8 @@ HWTEST_F(NNTensor2_0Test, nntensor2_0test_createdata_029, TestSize.Level0)
     NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
     EXPECT_NE(nullptr, nnTensor);
 
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* buffer = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* buffer = dataArry;
     nnTensor->SetData(buffer);
 
     int fd = 1;
@@ -1142,8 +1144,8 @@ HWTEST_F(NNTensor2_0Test, nntensor2_0test_checktensordata_005, TestSize.Level0)
 
     nnTensor->SetSize(200);
     nnTensor->SetOffset(0);
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* buffer = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* buffer = dataArry;
     nnTensor->SetData(buffer);
     nnTensor->SetFd(-1);
 
@@ -1177,8 +1179,8 @@ HWTEST_F(NNTensor2_0Test, nntensor2_0test_checktensordata_006, TestSize.Level0)
 
     nnTensor->SetSize(200);
     nnTensor->SetOffset(0);
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* buffer = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* buffer = dataArry;
     nnTensor->SetData(buffer);
 
     bool ret = nnTensor->CheckTensorData();

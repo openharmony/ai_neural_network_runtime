@@ -118,8 +118,6 @@ sptr<INnrtDevice> INnrtDevice::Get(const std::string& serviceName, bool isStub)
 } // HDI
 } // OHOS
 
-
-
 namespace mindspore {
 namespace lite {
 OHOS::HDI::Nnrt::V2_0::Model* MindIR_LiteGraph_To_Model(const LiteGraph* lite_graph,
@@ -994,8 +992,8 @@ HWTEST_F(HDIDeviceTest, hdidevice_preparemodel_005, TestSize.Level0)
     std::unique_ptr<HDIDeviceV2_0> hdiDevice = std::make_unique<HDIDeviceV2_0>(sp);
     EXPECT_NE(hdiDevice, nullptr);
 
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* data = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* data = dataArry;
     ModelConfig config;
     std::shared_ptr<PreparedModel> preparedModel;
     OH_NN_ReturnCode result = hdiDevice->PrepareModel(data, config, preparedModel);
@@ -2366,8 +2364,8 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_preparemodel_005, TestSize.Level0)
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(sp);
     EXPECT_NE(hdiDevice, nullptr);
 
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* data = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* data = dataArry;
     ModelConfig config;
     std::shared_ptr<PreparedModel> preparedModel;
     OH_NN_ReturnCode result = hdiDevice->PrepareModel(data, config, preparedModel);
@@ -3081,9 +3079,9 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::SubGraph* subGraph = new (std::nothrow) MSLITE::LiteGraph::SubGraph();
     subGraph->name_ = "NNRt_SubGraph";
-    subGraph->input_indices_ = {1,1,1,1};
-    subGraph->output_indices_ = {1,1,1,1};
-    subGraph->node_indices_ = {1,1,1,1};
+    subGraph->input_indices_ = {1, 1, 1, 1};
+    subGraph->output_indices_ = {1, 1, 1, 1};
+    subGraph->node_indices_ = {1, 1, 1, 1};
 
     void* tp = MSLITE::MindIR_Tensor_Create();
 
@@ -3153,8 +3151,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3175,14 +3173,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
 
     int8_t num = 1;
     int8_t* fuseData = &num;
-    mindspore::lite::ActivationType m_activationType = NNToMS::TransfromFusionType(static_cast<OH_NN_FuseType>(*fuseData));
-    void* primitive = mindspore::lite::MindIR_AddFusion_CreatePrimitive(m_activationType);
+    mindspore::lite::ActivationType type = NNToMS::TransfromFusionType(static_cast<OH_NN_FuseType>(*fuseData));
+    void* primitive = mindspore::lite::MindIR_AddFusion_CreatePrimitive(type);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3201,14 +3199,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_keepDims {0};
-    void* primitive = mindspore::lite::MindIR_All_CreatePrimitive(m_keepDims);
+    int64_t keepDims {0};
+    void* primitive = mindspore::lite::MindIR_All_CreatePrimitive(keepDims);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3227,17 +3225,17 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {-1};
-    int64_t m_topK {1};
-    bool m_keepDims {false};
-    bool m_outMaxValue {false};
-    void* primitive = mindspore::lite::MindIR_ArgMaxFusion_CreatePrimitive(m_axis, m_topK, m_keepDims, m_outMaxValue);
+    int64_t axis {-1};
+    int64_t topK {1};
+    bool keepDims {false};
+    bool outMaxValue {false};
+    void* primitive = mindspore::lite::MindIR_ArgMaxFusion_CreatePrimitive(axis, topK, keepDims, outMaxValue);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3256,14 +3254,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_summarize {0};
-    void* primitive = mindspore::lite::MindIR_Assert_CreatePrimitive(m_summarize);
+    int64_t summarize {0};
+    void* primitive = mindspore::lite::MindIR_Assert_CreatePrimitive(summarize);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3282,22 +3280,22 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_kernelSize;
-    std::vector<int64_t> m_pad;
-    std::vector<int64_t> m_strides;
-    mindspore::lite::PadMode m_padMode {mindspore::lite::PAD_MODE_PAD};
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    mindspore::lite::RoundMode m_roundMode {mindspore::lite::ROUND_MODE_FLOOR};
-    mindspore::lite::Format m_format {mindspore::lite::FORMAT_NCHW};
-    bool m_global {false};
-    void* primitive = mindspore::lite::MindIR_AvgPoolFusion_CreatePrimitive(m_kernelSize, m_strides, m_pad,
-        m_padMode, m_roundMode, m_format, m_global, m_activationType);
+    std::vector<int64_t> kernelSize;
+    std::vector<int64_t> pad;
+    std::vector<int64_t> strides;
+    mindspore::lite::PadMode padMode {mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    mindspore::lite::RoundMode roundMode {mindspore::lite::ROUND_MODE_FLOOR};
+    mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
+    bool global {false};
+    void* primitive = mindspore::lite::MindIR_AvgPoolFusion_CreatePrimitive(kernelSize, strides, pad,
+        padMode, roundMode, format, global, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3316,15 +3314,15 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_blockSize;
-    std::vector<std::vector<int64_t>> m_crops;
-    void* primitive = mindspore::lite::MindIR_BatchToSpaceND_CreatePrimitive(m_blockSize, m_crops);
+    std::vector<int64_t> blockSize;
+    std::vector<std::vector<int64_t>> crops;
+    void* primitive = mindspore::lite::MindIR_BatchToSpaceND_CreatePrimitive(blockSize, crops);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3343,14 +3341,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_epsilon {0.0001f};
-    void* primitive = mindspore::lite::MindIR_FusedBatchNorm_CreatePrimitive(m_epsilon);
+    float epsilon {0.0001f};
+    void* primitive = mindspore::lite::MindIR_FusedBatchNorm_CreatePrimitive(epsilon);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3369,14 +3367,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_epsilon {0.0001f};
-    void* primitive = mindspore::lite::MindIR_FusedBatchNorm_CreatePrimitive(m_epsilon);
+    float epsilon {0.0001f};
+    void* primitive = mindspore::lite::MindIR_FusedBatchNorm_CreatePrimitive(epsilon);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3400,8 +3398,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3420,14 +3418,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_shape;
-    void* primitive = mindspore::lite::MindIR_BroadcastTo_CreatePrimitive(m_shape);
+    std::vector<int64_t> shape;
+    void* primitive = mindspore::lite::MindIR_BroadcastTo_CreatePrimitive(shape);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3451,8 +3449,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3476,8 +3474,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3496,15 +3494,15 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_max {0.0f};
-    float m_min {0.0f};
-    void* primitive = mindspore::lite::MindIR_Clip_CreatePrimitive(m_max, m_min);
+    float max {0.0f};
+    float min {0.0f};
+    void* primitive = mindspore::lite::MindIR_Clip_CreatePrimitive(max, min);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3523,14 +3521,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis{0};
-    void* primitive = mindspore::lite::MindIR_Concat_CreatePrimitive(m_axis);
+    int64_t axis{0};
+    void* primitive = mindspore::lite::MindIR_Concat_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3549,15 +3547,15 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_dataType {0};
-    std::vector<float> m_value;
-    void* primitive = mindspore::lite::MindIR_ConstantOfShape_CreatePrimitive(m_dataType, m_value);
+    int64_t dataType {0};
+    std::vector<float> value;
+    void* primitive = mindspore::lite::MindIR_ConstantOfShape_CreatePrimitive(dataType, value);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3576,25 +3574,25 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_group {1};
-    int64_t m_inChannel {0};
-    int64_t m_outChannel {0};
-    std::vector<int64_t> m_kernelSize;
-    std::vector<int64_t> m_strides;
-    std::vector<int64_t> m_padList;
-    std::vector<int64_t> m_dilation;
-    std::vector<int64_t> m_outputPaddings;
-    mindspore::lite::PadMode m_padMode{mindspore::lite::PAD_MODE_PAD};
-    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = MindIR_Conv2dTransposeFusion_CreatePrimitive(m_kernelSize,
-        m_strides, m_dilation, m_padMode, m_padList, m_group, m_inChannel, m_outChannel,
-        m_activationType, m_outputPaddings);
+    int64_t group {1};
+    int64_t inChannel {0};
+    int64_t outChannel {0};
+    std::vector<int64_t> kernelSize;
+    std::vector<int64_t> strides;
+    std::vector<int64_t> padList;
+    std::vector<int64_t> dilation;
+    std::vector<int64_t> outputPaddings;
+    mindspore::lite::PadMode padMode{mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = MindIR_Conv2dTransposeFusion_CreatePrimitive(kernelSize,
+        strides, dilation, padMode, padList, group, inChannel, outChannel,
+        activationType, outputPaddings);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3618,8 +3616,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3638,15 +3636,15 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {0};
-    std::vector<int64_t> m_offset;
-    void* primitive = mindspore::lite::MindIR_Crop_CreatePrimitive(m_axis, m_offset);
+    int64_t axis {0};
+    std::vector<int64_t> offset;
+    void* primitive = mindspore::lite::MindIR_Crop_CreatePrimitive(axis, offset);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3665,16 +3663,16 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_blockSize {0};
-    std::string m_mode;
+    int64_t blockSize {0};
+    std::string mode;
     mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
-    void* primitive = mindspore::lite::MindIR_DepthToSpace_CreatePrimitive(m_blockSize, format, m_mode);
+    void* primitive = mindspore::lite::MindIR_DepthToSpace_CreatePrimitive(blockSize, format, mode);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3693,26 +3691,26 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_inputSize {0};
-    std::vector<float> m_scale;
-    float m_nmsIoUThreshold {0.0f};
-    float m_nmsScoreThreshold {0.0f};
-    int64_t m_maxDetections {0};
-    int64_t m_detectionsPerClass {0};
-    int64_t m_maxClassesPerDetection {0};
-    int64_t m_numClasses {0};
-    bool m_useRegularNms {false};
-    bool m_outQuantized {false};
+    int64_t inputSize {0};
+    std::vector<float> scale;
+    float nmsIoUThreshold {0.0f};
+    float nmsScoreThreshold {0.0f};
+    int64_t maxDetections {0};
+    int64_t detectionsPerClass {0};
+    int64_t maxClassesPerDetection {0};
+    int64_t numClasses {0};
+    bool useRegularNms {false};
+    bool outQuantized {false};
     mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
-    void* primitive = mindspore::lite::MindIR_DetectionPostProcess_CreatePrimitive(format, m_inputSize, m_scale,
-        m_nmsIoUThreshold, m_nmsScoreThreshold, m_maxDetections, m_detectionsPerClass, m_maxClassesPerDetection,
-        m_numClasses, m_useRegularNms, m_outQuantized);
+    void* primitive = mindspore::lite::MindIR_DetectionPostProcess_CreatePrimitive(format, inputSize, scale,
+        nmsIoUThreshold, nmsScoreThreshold, maxDetections, detectionsPerClass, maxClassesPerDetection,
+        numClasses, useRegularNms, outQuantized);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3731,14 +3729,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::EltwiseMode m_mode {mindspore::lite::ELTWISE_MODE_PROD};
-    void* primitive = mindspore::lite::MindIR_Eltwise_CreatePrimitive(m_mode);
+    mindspore::lite::EltwiseMode mode {mindspore::lite::ELTWISE_MODE_PROD};
+    void* primitive = mindspore::lite::MindIR_Eltwise_CreatePrimitive(mode);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3762,8 +3760,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3787,8 +3785,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3807,16 +3805,16 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_base {-1.0f};
-    float m_scale {1.0f};
-    float m_shift {0.0f};
-    void* primitive = mindspore::lite::MindIR_ExpFusion_CreatePrimitive(m_base, m_scale, m_shift);
+    float base {-1.0f};
+    float scale {1.0f};
+    float shift {0.0f};
+    void* primitive = mindspore::lite::MindIR_ExpFusion_CreatePrimitive(base, scale, shift);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3840,8 +3838,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3865,8 +3863,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3885,14 +3883,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {1};
-    void* primitive = mindspore::lite::MindIR_Flatten_CreatePrimitive(m_axis);
+    int64_t axis {1};
+    void* primitive = mindspore::lite::MindIR_Flatten_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3916,8 +3914,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3936,18 +3934,18 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    bool m_hasBias {false};
-    bool m_useAxis {false};
-    int64_t m_axis {0};
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_FullConnection_CreatePrimitive(m_hasBias, m_useAxis,
-        m_axis, m_activationType);
+    bool hasBias {false};
+    bool useAxis {false};
+    int64_t axis {0};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_FullConnection_CreatePrimitive(hasBias, useAxis,
+        axis, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3971,8 +3969,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3996,8 +3994,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4020,15 +4018,15 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     float alpha = 0.0f;
     float minVal = 0.0f;
     float maxVal = 0.0f;
-    bool m_approximate = false;
+    bool approximate = false;
     void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType,
-        alpha, minVal, maxVal, m_approximate);
+        alpha, minVal, maxVal, approximate);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4052,8 +4050,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4077,8 +4075,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4108,8 +4106,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4128,14 +4126,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_epsilon {0.0f};
-    void* primitive = mindspore::lite::MindIR_InstanceNorm_CreatePrimitive(m_epsilon);
+    float epsilon {0.0f};
+    void* primitive = mindspore::lite::MindIR_InstanceNorm_CreatePrimitive(epsilon);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4154,14 +4152,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_epsilon {0.0f};
-    void* primitive = mindspore::lite::MindIR_InstanceNorm_CreatePrimitive(m_epsilon);
+    float epsilon {0.0f};
+    void* primitive = mindspore::lite::MindIR_InstanceNorm_CreatePrimitive(epsilon);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4180,16 +4178,16 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    float m_epsilon {1e-6};
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_L2NormalizeFusion_CreatePrimitive(m_axis, m_epsilon, m_activationType);
+    std::vector<int64_t> axis;
+    float epsilon {1e-6};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_L2NormalizeFusion_CreatePrimitive(axis, epsilon, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4208,18 +4206,18 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_beginNormAxis {1};
-    float m_epsilon {1e-7};
-    bool m_elementwiseAffine {true};
-    int64_t m_beginParamsAxis {1};
-    void* primitive = mindspore::lite::MindIR_LayerNormFusion_CreatePrimitive(m_beginNormAxis,
-        m_epsilon, m_elementwiseAffine, m_beginParamsAxis);
+    int64_t beginNormAxis {1};
+    float epsilon {1e-7};
+    bool elementwiseAffine {true};
+    int64_t beginParamsAxis {1};
+    void* primitive = mindspore::lite::MindIR_LayerNormFusion_CreatePrimitive(beginNormAxis,
+        epsilon, elementwiseAffine, beginParamsAxis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4249,8 +4247,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4274,8 +4272,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4299,8 +4297,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4324,8 +4322,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4344,14 +4342,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {0};
-    void* primitive = mindspore::lite::MindIR_LogSoftmax_CreatePrimitive(m_axis);
+    int64_t axis {0};
+    void* primitive = mindspore::lite::MindIR_LogSoftmax_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4375,8 +4373,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4400,8 +4398,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4425,8 +4423,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4445,19 +4443,19 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_depthRadius {0};
-    float m_bias {0.0f};
-    float m_alpha {0.0f};
-    float m_beta {0.0f};
-    std::string m_normRegion {"ACROSS_CHANNELS"};
-    void* primitive = mindspore::lite::MindIR_LRN_CreatePrimitive(m_depthRadius, m_bias, m_alpha,
-        m_beta, m_normRegion);
+    int64_t depthRadius {0};
+    float bias {0.0f};
+    float alpha {0.0f};
+    float beta {0.0f};
+    std::string normRegion {"ACROSS_CHANNELS"};
+    void* primitive = mindspore::lite::MindIR_LRN_CreatePrimitive(depthRadius, bias, alpha,
+        beta, normRegion);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4476,24 +4474,24 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    bool m_bidirectional {false};
-    bool m_hasBias {false};
-    int64_t m_inputSize {0};
-    int64_t m_hiddenSize {0};
-    int64_t m_numLayers {0};
-    int64_t m_numDirections {0};
-    float m_dropout {0.0f};
-    float m_zoneoutCell {0.0f};
-    float m_zoneoutHidden {0.0f};
-    int64_t m_projSize {0};
-    void* primitive = mindspore::lite::MindIR_LSTM_CreatePrimitive(m_bidirectional, m_hasBias, m_inputSize,
-        m_hiddenSize, m_numLayers, m_numDirections, m_dropout, m_zoneoutCell, m_zoneoutHidden, m_projSize);
+    bool bidirectional {false};
+    bool hasBias {false};
+    int64_t inputSize {0};
+    int64_t hiddenSize {0};
+    int64_t numLayers {0};
+    int64_t numDirections {0};
+    float dropout {0.0f};
+    float zoneoutCell {0.0f};
+    float zoneoutHidden {0.0f};
+    int64_t projSize {0};
+    void* primitive = mindspore::lite::MindIR_LSTM_CreatePrimitive(bidirectional, hasBias, inputSize,
+        hiddenSize, numLayers, numDirections, dropout, zoneoutCell, zoneoutHidden, projSize);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4517,8 +4515,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4537,21 +4535,21 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_kernelSize;
-    std::vector<int64_t> m_pad;
-    std::vector<int64_t> m_strides;
-    mindspore::lite::PadMode m_padMode {mindspore::lite::PAD_MODE_PAD};
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    mindspore::lite::Format m_format {mindspore::lite::FORMAT_NCHW};
-    bool m_global {false};
-    void* primitive = MindIR_MaxPoolFusion_CreatePrimitive(m_kernelSize, m_strides, m_pad,
-        m_padMode, m_format, m_global, m_activationType);
+    std::vector<int64_t> kernelSize;
+    std::vector<int64_t> pad;
+    std::vector<int64_t> strides;
+    mindspore::lite::PadMode padMode {mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
+    bool global {false};
+    void* primitive = MindIR_MaxPoolFusion_CreatePrimitive(kernelSize, strides, pad,
+        padMode, format, global, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4575,8 +4573,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4600,8 +4598,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4620,14 +4618,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_MulFusion_CreatePrimitive(m_activationType);
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_MulFusion_CreatePrimitive(activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4651,8 +4649,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4676,8 +4674,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4696,14 +4694,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {-1};
-    void* primitive = mindspore::lite::MindIR_OneHot_CreatePrimitive(m_axis);
+    int64_t axis {-1};
+    void* primitive = mindspore::lite::MindIR_OneHot_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4723,15 +4721,15 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
     std::vector<std::vector<int64_t>> paddings;
-    float m_constantValue {0.0f};
-    mindspore::lite::PaddingMode m_paddingMode {mindspore::lite::PADDING_MODE_CONSTANT};
-    void* primitive = MindIR_PadFusion_CreatePrimitive(paddings, m_paddingMode, m_constantValue);
+    float constantValue {0.0f};
+    mindspore::lite::PaddingMode paddingMode {mindspore::lite::PADDING_MODE_CONSTANT};
+    void* primitive = MindIR_PadFusion_CreatePrimitive(paddings, paddingMode, constantValue);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4750,15 +4748,15 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_scale {1.0f};
-    float m_shift {0.0f};
-    void* primitive = mindspore::lite::MindIR_PowFusion_CreatePrimitive(m_scale, m_shift);
+    float scale {1.0f};
+    float shift {0.0f};
+    void* primitive = mindspore::lite::MindIR_PowFusion_CreatePrimitive(scale, shift);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4783,8 +4781,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4803,16 +4801,16 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    const uint64_t* m_src_t{nullptr};
-    const uint64_t* m_dst_t{nullptr};
-    int64_t m_axis {0};
-    void* primitive = mindspore::lite::MindIR_QuantDTypeCast_CreatePrimitive(*m_src_t, *m_dst_t, m_axis);
+    const uint64_t* srcT{nullptr};
+    const uint64_t* dstT{nullptr};
+    int64_t axis {0};
+    void* primitive = mindspore::lite::MindIR_QuantDTypeCast_CreatePrimitive(*srcT, *dstT, axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4832,16 +4830,16 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
     int64_t dType {0.0f};
-    int64_t m_start {0};
-    int64_t m_limit {0};
-    int64_t m_delta {1};
-    void* primitive = mindspore::lite::MindIR_Range_CreatePrimitive(dType, m_start, m_limit, m_delta);
+    int64_t start {0};
+    int64_t limit {0};
+    int64_t delta {1};
+    void* primitive = mindspore::lite::MindIR_Range_CreatePrimitive(dType, start, limit, delta);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4865,8 +4863,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4890,8 +4888,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4911,16 +4909,16 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
     mindspore::lite::ReduceMode mode {mindspore::lite::REDUCE_MODE_ALL};
-    float m_coeff {0.0f};
-    bool m_reduceToEnd {false};
-    bool m_keepDims {false};
-    void* primitive = mindspore::lite::MindIR_ReduceFusion_CreatePrimitive(m_keepDims, mode, m_reduceToEnd, m_coeff);
+    float coeff {0.0f};
+    bool reduceToEnd {false};
+    bool keepDims {false};
+    void* primitive = mindspore::lite::MindIR_ReduceFusion_CreatePrimitive(keepDims, mode, reduceToEnd, coeff);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4950,8 +4948,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4975,8 +4973,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4998,22 +4996,22 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     float cubicCoeff{0.0f};
     float extrapolationValue{0.0f};
     mindspore::lite::NearestMode nearestMode{mindspore::lite::NEAREST_MODE_NORMAL};
-    mindspore::lite::ResizeMethod m_method {mindspore::lite::RESIZE_METHOD_LINEAR};
-    uint64_t m_newHeight{0};
-    uint64_t m_newWidth{0};
-    bool m_preserveAspectRatio{false};
-    mindspore::lite::CoordinateTransformMode m_coordinateTransformMode {
+    mindspore::lite::ResizeMethod method {mindspore::lite::RESIZE_METHOD_LINEAR};
+    uint64_t newHeight{0};
+    uint64_t newWidth{0};
+    bool preserveAspectRatio{false};
+    mindspore::lite::CoordinateTransformMode coordinateTransformMode {
         mindspore::lite::COORDINATE_TRANSFORM_MODE_ASYMMETRIC};
-    uint64_t m_excludeOutside{0};
-    void* primitive = mindspore::lite::MindIR_Resize_CreatePrimitive(m_method, m_newHeight, m_newWidth,
-        m_preserveAspectRatio, m_coordinateTransformMode, cubicCoeff, m_excludeOutside,
+    uint64_t excludeOutside{0};
+    void* primitive = mindspore::lite::MindIR_Resize_CreatePrimitive(method, newHeight, newWidth,
+        preserveAspectRatio, coordinateTransformMode, cubicCoeff, excludeOutside,
         extrapolationValue, nearestMode);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5037,8 +5035,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5062,8 +5060,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5082,15 +5080,15 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    const uint64_t* m_axis{nullptr};
-    void* primitive = mindspore::lite::MindIR_ScaleFusion_CreatePrimitive(*m_axis, m_activationType);
+    mindspore::lite::ActivationType activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    const uint64_t* axis{nullptr};
+    void* primitive = mindspore::lite::MindIR_ScaleFusion_CreatePrimitive(*axis, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5114,8 +5112,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5139,8 +5137,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5170,8 +5168,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5195,8 +5193,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5216,14 +5214,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
     mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
-    int64_t m_blockSize {0};
-    void* primitive = mindspore::lite::MindIR_SpaceToDepth_CreatePrimitive(m_blockSize, format);
+    int64_t blockSize {0};
+    void* primitive = mindspore::lite::MindIR_SpaceToDepth_CreatePrimitive(blockSize, format);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5247,8 +5245,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5272,8 +5270,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5303,8 +5301,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5323,14 +5321,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {0};
-    void* primitive = mindspore::lite::MindIR_Unstack_CreatePrimitive(m_axis);
+    int64_t axis {0};
+    void* primitive = mindspore::lite::MindIR_Unstack_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5354,8 +5352,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5379,8 +5377,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5399,14 +5397,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(m_axis);
+    std::vector<int64_t> axis;
+    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5425,22 +5423,22 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_inChannel{0};
-    int64_t m_outChannel{0};
-    std::vector<int64_t> m_kernelSize;
-    std::vector<int64_t> m_strides;
-    std::vector<int64_t> m_pad;
-    std::vector<int64_t> m_dilation;
-    mindspore::lite::PadMode m_padMode{mindspore::lite::PAD_MODE_PAD};
-    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_Conv2DFusion_CreatePrimitive(m_kernelSize, m_strides,
-        m_dilation, m_padMode, m_pad, m_inChannel, m_inChannel, m_outChannel, m_activationType);
+    int64_t inChannel{0};
+    int64_t outChannel{0};
+    std::vector<int64_t> kernelSize;
+    std::vector<int64_t> strides;
+    std::vector<int64_t> pad;
+    std::vector<int64_t> dilation;
+    mindspore::lite::PadMode padMode{mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_Conv2DFusion_CreatePrimitive(kernelSize, strides,
+        dilation, padMode, pad, inChannel, inChannel, outChannel, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5459,14 +5457,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_DivFusion_CreatePrimitive(m_activationType);
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_DivFusion_CreatePrimitive(activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5485,16 +5483,16 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    bool m_transposeA{false};
-    bool m_transposeB{false};
-    void* primitive = mindspore::lite::MindIR_MatMulFusion_CreatePrimitive(m_transposeA, m_transposeB, m_activationType);
+    mindspore::lite::ActivationType activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    bool transposeA{false};
+    bool transposeB{false};
+    void* primitive = mindspore::lite::MindIR_MatMulFusion_CreatePrimitive(transposeA, transposeB, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5513,14 +5511,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axes;
-    void* primitive = mindspore::lite::MindIR_SliceFusion_CreatePrimitive(m_axes);
+    std::vector<int64_t> axes;
+    void* primitive = mindspore::lite::MindIR_SliceFusion_CreatePrimitive(axes);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5539,14 +5537,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    void* primitive = mindspore::lite::MindIR_Softmax_CreatePrimitive(m_axis);
+    std::vector<int64_t> axis;
+    void* primitive = mindspore::lite::MindIR_Softmax_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5572,8 +5570,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5592,16 +5590,16 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_output_num {0};
-    std::vector<int64_t> m_size_splits;
-    int64_t m_axis {0};
-    void* primitive = mindspore::lite::MindIR_Split_CreatePrimitive(m_output_num, m_size_splits, m_axis);
+    int64_t outputNum {0};
+    std::vector<int64_t> sizeSplits;
+    int64_t axis {0};
+    void* primitive = mindspore::lite::MindIR_Split_CreatePrimitive(outputNum, sizeSplits, axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5625,8 +5623,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5650,8 +5648,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5670,14 +5668,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    void* primitive = mindspore::lite::MindIR_Squeeze_CreatePrimitive(m_axis);
+    std::vector<int64_t> axis;
+    void* primitive = mindspore::lite::MindIR_Squeeze_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5696,14 +5694,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis = {0};
-    void* primitive = mindspore::lite::MindIR_Stack_CreatePrimitive(m_axis);
+    int64_t axis = {0};
+    void* primitive = mindspore::lite::MindIR_Stack_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5722,19 +5720,19 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_begin_mask = {0};
-    int64_t m_end_mask = {0};
-    int64_t m_ellipsis_mask = {0};
-    int64_t m_new_axis_mask = {0};
-    int64_t m_shrink_axis_mask = {0};
-    void* primitive = mindspore::lite::MindIR_StridedSlice_CreatePrimitive(m_begin_mask, m_end_mask, m_ellipsis_mask,
-        m_new_axis_mask, m_shrink_axis_mask);
+    int64_t beginMask = {0};
+    int64_t endMask = {0};
+    int64_t ellipsisMask = {0};
+    int64_t newAxisMask = {0};
+    int64_t shrinkAxisMask = {0};
+    void* primitive = mindspore::lite::MindIR_StridedSlice_CreatePrimitive(beginMask, endMask, ellipsisMask,
+        newAxisMask, shrinkAxisMask);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5753,14 +5751,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::ActivationType  m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_SubFusion_CreatePrimitive(m_activationType);
+    mindspore::lite::ActivationType  activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_SubFusion_CreatePrimitive(activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5779,14 +5777,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_dims {0};
-    void* primitive = mindspore::lite::MindIR_TileFusion_CreatePrimitive(m_dims);
+    std::vector<int64_t> dims {0};
+    void* primitive = mindspore::lite::MindIR_TileFusion_CreatePrimitive(dims);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5805,15 +5803,15 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {0};
-    bool m_sorted {true};
-    void* primitive = mindspore::lite::MindIR_TopKFusion_CreatePrimitive(m_sorted, m_axis);
+    int64_t axis {0};
+    bool sorted {true};
+    void* primitive = mindspore::lite::MindIR_TopKFusion_CreatePrimitive(sorted, axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5837,8 +5835,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5857,14 +5855,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(m_axis);
+    std::vector<int64_t> axis;
+    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5883,14 +5881,14 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(m_axis);
+    std::vector<int64_t> axis;
+    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -5909,9 +5907,9 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::SubGraph* subGraph = new (std::nothrow) MSLITE::LiteGraph::SubGraph();
     subGraph->name_ = "NNRt_SubGraph";
-    subGraph->input_indices_ = {1,1,1,1};
-    subGraph->output_indices_ = {1,1,1,1};
-    subGraph->node_indices_ = {1,1,1,1};
+    subGraph->input_indices_ = {1, 1, 1, 1};
+    subGraph->output_indices_ = {1, 1, 1, 1};
+    subGraph->node_indices_ = {1, 1, 1, 1};
 
     void* tp = MSLITE::MindIR_Tensor_Create();
 
@@ -5951,8 +5949,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_hdimodel_destroy_001, 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_1::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6023,9 +6021,9 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::SubGraph* subGraph = new (std::nothrow) MSLITE::LiteGraph::SubGraph();
     subGraph->name_ = "NNRt_SubGraph";
-    subGraph->input_indices_ = {1,1,1,1};
-    subGraph->output_indices_ = {1,1,1,1};
-    subGraph->node_indices_ = {1,1,1,1};
+    subGraph->input_indices_ = {1, 1, 1, 1};
+    subGraph->output_indices_ = {1, 1, 1, 1};
+    subGraph->node_indices_ = {1, 1, 1, 1};
 
     void* tp = MSLITE::MindIR_Tensor_Create();
 
@@ -6095,8 +6093,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6117,14 +6115,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
 
     int8_t num = 1;
     int8_t* fuseData = &num;
-    mindspore::lite::ActivationType m_activationType = NNToMS::TransfromFusionType(static_cast<OH_NN_FuseType>(*fuseData));
-    void* primitive = mindspore::lite::MindIR_AddFusion_CreatePrimitive(m_activationType);
+    mindspore::lite::ActivationType activationType = NNToMS::TransfromFusionType(static_cast<OH_NN_FuseType>(*fuseData));
+    void* primitive = mindspore::lite::MindIR_AddFusion_CreatePrimitive(activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6143,14 +6141,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_keepDims {0};
-    void* primitive = mindspore::lite::MindIR_All_CreatePrimitive(m_keepDims);
+    int64_t keepDims {0};
+    void* primitive = mindspore::lite::MindIR_All_CreatePrimitive(keepDims);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6169,17 +6167,17 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {-1};
-    int64_t m_topK {1};
-    bool m_keepDims {false};
-    bool m_outMaxValue {false};
-    void* primitive = mindspore::lite::MindIR_ArgMaxFusion_CreatePrimitive(m_axis, m_topK, m_keepDims, m_outMaxValue);
+    int64_t axis {-1};
+    int64_t topK {1};
+    bool keepDims {false};
+    bool outMaxValue {false};
+    void* primitive = mindspore::lite::MindIR_ArgMaxFusion_CreatePrimitive(axis, topK, keepDims, outMaxValue);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6198,14 +6196,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_summarize {0};
-    void* primitive = mindspore::lite::MindIR_Assert_CreatePrimitive(m_summarize);
+    int64_t summarize {0};
+    void* primitive = mindspore::lite::MindIR_Assert_CreatePrimitive(summarize);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6224,22 +6222,22 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_kernelSize;
-    std::vector<int64_t> m_pad;
-    std::vector<int64_t> m_strides;
-    mindspore::lite::PadMode m_padMode {mindspore::lite::PAD_MODE_PAD};
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    mindspore::lite::RoundMode m_roundMode {mindspore::lite::ROUND_MODE_FLOOR};
-    mindspore::lite::Format m_format {mindspore::lite::FORMAT_NCHW};
-    bool m_global {false};
-    void* primitive = mindspore::lite::MindIR_AvgPoolFusion_CreatePrimitive(m_kernelSize, m_strides, m_pad,
-        m_padMode, m_roundMode, m_format, m_global, m_activationType);
+    std::vector<int64_t> kernelSize;
+    std::vector<int64_t> pad;
+    std::vector<int64_t> strides;
+    mindspore::lite::PadMode padMode {mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    mindspore::lite::RoundMode roundMode {mindspore::lite::ROUND_MODE_FLOOR};
+    mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
+    bool global {false};
+    void* primitive = mindspore::lite::MindIR_AvgPoolFusion_CreatePrimitive(kernelSize, strides, pad,
+        padMode, roundMode, format, global, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6258,15 +6256,15 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_blockSize;
-    std::vector<std::vector<int64_t>> m_crops;
-    void* primitive = mindspore::lite::MindIR_BatchToSpaceND_CreatePrimitive(m_blockSize, m_crops);
+    std::vector<int64_t> blockSize;
+    std::vector<std::vector<int64_t>> crops;
+    void* primitive = mindspore::lite::MindIR_BatchToSpaceND_CreatePrimitive(blockSize, crops);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6285,14 +6283,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_epsilon {0.0001f};
-    void* primitive = mindspore::lite::MindIR_FusedBatchNorm_CreatePrimitive(m_epsilon);
+    float epsilon {0.0001f};
+    void* primitive = mindspore::lite::MindIR_FusedBatchNorm_CreatePrimitive(epsilon);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6311,14 +6309,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_epsilon {0.0001f};
-    void* primitive = mindspore::lite::MindIR_FusedBatchNorm_CreatePrimitive(m_epsilon);
+    float epsilon {0.0001f};
+    void* primitive = mindspore::lite::MindIR_FusedBatchNorm_CreatePrimitive(epsilon);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6342,8 +6340,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6362,14 +6360,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_shape;
-    void* primitive = mindspore::lite::MindIR_BroadcastTo_CreatePrimitive(m_shape);
+    std::vector<int64_t> shape;
+    void* primitive = mindspore::lite::MindIR_BroadcastTo_CreatePrimitive(shape);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6393,8 +6391,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6418,8 +6416,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6438,15 +6436,15 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_max {0.0f};
-    float m_min {0.0f};
-    void* primitive = mindspore::lite::MindIR_Clip_CreatePrimitive(m_max, m_min);
+    float max {0.0f};
+    float min {0.0f};
+    void* primitive = mindspore::lite::MindIR_Clip_CreatePrimitive(max, min);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6465,14 +6463,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis{0};
-    void* primitive = mindspore::lite::MindIR_Concat_CreatePrimitive(m_axis);
+    int64_t axis{0};
+    void* primitive = mindspore::lite::MindIR_Concat_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6491,15 +6489,15 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_dataType {0};
-    std::vector<float> m_value;
-    void* primitive = mindspore::lite::MindIR_ConstantOfShape_CreatePrimitive(m_dataType, m_value);
+    int64_t dataType {0};
+    std::vector<float> value;
+    void* primitive = mindspore::lite::MindIR_ConstantOfShape_CreatePrimitive(dataType, value);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6518,25 +6516,25 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_group {1};
-    int64_t m_inChannel {0};
-    int64_t m_outChannel {0};
-    std::vector<int64_t> m_kernelSize;
-    std::vector<int64_t> m_strides;
-    std::vector<int64_t> m_padList;
-    std::vector<int64_t> m_dilation;
-    std::vector<int64_t> m_outputPaddings;
-    mindspore::lite::PadMode m_padMode{mindspore::lite::PAD_MODE_PAD};
-    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = MindIR_Conv2dTransposeFusion_CreatePrimitive(m_kernelSize,
-        m_strides, m_dilation, m_padMode, m_padList, m_group, m_inChannel, m_outChannel,
-        m_activationType, m_outputPaddings);
+    int64_t group {1};
+    int64_t inChannel {0};
+    int64_t outChannel {0};
+    std::vector<int64_t> kernelSize;
+    std::vector<int64_t> strides;
+    std::vector<int64_t> padList;
+    std::vector<int64_t> dilation;
+    std::vector<int64_t> outputPaddings;
+    mindspore::lite::PadMode padMode{mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = MindIR_Conv2dTransposeFusion_CreatePrimitive(kernelSize,
+        strides, dilation, padMode, padList, group, inChannel, outChannel,
+        activationType, outputPaddings);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6560,8 +6558,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6580,15 +6578,15 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {0};
-    std::vector<int64_t> m_offset;
-    void* primitive = mindspore::lite::MindIR_Crop_CreatePrimitive(m_axis, m_offset);
+    int64_t axis {0};
+    std::vector<int64_t> offset;
+    void* primitive = mindspore::lite::MindIR_Crop_CreatePrimitive(axis, offset);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6607,16 +6605,16 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_blockSize {0};
-    std::string m_mode;
+    int64_t blockSize {0};
+    std::string mode;
     mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
-    void* primitive = mindspore::lite::MindIR_DepthToSpace_CreatePrimitive(m_blockSize, format, m_mode);
+    void* primitive = mindspore::lite::MindIR_DepthToSpace_CreatePrimitive(blockSize, format, mode);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6635,26 +6633,26 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_inputSize {0};
-    std::vector<float> m_scale;
-    float m_nmsIoUThreshold {0.0f};
-    float m_nmsScoreThreshold {0.0f};
-    int64_t m_maxDetections {0};
-    int64_t m_detectionsPerClass {0};
-    int64_t m_maxClassesPerDetection {0};
-    int64_t m_numClasses {0};
-    bool m_useRegularNms {false};
-    bool m_outQuantized {false};
+    int64_t inputSize {0};
+    std::vector<float> scale;
+    float nmsIoUThreshold {0.0f};
+    float nmsScoreThreshold {0.0f};
+    int64_t maxDetections {0};
+    int64_t detectionsPerClass {0};
+    int64_t maxClassesPerDetection {0};
+    int64_t numClasses {0};
+    bool useRegularNms {false};
+    bool outQuantized {false};
     mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
-    void* primitive = mindspore::lite::MindIR_DetectionPostProcess_CreatePrimitive(format, m_inputSize, m_scale,
-        m_nmsIoUThreshold, m_nmsScoreThreshold, m_maxDetections, m_detectionsPerClass, m_maxClassesPerDetection,
-        m_numClasses, m_useRegularNms, m_outQuantized);
+    void* primitive = mindspore::lite::MindIR_DetectionPostProcess_CreatePrimitive(format, inputSize, scale,
+        nmsIoUThreshold, nmsScoreThreshold, maxDetections, detectionsPerClass, maxClassesPerDetection,
+        numClasses, useRegularNms, outQuantized);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6673,14 +6671,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::EltwiseMode m_mode {mindspore::lite::ELTWISE_MODE_PROD};
-    void* primitive = mindspore::lite::MindIR_Eltwise_CreatePrimitive(m_mode);
+    mindspore::lite::EltwiseMode mode {mindspore::lite::ELTWISE_MODE_PROD};
+    void* primitive = mindspore::lite::MindIR_Eltwise_CreatePrimitive(mode);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6704,8 +6702,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6729,8 +6727,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6749,16 +6747,16 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_base {-1.0f};
-    float m_scale {1.0f};
-    float m_shift {0.0f};
-    void* primitive = mindspore::lite::MindIR_ExpFusion_CreatePrimitive(m_base, m_scale, m_shift);
+    float base {-1.0f};
+    float scale {1.0f};
+    float shift {0.0f};
+    void* primitive = mindspore::lite::MindIR_ExpFusion_CreatePrimitive(base, scale, shift);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6782,8 +6780,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6807,8 +6805,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6827,14 +6825,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {1};
-    void* primitive = mindspore::lite::MindIR_Flatten_CreatePrimitive(m_axis);
+    int64_t axis {1};
+    void* primitive = mindspore::lite::MindIR_Flatten_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6858,8 +6856,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6878,18 +6876,18 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    bool m_hasBias {false};
-    bool m_useAxis {false};
-    int64_t m_axis {0};
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_FullConnection_CreatePrimitive(m_hasBias, m_useAxis,
-        m_axis, m_activationType);
+    bool hasBias {false};
+    bool useAxis {false};
+    int64_t axis {0};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_FullConnection_CreatePrimitive(hasBias, useAxis,
+        axis, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6913,8 +6911,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6938,8 +6936,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6962,15 +6960,15 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     float alpha = 0.0f;
     float minVal = 0.0f;
     float maxVal = 0.0f;
-    bool m_approximate = false;
+    bool approximate = false;
     void* primitive = mindspore::lite::MindIR_Activation_CreatePrimitive(activationType,
-        alpha, minVal, maxVal, m_approximate);
+        alpha, minVal, maxVal, approximate);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -6994,8 +6992,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7019,8 +7017,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7050,8 +7048,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7070,14 +7068,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_epsilon {0.0f};
-    void* primitive = mindspore::lite::MindIR_InstanceNorm_CreatePrimitive(m_epsilon);
+    float epsilon {0.0f};
+    void* primitive = mindspore::lite::MindIR_InstanceNorm_CreatePrimitive(epsilon);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7096,14 +7094,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_epsilon {0.0f};
-    void* primitive = mindspore::lite::MindIR_InstanceNorm_CreatePrimitive(m_epsilon);
+    float epsilon {0.0f};
+    void* primitive = mindspore::lite::MindIR_InstanceNorm_CreatePrimitive(epsilon);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7122,16 +7120,16 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    float m_epsilon {1e-6};
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_L2NormalizeFusion_CreatePrimitive(m_axis, m_epsilon, m_activationType);
+    std::vector<int64_t> axis;
+    float epsilon {1e-6};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_L2NormalizeFusion_CreatePrimitive(axis, epsilon, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7150,18 +7148,18 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_beginNormAxis {1};
-    float m_epsilon {1e-7};
-    bool m_elementwiseAffine {true};
-    int64_t m_beginParamsAxis {1};
-    void* primitive = mindspore::lite::MindIR_LayerNormFusion_CreatePrimitive(m_beginNormAxis,
-        m_epsilon, m_elementwiseAffine, m_beginParamsAxis);
+    int64_t beginNormAxis {1};
+    float epsilon {1e-7};
+    bool elementwiseAffine {true};
+    int64_t beginParamsAxis {1};
+    void* primitive = mindspore::lite::MindIR_LayerNormFusion_CreatePrimitive(beginNormAxis,
+        epsilon, elementwiseAffine, beginParamsAxis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7191,8 +7189,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7216,8 +7214,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7241,8 +7239,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7266,8 +7264,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7286,14 +7284,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {0};
-    void* primitive = mindspore::lite::MindIR_LogSoftmax_CreatePrimitive(m_axis);
+    int64_t axis {0};
+    void* primitive = mindspore::lite::MindIR_LogSoftmax_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7317,8 +7315,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7342,8 +7340,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7367,8 +7365,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7387,19 +7385,19 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_depthRadius {0};
-    float m_bias {0.0f};
-    float m_alpha {0.0f};
-    float m_beta {0.0f};
-    std::string m_normRegion {"ACROSS_CHANNELS"};
-    void* primitive = mindspore::lite::MindIR_LRN_CreatePrimitive(m_depthRadius, m_bias, m_alpha,
-        m_beta, m_normRegion);
+    int64_t depthRadius {0};
+    float bias {0.0f};
+    float alpha {0.0f};
+    float beta {0.0f};
+    std::string normRegion {"ACROSS_CHANNELS"};
+    void* primitive = mindspore::lite::MindIR_LRN_CreatePrimitive(depthRadius, bias, alpha,
+        beta, normRegion);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7418,24 +7416,24 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    bool m_bidirectional {false};
-    bool m_hasBias {false};
-    int64_t m_inputSize {0};
-    int64_t m_hiddenSize {0};
-    int64_t m_numLayers {0};
-    int64_t m_numDirections {0};
-    float m_dropout {0.0f};
-    float m_zoneoutCell {0.0f};
-    float m_zoneoutHidden {0.0f};
-    int64_t m_projSize {0};
-    void* primitive = mindspore::lite::MindIR_LSTM_CreatePrimitive(m_bidirectional, m_hasBias, m_inputSize,
-        m_hiddenSize, m_numLayers, m_numDirections, m_dropout, m_zoneoutCell, m_zoneoutHidden, m_projSize);
+    bool bidirectional {false};
+    bool hasBias {false};
+    int64_t inputSize {0};
+    int64_t hiddenSize {0};
+    int64_t numLayers {0};
+    int64_t numDirections {0};
+    float dropout {0.0f};
+    float zoneoutCell {0.0f};
+    float zoneoutHidden {0.0f};
+    int64_t projSize {0};
+    void* primitive = mindspore::lite::MindIR_LSTM_CreatePrimitive(bidirectional, hasBias, inputSize,
+        hiddenSize, numLayers, numDirections, dropout, zoneoutCell, zoneoutHidden, projSize);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7459,8 +7457,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7479,21 +7477,21 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_kernelSize;
-    std::vector<int64_t> m_pad;
-    std::vector<int64_t> m_strides;
-    mindspore::lite::PadMode m_padMode {mindspore::lite::PAD_MODE_PAD};
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    mindspore::lite::Format m_format {mindspore::lite::FORMAT_NCHW};
-    bool m_global {false};
-    void* primitive = MindIR_MaxPoolFusion_CreatePrimitive(m_kernelSize, m_strides, m_pad,
-        m_padMode, m_format, m_global, m_activationType);
+    std::vector<int64_t> kernelSize;
+    std::vector<int64_t> pad;
+    std::vector<int64_t> strides;
+    mindspore::lite::PadMode padMode {mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
+    bool global {false};
+    void* primitive = MindIR_MaxPoolFusion_CreatePrimitive(kernelSize, strides, pad,
+        padMode, format, global, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7517,8 +7515,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7542,8 +7540,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7562,14 +7560,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_MulFusion_CreatePrimitive(m_activationType);
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_MulFusion_CreatePrimitive(activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7593,8 +7591,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7618,8 +7616,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7638,14 +7636,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {-1};
-    void* primitive = mindspore::lite::MindIR_OneHot_CreatePrimitive(m_axis);
+    int64_t axis {-1};
+    void* primitive = mindspore::lite::MindIR_OneHot_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7665,15 +7663,15 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
     std::vector<std::vector<int64_t>> paddings;
-    float m_constantValue {0.0f};
-    mindspore::lite::PaddingMode m_paddingMode {mindspore::lite::PADDING_MODE_CONSTANT};
-    void* primitive = MindIR_PadFusion_CreatePrimitive(paddings, m_paddingMode, m_constantValue);
+    float constantValue {0.0f};
+    mindspore::lite::PaddingMode paddingMode {mindspore::lite::PADDING_MODE_CONSTANT};
+    void* primitive = MindIR_PadFusion_CreatePrimitive(paddings, paddingMode, constantValue);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7692,15 +7690,15 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    float m_scale {1.0f};
-    float m_shift {0.0f};
-    void* primitive = mindspore::lite::MindIR_PowFusion_CreatePrimitive(m_scale, m_shift);
+    float scale {1.0f};
+    float shift {0.0f};
+    void* primitive = mindspore::lite::MindIR_PowFusion_CreatePrimitive(scale, shift);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7725,8 +7723,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7745,16 +7743,16 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    const uint64_t* m_src_t{nullptr};
-    const uint64_t* m_dst_t{nullptr};
-    int64_t m_axis {0};
-    void* primitive = mindspore::lite::MindIR_QuantDTypeCast_CreatePrimitive(*m_src_t, *m_dst_t, m_axis);
+    const uint64_t* srcT{nullptr};
+    const uint64_t* dstT{nullptr};
+    int64_t axis {0};
+    void* primitive = mindspore::lite::MindIR_QuantDTypeCast_CreatePrimitive(*srcT, *dstT, axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7774,16 +7772,16 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
     int64_t dType {0.0f};
-    int64_t m_start {0};
-    int64_t m_limit {0};
-    int64_t m_delta {1};
-    void* primitive = mindspore::lite::MindIR_Range_CreatePrimitive(dType, m_start, m_limit, m_delta);
+    int64_t start {0};
+    int64_t limit {0};
+    int64_t delta {1};
+    void* primitive = mindspore::lite::MindIR_Range_CreatePrimitive(dType, start, limit, delta);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7807,8 +7805,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7832,8 +7830,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7853,16 +7851,16 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
     mindspore::lite::ReduceMode mode {mindspore::lite::REDUCE_MODE_ALL};
-    float m_coeff {0.0f};
-    bool m_reduceToEnd {false};
-    bool m_keepDims {false};
-    void* primitive = mindspore::lite::MindIR_ReduceFusion_CreatePrimitive(m_keepDims, mode, m_reduceToEnd, m_coeff);
+    float coeff {0.0f};
+    bool reduceToEnd {false};
+    bool keepDims {false};
+    void* primitive = mindspore::lite::MindIR_ReduceFusion_CreatePrimitive(keepDims, mode, reduceToEnd, coeff);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7892,8 +7890,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7917,8 +7915,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7940,22 +7938,22 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     float cubicCoeff{0.0f};
     float extrapolationValue{0.0f};
     mindspore::lite::NearestMode nearestMode{mindspore::lite::NEAREST_MODE_NORMAL};
-    mindspore::lite::ResizeMethod m_method {mindspore::lite::RESIZE_METHOD_LINEAR};
-    uint64_t m_newHeight{0};
-    uint64_t m_newWidth{0};
-    bool m_preserveAspectRatio{false};
-    mindspore::lite::CoordinateTransformMode m_coordinateTransformMode {
+    mindspore::lite::ResizeMethod method {mindspore::lite::RESIZE_METHOD_LINEAR};
+    uint64_t newHeight{0};
+    uint64_t newWidth{0};
+    bool preserveAspectRatio{false};
+    mindspore::lite::CoordinateTransformMode coordinateTransformMode {
         mindspore::lite::COORDINATE_TRANSFORM_MODE_ASYMMETRIC};
-    uint64_t m_excludeOutside{0};
-    void* primitive = mindspore::lite::MindIR_Resize_CreatePrimitive(m_method, m_newHeight, m_newWidth,
-        m_preserveAspectRatio, m_coordinateTransformMode, cubicCoeff, m_excludeOutside,
+    uint64_t excludeOutside{0};
+    void* primitive = mindspore::lite::MindIR_Resize_CreatePrimitive(method, newHeight, newWidth,
+        preserveAspectRatio, coordinateTransformMode, cubicCoeff, excludeOutside,
         extrapolationValue, nearestMode);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -7979,8 +7977,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8004,8 +8002,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8024,15 +8022,15 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    const uint64_t* m_axis{nullptr};
-    void* primitive = mindspore::lite::MindIR_ScaleFusion_CreatePrimitive(*m_axis, m_activationType);
+    mindspore::lite::ActivationType activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    const uint64_t* axis{nullptr};
+    void* primitive = mindspore::lite::MindIR_ScaleFusion_CreatePrimitive(*axis, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8056,8 +8054,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8081,8 +8079,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8112,8 +8110,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8137,8 +8135,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8158,14 +8156,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
     mindspore::lite::Format format {mindspore::lite::FORMAT_NCHW};
-    int64_t m_blockSize {0};
-    void* primitive = mindspore::lite::MindIR_SpaceToDepth_CreatePrimitive(m_blockSize, format);
+    int64_t blockSize {0};
+    void* primitive = mindspore::lite::MindIR_SpaceToDepth_CreatePrimitive(blockSize, format);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8189,8 +8187,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8214,8 +8212,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8245,8 +8243,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8265,14 +8263,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {0};
-    void* primitive = mindspore::lite::MindIR_Unstack_CreatePrimitive(m_axis);
+    int64_t axis {0};
+    void* primitive = mindspore::lite::MindIR_Unstack_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8296,8 +8294,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8321,8 +8319,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8341,14 +8339,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(m_axis);
+    std::vector<int64_t> axis;
+    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8367,22 +8365,22 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_inChannel{0};
-    int64_t m_outChannel{0};
-    std::vector<int64_t> m_kernelSize;
-    std::vector<int64_t> m_strides;
-    std::vector<int64_t> m_pad;
-    std::vector<int64_t> m_dilation;
-    mindspore::lite::PadMode m_padMode{mindspore::lite::PAD_MODE_PAD};
-    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_Conv2DFusion_CreatePrimitive(m_kernelSize, m_strides,
-        m_dilation, m_padMode, m_pad, m_inChannel, m_inChannel, m_outChannel, m_activationType);
+    int64_t inChannel{0};
+    int64_t outChannel{0};
+    std::vector<int64_t> kernelSize;
+    std::vector<int64_t> strides;
+    std::vector<int64_t> pad;
+    std::vector<int64_t> dilation;
+    mindspore::lite::PadMode padMode{mindspore::lite::PAD_MODE_PAD};
+    mindspore::lite::ActivationType activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_Conv2DFusion_CreatePrimitive(kernelSize, strides,
+        dilation, padMode, pad, inChannel, inChannel, outChannel, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8401,14 +8399,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::ActivationType m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_DivFusion_CreatePrimitive(m_activationType);
+    mindspore::lite::ActivationType activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_DivFusion_CreatePrimitive(activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8427,16 +8425,16 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::ActivationType m_activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    bool m_transposeA{false};
-    bool m_transposeB{false};
-    void* primitive = mindspore::lite::MindIR_MatMulFusion_CreatePrimitive(m_transposeA, m_transposeB, m_activationType);
+    mindspore::lite::ActivationType activationType{mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    bool transposeA{false};
+    bool transposeB{false};
+    void* primitive = mindspore::lite::MindIR_MatMulFusion_CreatePrimitive(transposeA, transposeB, activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8455,14 +8453,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axes;
-    void* primitive = mindspore::lite::MindIR_SliceFusion_CreatePrimitive(m_axes);
+    std::vector<int64_t> axes;
+    void* primitive = mindspore::lite::MindIR_SliceFusion_CreatePrimitive(axes);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8481,14 +8479,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    void* primitive = mindspore::lite::MindIR_Softmax_CreatePrimitive(m_axis);
+    std::vector<int64_t> axis;
+    void* primitive = mindspore::lite::MindIR_Softmax_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8514,8 +8512,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8534,16 +8532,16 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_output_num {0};
-    std::vector<int64_t> m_size_splits;
-    int64_t m_axis {0};
-    void* primitive = mindspore::lite::MindIR_Split_CreatePrimitive(m_output_num, m_size_splits, m_axis);
+    int64_t outputNum {0};
+    std::vector<int64_t> sizeSplits;
+    int64_t axis {0};
+    void* primitive = mindspore::lite::MindIR_Split_CreatePrimitive(outputNum, sizeSplits, axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8567,8 +8565,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8592,8 +8590,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8612,14 +8610,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    void* primitive = mindspore::lite::MindIR_Squeeze_CreatePrimitive(m_axis);
+    std::vector<int64_t> axis;
+    void* primitive = mindspore::lite::MindIR_Squeeze_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8638,14 +8636,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis = {0};
-    void* primitive = mindspore::lite::MindIR_Stack_CreatePrimitive(m_axis);
+    int64_t axis = {0};
+    void* primitive = mindspore::lite::MindIR_Stack_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8664,19 +8662,19 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_begin_mask = {0};
-    int64_t m_end_mask = {0};
-    int64_t m_ellipsis_mask = {0};
-    int64_t m_new_axis_mask = {0};
-    int64_t m_shrink_axis_mask = {0};
-    void* primitive = mindspore::lite::MindIR_StridedSlice_CreatePrimitive(m_begin_mask, m_end_mask, m_ellipsis_mask,
-        m_new_axis_mask, m_shrink_axis_mask);
+    int64_t beginMask = {0};
+    int64_t endMask = {0};
+    int64_t ellipsisMask = {0};
+    int64_t newAxisMask = {0};
+    int64_t shrinkAxisMask = {0};
+    void* primitive = mindspore::lite::MindIR_StridedSlice_CreatePrimitive(beginMask, endMask, ellipsisMask,
+        newAxisMask, shrinkAxisMask);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8695,14 +8693,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    mindspore::lite::ActivationType  m_activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
-    void* primitive = mindspore::lite::MindIR_SubFusion_CreatePrimitive(m_activationType);
+    mindspore::lite::ActivationType  activationType {mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION};
+    void* primitive = mindspore::lite::MindIR_SubFusion_CreatePrimitive(activationType);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8721,14 +8719,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_dims {0};
-    void* primitive = mindspore::lite::MindIR_TileFusion_CreatePrimitive(m_dims);
+    std::vector<int64_t> dims {0};
+    void* primitive = mindspore::lite::MindIR_TileFusion_CreatePrimitive(dims);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8747,15 +8745,15 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    int64_t m_axis {0};
-    bool m_sorted {true};
-    void* primitive = mindspore::lite::MindIR_TopKFusion_CreatePrimitive(m_sorted, m_axis);
+    int64_t axis {0};
+    bool sorted {true};
+    void* primitive = mindspore::lite::MindIR_TopKFusion_CreatePrimitive(sorted, axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8779,8 +8777,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8799,14 +8797,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(m_axis);
+    std::vector<int64_t> axis;
+    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8825,14 +8823,14 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
 
-    std::vector<int64_t> m_axis;
-    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(m_axis);
+    std::vector<int64_t> axis;
+    void* primitive = mindspore::lite::MindIR_Unsqueeze_CreatePrimitive(axis);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -8851,9 +8849,9 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_litegraph_to_hdimo
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::SubGraph* subGraph = new (std::nothrow) MSLITE::LiteGraph::SubGraph();
     subGraph->name_ = "NNRt_SubGraph";
-    subGraph->input_indices_ = {1,1,1,1};
-    subGraph->output_indices_ = {1,1,1,1};
-    subGraph->node_indices_ = {1,1,1,1};
+    subGraph->input_indices_ = {1, 1, 1, 1};
+    subGraph->output_indices_ = {1, 1, 1, 1};
+    subGraph->node_indices_ = {1, 1, 1, 1};
 
     void* tp = MSLITE::MindIR_Tensor_Create();
 
@@ -8893,8 +8891,8 @@ HWTEST_F(LiteGraphToHDIModelV2_1Test, litegraphtohdimodeltest_hdimodel_destroy_0
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V2_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
