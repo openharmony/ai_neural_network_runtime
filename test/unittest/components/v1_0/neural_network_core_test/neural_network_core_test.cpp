@@ -151,7 +151,8 @@ public:
                                            std::vector<bool>&));
 };
 
-std::shared_ptr<Backend> Creator4() {
+std::shared_ptr<Backend> Creator4()
+{
     size_t backendID = 4;
     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
 
@@ -183,7 +184,6 @@ std::shared_ptr<Backend> Creator4() {
 
     testing::Mock::AllowLeak(device.get());
 
-    // LOGE("CreateData Creator [%{public}zu]",backend->GetBackendID());
     return backend;
 }
 
@@ -2324,11 +2324,9 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_construct_001, testing::ext::Test
  */
 HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_construct_002, testing::ext::TestSize.Level0)
 {
-    LOGE("nnt_nnexecutor_construct_002");
     Compilation *compilation = new (std::nothrow) Compilation();
     OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation *>(compilation);
     EXPECT_NE(nnCompilation, nullptr);
-    LOGE("nnt_nnexecutor_construct_002 is nullptr");
     BackendManager& backendManager = BackendManager::GetInstance();
     std::string backendName = "mock";
     std::function<std::shared_ptr<Backend>()> creator = Creator4;
