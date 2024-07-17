@@ -779,6 +779,7 @@ ohos_unittest("NeuralNetworkRuntimeV2_0Test") {
 group("components_unittest") {
   testonly = true
   deps = [
+    ":DeviceManagerV1_0Test",
     ":HDIDeviceV1_0Test",
     ":HDIDeviceV2_0Test",
     ":HDIPreparedModelV1_0Test",
