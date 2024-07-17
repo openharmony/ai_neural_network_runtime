@@ -100,8 +100,8 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_save_002, TestSize.Level0)
     NNCompiledCache nncompiledCache;
 
     Buffer buffer;
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* data = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* data = dataArry;
     buffer.data = data;
     buffer.length = 1;
     std::vector<Buffer> caches;
@@ -113,7 +113,8 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_save_002, TestSize.Level0)
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
-std::shared_ptr<Backend> Creator() {
+std::shared_ptr<Backend> Creator()
+{
     size_t backendID = 1;
     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
 
@@ -163,8 +164,8 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_save_003, TestSize.Level0)
     EXPECT_EQ(OH_NN_SUCCESS, ret);
 
     Buffer buffer;
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* data = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* data = dataArry;
     buffer.data = data;
     buffer.length = 1;
     std::vector<Buffer> caches;
@@ -176,7 +177,8 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_save_003, TestSize.Level0)
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, retSave);
 }
 
-std::shared_ptr<Backend> Creator2() {
+std::shared_ptr<Backend> Creator2()
+{
     size_t backendID = 2;
     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
 
@@ -223,8 +225,8 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_save_004, TestSize.Level0)
     EXPECT_EQ(OH_NN_SUCCESS, ret);
 
     Buffer buffer;
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* data = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* data = dataArry;
     buffer.data = data;
     buffer.length = 1;
     std::vector<Buffer> caches;
@@ -302,8 +304,8 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_003, TestSize.Level0)
     std::string m_cachePath = "a";
     uint32_t m_cacheVersion = 1;
     Buffer buffer;
-    float m_dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
-    void* data = m_dataArry;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* data = dataArry;
     buffer.data = data;
     buffer.length = 1;
     std::vector<Buffer> caches;

@@ -1532,9 +1532,9 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::SubGraph* subGraph = new (std::nothrow) MSLITE::LiteGraph::SubGraph();
     subGraph->name_ = "NNRt_SubGraph";
-    subGraph->input_indices_ = {1,1,1,1};
-    subGraph->output_indices_ = {1,1,1,1};
-    subGraph->node_indices_ = {1,1,1,1};
+    subGraph->input_indices_ = {1, 1, 1, 1};
+    subGraph->output_indices_ = {1, 1, 1, 1};
+    subGraph->node_indices_ = {1, 1, 1, 1};
 
     void* tp = MSLITE::MindIR_Tensor_Create();
 
@@ -1604,8 +1604,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1632,8 +1632,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1658,8 +1658,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1687,8 +1687,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1713,8 +1713,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1747,8 +1747,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1774,8 +1774,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1800,8 +1800,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1826,8 +1826,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1851,8 +1851,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1877,8 +1877,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1902,8 +1902,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1927,8 +1927,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1954,8 +1954,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -1980,8 +1980,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2007,8 +2007,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2044,8 +2044,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2069,8 +2069,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2096,8 +2096,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2124,8 +2124,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2162,8 +2162,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2188,8 +2188,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2213,8 +2213,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2238,8 +2238,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2266,8 +2266,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2291,8 +2291,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2316,8 +2316,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2342,8 +2342,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2367,8 +2367,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2397,8 +2397,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2422,8 +2422,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2447,8 +2447,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2478,8 +2478,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2503,8 +2503,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2528,8 +2528,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2559,8 +2559,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2585,8 +2585,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2611,8 +2611,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2639,8 +2639,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2669,8 +2669,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2700,8 +2700,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2725,8 +2725,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2750,8 +2750,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2775,8 +2775,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2801,8 +2801,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2826,8 +2826,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2851,8 +2851,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2876,8 +2876,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2907,8 +2907,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2943,8 +2943,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -2968,8 +2968,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3001,8 +3001,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3026,8 +3026,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3051,8 +3051,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3077,8 +3077,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3102,8 +3102,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3127,8 +3127,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3153,8 +3153,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3181,8 +3181,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3208,8 +3208,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3234,8 +3234,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3262,8 +3262,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3291,8 +3291,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3316,8 +3316,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3341,8 +3341,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3370,8 +3370,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3401,8 +3401,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3426,8 +3426,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3463,8 +3463,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3488,8 +3488,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3513,8 +3513,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3540,8 +3540,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3565,8 +3565,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3590,8 +3590,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3621,8 +3621,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3646,8 +3646,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3673,8 +3673,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3698,8 +3698,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3723,8 +3723,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3754,8 +3754,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3780,8 +3780,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3805,8 +3805,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3830,8 +3830,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3856,8 +3856,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3890,8 +3890,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3916,8 +3916,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3944,8 +3944,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3970,8 +3970,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -3996,8 +3996,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4023,8 +4023,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4051,8 +4051,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4076,8 +4076,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4101,8 +4101,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4127,8 +4127,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4153,8 +4153,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4184,8 +4184,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4210,8 +4210,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4236,8 +4236,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4263,8 +4263,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4288,8 +4288,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4314,8 +4314,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4340,8 +4340,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};
@@ -4360,9 +4360,9 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
     std::shared_ptr<MSLITE::LiteGraph> liteGraph = std::make_shared<MSLITE::LiteGraph>();
     MSLITE::LiteGraph::SubGraph* subGraph = new (std::nothrow) MSLITE::LiteGraph::SubGraph();
     subGraph->name_ = "NNRt_SubGraph";
-    subGraph->input_indices_ = {1,1,1,1};
-    subGraph->output_indices_ = {1,1,1,1};
-    subGraph->node_indices_ = {1,1,1,1};
+    subGraph->input_indices_ = {1, 1, 1, 1};
+    subGraph->output_indices_ = {1, 1, 1, 1};
+    subGraph->node_indices_ = {1, 1, 1, 1};
 
     void* tp = MSLITE::MindIR_Tensor_Create();
 
@@ -4403,8 +4403,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_hdimodel_destroy_001, 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
     node->primitive_ = primitive;
-    node->input_indices_ = {1,1,1,1};
-    node->output_indices_ = {1,1,1,1};
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
 
     liteGraph.get()->all_nodes_.emplace_back(node);
     OHOS::HDI::Nnrt::V1_0::SharedBuffer tensorBuffer {-1, 0, 0, 0};

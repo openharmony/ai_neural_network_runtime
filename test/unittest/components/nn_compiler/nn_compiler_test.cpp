@@ -1057,7 +1057,7 @@ HWTEST_F(NNCompilerTest, nncompilertest_restorefromcachebuffer_001, TestSize.Lev
     NNCompiler* nncompiler = new (std::nothrow) NNCompiler(device, backendID);
     EXPECT_NE(nullptr, nncompiler);
 
-    size_t length = 10; 
+    size_t length = 10;
     InnerModel innerModel;
     BuildModel(innerModel);
     void* model = &innerModel;
