@@ -1491,16 +1491,16 @@ public:
     std::vector<int32_t> m_param_dim{};
 };
 
-    MSLITE::LiteGraph::Node* getNode(void* primitive)
-    {
-        MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
-        node->name_ = "NNRt_SubGraph";
-        node->quant_type_ = 1;
-        node->primitive_ = primitive;
-        node->input_indices_ = {1, 1, 1, 1};
-        node->output_indices_ = {1, 1, 1, 1};
-        return node;
-    }
+MSLITE::LiteGraph::Node* getNode(void* primitive)
+{
+    MSLITE::LiteGraph::Node* node = new(std::nothrow) MSLITE::LiteGraph::Node();
+    node->name_ = "NNRt_SubGraph";
+    node->quant_type_ = 1;
+    node->primitive_ = primitive;
+    node->input_indices_ = {1, 1, 1, 1};
+    node->output_indices_ = {1, 1, 1, 1};
+    return node;
+}
 
 /**
  * @tc.name: litegraphtohdimodeltest_litegraph_to_hdimodel_001
