@@ -1626,8 +1626,8 @@ HWTEST_F(LiteGraphToHDIModelTest, litegraphtohdimodeltest_litegraph_to_hdimodel_
 
     int8_t num = 1;
     int8_t* fuseData = &num;
-    mindspore::lite::ActivationType activationType = NNToMS::TransfromFusionType(static_cast<OH_NN_FuseType>(*fuseData));
-    void* primitive = mindspore::lite::MindIR_AddFusion_CreatePrimitive(activationType);
+    mindspore::lite::ActivationType type = NNToMS::TransfromFusionType(static_cast<OH_NN_FuseType>(*fuseData));
+    void* primitive = mindspore::lite::MindIR_AddFusion_CreatePrimitive(type);
 
     node->name_ = "NNRt_SubGraph";
     node->quant_type_ = 1;
