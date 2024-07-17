@@ -991,7 +991,8 @@ HWTEST_F(NNCompilerTest, nncompilertest_restorefromcachefile_003, TestSize.Level
     InnerModel innerModel;
     BuildModel(innerModel);
     void* model = &innerModel;
-    EXPECT_CALL(*((MockIDevice *) device.get()), PrepareModel(testing::A<std::shared_ptr<const mindspore::lite::LiteGraph>>(), ::testing::_, ::testing::_))
+    EXPECT_CALL(*((MockIDevice *) device.get()),
+        PrepareModel(testing::A<std::shared_ptr<const mindspore::lite::LiteGraph>>(), ::testing::_, ::testing::_))
         .WillOnce(Invoke([&prepared](std::shared_ptr<const mindspore::lite::LiteGraph> model,
                                           const ModelConfig& config,
                                           std::shared_ptr<PreparedModel>& preparedModel) {
@@ -1031,7 +1032,7 @@ HWTEST_F(NNCompilerTest, nncompilertest_savetocachebuffer_001, TestSize.Level0)
     NNCompiler* nncompiler = new (std::nothrow) NNCompiler(device, backendID);
     EXPECT_NE(nullptr, nncompiler);
 
-    size_t length = 10; 
+    size_t length = 10;
     size_t* modelSize = &length;
     InnerModel innerModel;
     BuildModel(innerModel);
@@ -1166,7 +1167,8 @@ HWTEST_F(NNCompilerTest, nncompilertest_createexecutor_003, TestSize.Level0)
     InnerModel innerModel;
     BuildModel(innerModel);
     void* model = &innerModel;
-    EXPECT_CALL(*((MockIDevice *) device.get()), PrepareModel(testing::A<std::shared_ptr<const mindspore::lite::LiteGraph>>(), ::testing::_, ::testing::_))
+    EXPECT_CALL(*((MockIDevice *) device.get()),
+        PrepareModel(testing::A<std::shared_ptr<const mindspore::lite::LiteGraph>>(), ::testing::_, ::testing::_))
         .WillOnce(Invoke([&prepared](std::shared_ptr<const mindspore::lite::LiteGraph> model,
                                           const ModelConfig& config,
                                           std::shared_ptr<PreparedModel>& preparedModel) {
