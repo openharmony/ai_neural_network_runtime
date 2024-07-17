@@ -22,6 +22,9 @@
 #include "compilation.h"
 #include "tensor.h"
 #include "device.h"
+#include "backend.h"
+#include "backend_manager.h"
+#include "backend_registrar.h"
 #include "common/log.h"
 #include "interfaces/kits/c/neural_network_runtime/neural_network_core.h"
 
@@ -131,6 +134,58 @@ public:
     MOCK_METHOD2(AllocateBuffer, OH_NN_ReturnCode(size_t, int&));
     MOCK_METHOD2(ReleaseBuffer, OH_NN_ReturnCode(int, size_t));
 };
+
+class MockBackend : public Backend {
+public:
+    MOCK_CONST_METHOD0(GetBackendID, size_t());
+    MOCK_CONST_METHOD1(GetBackendName, OH_NN_ReturnCode(std::string&));
+    MOCK_CONST_METHOD1(GetBackendType, OH_NN_ReturnCode(OH_NN_DeviceType&));
+    MOCK_CONST_METHOD1(GetBackendStatus, OH_NN_ReturnCode(DeviceStatus&));
+    MOCK_METHOD1(CreateCompiler, Compiler*(Compilation*));
+    MOCK_METHOD1(DestroyCompiler, OH_NN_ReturnCode(Compiler*));
+    MOCK_METHOD1(CreateExecutor, Executor*(Compilation*));
+    MOCK_METHOD1(DestroyExecutor, OH_NN_ReturnCode(Executor*));
+    MOCK_METHOD1(CreateTensor, Tensor*(TensorDesc*));
+    MOCK_METHOD1(DestroyTensor, OH_NN_ReturnCode(Tensor*));
+    MOCK_METHOD2(GetSupportedOperation, OH_NN_ReturnCode(std::shared_ptr<const mindspore::lite::LiteGraph>,
+                                           std::vector<bool>&));
+};
+
+std::shared_ptr<Backend> Creator4()
+{
+    size_t backendID = 4;
+    std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
+
+    EXPECT_CALL(*((MockIDevice *) device.get()), GetDeviceStatus(::testing::_))
+        .WillRepeatedly(::testing::Invoke([](DeviceStatus& status) {
+                // 这里直接修改传入的引用参数
+                status = AVAILABLE;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
+
+    std::string backendName = "mock";
+    EXPECT_CALL(*((MockIDevice *) device.get()), GetDeviceName(::testing::_))
+        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(backendName), ::testing::Return(OH_NN_SUCCESS)));
+
+    EXPECT_CALL(*((MockIDevice *) device.get()), GetVendorName(::testing::_))
+        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(backendName), ::testing::Return(OH_NN_SUCCESS)));
+
+    EXPECT_CALL(*((MockIDevice *) device.get()), GetVersion(::testing::_))
+        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(backendName), ::testing::Return(OH_NN_SUCCESS)));
+
+    EXPECT_CALL(*((MockIDevice *) device.get()), AllocateBuffer(::testing::_, ::testing::_))
+        .WillRepeatedly(::testing::Invoke([](size_t length, int& fd) {
+                // 这里直接修改传入的引用参数
+                fd = -1;
+                return OH_NN_SUCCESS; // 假设成功的状态码
+            }));
+
+    std::shared_ptr<Backend> backend = std::make_unique<NNBackend>(device, backendID);
+
+    testing::Mock::AllowLeak(device.get());
+
+    return backend;
+}
 
 /*
  * @tc.name: alldevicesid_001
@@ -245,22 +300,32 @@ HWTEST_F(NeuralNetworkCoreTest, device_get_type_002, testing::ext::TestSize.Leve
 {
     size_t deviceID = 0;
     OH_NN_DeviceType* pDeviceType = nullptr;
+    BackendManager& backendManager = BackendManager::GetInstance();
+    std::string backendName = "mock";
+    std::function<std::shared_ptr<Backend>()> creator = Creator4;
+
+    backendManager.RegisterBackend(backendName, creator);
     OH_NN_ReturnCode ret = OH_NNDevice_GetType(deviceID, pDeviceType);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
 /*
  * @tc.name: device_get_type_003
- * @tc.desc: Verify the error happened when getting name of deviceID of the OH_NNDevice_GetType function.
+ * @tc.desc: Verify the device is nullptr of the OH_NNDevice_GetType function.
  * @tc.type: FUNC
  */
 HWTEST_F(NeuralNetworkCoreTest, device_get_type_003, testing::ext::TestSize.Level0)
 {
-    size_t deviceID = 1;
+    size_t deviceID = 0;
     OH_NN_DeviceType deviceType = OH_NN_OTHERS;
     OH_NN_DeviceType* pDeviceType = &deviceType;
+    BackendManager& backendManager = BackendManager::GetInstance();
+    std::string backendName = "mock";
+    std::function<std::shared_ptr<Backend>()> creator = Creator4;
+
+    backendManager.RegisterBackend(backendName, creator);
     OH_NN_ReturnCode ret = OH_NNDevice_GetType(deviceID, pDeviceType);
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
 }
 
 /*
@@ -287,6 +352,18 @@ HWTEST_F(NeuralNetworkCoreTest, compilation_construct_001, testing::ext::TestSiz
     const OH_NNModel* model = nullptr;
     OH_NNCompilation* ret = OH_NNCompilation_Construct(model);
     EXPECT_EQ(nullptr, ret);
+}
+
+/*
+ * @tc.name: compilation_construct_002
+ * @tc.desc: Verify the OH_NNModel is nullptr of the OH_NNCompilation_Construct function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, compilation_construct_002, testing::ext::TestSize.Level0)
+{
+    const OH_NNModel* model = OH_NNModel_Construct();
+    OH_NNCompilation* ret = OH_NNCompilation_Construct(model);
+    EXPECT_NE(nullptr, ret);
 }
 
 /*
@@ -337,6 +414,19 @@ HWTEST_F(NeuralNetworkCoreTest, compilation_construct_with_off_modelbuffer_002, 
     size_t modelsize = 0;
     OH_NNCompilation* ret = OH_NNCompilation_ConstructWithOfflineModelBuffer(modelbuffer, modelsize);
     EXPECT_EQ(nullptr, ret);
+}
+
+/*
+ * @tc.name: compilation_construct_with_off_modelbuffer_003
+ * @tc.desc: Verify the modelbuffer is no nullptr of the OH_NNCompilation_ConstructWithOfflineModelBuffer function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, compilation_construct_with_off_modelbuffer_003, testing::ext::TestSize.Level0)
+{
+    char modelbuffer[SIZE_ONE];
+    size_t modelsize = 1;
+    OH_NNCompilation* ret = OH_NNCompilation_ConstructWithOfflineModelBuffer(modelbuffer, modelsize);
+    EXPECT_NE(nullptr, ret);
 }
 
 /*
@@ -449,6 +539,28 @@ HWTEST_F(NeuralNetworkCoreTest, compilation_exportchachetobuffer_006, testing::e
     OH_NN_ReturnCode ret = OH_NNCompilation_ExportCacheToBuffer(nnCompilation, buffer, SIZE_ONE, &modelSize);
     delete compilation;
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: compilation_exportchachetobuffer_007
+ * @tc.desc: Verify the length is 0 of the OH_NNCompilation_ExportCacheToBuffer function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, compilation_exportchachetobuffer_007, testing::ext::TestSize.Level0)
+{
+    Compilation *compilation = new (std::nothrow) Compilation();
+    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(compilation);
+    char buffer[SIZE_ONE];
+    size_t modelSize = 0;
+    std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
+    size_t backid = 1;
+
+    NNCompiler nnCompiler(device, backid);
+    compilation->compiler = &nnCompiler;
+    OH_NN_ReturnCode ret = OH_NNCompilation_ExportCacheToBuffer(nnCompilation, buffer, SIZE_ONE, &modelSize);
+    delete compilation;
+    EXPECT_NE(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -675,8 +787,11 @@ HWTEST_F(NeuralNetworkCoreTest, compilation_set_cache_003, testing::ext::TestSiz
  */
 HWTEST_F(NeuralNetworkCoreTest, compilation_set_performancemode_001, testing::ext::TestSize.Level0)
 {
+    InnerModel innerModel;
+    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
     OH_NNCompilation* nnCompilation = nullptr;
     OH_NN_PerformanceMode performanceMode = OH_NN_PERFORMANCE_NONE;
+
     OH_NN_ReturnCode ret = OH_NNCompilation_SetPerformanceMode(nnCompilation, performanceMode);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
@@ -775,7 +890,24 @@ HWTEST_F(NeuralNetworkCoreTest, compilation_build_002, testing::ext::TestSize.Le
     OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation*>(compilation);
     OH_NN_ReturnCode ret = OH_NNCompilation_Build(nnCompilation);
     delete compilation;
-    EXPECT_EQ(OH_NN_FAILED, ret);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+}
+
+/*
+ * @tc.name: compilation_build_002
+ * @tc.desc: Verify the success of the OH_NNCompilation_Build function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, compilation_build_003, testing::ext::TestSize.Level0)
+{
+    InnerModel innerModel;
+    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+
+    OH_NN_ReturnCode ret = OH_NNCompilation_Build(nnCompilation);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
 }
 
 /*
@@ -927,9 +1059,9 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_tensordesc_getdatatype_001, testing::ext::Te
 HWTEST_F(NeuralNetworkCoreTest, nnt_tensordesc_getdatatype_002, testing::ext::TestSize.Level0)
 {
     NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
-    OH_NN_DataType* datatype = nullptr;
-    OH_NN_ReturnCode ret = OH_NNTensorDesc_GetDataType(tensorDesc, datatype);
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    OH_NN_DataType datatype = OH_NN_BOOL;
+    OH_NN_ReturnCode ret = OH_NNTensorDesc_GetDataType(tensorDesc, &datatype);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
 }
 
 /*
@@ -939,9 +1071,9 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_tensordesc_getdatatype_002, testing::ext::Te
  */
 HWTEST_F(NeuralNetworkCoreTest, nnt_tensordesc_getdatatype_003, testing::ext::TestSize.Level0)
 {
-    NN_TensorDesc* tensorDesc = nullptr;
-    OH_NN_DataType datatype = OH_NN_INT32;
-    OH_NN_ReturnCode ret = OH_NNTensorDesc_GetDataType(tensorDesc, &datatype);
+    NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
+    OH_NN_DataType* datatype = nullptr;
+    OH_NN_ReturnCode ret = OH_NNTensorDesc_GetDataType(tensorDesc, datatype);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
@@ -1215,6 +1347,24 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_create_002, testing::ext::TestSize.
 }
 
 /*
+ * @tc.name: nnt_nntensor_create_003
+ * @tc.desc: Verify the NN_TensorDesc is nullptr of the OH_NNTensorDesc_SetShape function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_create_003, testing::ext::TestSize.Level0)
+{
+    NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
+    size_t deviceid = 0;
+    BackendManager& backendManager = BackendManager::GetInstance();
+    std::string backendName = "mock";
+    std::function<std::shared_ptr<Backend>()> creator = Creator4;
+
+    backendManager.RegisterBackend(backendName, creator);
+    NN_Tensor* ret = OH_NNTensor_Create(deviceid, tensorDesc);
+    EXPECT_EQ(nullptr, ret);
+}
+
+/*
  * @tc.name: nnt_nntensor_createwithsize_001
  * @tc.desc: Verify the NN_TensorDesc is nullptr of the OH_NNTensorDesc_SetShape function.
  * @tc.type: FUNC
@@ -1236,8 +1386,27 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_createwithsize_001, testing::ext::T
 HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_createwithsize_002, testing::ext::TestSize.Level0)
 {
     NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
+    size_t deviceid = 1;
+    size_t size = 0;
+    NN_Tensor* ret = OH_NNTensor_CreateWithSize(deviceid, tensorDesc, size);
+    EXPECT_EQ(nullptr, ret);
+}
+
+/*
+ * @tc.name: nnt_nntensor_createwithsize_003
+ * @tc.desc: Verify the NN_TensorDesc is nullptr of the OH_NNTensorDesc_SetShape function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_createwithsize_003, testing::ext::TestSize.Level0)
+{
+    NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
     size_t deviceid = 0;
     size_t size = 0;
+    BackendManager& backendManager = BackendManager::GetInstance();
+    std::string backendName = "mock";
+    std::function<std::shared_ptr<Backend>()> creator = Creator4;
+
+    backendManager.RegisterBackend(backendName, creator);
     NN_Tensor* ret = OH_NNTensor_CreateWithSize(deviceid, tensorDesc, size);
     EXPECT_EQ(nullptr, ret);
 }
@@ -1283,7 +1452,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_createwithfd_003, testing::ext::Tes
 {
     NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
     size_t deviceid = 0;
-    int fd = -1;
+    int fd = 1;
     size_t size = 0;
     size_t offset = 0;
     NN_Tensor* ret = OH_NNTensor_CreateWithFd(deviceid, tensorDesc, fd, size, offset);
@@ -1323,6 +1492,22 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_createwithfd_005, testing::ext::Tes
 }
 
 /*
+ * @tc.name: nnt_nntensor_createwithsize_006
+ * @tc.desc: Verify the NN_TensorDesc is nullptr of the OH_NNTensorDesc_SetShape function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_createwithsize_006, testing::ext::TestSize.Level0)
+{
+    NN_TensorDesc* tensorDesc = OH_NNTensorDesc_Create();
+    size_t deviceid = 0;
+    int fd = 1;
+    size_t size = 1;
+    size_t offset = 2;
+    NN_Tensor* ret = OH_NNTensor_CreateWithFd(deviceid, tensorDesc, fd, size, offset);
+    EXPECT_EQ(nullptr, ret);
+}
+
+/*
  * @tc.name: nnt_nntensor_destroy_001
  * @tc.desc: Verify the NN_Tensor is nullptr of the OH_NNTensorDesc_SetShape function.
  * @tc.type: FUNC
@@ -1335,7 +1520,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_destroy_001, testing::ext::TestSize
 }
 
 /*
- * @tc.name: nnt_nntensor_destroy_00
+ * @tc.name: nnt_nntensor_destroy_002
  * @tc.desc: Verify the NN_Tensor is nullptr of the OH_NNTensorDesc_SetShape function.
  * @tc.type: FUNC
  */
@@ -1346,6 +1531,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_destroy_002, testing::ext::TestSize
     NN_Tensor* tensor = reinterpret_cast<NN_Tensor*>(hdiDevice->CreateTensor(tensorDesc));
     OH_NN_ReturnCode ret = OH_NNTensor_Destroy(&tensor);
     EXPECT_EQ(OH_NN_NULL_PTR, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1372,6 +1558,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_gettensordesc_002, testing::ext::Te
     NN_Tensor* tensor = reinterpret_cast<NN_Tensor*>(hdiDevice->CreateTensor(tensorDesc));
     NN_TensorDesc* ret = OH_NNTensor_GetTensorDesc(tensor);
     EXPECT_NE(nullptr, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1398,6 +1585,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_getdatabuffer_002, testing::ext::Te
     NN_Tensor* tensor = reinterpret_cast<NN_Tensor*>(hdiDevice->CreateTensor(tensorDesc));
     void* ret = OH_NNTensor_GetDataBuffer(tensor);
     EXPECT_EQ(nullptr, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1426,6 +1614,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_getsize_002, testing::ext::TestSize
     NN_Tensor* tensor = reinterpret_cast<NN_Tensor*>(hdiDevice->CreateTensor(tensorDesc));
     OH_NN_ReturnCode ret = OH_NNTensor_GetSize(tensor, size);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1441,6 +1630,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_getsize_003, testing::ext::TestSize
     NN_Tensor* tensor = reinterpret_cast<NN_Tensor*>(hdiDevice->CreateTensor(tensorDesc));
     OH_NN_ReturnCode ret = OH_NNTensor_GetSize(tensor, &size);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1469,6 +1659,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_getfd_002, testing::ext::TestSize.L
     int* fd = nullptr;
     OH_NN_ReturnCode ret = OH_NNTensor_GetFd(tensor, fd);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1484,6 +1675,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_getfd_003, testing::ext::TestSize.L
     int fd = 1;
     OH_NN_ReturnCode ret = OH_NNTensor_GetFd(tensor, &fd);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1512,6 +1704,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_getoffset_002, testing::ext::TestSi
     size_t* offset = nullptr;
     OH_NN_ReturnCode ret = OH_NNTensor_GetOffset(tensor, offset);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1527,6 +1720,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nntensor_getoffset_003, testing::ext::TestSi
     size_t offset = 1;
     OH_NN_ReturnCode ret = OH_NNTensor_GetOffset(tensor, &offset);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1566,6 +1760,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getputputshape_002, testing::ext:
     OH_NN_ReturnCode ret = OH_NNExecutor_GetOutputShape(nnExecutor, outputIndex, &shape, shapeLength);
     delete executor;
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1601,6 +1796,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputcount_002, testing::ext::
     OH_NN_ReturnCode ret = OH_NNExecutor_GetInputCount(nnExecutor, inputCount);
     delete executor;
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1636,6 +1832,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getoutputcount_002, testing::ext:
     OH_NN_ReturnCode ret = OH_NNExecutor_GetOutputCount(nnExecutor, outputCount);
     delete executor;
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1704,6 +1901,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_002, testing::ex
     &minInputDims, &maxInputDims, shapeLength);
     delete executor;
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
  /*
@@ -1731,6 +1929,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_getinputdimRange_003, testing::ex
     &minInputDims, &maxInputDims, shapeLength);
     delete executor;
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1765,6 +1964,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_setonrundone_002, testing::ext::T
     NN_OnRunDone rundone = nullptr;
     OH_NN_ReturnCode ret = OH_NNExecutor_SetOnRunDone(nnExecutor, rundone);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1799,6 +1999,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_setonservicedied_002, testing::ex
     NN_OnServiceDied servicedied = nullptr;
     OH_NN_ReturnCode ret = OH_NNExecutor_SetOnServiceDied(nnExecutor, servicedied);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1839,6 +2040,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_executor_runsync_002, testing::ext::TestSize
     size_t outputcount = 0;
     OH_NN_ReturnCode ret = OH_NNExecutor_RunSync(nnExecutor, inputTensor, inputCount, outputTensor, outputcount);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1863,6 +2065,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_executor_runsync_003, testing::ext::TestSize
     size_t outputcount = 0;
     OH_NN_ReturnCode ret = OH_NNExecutor_RunSync(nnExecutor, inputTensor, inputCount, outputTensor, outputcount);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1887,6 +2090,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_executor_runsync_004, testing::ext::TestSize
     size_t outputcount = 0;
     OH_NN_ReturnCode ret = OH_NNExecutor_RunSync(nnExecutor, inputTensor, inputCount, outputTensor, outputcount);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1911,6 +2115,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_executor_runsync_005, testing::ext::TestSize
     size_t outputcount = 0;
     OH_NN_ReturnCode ret = OH_NNExecutor_RunSync(nnExecutor, inputTensor, inputCount, outputTensor, outputcount);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1957,6 +2162,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_executor_runasync_002, testing::ext::TestSiz
     OH_NN_ReturnCode ret = OH_NNExecutor_RunAsync(nnExecutor, inputTensor, inputCount, outputTensor, outputcount,
         timeout, userdata);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -1984,6 +2190,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_executor_runasync_003, testing::ext::TestSiz
     OH_NN_ReturnCode ret = OH_NNExecutor_RunAsync(nnExecutor, inputTensor, inputCount, outputTensor, outputcount,
         timeout, userdata);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -2011,6 +2218,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_executor_runasync_004, testing::ext::TestSiz
     OH_NN_ReturnCode ret = OH_NNExecutor_RunAsync(nnExecutor, inputTensor, inputCount, outputTensor, outputcount,
         timeout, userdata);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -2038,6 +2246,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_executor_runasync_005, testing::ext::TestSiz
     OH_NN_ReturnCode ret = OH_NNExecutor_RunAsync(nnExecutor, inputTensor, inputCount, outputTensor, outputcount,
         timeout, userdata);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -2065,6 +2274,7 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_executor_runasync_006, testing::ext::TestSiz
     OH_NN_ReturnCode ret = OH_NNExecutor_RunAsync(nnExecutor, inputTensor, inputCount, outputTensor, outputcount,
         timeout, userdata);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
 }
 
 /*
@@ -2092,6 +2302,106 @@ HWTEST_F(NeuralNetworkCoreTest, nnt_executor_runasync_007, testing::ext::TestSiz
     OH_NN_ReturnCode ret = OH_NNExecutor_RunAsync(nnExecutor, inputTensor, inputCount, outputTensor, outputcount,
         timeout, userdata);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    testing::Mock::AllowLeak(device.get());
+}
+
+/*
+ * @tc.name: nnt_nnexecutor_construct_001
+ * @tc.desc: Verify the OH_NNCompilation is nullptr of the OH_NNCompilation_SetDevice function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_construct_001, testing::ext::TestSize.Level0)
+{
+    OH_NNCompilation* nnCompilation = nullptr;
+    OH_NNExecutor* ret = OH_NNExecutor_Construct(nnCompilation);
+    EXPECT_EQ(nullptr, ret);
+}
+
+/*
+ * @tc.name: nnt_nnexecutor_construct_002
+ * @tc.desc: Verify the OH_NNCompilation is nullptr of the OH_NNCompilation_SetDevice function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_construct_002, testing::ext::TestSize.Level0)
+{
+    Compilation *compilation = new (std::nothrow) Compilation();
+    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation *>(compilation);
+    EXPECT_NE(nnCompilation, nullptr);
+    BackendManager& backendManager = BackendManager::GetInstance();
+    std::string backendName = "mock";
+    std::function<std::shared_ptr<Backend>()> creator = Creator4;
+
+    BackendRegistrar backendregistrar(backendName, creator);
+    backendManager.RemoveBackend(backendName);
+    backendManager.RegisterBackend(backendName, creator);
+    OH_NNExecutor* ret = OH_NNExecutor_Construct(nnCompilation);
+    delete compilation;
+    EXPECT_EQ(nullptr, ret);
+}
+
+/*
+ * @tc.name: nnt_nnexecutor_construct_003
+ * @tc.desc: Verify the OH_NNCompilation is nullptr of the OH_NNCompilation_SetDevice function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, nnt_nnexecutor_construct_003, testing::ext::TestSize.Level0)
+{
+    Compilation *compilation = new (std::nothrow) Compilation();
+    OH_NNCompilation* nnCompilation = reinterpret_cast<OH_NNCompilation *>(compilation);
+    EXPECT_NE(nnCompilation, nullptr);
+    BackendManager& backendManager = BackendManager::GetInstance();
+    std::string backendName = "mock";
+    std::function<std::shared_ptr<Backend>()> creator = Creator4;
+
+    backendManager.RegisterBackend(backendName, creator);
+    std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
+    size_t backid = 1;
+
+    NNCompiler nnCompiler(device, backid);
+    compilation->compiler = &nnCompiler;
+    OH_NNExecutor* ret = OH_NNExecutor_Construct(nnCompilation);
+    delete compilation;
+    EXPECT_EQ(nullptr, ret);
+}
+
+/*
+ * @tc.name: compilation_destroy_001
+ * @tc.desc: Verify the compilation is nullptr of the OH_NNCompilation_ExportCacheToBuffer function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, compilation_destroy_001, testing::ext::TestSize.Level0)
+{
+    OH_NNCompilation* nncompilation = nullptr;
+    OH_NNCompilation_Destroy(&nncompilation);
+    EXPECT_EQ(nullptr, nncompilation);
+}
+
+/*
+ * @tc.name: compilation_destroy_002
+ * @tc.desc: Verify the normal model of the OH_NNCompilation_Destroy function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, compilation_destroy_002, testing::ext::TestSize.Level0)
+{
+    InnerModel* innerModel = new InnerModel();
+    EXPECT_NE(nullptr, innerModel);
+
+    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
+    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
+    OH_NNCompilation_Destroy(&nnCompilation);
+    EXPECT_EQ(nullptr, nnCompilation);
+}
+
+/*
+ * @tc.name: executor_destroy_001
+ * @tc.desc: Verify the compilation is nullptr of the OH_NNCompilation_ExportCacheToBuffer function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NeuralNetworkCoreTest, executor_destroy_001, testing::ext::TestSize.Level0)
+{
+    OH_NNExecutor* nnExecutor = nullptr;
+    OH_NNExecutor_Destroy(&nnExecutor);
+    EXPECT_EQ(nullptr, nnExecutor);
 }
 } // Unittest
 } // namespace NeuralNetworkRuntime
