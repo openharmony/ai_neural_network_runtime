@@ -32,6 +32,7 @@ constexpr int32_t NUMBER_CACHE_INFO_MEMBERS = 3;
 constexpr int32_t HEX_UNIT = 16;
 constexpr char ROOT_DIR_STR = '/';
 constexpr char DOUBLE_SLASH_STR[] = "//";
+constexpr int OPVERSION_SUBSTR_NUM = 2;
 
 OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
                                        const std::string& cacheDir,
@@ -162,7 +163,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheFiles(const std::vector<OHOS::Neu
                                                      uint32_t version) const
 {
     const size_t cacheNumber = caches.size();
-    uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber;
+    uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber + 1;
     std::unique_ptr<int64_t[]> cacheInfo = CreateUniquePtr<int64_t[]>(cacheSize);
     if (cacheInfo == nullptr) {
         LOGE("[NNCompiledCache] GenerateCacheFiles failed, fail to create cacheInfo instance.");
@@ -231,6 +232,17 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
 
         cacheModelStream.close();
     }
+
+    std::string currentVersion = "0x00000000";
+    std::string opVersionPath = "/data/data/hiai/version";
+    std::ifstream inf(opVersionPath.c_str());
+    if (inf.is_open()) {
+        getline(inf, currentVersion);
+    }
+
+    int currentOpVersion = std::stoi(currentVersion.substr(OPVERSION_SUBSTR_NUM));
+    *cacheInfoPtr++ = currentOpVersion;
+    inf.close();
 
     return OH_NN_SUCCESS;
 }
@@ -314,6 +326,11 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
         modelCacheInfo.modelCheckSum[i] = static_cast<unsigned short>(modelCheckSum[i]);
     }
 
+    if (!infoCacheFile.read(reinterpret_cast<char*>(&(modelCacheInfo.opVersion)), sizeof(uint64_t))) {
+        LOGW("[NNCompiledCache] opVersion failed.");
+    }
+
+    infoCacheFile.close();
     return OH_NN_SUCCESS;
 }
 

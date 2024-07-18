@@ -33,6 +33,7 @@ struct NNCompiledCacheInfo {
     int64_t version{0};
     int64_t deviceId{0};
     std::vector<unsigned short> modelCheckSum;
+    int64_t opVersion{0};
 };
 
 class NNCompiledCache {
