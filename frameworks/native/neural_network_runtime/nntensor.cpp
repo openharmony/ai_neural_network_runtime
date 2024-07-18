@@ -181,9 +181,19 @@ void* NNTensor2_0::GetData() const
     return m_data;
 }
 
+void NNTensor2_0::SetData(void* data)
+{
+    m_data = data;
+}
+
 int NNTensor2_0::GetFd() const
 {
     return m_fd;
+}
+
+void NNTensor2_0::SetFd(int fd)
+{
+    m_fd = fd;
 }
 
 size_t NNTensor2_0::GetSize() const
@@ -191,9 +201,19 @@ size_t NNTensor2_0::GetSize() const
     return m_size;
 }
 
+void NNTensor2_0::SetSize(size_t size)
+{
+    m_size = size;
+}
+
 size_t NNTensor2_0::GetOffset() const
 {
     return m_offset;
+}
+
+void NNTensor2_0::SetOffset(size_t offset)
+{
+    m_offset = offset;
 }
 
 OH_NN_ReturnCode NNTensor2_0::AllocateMemory(size_t length)
