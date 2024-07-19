@@ -454,7 +454,7 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild()
         LOGE("[NNCompiler] cache file is failed, to delete cache.");
         char path[PATH_MAX];
         if (realpath(m_cachePath.c_str(), path) == nullptr) {
-            LOGE("[NNCompiledCache] WriteCacheInfo failed, fail to get the real path of cache Dir.");
+            LOGE("[NNCompiledCache] WriteCacheInfo failed, fail to get the real path of cacheDir.");
             return OH_NN_INVALID_PARAMETER;
         }
 
@@ -476,6 +476,7 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild()
             std::filesystem::remove_all(cacheInfo);
         }
     }
+
     if (ret == OH_NN_OPERATION_FORBIDDEN) {
         LOGE("[NNCompiler] Build failed, operation is forbidden.");
         return ret;

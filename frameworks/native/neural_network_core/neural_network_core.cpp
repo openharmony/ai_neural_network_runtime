@@ -638,17 +638,17 @@ OH_NN_ReturnCode GetModelId(Compilation** compilation)
     }
 
     if (nnrtService.GetNNRtModelIDFromPath == nullptr) {
-        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromPath func is nullptr");
+        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromPath func is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
     if (nnrtService.GetNNRtModelIDFromBuffer == nullptr) {
-        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromBuffer func is nullptr");
+        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromBuffer func is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
     if (nnrtService.GetNNRtModelIDFromModel == nullptr) {
-        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromModel func is nullptr");
+        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromModel func is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
