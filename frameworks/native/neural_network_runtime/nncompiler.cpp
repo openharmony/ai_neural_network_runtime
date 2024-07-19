@@ -452,8 +452,8 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild()
     OH_NN_ReturnCode ret = RestoreFromCacheFile();
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] cache file is failed, to delete cache.");
-        char* path = new char[PATH_MAX];
-        if (realpath(m_cachePath.c_str(), path) == nullptr) {
+        char path[PATH_MAX + 1];
+        if (realpath(m_cachePath.c_str(), path) == nullptr || strlen(path) >= PATH_MAX) {
             LOGW("[NNCompiledCache] WriteCacheInfo failed, fail to get the real path of cacheDir.");
         }
 
@@ -474,7 +474,6 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild()
         if (std::filesystem::exists(cacheInfo)) {
             std::filesystem::remove_all(cacheInfo);
         }
-        delete []path;
     }
 
     if (ret == OH_NN_OPERATION_FORBIDDEN) {
