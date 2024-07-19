@@ -503,31 +503,7 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
     return innerModel->BuildFromLiteGraph(pLiteGraph, extensionConfig);
 }
 
-bool CheckCacheFile(char* path, int64_t fileNumber, int64_t cacheVersion)
-{
-    std::ifstream ifs(path, std::ios::in | std::ios::binary);
-    if (!ifs) {
-        LOGI("OH_NNModel_HasCache open cache info file failed.");
-        return false;
-    }
-
-    if (!ifs.read(reinterpret_cast<char*>(&(fileNumber)), sizeof(fileNumber))) {
-        LOGI("CheckCacheFile read fileNumber cache info file failed.");
-        ifs.close();
-        return false;
-    }
-
-    if (!ifs.read(reinterpret_cast<char*>(&(cacheVersion)), sizeof(cacheVersion))) {
-        LOGI("CheckCacheFile read cacheVersion cache info file failed.");
-        ifs.close();
-        return false;
-    }
-
-    ifs.close();
-    return true;
-}
-
-NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, uint32_t version)
+NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName)
 {
     if (cacheDir == nullptr) {
         LOGI("OH_NNModel_HasCache get empty cache directory.");
@@ -560,23 +536,25 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, u
         return false;
     }
 
-    int64_t fileNumber{0};
-    int64_t cacheVersion{0};
-    if (!CheckCacheFile(path, fileNumber, cacheVersion)) {
-        LOGI("OH_NNModel_HasCache read fileNumber or cacheVersion filed.");
+    std::ifstream ifs(path, std::ios::in | std::ios::binary);
+    if (!ifs) {
+        LOGI("OH_NNModel_HasCache open cache info file failed.");
         return false;
     }
+
+    int64_t fileNumber{0};
+    if (!ifs.read(reinterpret_cast<char*>(&(fileNumber)), sizeof(fileNumber))) {
+        LOGI("OH_NNModel_HasCache read cache info file failed.");
+        ifs.close();
+        return false;
+    }
+    ifs.close();
 
     // determine whether cache model files exist
     for (int64_t i = 0; i < fileNumber; ++i) {
         std::string cacheModelPath =
             std::string(cacheDir) + "/" + std::string(modelName) + std::to_string(i) + ".nncache";
         exist = (exist && (stat(cacheModelPath.c_str(), &buffer) == 0));
-    }
-
-    if (cacheVersion != version) {
-        LOGW("OH_NNModel_HasCache version is not match.");
-        exist = false;
     }
 
     return exist;
