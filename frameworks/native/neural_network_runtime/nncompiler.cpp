@@ -454,8 +454,7 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild()
         LOGE("[NNCompiler] cache file is failed, to delete cache.");
         char path[PATH_MAX];
         if (realpath(m_cachePath.c_str(), path) == nullptr) {
-            LOGE("[NNCompiledCache] WriteCacheInfo failed, fail to get the real path of cacheDir.");
-            return OH_NN_INVALID_PARAMETER;
+            LOGW("[NNCompiledCache] WriteCacheInfo failed, fail to get the real path of cacheDir.");
         }
 
         std::string cachePath = path;
