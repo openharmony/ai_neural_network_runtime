@@ -81,7 +81,7 @@ NNRT_API OH_NN_ReturnCode OH_NNDevice_GetName(size_t deviceID, const char **name
     BackendManager& backendManager = BackendManager::GetInstance();
     const std::string& backendName = backendManager.GetBackendName(deviceID);
     if (backendName.empty()) {
-        LOGE("OH_NNDevice_GetName failed, error happened when getting name of deviceID %{public}zu.", deviceID);
+        LOGE("OH_NNDevice_GetName failed, error happened when getting name of deviceID.");
         *name = nullptr;
         return OH_NN_FAILED;
     }
@@ -106,7 +106,7 @@ NNRT_API OH_NN_ReturnCode OH_NNDevice_GetType(size_t deviceID, OH_NN_DeviceType*
 
     OH_NN_ReturnCode ret = backend->GetBackendType(*deviceType);
     if (ret != OH_NN_SUCCESS) {
-        LOGE("OH_NNDevice_GetType failed, device id: %{public}zu.", deviceID);
+        LOGE("OH_NNDevice_GetType failed.");
         return ret;
     }
     return OH_NN_SUCCESS;
@@ -978,7 +978,7 @@ NNRT_API NN_Tensor* OH_NNTensor_Create(size_t deviceID, NN_TensorDesc *tensorDes
     BackendManager& backendManager = BackendManager::GetInstance();
     std::shared_ptr<Backend> backend = backendManager.GetBackend(deviceID);
     if (backend == nullptr) {
-        LOGE("OH_NNTensor_Create failed, passed invalid backend name %{public}zu.", deviceID);
+        LOGE("OH_NNTensor_Create failed, passed invalid backend name.");
         return nullptr;
     }
 
@@ -1010,7 +1010,7 @@ NNRT_API NN_Tensor* OH_NNTensor_CreateWithSize(size_t deviceID, NN_TensorDesc *t
     BackendManager& backendManager = BackendManager::GetInstance();
     std::shared_ptr<Backend> backend = backendManager.GetBackend(deviceID);
     if (backend == nullptr) {
-        LOGE("OH_NNTensor_CreateWithSize failed, passed invalid backend name %{public}zu.", deviceID);
+        LOGE("OH_NNTensor_CreateWithSize failed, passed invalid backend name.");
         return nullptr;
     }
 
@@ -1068,7 +1068,7 @@ NNRT_API NN_Tensor* OH_NNTensor_CreateWithFd(size_t deviceID,
     BackendManager& backendManager = BackendManager::GetInstance();
     std::shared_ptr<Backend> backend = backendManager.GetBackend(deviceID);
     if (backend == nullptr) {
-        LOGE("OH_NNTensor_CreateWithFd failed, passed invalid backend name %{public}zu.", deviceID);
+        LOGE("OH_NNTensor_CreateWithFd failed, passed invalid backend name.");
         return nullptr;
     }
 

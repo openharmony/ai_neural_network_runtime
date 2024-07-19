@@ -503,7 +503,7 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
     return innerModel->BuildFromLiteGraph(pLiteGraph, extensionConfig);
 }
 
-NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName)
+NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, uint32_t version)
 {
     if (cacheDir == nullptr) {
         LOGI("OH_NNModel_HasCache get empty cache directory.");
@@ -543,8 +543,15 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName)
     }
 
     int64_t fileNumber{0};
+    int64_t cacheVersion{0};
     if (!ifs.read(reinterpret_cast<char*>(&(fileNumber)), sizeof(fileNumber))) {
-        LOGI("OH_NNModel_HasCache read cache info file failed.");
+        LOGI("OH_NNModel_HasCache read fileNumber cache info file failed.");
+        ifs.close();
+        return false;
+    }
+
+    if (!ifs.read(reinterpret_cast<char*>(&(cacheVersion)), sizeof(cacheVersion))) {
+        LOGI("OH_NNModel_HasCache read cacheVersion cache info file failed.");
         ifs.close();
         return false;
     }
@@ -557,6 +564,11 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName)
         exist = (exist && (stat(cacheModelPath.c_str(), &buffer) == 0));
     }
 
+    if (cacheVersion != version) {
+        LOGW("OH_NNModel_HasCache version is not match.");
+        exist = false;
+    }
+    
     return exist;
 }
 
