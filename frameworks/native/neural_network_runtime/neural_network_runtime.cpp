@@ -503,8 +503,14 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
     return innerModel->BuildFromLiteGraph(pLiteGraph, extensionConfig);
 }
 
-bool CheckCacheFile(int64_t fileNumber, int64_t cacheVersion)
+bool CheckCacheFile(char* path, int64_t fileNumber, int64_t cacheVersion)
 {
+    std::ifstream ifs(path, std::ios::in | std::ios::binary);
+    if (!ifs) {
+        LOGI("OH_NNModel_HasCache open cache info file failed.");
+        return false;
+    }
+
     if (!ifs.read(reinterpret_cast<char*>(&(fileNumber)), sizeof(fileNumber))) {
         LOGI("CheckCacheFile read fileNumber cache info file failed.");
         ifs.close();
@@ -554,15 +560,9 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, u
         return false;
     }
 
-    std::ifstream ifs(path, std::ios::in | std::ios::binary);
-    if (!ifs) {
-        LOGI("OH_NNModel_HasCache open cache info file failed.");
-        return false;
-    }
-
     int64_t fileNumber{0};
     int64_t cacheVersion{0};
-    if (!CheckCacheFile(fileNumber, cacheVersion)) {
+    if (!CheckCacheFile(path, fileNumber, cacheVersion)) {
         LOGI("OH_NNModel_HasCache read fileNumber or cacheVersion filed.");
         return false;
     }
