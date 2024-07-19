@@ -563,7 +563,7 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, u
     int64_t fileNumber{0};
     int64_t cacheVersion{0};
     if (!CheckCacheFile(fileNumber, cacheVersion)) {
-        LOGE("OH_NNModel_HasCache read fileNumber or cacheVersion filed.");
+        LOGI("OH_NNModel_HasCache read fileNumber or cacheVersion filed.");
         return false;
     }
 
