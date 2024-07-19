@@ -213,8 +213,9 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
         return ret;
     }
 
+    std::string cachePath = path;
     for (size_t i = 0; i < cacheNumber; ++i) {
-        std::string cacheModelFile = cacheDir + "/" + m_modelName + std::to_string(i) + ".nncache";
+        std::string cacheModelFile = cachePath + "/" + m_modelName + std::to_string(i) + ".nncache";
         std::ofstream cacheModelStream(cacheModelFile, std::ios::binary | std::ios::out | std::ios::trunc);
         if (cacheModelStream.fail()) {
             LOGE("[NNCompiledCache] GenerateCacheModel failed, model cache file is invalid.");
@@ -265,7 +266,8 @@ OH_NN_ReturnCode NNCompiledCache::WriteCacheInfo(uint32_t cacheSize,
         return ret;
     }
 
-    std::string cacheInfoPath = cacheDir + "/" + m_modelName + "cache_info.nncache";
+    std::string cachePath = path;
+    std::string cacheInfoPath = cachePath + "/" + m_modelName + "cache_info.nncache";
     std::ofstream cacheInfoStream(cacheInfoPath, std::ios::binary | std::ios::out | std::ios::trunc);
     if (cacheInfoStream.fail()) {
         LOGE("[NNCompiledCache] WriteCacheInfo failed, model cache info file is invalid.");
@@ -303,11 +305,9 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
     // it is transformed from size_t value, so the transform here will not truncate value.
     size_t deviceId = static_cast<size_t>(modelCacheInfo.deviceId);
     if (deviceId != m_backendID) {
-        LOGE("[NNCompiledCache] CheckCacheInfo failed. The deviceId=%{public}zu in the cache files "
-             "is different from current deviceId=%{public}zu,"
-             "please change the cache directory or current deviceId.",
-             deviceId,
-             m_backendID);
+        LOGE("[NNCompiledCache] CheckCacheInfo failed. The deviceId in the cache files "
+             "is different from current deviceId,"
+             "please change the cache directory or current deviceId.");
         infoCacheFile.close();
         return OH_NN_INVALID_PARAMETER;
     }
