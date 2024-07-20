@@ -32,6 +32,8 @@ const int CACHE_OUTPUT_TENSORDESC_OFFSET = 1;
 constexpr int32_t  NUMBER_CACHE_INFO_MEMBERS = 3;
 const std::string EXTENSION_KEY_MODEL_NAME = "ModelName";
 const int OPVERSION_SUBSTR_NUM = 2;
+const std::string CURRENT_VERSION = "0x00000000";
+const std::string HIAI_VERSION_PATH = "/data/data/hiai/version";
 
 struct SerializedTensorDesc {
 public:
@@ -633,15 +635,17 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     if (isUpdatable) {
         LOGI("isUpdatable is true");
 
-        std::string currentVersion = "0x00000000";
-        std::string path = "/data/data/hiai/version";
-        std::ifstream inf(path.c_str());
-        if (inf.is_open()) {
-            getline(inf, currentVersion);
+        std::string currentVersion = CURRENT_VERSION;
+        char versionPath[PATH_MAX];
+        if (realpath(HIAI_VERSION_PATH.c_str(), versionPath) != nullptr) {
+            std::ifstream inf(versionPath);
+            if (inf.is_open()) {
+                getline(inf, currentVersion);
+            }
+            inf.close();
         }
 
         int currentOpVersion = std::stoi(currentVersion.substr(OPVERSION_SUBSTR_NUM));
-        inf.close();
 
         NNCompiledCacheInfo modelCacheInfo;
         std::string cacheInfoPath = m_cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
