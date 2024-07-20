@@ -139,7 +139,7 @@ OH_NN_ReturnCode OH_NNModel_BuildFromMetaGraph(OH_NNModel *model, const void *me
  * @since 11
  * @version 1.0
  */
-bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName);
+bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, uint32_t version);
 
 #ifdef __cplusplus
 }
