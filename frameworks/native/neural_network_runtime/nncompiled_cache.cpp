@@ -33,6 +33,8 @@ constexpr int32_t HEX_UNIT = 16;
 constexpr char ROOT_DIR_STR = '/';
 constexpr char DOUBLE_SLASH_STR[] = "//";
 constexpr int OPVERSION_SUBSTR_NUM = 2;
+const std::string CURRENT_VERSION = "0x00000000";
+const std::string HIAI_VERSION_PATH = "/data/data/hiai/version";
 
 OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
                                        const std::string& cacheDir,
@@ -234,16 +236,18 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
         cacheModelStream.close();
     }
 
-    std::string currentVersion = "0x00000000";
-    std::string opVersionPath = "/data/data/hiai/version";
-    std::ifstream inf(opVersionPath.c_str());
-    if (inf.is_open()) {
-        getline(inf, currentVersion);
+    std::string currentVersion = CURRENT_VERSION;
+    char versionPath[PATH_MAX];
+    if (realpath(HIAI_VERSION_PATH.c_str(), versionPath) != nullptr) {
+        std::ifstream inf(versionPath);
+        if (inf.is_open()) {
+            getline(inf, currentVersion);
+        }
+        inf.close();
     }
 
     int currentOpVersion = std::stoi(currentVersion.substr(OPVERSION_SUBSTR_NUM));
     *cacheInfoPtr++ = currentOpVersion;
-    inf.close();
 
     return OH_NN_SUCCESS;
 }
