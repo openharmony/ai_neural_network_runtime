@@ -450,6 +450,20 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild()
 {
     // cache存在，从cache直接复原prepareModel、input/output TensorDesc
     OH_NN_ReturnCode ret = RestoreFromCacheFile();
+    if (ret != OH_NN_SUCCESS) {
+        LOGW("[NNCompiler] cache file is failed, to delete cache file.");
+        char path[PATH_MAX];
+        if (realpath(m_cachePath.c_str(), path) == nullptr) {
+            LOGW("[NNCompiledCache] WriteCacheInfo failed, fail to get the real path of cacheDir.");
+        }
+
+        std::string cachePath = path;
+        std::string cacheInfo = cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
+        if (std::filesystem::exists(cacheInfo)) {
+            std::filesystem::remove_all(cacheInfo);
+        }
+    }
+
     if (ret == OH_NN_OPERATION_FORBIDDEN) {
         LOGE("[NNCompiler] Build failed, operation is forbidden.");
         return ret;
