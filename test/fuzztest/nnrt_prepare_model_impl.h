@@ -15,7 +15,7 @@
 
 #ifndef OHOS_HDI_NNRT_V2_0_NNRTPREPAREMODELIMPL_H
 #define OHOS_HDI_NNRT_V2_0_NNRTPREPAREMODELIMPL_H
-#include"../../common/log.h"
+#include "../../common/log.h"
 
 #include "v2_0/iprepared_model.h"
 
