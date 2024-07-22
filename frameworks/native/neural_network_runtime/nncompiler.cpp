@@ -728,6 +728,12 @@ OH_NN_ReturnCode NNCompiler::SetOptions(const std::vector<std::shared_ptr<void>>
     return OH_NN_UNSUPPORTED;
 }
 
+OH_NN_ReturnCode NNCompiler::GetModelName(std::string& modelName)
+{
+    modelName = m_extensionConfig.modelName;
+    return OH_NN_SUCCESS;
+}
+
 NNExecutor* NNCompiler::CreateExecutor()
 {
     if (m_device == nullptr) {
