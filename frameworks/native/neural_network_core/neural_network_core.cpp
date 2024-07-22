@@ -652,13 +652,15 @@ OH_NN_ReturnCode GetModelId(Compilation** compilation)
         return OH_NN_INVALID_PARAMETER;
     }
 
-    int ret = static_cast<OH_NN_ReturnCode>(OH_NN_SUCCESS);
     if (compilationImpl->nnModel != nullptr) {
         compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromModel(compilationImpl->nnModel);
     } else if (compilationImpl->offlineModelPath != nullptr) {
         compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromPath(compilationImpl->offlineModelPath);
     } else if (compilationImpl->cachePath != nullptr) {
-        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromPath(compilationImpl->cachePath);
+        std::string modelName;
+        compilationImpl->compiler->GetModelName(modelName);
+        compilationImpl->nnrtModelID =
+            nnrtService.GetNNRtModelIDFromCache(compilationImpl->cachePath, modelName.c_str());
     } else if ((compilationImpl->offlineModelBuffer.first != nullptr) && \
                (compilationImpl->offlineModelBuffer.second != size_t(0))) {
         compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromBuffer(
@@ -669,11 +671,6 @@ OH_NN_ReturnCode GetModelId(Compilation** compilation)
             compilationImpl->cacheBuffer.first, compilationImpl->cacheBuffer.second);
     } else {
         LOGE("GetModelId failed, no available model to set modelId, please check.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (ret != static_cast<OH_NN_ReturnCode>(OH_NN_SUCCESS)) {
-        LOGE("GetModelId failed, some error happened when set modelId.");
         return OH_NN_INVALID_PARAMETER;
     }
 

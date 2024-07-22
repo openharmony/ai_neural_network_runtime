@@ -30,6 +30,7 @@ public:
     int (*CheckModelSizeFromBuffer)(const void* buffer, size_t size, bool& exceedLimit) = nullptr;
     int (*CheckModelSizeFromModel)(void* model, bool& exceedLimit) = nullptr;
     size_t (*GetNNRtModelIDFromPath)(const char*) = nullptr;
+    size_t (*GetNNRtModelIDFromCache)(const char* path, const char* modelName) = nullptr;
     size_t (*GetNNRtModelIDFromBuffer)(const void* buffer, size_t size) = nullptr;
     size_t (*GetNNRtModelIDFromModel)(void* model) = nullptr;
     int (*SetModelID)(int callingPid, uint32_t hiaimodelID, size_t nnrtModelID) = nullptr;

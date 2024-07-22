@@ -46,6 +46,10 @@ public:
 
     virtual OH_NN_ReturnCode SetExtensionConfig(const std::unordered_map<std::string, std::vector<char>>& configs) = 0;
     virtual OH_NN_ReturnCode SetOptions(const std::vector<std::shared_ptr<void>>& options) = 0;
+    virtual OH_NN_ReturnCode GetModelName(std::string& modelName)
+    {
+        return OH_NN_UNSUPPORTED;
+    }
 };
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
