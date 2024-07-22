@@ -674,7 +674,7 @@ OH_NN_ReturnCode GetModelId(Compilation** compilation)
 
     if (ret != static_cast<OH_NN_ReturnCode>(OH_NN_SUCCESS)) {
         LOGE("GetModelId failed, some error happened when set modelId.");
-        return OH_NN_FAILED;
+        return OH_NN_INVALID_PARAMETER;
     }
 
     return OH_NN_SUCCESS;
