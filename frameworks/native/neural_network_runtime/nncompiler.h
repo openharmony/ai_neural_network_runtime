@@ -51,6 +51,7 @@ public:
 
     OH_NN_ReturnCode SetExtensionConfig(const std::unordered_map<std::string, std::vector<char>>& configs) override;
     OH_NN_ReturnCode SetOptions(const std::vector<std::shared_ptr<void>>& options) override;
+    OH_NN_ReturnCode GetModelName(std::string& modelName) override;
 
     NNExecutor* CreateExecutor();
 
