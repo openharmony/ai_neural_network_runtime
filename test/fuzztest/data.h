@@ -16,7 +16,6 @@
 #ifndef TEST_FUZZTEST_GETDATA_H
 #define TEST_FUZZTEST_GETDATA_H
 
-
 #include <cstdint>
 
 #include "../../common/log.h"
