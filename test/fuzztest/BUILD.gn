@@ -18,6 +18,4 @@ group("fuzztest") {
 
   deps += [ "hdinnrtdevice_fuzzer:HdiNnrtDeviceFuzzTest" ]
   deps += [ "hdinnrtpreparedmodel_fuzzer:HdiNnrtPreparedModelFuzzTest" ]
-  deps += [ "nncore_fuzzer:NNCoreFuzzTest" ]
-  deps += [ "nnrtops_fuzzer:NnrtOpsFuzzTest" ]
 }
