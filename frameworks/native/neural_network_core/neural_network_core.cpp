@@ -526,7 +526,7 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
 
     if (ret != static_cast<OH_NN_ReturnCode>(OH_NN_SUCCESS)) {
         LOGE("CheckExceedRamLimit failed, some error happened when check if model exceed ram limit.");
-        return OH_NN_FAILED;
+        return OH_NN_INVALID_PARAMETER;
     }
 
     return OH_NN_SUCCESS;
