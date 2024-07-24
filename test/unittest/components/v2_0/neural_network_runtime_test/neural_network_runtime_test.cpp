@@ -2091,7 +2091,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, device_get_name_002, testing::ext::TestSize.L
  */
 HWTEST_F(NeuralNetworkRuntimeTest, device_get_name_003, testing::ext::TestSize.Level0)
 {
-    size_t deviceID = 0;
+    size_t deviceID = 12345;
     const char* name = nullptr;
     const char** pName = &name;
     OH_NN_ReturnCode ret = OH_NNDevice_GetName(deviceID, pName);
@@ -2119,7 +2119,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, device_get_name_004, testing::ext::TestSize.L
  */
 HWTEST_F(NeuralNetworkRuntimeTest, device_get_type_001, testing::ext::TestSize.Level0)
 {
-    size_t deviceID = 0;
+    size_t deviceID = 12345;
     OH_NN_DeviceType deviceType = OH_NN_CPU;
     OH_NN_DeviceType* pDeviceType = &deviceType;
     OH_NN_ReturnCode ret = OH_NNDevice_GetType(deviceID, pDeviceType);

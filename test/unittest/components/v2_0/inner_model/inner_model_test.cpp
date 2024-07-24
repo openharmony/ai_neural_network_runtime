@@ -862,7 +862,7 @@ HWTEST_F(InnerModelTest, inner_model_get_supported_operation_003, TestSize.Level
 
     uint32_t index = 3;
     const int8_t activation = 0;
-    size_t deviceID = 0;
+    size_t deviceID = 12345;
     EXPECT_EQ(OH_NN_SUCCESS, m_innerModelTest.SetTensorValue(index,
        static_cast<const void *>(&activation), sizeof(int8_t)));
 
