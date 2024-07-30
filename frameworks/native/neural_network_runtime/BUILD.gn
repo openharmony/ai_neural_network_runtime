@@ -46,6 +46,9 @@ nnrt_sources = [
   "nntensor.cpp",
   "ops_builder.cpp",
   "ops_registry.cpp",
+  "register_hdi_device_v1_0.cpp",
+  "register_hdi_device_v2_0.cpp",
+  "register_hdi_device_v2_1.cpp",
   "quant_param.cpp",
   "transform.cpp",
 ]
