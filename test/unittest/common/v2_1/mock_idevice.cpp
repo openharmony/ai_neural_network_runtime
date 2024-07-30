@@ -19,35 +19,6 @@ namespace OHOS {
 namespace HDI {
 namespace Nnrt {
 namespace V2_1 {
-sptr<INnrtDevice> INnrtDevice::Get(bool isStub)
-{
-    return INnrtDevice::Get("device_service", isStub);
-}
-
-sptr<INnrtDevice> INnrtDevice::Get(const std::string& serviceName, bool isStub)
-{
-    if (isStub) {
-        return nullptr;
-    }
-
-    sptr<INnrtDevice> mockIDevice = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
-    if (mockIDevice == nullptr) {
-        return nullptr;
-    }
-    std::string deviceName = "MockDevice";
-    EXPECT_CALL(*((V2_1::MockIDevice*)mockIDevice.GetRefPtr()), GetDeviceName(::testing::_))
-        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(deviceName), ::testing::Return(HDF_SUCCESS)));
-
-    std::string vendorName = "MockVendor";
-    EXPECT_CALL(*((V2_1::MockIDevice*)mockIDevice.GetRefPtr()), GetVendorName(::testing::_))
-        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(vendorName), ::testing::Return(HDF_SUCCESS)));
-
-    V2_1::DeviceStatus deviceStatus = V2_1::DeviceStatus::AVAILABLE;
-    EXPECT_CALL(*((V2_1::MockIDevice*)mockIDevice.GetRefPtr()), GetDeviceStatus(::testing::_))
-        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(deviceStatus), ::testing::Return(HDF_SUCCESS)));
-
-    return mockIDevice;
-}
 } // V2_1
 } // Nnrt
 } // HDI
