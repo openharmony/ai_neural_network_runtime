@@ -43,6 +43,7 @@
 using namespace testing;
 using namespace testing::ext;
 using namespace OHOS::NeuralNetworkRuntime;
+using namespace OHOS::HDI::Nnrt::V2_1;
 
 namespace MSLITE = mindspore::lite;
 
@@ -82,37 +83,6 @@ public:
 
     static OH_NN_ReturnCode m_ExpectRetCode;
 };
-
-
-sptr<INnrtDevice> INnrtDevice::Get(bool isStub)
-{
-    return INnrtDevice::Get("device_service", isStub);
-}
-
-sptr<INnrtDevice> INnrtDevice::Get(const std::string& serviceName, bool isStub)
-{
-    if (isStub) {
-        return nullptr;
-    }
-
-    sptr<INnrtDevice> mockIDevice = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
-    if (mockIDevice == nullptr) {
-        return nullptr;
-    }
-    std::string deviceName = "MockDevice";
-    EXPECT_CALL(*((V2_1::MockIDevice*)mockIDevice.GetRefPtr()), GetDeviceName(::testing::_))
-        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(deviceName), ::testing::Return(HDF_SUCCESS)));
-
-    std::string vendorName = "MockVendor";
-    EXPECT_CALL(*((V2_1::MockIDevice*)mockIDevice.GetRefPtr()), GetVendorName(::testing::_))
-        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(vendorName), ::testing::Return(HDF_SUCCESS)));
-
-    V2_1::DeviceStatus deviceStatus = V2_1::DeviceStatus::AVAILABLE;
-    EXPECT_CALL(*((V2_1::MockIDevice*)mockIDevice.GetRefPtr()), GetDeviceStatus(::testing::_))
-        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(deviceStatus), ::testing::Return(HDF_SUCCESS)));
-
-    return mockIDevice;
-}
 } // V2_1
 } // Nnrt
 } // HDI
@@ -1653,7 +1623,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_prepareofflinemodel_004, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_constructor_001, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     EXPECT_NE(device, nullptr);
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
@@ -1666,7 +1636,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_constructor_001, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicename_001, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     std::string deviceName = "MockDevice";
@@ -1687,7 +1657,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicename_001, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicename_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     std::string deviceName = "MockDevice";
@@ -1704,7 +1674,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicename_002, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getvendorname_001, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     std::string vendorName = "MockVendor";
@@ -1725,7 +1695,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getvendorname_001, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getvendorname_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     std::string vendorName = "MockVendor";
@@ -1743,7 +1713,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getvendorname_002, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getversion_001, TestSize.Level0)
 {
     LOGE("GetVersion hdidevice_V2_1_getversion_001");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     std::string vendorName = "MockVendor";
@@ -1764,7 +1734,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getversion_001, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getversion_002, TestSize.Level0)
 {
     LOGE("GetVersion hdidevice_V2_1_getversion_002");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     std::string vendorName = "MockVendor";
@@ -1781,7 +1751,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getversion_002, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicetype_001, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     V2_1::DeviceType iDeviceType = V2_1::DeviceType::CPU;
@@ -1802,7 +1772,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicetype_001, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicetype_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -1822,7 +1792,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicetype_002, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicetype_003, TestSize.Level0)
 {
     LOGE("GetDeviceType hdidevice_V2_1_getdevicetype_003");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -1845,7 +1815,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicetype_003, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicetype_004, TestSize.Level0)
 {
     LOGE("GetDeviceType hdidevice_V2_1_getdevicetype_004");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -1868,7 +1838,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicetype_004, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicetype_005, TestSize.Level0)
 {
     LOGE("GetDeviceType hdidevice_V2_1_getdevicetype_005");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -1890,7 +1860,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicetype_005, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicestatus_001, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -1912,7 +1882,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicestatus_001, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicestatus_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     DeviceStatus deviceStatus = AVAILABLE;
@@ -1931,7 +1901,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicestatus_002, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicestatus_003, TestSize.Level0)
 {
     LOGE("GetDeviceStatus hdidevice_V2_1_getdevicestatus_003");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -1955,7 +1925,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicestatus_003, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicestatus_004, TestSize.Level0)
 {
     LOGE("GetDeviceStatus hdidevice_V2_1_getdevicestatus_004");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -1979,7 +1949,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicestatus_004, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getdevicestatus_005, TestSize.Level0)
 {
     LOGE("GetDeviceStatus hdidevice_V2_1_getdevicestatus_005");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2007,7 +1977,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getsupportedoperation_001, TestSize.Level
     EXPECT_NE(nullptr, model);
     BuildLiteGraph(model);
 
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2040,7 +2010,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getsupportedoperation_002, TestSize.Level
     EXPECT_NE(nullptr, model);
     BuildLiteGraph(model);
 
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2059,7 +2029,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getsupportedoperation_002, TestSize.Level
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getsupportedoperation_003, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2081,7 +2051,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getsupportedoperation_004, TestSize.Level
     EXPECT_NE(nullptr, model);
     BuildLiteGraph(model);
 
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2104,7 +2074,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_getsupportedoperation_004, TestSize.Level
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isfloat16precisionsupported_001, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2122,7 +2092,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isfloat16precisionsupported_001, TestSize
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isfloat16precisionsupported_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2140,7 +2110,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isfloat16precisionsupported_002, TestSize
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isperformancemodesupported_001, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2162,7 +2132,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isperformancemodesupported_001, TestSize.
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isperformancemodesupported_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2180,7 +2150,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isperformancemodesupported_002, TestSize.
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isprioritysupported_001, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2202,7 +2172,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isprioritysupported_001, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isprioritysupported_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2220,7 +2190,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isprioritysupported_002, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isdynamicinputsupported_001, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2242,7 +2212,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isdynamicinputsupported_001, TestSize.Lev
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isdynamicinputsupported_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2260,7 +2230,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_isdynamicinputsupported_002, TestSize.Lev
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_ismodelcachesupported_001, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2282,7 +2252,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_ismodelcachesupported_001, TestSize.Level
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_ismodelcachesupported_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2313,7 +2283,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_preparemodel_001, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_preparemodel_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2448,7 +2418,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_preparemodelfrommodelcache_002, TestSize.
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_preparemodelfrommodelcache_003, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2618,7 +2588,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_preparemodelfrommodelcache_007, TestSize.
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatebuffer_001, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2639,7 +2609,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatebuffer_001, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatebuffer_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2656,7 +2626,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatebuffer_002, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatebuffer_003, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2673,7 +2643,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatebuffer_003, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatebuffer_004, TestSize.Level0)
 {
     LOGE("AllocateBuffer hdidevice_V2_1_preparemodelfrommodelcache_007");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2691,7 +2661,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatebuffer_004, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatebuffer_005, TestSize.Level0)
 {
     LOGE("AllocateBuffer hdidevice_V2_1_allocatebuffer_005");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     EXPECT_CALL(*((V2_1::MockIDevice *)device.GetRefPtr()), AllocateBuffer(::testing::_, ::testing::_))
         .WillRepeatedly(::testing::Return(HDF_FAILURE));
 
@@ -2712,7 +2682,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatebuffer_005, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatebuffer_006, TestSize.Level0)
 {
     LOGE("AllocateBuffer hdidevice_V2_1_allocatebuffer_006");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     EXPECT_CALL(*((V2_1::MockIDevice *)device.GetRefPtr()), AllocateBuffer(::testing::_, ::testing::_))
         .WillRepeatedly(::testing::Return(HDF_SUCCESS));
 
@@ -2736,7 +2706,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_001, TestSize.Level0)
     void *buffer = nullptr;
     GetBuffer(buffer, length);
 
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
 
     EXPECT_CALL(*((V2_1::MockIDevice *)device.GetRefPtr()), ReleaseBuffer(::testing::_))
@@ -2755,7 +2725,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_001, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_002, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2778,7 +2748,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_002, TestSize.Level0)
  */
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_003, TestSize.Level0)
 {
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2795,7 +2765,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_004, TestSize.Level0)
 {
     const size_t length = 100;
     auto* buffer = new(std::nothrow) char[length];
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2815,7 +2785,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_005, TestSize.Level0)
     void *buffer = nullptr;
     GetBuffer(buffer, length);
 
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2835,7 +2805,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_005, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_007, TestSize.Level0)
 {
     LOGE("ReleaseBuffer hdidevice_V2_1_releasebuffer_007");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2856,7 +2826,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_007, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_008, TestSize.Level0)
 {
     LOGE("ReleaseBuffer hdidevice_V2_1_releasebuffer_008");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2877,7 +2847,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_releasebuffer_008, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatetensorbuffer_001, TestSize.Level0)
 {
     LOGE("AllocateTensorBuffer hdidevice_V2_1_allocatetensorbuffer_001");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2895,7 +2865,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatetensorbuffer_001, TestSize.Level0
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatetensorbuffer_002, TestSize.Level0)
 {
     LOGE("AllocateTensorBuffer hdidevice_V2_1_allocatetensorbuffer_002");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
@@ -2913,7 +2883,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_allocatetensorbuffer_002, TestSize.Level0
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_prepareofflinemodel_001, TestSize.Level0)
 {
     LOGE("PrepareOfflineModel hdidevice_V2_1_prepareofflinemodel_001");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     
@@ -2931,7 +2901,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_prepareofflinemodel_001, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_prepareofflinemodel_002, TestSize.Level0)
 {
     LOGE("PrepareOfflineModel hdidevice_V2_1_prepareofflinemodel_002");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     
@@ -2953,7 +2923,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_prepareofflinemodel_002, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_prepareofflinemodel_003, TestSize.Level0)
 {
     LOGE("PrepareOfflineModel hdidevice_V2_1_prepareofflinemodel_003");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     
@@ -2980,7 +2950,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_V2_1_prepareofflinemodel_003, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_V2_1_prepareofflinemodel_004, TestSize.Level0)
 {
     LOGE("PrepareOfflineModel hdidevice_V2_1_prepareofflinemodel_004");
-    OHOS::sptr<V2_1::INnrtDevice> device = V2_1::INnrtDevice::Get(false);
+    sptr<INnrtDevice> device = sptr<MockIDevice>(new (std::nothrow) MockIDevice());
     std::unique_ptr<HDIDeviceV2_1> hdiDevice = std::make_unique<HDIDeviceV2_1>(device);
     EXPECT_NE(hdiDevice, nullptr);
     

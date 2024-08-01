@@ -34,18 +34,6 @@ sptr<INnrtDevice> INnrtDevice::Get(const std::string& serviceName, bool isStub)
     if (mockIDevice == nullptr) {
         return nullptr;
     }
-    std::string deviceName = "MockDevice";
-    EXPECT_CALL(*((V2_0::MockIDevice*)mockIDevice.GetRefPtr()), GetDeviceName(::testing::_))
-        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(deviceName), ::testing::Return(HDF_SUCCESS)));
-
-    std::string vendorName = "MockVendor";
-    EXPECT_CALL(*((V2_0::MockIDevice*)mockIDevice.GetRefPtr()), GetVendorName(::testing::_))
-        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(vendorName), ::testing::Return(HDF_SUCCESS)));
-
-    V2_0::DeviceStatus deviceStatus = V2_0::DeviceStatus::AVAILABLE;
-    EXPECT_CALL(*((V2_0::MockIDevice*)mockIDevice.GetRefPtr()), GetDeviceStatus(::testing::_))
-        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<0>(deviceStatus), ::testing::Return(HDF_SUCCESS)));
-
     return mockIDevice;
 }
 } // V2_0
