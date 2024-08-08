@@ -140,8 +140,8 @@ void BuildLiteGraph(std::shared_ptr<mindspore::lite::LiteGraph>& model)
         model->all_tensors_.emplace_back(mindspore::lite::MindIR_Tensor_Create());
     }
 
-    mindspore::lite::LiteGraph::Node node;
-    node.name_ = "testNode";
+    mindspore::lite::LiteGraph::Node* node = new (std::nothrow) mindspore::lite::LiteGraph::Node();
+    node->name_ = "testNode";
     auto activation_type = mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION;
     node->primitive_ = mindspore::lite::MindIR_AddFusion_CreatePrimitive(activation_type);
     model->all_nodes_.emplace_back(node);
