@@ -96,6 +96,11 @@ OHOS::HDI::Nnrt::V2_0::Model* MindIR_LiteGraph_To_Model(const LiteGraph* lite_gr
     return new (std::nothrow) OHOS::HDI::Nnrt::V2_0::Model();
 }
 
+void LiteGraphDeleter(mindspore::lite::LiteGraph* liteGraph)
+{
+    MindIR_LiteGraph_Destroy(&liteGraph);
+}
+
 void MindIR_Model_Destroy(OHOS::HDI::Nnrt::V2_0::Model** model)
 {
     if ((model != nullptr) && (*model != nullptr)) {
@@ -123,7 +128,6 @@ void BuildLiteGraph(std::shared_ptr<mindspore::lite::LiteGraph>& model)
     model->name_ = "testGraph";
     model->input_indices_ = {0};
     model->output_indices_ = {1};
-    model->all_tensors_ = {nullptr};
     const std::vector<mindspore::lite::QuantParam> quant_params {};
     const std::vector<uint8_t> data(DATA_NUM, DATA_VALUE);
     const std::vector<int32_t> dim = {DIM_NUM, DIM_NUM};
@@ -136,11 +140,11 @@ void BuildLiteGraph(std::shared_ptr<mindspore::lite::LiteGraph>& model)
         model->all_tensors_.emplace_back(mindspore::lite::MindIR_Tensor_Create());
     }
 
-    mindspore::lite::LiteGraph::Node node;
-    node.name_ = "testNode";
-    mindspore::lite::LiteGraph::Node* testNode = &node;
-    model->all_nodes_.emplace_back(testNode);
-    model->all_nodes_.emplace_back(testNode);
+    mindspore::lite::LiteGraph::Node* node = new (std::nothrow) mindspore::lite::LiteGraph::Node();
+    node->name_ = "testNode";
+    auto activation_type = mindspore::lite::ACTIVATION_TYPE_NO_ACTIVATION;
+    node->primitive_ = mindspore::lite::MindIR_AddFusion_CreatePrimitive(activation_type);
+    model->all_nodes_.emplace_back(node);
 }
 
 class HDIDeviceTest : public testing::Test {
@@ -601,7 +605,9 @@ HWTEST_F(HDIDeviceTest, hdidevice_getdevicestatus_005, TestSize.Level0)
 HWTEST_F(HDIDeviceTest, hdidevice_getsupportedoperation_001, TestSize.Level0)
 {
     std::vector<bool> ops {true};
-    std::shared_ptr<mindspore::lite::LiteGraph> model = std::make_shared<mindspore::lite::LiteGraph>();
+    std::shared_ptr<mindspore::lite::LiteGraph> model =
+        std::shared_ptr<mindspore::lite::LiteGraph>(new (std::nothrow) mindspore::lite::LiteGraph(),
+        mindspore::lite::LiteGraphDeleter);
     EXPECT_NE(nullptr, model);
     BuildLiteGraph(model);
 
