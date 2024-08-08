@@ -115,6 +115,11 @@ OH_NN_ReturnCode IsOfflineModel(std::shared_ptr<const mindspore::lite::LiteGraph
         return OH_NN_NULL_PTR;
     }
 
+    if (pNode->primitive_ == nullptr) {
+        LOGE("Find invalid node primitive in the model.");
+        return OH_NN_NULL_PTR;
+    }
+
     const mindspore::lite::NodeType& nodeType = mindspore::lite::MindIR_Primitive_GetType(pNode->primitive_);
     if (nodeType == mindspore::lite::NodeType::NODE_TYPE_CUSTOM) {
         isOfflineModel = true;
