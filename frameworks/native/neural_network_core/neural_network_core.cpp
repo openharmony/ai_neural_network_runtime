@@ -693,6 +693,7 @@ OH_NN_ReturnCode GetModelId(Compilation** compilation)
     auto ret = GetNnrtModelId(compilationImpl, nnrtService);
     if (ret != OH_NN_SUCCESS) {
         LOGE("GetNnrtModelId failed.");
+        return ret;
     }
 
     return OH_NN_SUCCESS;
