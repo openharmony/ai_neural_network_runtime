@@ -151,7 +151,7 @@ bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, uint32_t v
  * @since 11
  * @version 1.0
  */
-OH_NN_ReturnCode OH_NNModel_GetDevice(const char **nnrtDevice);
+OH_NN_ReturnCode OH_NN_GetDeviceID(const char **nnrtDevice);
 
 #ifdef __cplusplus
 }
