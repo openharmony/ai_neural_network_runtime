@@ -707,5 +707,9 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_GetDevice(const char **nnrtDevice)
 
     std::string deviceName = (std::string)cName + "_" + HARDWARE_VERSION;
     *nnrtDevice = static_cast<const char*>(deviceName.c_str());
+    if (*nnrtDevice == nullptr) {
+        LOGE("GetNNRtDeviceName failed, failed to get name.");
+        return OH_NN_FAILED;
+    }
     return OH_NN_SUCCESS;
 }
