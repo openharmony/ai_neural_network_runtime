@@ -697,11 +697,11 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_GetAvailableOperations(OH_NNModel *model,
 
 NNRT_API OH_NN_ReturnCode OH_NNModel_GetDevice(const char **nnrtDevice)
 {
-    const cName[HARDWARE_NAME_MAX_LENGTH] = {0};
+    char cName[HARDWARE_NAME_MAX_LENGTH] = {0};
     int ret = GetParameter(HARDWARE_NAME.c_str(), NULL_HARDWARE_NAME.c_str(), cName, HARDWARE_NAME_MAX_LENGTH);
     // 如果成功获取返回值为硬件名称的字节数
     if (ret <= 0) {
-        LOGE("GetNNRTDeviceName failed, failed to get parameter.");
+        LOGE("GetNNRtDeviceName failed, failed to get parameter.");
         return OH_NN_FAILED;
     }
 
