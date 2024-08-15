@@ -21,6 +21,7 @@ config("nnrt_config") {
     "../neural_network_core",
     "../../../interfaces/innerkits/c",
     "../../../interfaces/kits/c",
+    "//base/startup/init/interfaces/innerkits/include",
   ]
 }
 
@@ -190,6 +191,7 @@ ohos_shared_library("libneural_network_runtime") {
     "hitrace:libhitracechain",
     "ipc:ipc_core",
     "mindspore:mindir",
+    "init:libbegetutil",
   ]
 
   deps = [ "../neural_network_core:libneural_network_core" ]

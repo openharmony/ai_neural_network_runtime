@@ -22,6 +22,7 @@
 #include "common/log.h"
 #include "quant_param.h"
 #include "validation.h"
+#include "syspara/parameter.h"
 
 #include <fstream>
 #include <sys/stat.h>
@@ -37,6 +38,11 @@ const std::string EXTENSION_KEY_IS_PROFILING = "isProfiling";
 const std::string EXTENSION_KEY_OP_LAYOUT = "opLayout";
 const std::string EXTENSION_KEY_INPUT_DIMS = "InputDims";
 const std::string EXTENSION_KEY_DYNAMIC_DIMS = "DynamicDims";
+
+const std::string NULL_HARDWARE_NAME = "NULL";
+const std::string HARDWARE_NAME = "const.ai.nnrt_device";
+const std::string HARDWARE_VERSION = "v5_0";
+constexpr size_t HARDWARE_NAME_MAX_LENGTH = 128;
 
 NNRT_API NN_QuantParam *OH_NNQuantParam_Create()
 {
@@ -687,4 +693,19 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_GetAvailableOperations(OH_NNModel *model,
 
     InnerModel *innerModel = reinterpret_cast<InnerModel*>(model);
     return innerModel->GetSupportedOperations(deviceID, isAvailable, *opCount);
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNModel_GetDevice(const char **nnrtDevice)
+{
+    const cName[HARDWARE_NAME_MAX_LENGTH] = {0};
+    int ret = GetParameter(HARDWARE_NAME.c_str(), NULL_HARDWARE_NAME.c_str(), cName, HARDWARE_NAME_MAX_LENGTH);
+    // 如果成功获取返回值为硬件名称的字节数
+    if (ret <= 0) {
+        LOGE("GetNNRTDeviceName failed, failed to get parameter.");
+        return OH_NN_FAILED;
+    }
+
+    std::string deviceName = (std::string)cName + "_" + HARDWARE_VERSION;
+    *nnrtDevice = static_cast<const char*>(deviceName.c_str());
+    return OH_NN_SUCCESS;
 }
