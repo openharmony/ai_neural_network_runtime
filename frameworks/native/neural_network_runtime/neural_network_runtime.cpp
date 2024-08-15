@@ -695,7 +695,7 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_GetAvailableOperations(OH_NNModel *model,
     return innerModel->GetSupportedOperations(deviceID, isAvailable, *opCount);
 }
 
-NNRT_API OH_NN_ReturnCode OH_NNModel_GetDevice(const char **nnrtDevice)
+NNRT_API OH_NN_ReturnCode OH_NN_GetDeviceID(const char **nnrtDevice)
 {
     char cName[HARDWARE_NAME_MAX_LENGTH] = {0};
     int ret = GetParameter(HARDWARE_NAME.c_str(), NULL_HARDWARE_NAME.c_str(), cName, HARDWARE_NAME_MAX_LENGTH);
