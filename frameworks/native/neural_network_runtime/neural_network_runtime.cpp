@@ -695,8 +695,18 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_GetAvailableOperations(OH_NNModel *model,
     return innerModel->GetSupportedOperations(deviceID, isAvailable, *opCount);
 }
 
-NNRT_API OH_NN_ReturnCode OH_NN_GetDeviceID(const char **nnrtDevice)
+NNRT_API OH_NN_ReturnCode OH_NN_GetDeviceID(char *nnrtDevice, size_t len)
 {
+    if (nnrtDevice != nullptr) {
+        LOGE("nnrtDevice is not nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (len == 0) {
+        LOGE("len is 0.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
     char cName[HARDWARE_NAME_MAX_LENGTH] = {0};
     int ret = GetParameter(HARDWARE_NAME.c_str(), NULL_HARDWARE_NAME.c_str(), cName, HARDWARE_NAME_MAX_LENGTH);
     // 如果成功获取返回值为硬件名称的字节数
@@ -706,8 +716,8 @@ NNRT_API OH_NN_ReturnCode OH_NN_GetDeviceID(const char **nnrtDevice)
     }
 
     std::string deviceName = (std::string)cName + "_" + HARDWARE_VERSION;
-    *nnrtDevice = static_cast<const char*>(deviceName.c_str());
-    if (*nnrtDevice == nullptr) {
+    auto secureRet = strcpy_s(nnrtDevice, len, deviceName.c_str());
+    if (secureRet != EOK) {
         LOGE("GetNNRtDeviceName failed, failed to get name.");
         return OH_NN_FAILED;
     }
