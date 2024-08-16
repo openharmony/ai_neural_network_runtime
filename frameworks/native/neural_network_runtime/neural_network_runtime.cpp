@@ -23,6 +23,7 @@
 #include "quant_param.h"
 #include "validation.h"
 #include "syspara/parameter.h"
+#include "securec.h"
 
 #include <cstring>
 #include <fstream>
