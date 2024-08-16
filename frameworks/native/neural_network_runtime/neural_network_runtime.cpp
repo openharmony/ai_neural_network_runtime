@@ -697,13 +697,8 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_GetAvailableOperations(OH_NNModel *model,
 
 NNRT_API OH_NN_ReturnCode OH_NN_GetDeviceID(char *nnrtDevice, size_t len)
 {
-    if (nnrtDevice != nullptr) {
-        LOGE("nnrtDevice is not nullptr.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (len == 0) {
-        LOGE("len is 0.");
+    if (nnrtDevice == nullptr || len == 0) {
+        LOGE("nnrtDevice is nullptr or len is 0.");
         return OH_NN_INVALID_PARAMETER;
     }
 
