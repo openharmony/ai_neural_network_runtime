@@ -21,7 +21,6 @@ config("nnrt_config") {
     "../neural_network_core",
     "../../../interfaces/innerkits/c",
     "../../../interfaces/kits/c",
-    "//base/startup/init/interfaces/innerkits/include",
   ]
 }
 

@@ -24,6 +24,7 @@
 #include "validation.h"
 #include "syspara/parameter.h"
 
+#include <string.h>
 #include <fstream>
 #include <sys/stat.h>
 #include <unistd.h>
