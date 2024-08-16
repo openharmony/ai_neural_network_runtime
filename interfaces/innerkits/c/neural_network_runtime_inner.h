@@ -141,6 +141,18 @@ OH_NN_ReturnCode OH_NNModel_BuildFromMetaGraph(OH_NNModel *model, const void *me
  */
 bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, uint32_t version);
 
+/**
+ * @brief 获取NNRt device信息。
+ *
+ * 本接口不作为Neural Network Runtime接口对外开放。\n
+ *
+ * @param nnrtDevice 传出device参数。
+ * @return 函数执行的结果状态，执行成功返回OH_NN_SUCCESS，失败返回具体错误码，参考{@link OH_NN_ReturnCode}。
+ * @since 11
+ * @version 1.0
+ */
+OH_NN_ReturnCode OH_NN_GetDeviceID(char *nnrtDevice, size_t len);
+
 #ifdef __cplusplus
 }
 #endif // __cpluscplus
