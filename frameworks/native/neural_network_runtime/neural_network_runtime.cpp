@@ -40,6 +40,7 @@ const std::string EXTENSION_KEY_IS_PROFILING = "isProfiling";
 const std::string EXTENSION_KEY_OP_LAYOUT = "opLayout";
 const std::string EXTENSION_KEY_INPUT_DIMS = "InputDims";
 const std::string EXTENSION_KEY_DYNAMIC_DIMS = "DynamicDims";
+const std::string EXTENSION_KEY_FM_SHARED = "NPU_FM_SHARED";
 
 const std::string NULL_HARDWARE_NAME = "NULL";
 const std::string HARDWARE_NAME = "const.ai.nnrt_device";
@@ -469,7 +470,10 @@ OH_NN_ReturnCode ParseExtensionConfigs(
         }
         extensionConfig.tuningStrategy = TuningStrategy::OFF; // 分档shape不支持fftl
     }
-
+    if (extensionMap.find(EXTENSION_KEY_FM_SHARED) != extensionMap.end()) {
+        ExtensionConfig.isNpuFmShared = true;
+        LOGI("NNRT enable fm shared success.");
+    }
     return OH_NN_SUCCESS;
 }
 
