@@ -471,7 +471,7 @@ OH_NN_ReturnCode ParseExtensionConfigs(
         extensionConfig.tuningStrategy = TuningStrategy::OFF; // 分档shape不支持fftl
     }
     if (extensionMap.find(EXTENSION_KEY_FM_SHARED) != extensionMap.end()) {
-        ExtensionConfig.isNpuFmShared = true;
+        extensionConfig.isNpuFmShared = true;
         LOGI("NNRT enable fm shared success.");
     }
     return OH_NN_SUCCESS;
