@@ -55,6 +55,7 @@ struct ExtensionConfig {
     // inputDims and dynamicDims are used in hiai adapter
     std::vector<std::vector<int32_t>> inputDims;
     std::vector<std::vector<int32_t>> dynamicDims;
+    bool isNpuFmShared = false;
 };
 
 struct ModelConfig {
