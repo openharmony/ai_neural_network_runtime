@@ -418,11 +418,10 @@ OH_NN_ReturnCode ParseDynamicDimsFromExtensions(
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ParseExtensionConfigs(
+OH_NN_ReturnCode CheckExtensionConfigs(
     const std::unordered_map<std::string, std::vector<std::pair<char*, size_t>>>& extensionMap,
-    const mindspore::lite::LiteGraph* pLiteGraph, ExtensionConfig& extensionConfig)
+    ExtensionConfig& extensionConfig)
 {
-    extensionConfig.tuningStrategy = TuningStrategy::ON_DEVICE_PREPROCESS_TUNING;
     if (extensionMap.find(EXTENSION_KEY_QUANT_BUFFER) != extensionMap.end()) {
         const std::vector<std::pair<char*, size_t>>& value = extensionMap.at(EXTENSION_KEY_QUANT_BUFFER);
         if (value.empty()) {
@@ -460,6 +459,19 @@ OH_NN_ReturnCode ParseExtensionConfigs(
             extensionConfig.opLayout.insert({ops, "hiai::ExecuteDevice::CPU"});
             LOGI("ParseExtensionConfigs opLayout:%{public}s.", ops.c_str());
         }
+    }
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode ParseExtensionConfigs(
+    const std::unordered_map<std::string, std::vector<std::pair<char*, size_t>>>& extensionMap,
+    const mindspore::lite::LiteGraph* pLiteGraph, ExtensionConfig& extensionConfig)
+{
+    extensionConfig.tuningStrategy = TuningStrategy::ON_DEVICE_PREPROCESS_TUNING;
+    OH_NN_ReturnCode ret = CheckExtensionConfigs(extensionMap, extensionConfig);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("CheckExtensionConfigs failed.");
+        return ret;
     }
     if (extensionMap.find(EXTENSION_KEY_INPUT_DIMS) != extensionMap.end() &&
         extensionMap.find(EXTENSION_KEY_DYNAMIC_DIMS) != extensionMap.end()) {
