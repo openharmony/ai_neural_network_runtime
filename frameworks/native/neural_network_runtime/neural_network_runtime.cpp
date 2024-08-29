@@ -40,6 +40,7 @@ const std::string EXTENSION_KEY_IS_PROFILING = "isProfiling";
 const std::string EXTENSION_KEY_OP_LAYOUT = "opLayout";
 const std::string EXTENSION_KEY_INPUT_DIMS = "InputDims";
 const std::string EXTENSION_KEY_DYNAMIC_DIMS = "DynamicDims";
+const std::string EXTENSION_KEY_FM_SHARED = "NPU_FM_SHARED";
 
 const std::string NULL_HARDWARE_NAME = "NULL";
 const std::string HARDWARE_NAME = "const.ai.nnrt_device";
@@ -417,11 +418,10 @@ OH_NN_ReturnCode ParseDynamicDimsFromExtensions(
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ParseExtensionConfigs(
+OH_NN_ReturnCode CheckExtensionConfigs(
     const std::unordered_map<std::string, std::vector<std::pair<char*, size_t>>>& extensionMap,
-    const mindspore::lite::LiteGraph* pLiteGraph, ExtensionConfig& extensionConfig)
+    ExtensionConfig& extensionConfig)
 {
-    extensionConfig.tuningStrategy = TuningStrategy::ON_DEVICE_PREPROCESS_TUNING;
     if (extensionMap.find(EXTENSION_KEY_QUANT_BUFFER) != extensionMap.end()) {
         const std::vector<std::pair<char*, size_t>>& value = extensionMap.at(EXTENSION_KEY_QUANT_BUFFER);
         if (value.empty()) {
@@ -460,6 +460,19 @@ OH_NN_ReturnCode ParseExtensionConfigs(
             LOGI("ParseExtensionConfigs opLayout:%{public}s.", ops.c_str());
         }
     }
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode ParseExtensionConfigs(
+    const std::unordered_map<std::string, std::vector<std::pair<char*, size_t>>>& extensionMap,
+    const mindspore::lite::LiteGraph* pLiteGraph, ExtensionConfig& extensionConfig)
+{
+    extensionConfig.tuningStrategy = TuningStrategy::ON_DEVICE_PREPROCESS_TUNING;
+    OH_NN_ReturnCode ret = CheckExtensionConfigs(extensionMap, extensionConfig);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("CheckExtensionConfigs failed.");
+        return ret;
+    }
     if (extensionMap.find(EXTENSION_KEY_INPUT_DIMS) != extensionMap.end() &&
         extensionMap.find(EXTENSION_KEY_DYNAMIC_DIMS) != extensionMap.end()) {
         auto returnCode = ParseDynamicDimsFromExtensions(extensionMap, pLiteGraph, extensionConfig);
@@ -469,7 +482,10 @@ OH_NN_ReturnCode ParseExtensionConfigs(
         }
         extensionConfig.tuningStrategy = TuningStrategy::OFF; // 分档shape不支持fftl
     }
-
+    if (extensionMap.find(EXTENSION_KEY_FM_SHARED) != extensionMap.end()) {
+        extensionConfig.isNpuFmShared = true;
+        LOGI("NNRT enable fm shared success.");
+    }
     return OH_NN_SUCCESS;
 }
 
