@@ -42,8 +42,8 @@ const std::string EXTENSION_KEY_INPUT_DIMS = "InputDims";
 const std::string EXTENSION_KEY_DYNAMIC_DIMS = "DynamicDims";
 const std::string EXTENSION_KEY_FM_SHARED = "NPU_FM_SHARED";
 
-const std::string NULL_HARDWARE_NAME = "default";
-const std::string HARDWARE_NAME = "const.ai.nnrt_deivce";
+const std::string NULL_HARDWARE_NAME = "NULL";
+const std::string HARDWARE_NAME = "const.ai.nnrt_device";
 const std::string HARDWARE_VERSION = "v5_0";
 constexpr size_t HARDWARE_NAME_MAX_LENGTH = 128;
 
