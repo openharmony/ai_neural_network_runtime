@@ -65,7 +65,7 @@ private:
                                         uint32_t version) const;
     OH_NN_ReturnCode ReadCacheModelFile(const std::string& file, Buffer& cache) const;
     unsigned short GetCrc16(char* buffer, size_t length) const;
-    OH_NN_ReturnCode GetCacheFileLength(std::ifstream& ifs, int& fileSize) const;
+    OH_NN_ReturnCode GetCacheFileLength(FILE* pFile, long& fileSize) const;
     OH_NN_ReturnCode VerifyCachePath(const std::string& cachePath) const;
 
 private:
