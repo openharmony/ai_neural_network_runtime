@@ -1244,6 +1244,11 @@ OH_NN_ReturnCode Scheduling(Compilation** compilation)
         return OH_NN_INVALID_PARAMETER;
     }
 
+    std::string cachePath = "";
+    if (compilationImpl->cachePath != nullptr) {
+        cachePath = compilationImpl->cachePath;
+    }
+
     bool supportStat = false;
     int ret = nnrtService.IsSupportScheduling(&supportStat);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
@@ -1261,7 +1266,7 @@ OH_NN_ReturnCode Scheduling(Compilation** compilation)
     }
 
     bool needModelLatency = false;
-    ret = nnrtService.Scheduling(compilationImpl->hiaiModelId, &needModelLatency);
+    ret = nnrtService.Scheduling(compilationImpl->hiaiModelId, &needModelLatency, cachePath.c_str());
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("Scheduling failed, some error happened when scheduling.");
         return static_cast<OH_NN_ReturnCode>(ret);
