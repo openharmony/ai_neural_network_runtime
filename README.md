@@ -59,5 +59,5 @@ In the root directory of the OpenHarmony source code, call the following command
 
 ## Repositories Involved
 
-- [neural_network_runtime](https://gitee.com/openharmony/neural_network_runtime)
+- [ai_neural_network_runtime](https://gitee.com/openharmony/ai_neural_network_runtime)
 - [third_party_mindspore](https://gitee.com/openharmony/third_party_mindspore)
