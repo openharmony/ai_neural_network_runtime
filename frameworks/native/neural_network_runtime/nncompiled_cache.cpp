@@ -19,6 +19,7 @@
 #include <functional>
 #include <memory>
 #include <limits>
+#include <stdio.h>
 
 #include "common/utils.h"
 #include "backend_manager.h"
@@ -342,44 +343,41 @@ OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath
                                                      OHOS::NeuralNetworkRuntime::Buffer& cache) const
 {
     // filePath is validate in NNCompiledCache::Restore, no need to check again.
-    std::ifstream ifs(filePath.c_str(), std::ios::in | std::ios::binary);
-    if (!ifs) {
-        LOGE("[NNCompiledCache] ReadCacheModelFile failed, file is invalid.");
+    FILE* pFile = fopen(filePath.c_str(), "rb");
+    if (pFile == NULL) {
+        LOGE("[NNCompiledCache] ReadCacheModelFile failed, file fopen failed.");
         return OH_NN_INVALID_FILE;
     }
 
-    int fsize{-1};
-    OH_NN_ReturnCode ret = GetCacheFileLength(ifs, fsize);
+    long fsize{-1};
+    OH_NN_ReturnCode ret = GetCacheFileLength(pFile, fsize);
     if (ret != OH_NN_SUCCESS) {
-        ifs.close();
+        fclose(pFile);
         LOGE("[NNCompiledCache] ReadCacheModelFile failed, get file %{public}s length fialed.", filePath.c_str());
         return ret;
     }
 
-    ifs.seekg(0, std::ios::beg);
-    if (!ifs.good()) {
-        LOGE("[NNCompiledCache] ReadCacheModelFile failed, file is invalid.");
-        ifs.close();
-        return OH_NN_INVALID_FILE;
-    }
+    rewind(pFile);
 
     char* ptr = static_cast<char*>(m_device->AllocateBuffer(fsize));
     if (ptr == nullptr) {
         LOGE("[NNCompiledCache] ReadCacheModelFile failed, failed to allocate memory.");
-        ifs.close();
+        fclose(pFile);
         return OH_NN_MEMORY_ERROR;
     }
 
-    ifs.read(ptr, fsize);
-    if (!ifs.good()) {
+    LOGI("ReadCacheModelFile read start.");
+    size_t result = fread(ptr, 1, fsize, pFile); // size of each object in bytes is 1
+    LOGI("ReadCacheModelFile read end.");
+    if (result != static_cast<size_t>(fsize)) {
         LOGE("[NNCompiledCache] ReadCacheModelFile failed, failed to read file.");
-        ifs.close();
+        fclose(pFile);
         m_device->ReleaseBuffer(ptr);
         ptr = nullptr;
         return OH_NN_INVALID_FILE;
     }
 
-    ifs.close();
+    fclose(pFile);
     cache.data = ptr;
     cache.length = static_cast<size_t>(fsize); // fsize should be non-negative, safe to cast.
     return OH_NN_SUCCESS;
@@ -405,16 +403,16 @@ unsigned short NNCompiledCache::GetCrc16(char* buffer, size_t length) const
     return static_cast<unsigned short>(~sum);
 }
 
-OH_NN_ReturnCode NNCompiledCache::GetCacheFileLength(std::ifstream& ifs, int& fileSize) const
+OH_NN_ReturnCode NNCompiledCache::GetCacheFileLength(FILE* pFile, long& fileSize) const
 {
-    ifs.seekg(0, std::ios::end);
-    if (!ifs.good()) {
+    int ret = fseek(pFile, 0L, SEEK_END);
+    if (ret != 0) {
         LOGE("[NNCompiledCache] GetCacheFileLength failed, fail to set the position of the next character "
              "to be extracted from the input stream.");
         return OH_NN_FAILED;
     }
 
-    int handleValue = ifs.tellg();
+    long handleValue = ftell(pFile);
     if (handleValue == -1) {
         LOGE("[NNCompiledCache] GetCacheFileLength failed, fail to get position of the input stream.");
         return OH_NN_INVALID_FILE;
@@ -422,7 +420,7 @@ OH_NN_ReturnCode NNCompiledCache::GetCacheFileLength(std::ifstream& ifs, int& fi
 
     if ((handleValue > MAX_MODEL_SIZE) || (handleValue == NULL_PTR_LENGTH)) {
         LOGE("[NNCompiledCache] GetCacheFileLength failed, unable to read huge or empty input stream, "
-             "get cache file size=%{public}d",
+             "get cache file size=%{public}ld",
              handleValue);
         return OH_NN_INVALID_FILE;
     }
