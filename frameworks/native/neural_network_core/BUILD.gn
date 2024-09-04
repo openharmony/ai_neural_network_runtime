@@ -38,6 +38,7 @@ nnrt_core_sources = [
 ]
 
 ohos_shared_library("libneural_network_core") {
+  branch_protector_ret = "pac_ret"
   sources = nnrt_core_sources
   output_extension = "so"
 
