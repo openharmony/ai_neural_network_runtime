@@ -38,7 +38,7 @@ public:
     static OHOS::NeuralNetworkRuntime::BackendRegistrar g_##backend##_backend_registrar(#backend, creator); \
     } // namespace
 
-#define UNREGISTER_BACKEND(backend)
+#define UNREGISTER_BACKEND(backend)                                                                         \
     BackendManager::GetInstance().RemoveBackend(#backend);
 } // NeuralNetworkRuntime
 } // OHOS
