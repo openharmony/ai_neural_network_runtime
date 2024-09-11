@@ -23,7 +23,7 @@ namespace NeuralNetworkRuntime {
 BackendRegistrar::BackendRegistrar(const std::string& backendName, const CreateBackend creator)
 {
     auto& backendManager = BackendManager::GetInstance();
-    OH_NN_ReturnCode ret = backendManager.RegisterBackend(backend, creator);
+    OH_NN_ReturnCode ret = backendManager.RegisterBackend(backendName, creator);
     if (ret != OH_NN_SUCCESS) {
         LOGW("[BackendRegistrar] Register backend failed. ErrorCode=%{public}d", ret);
     }

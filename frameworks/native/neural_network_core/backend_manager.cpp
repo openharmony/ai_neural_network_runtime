@@ -81,7 +81,7 @@ const std::string& BackendManager::GetBackendName(size_t backendID)
 }
 
 OH_NN_ReturnCode BackendManager::RegisterBackend(
-        const std::string& backendName, std::function<std::shared_ptr<Backend>()> creator)
+    const std::string& backendName, std::function<std::shared_ptr<Backend>()> creator)
 {
     auto regBackend = creator();
     if (regBackend == nullptr) {
@@ -124,7 +124,7 @@ OH_NN_ReturnCode BackendManager::RegisterBackend(
 
 void BackendManager::RemoveBackend(const std::string& backendName)
 {
-    LOGI("[RemoveBackend] start remove backend for %{public}s", backendName.c_str());
+    LOGI("[RemoveBackend] start remove backend for %{public}s.", backendName.c_str());
     const std::lock_guard<std::mutex> lock(m_mtx);
     if (m_backendIDGroup.find(backendName) == m_backendIDGroup.end()) {
         LOGI("[RemoveBackend] No need to remove backend for %{public}s.", backendName.c_str());
