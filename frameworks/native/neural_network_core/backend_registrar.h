@@ -21,6 +21,7 @@
 #include <functional>
 
 #include "backend.h"
+#include "backend_manager.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -28,14 +29,17 @@ using CreateBackend = std::function<std::shared_ptr<Backend>()>;
 
 class BackendRegistrar {
 public:
-    explicit BackendRegistrar(const CreateBackend creator);
+    BackendRegistrar(const std::string& backendName, const CreateBackend creator);
     ~BackendRegistrar() = default;
 };
 
-#define REGISTER_BACKEND(backend, creator)                                                            \
-    namespace {                                                                                       \
-    static OHOS::NeuralNetworkRuntime::BackendRegistrar g_##backend##_backend_registrar(creator); \
+#define REGISTER_BACKEND(backend, creator)                                                                  \
+    namespace {                                                                                             \
+    static OHOS::NeuralNetworkRuntime::BackendRegistrar g_##backend##_backend_registrar(#backend, creator); \
     } // namespace
+
+#define UNREGISTER_BACKEND(backend)                                                                         \
+    BackendManager::GetInstance().RemoveBackend(#backend);
 } // NeuralNetworkRuntime
 } // OHOS
 
