@@ -37,7 +37,9 @@ public:
     const std::string& GetBackendName(size_t backendID);
 
     // Register backend by C++ API
-    OH_NN_ReturnCode RegisterBackend(std::function<std::shared_ptr<Backend>()> creator);
+    OH_NN_ReturnCode RegisterBackend(
+        const std::string& backendName, std::function<std::shared_ptr<Backend>()> creator);
+    void RemoveBackend(const std::string& backendName);
 
     static BackendManager& GetInstance()
     {
@@ -70,6 +72,7 @@ private:
     // key is the name of backend.
     std::unordered_map<size_t, std::shared_ptr<Backend>> m_backends;
     std::mutex m_mtx;
+    std::unordered_map<std::string, std::vector<size_t>> m_backendIDGroup;
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
