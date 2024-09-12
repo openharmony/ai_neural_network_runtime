@@ -1108,6 +1108,11 @@ NNExecutor::~NNExecutor()
         it.second.clear();
     }
     m_outputCreatedMem.clear();
+
+    if (m_executorConfig != nullptr) {
+        delete m_executorConfig;
+        m_executorConfig = nullptr;
+    }
 }
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
