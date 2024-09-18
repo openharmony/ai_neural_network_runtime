@@ -167,6 +167,7 @@ ops_sources = [
 ]
 
 ohos_shared_library("libneural_network_runtime") {
+  branch_protector_ret = "pac_ret"
   sources = nnrt_sources
   sources += ops_sources
   output_extension = "so"
