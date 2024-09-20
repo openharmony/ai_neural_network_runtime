@@ -624,8 +624,7 @@ OH_NN_ReturnCode GetNnrtModelId(Compilation* compilationImpl, NNRtServiceApi& nn
     std::string modelName;
     OH_NN_ReturnCode retCode = compilationImpl->compiler->GetModelName(modelName);
     if (retCode != OH_NN_SUCCESS) {
-        LOGE("GetModelName is failed.");
-        return retCode;
+        LOGW("GetModelName is failed.");
     }
 
     if (compilationImpl->nnModel != nullptr) {
@@ -692,7 +691,7 @@ OH_NN_ReturnCode GetModelId(Compilation** compilation)
 
     auto ret = GetNnrtModelId(compilationImpl, nnrtService);
     if (ret != OH_NN_SUCCESS) {
-        LOGE("GetNnrtModelId failed.");
+        LOGE("GetNnrtModelId is failed.");
         return ret;
     }
 
