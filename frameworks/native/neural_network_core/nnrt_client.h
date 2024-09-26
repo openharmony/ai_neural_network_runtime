@@ -33,10 +33,10 @@ public:
     size_t (*GetNNRtModelIDFromCache)(const char* path, const char* modelName) = nullptr;
     size_t (*GetNNRtModelIDFromBuffer)(const void* buffer, size_t size) = nullptr;
     size_t (*GetNNRtModelIDFromModel)(void* model) = nullptr;
-    int (*SetModelID)(int callingPid, uint32_t hiaimodelID, size_t nnrtModelID) = nullptr;
+    int (*SetModelID)(uint32_t hiaimodelID, size_t nnrtModelID) = nullptr;
     int (*IsSupportAuthentication)(bool* supportStat) = nullptr;
     int (*IsSupportScheduling)(bool* supportStat) = nullptr;
-    int (*Authentication)(int callingPid) = nullptr;
+    int (*Authentication)() = nullptr;
     int (*Scheduling)(uint32_t hiaiModelId, bool* needModelLatency, const char* cachePath) = nullptr;
     int (*UpdateModelLatency)(uint32_t hiaiModelId, int modelLatency) = nullptr;
     int (*Unload)(uint32_t hiaiModelId) = nullptr;

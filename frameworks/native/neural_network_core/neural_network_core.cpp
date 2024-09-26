@@ -573,7 +573,7 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation)
         LOGE("Authentication failed, nnrtService Authentication func is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
-    ret = nnrtService.Authentication(compilation->callingPid);
+    ret = nnrtService.Authentication();
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("Authentication failed, input model cannot run by npu.");
         return static_cast<OH_NN_ReturnCode>(ret);
@@ -593,13 +593,6 @@ OH_NN_ReturnCode Authentication(Compilation** compilation)
     if (compilationImpl == nullptr) {
         LOGE("Authentication failed, compilation implementation is nullptr.");
         return OH_NN_INVALID_PARAMETER;
-    }
-
-    auto iter = compilationImpl->configs.find("callingPid");
-    if (iter == compilationImpl->configs.end()) {
-        LOGE("missing 'callingPid' parameter in compilation configs.");
-    } else {
-        compilationImpl->callingPid = std::atoi((iter->second).data());
     }
 
     const NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
@@ -1296,7 +1289,7 @@ OH_NN_ReturnCode SetModelId(const Compilation* compilation)
     }
 
     int ret = nnrtService.SetModelID(
-        compilation->callingPid, compilation->hiaiModelId, compilation->nnrtModelID);
+        compilation->hiaiModelId, compilation->nnrtModelID);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("SetModelId failed, fail to set modelId.");
         return static_cast<OH_NN_ReturnCode>(ret);
@@ -1335,8 +1328,8 @@ OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation)
         return ret;
     }
 
-    LOGD("ExecutorPrepare parameter, callingPid: %{public}d, hiaiModelId: %{public}u, nnrtModelId: %{public}zu.",
-         compilationImpl->callingPid, compilationImpl->hiaiModelId, compilationImpl->nnrtModelID);
+    LOGD("ExecutorPrepare parameter, hiaiModelId: %{public}u, nnrtModelId: %{public}zu.",
+        compilationImpl->hiaiModelId, compilationImpl->nnrtModelID);
 
     ret = Scheduling(&compilationImpl);
     if (ret != OH_NN_SUCCESS) {
@@ -1345,11 +1338,6 @@ OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation)
     }
 
     std::unordered_map<std::string, std::vector<char>> configMap;
-    std::string callingPidStr = std::to_string(compilationImpl->callingPid);
-    std::vector<char> vecCallingPid(callingPidStr.begin(), callingPidStr.end());
-    vecCallingPid.emplace_back('\0');
-    configMap["callingPid"] = vecCallingPid;
-
     std::string hiaiModelIdStr = std::to_string(compilationImpl->hiaiModelId);
     std::vector<char> vechiaiModelId(hiaiModelIdStr.begin(), hiaiModelIdStr.end());
     vechiaiModelId.emplace_back('\0');
