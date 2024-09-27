@@ -86,13 +86,13 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
         LOGE("[NNCompiledCache] Restore failed, fail to get the real path of cacheInfoPath.");
         return OH_NN_INVALID_PARAMETER;
     }
-    if (access(cacheInfoPath.c_str(), F_OK) != 0) {
+    if (access(path, F_OK) != 0) {
         LOGE("[NNCompiledCache] Restore failed, cacheInfoPath is not exist.");
         return OH_NN_INVALID_PARAMETER;
     }
 
     NNCompiledCacheInfo cacheInfo;
-    OH_NN_ReturnCode ret = CheckCacheInfo(cacheInfo, cacheInfoPath);
+    OH_NN_ReturnCode ret = CheckCacheInfo(cacheInfo, path);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiledCache] Restore failed, error happened when calling CheckCacheInfo.");
         return ret;
@@ -337,10 +337,9 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
 OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath,
                                                      OHOS::NeuralNetworkRuntime::Buffer& cache) const
 {
-    // filePath is validate in NNCompiledCache::Restore, no need to check again.
     char path[PATH_MAX];
     if (realpath(filePath.c_str(), path) == nullptr) {
-        LOGE("[NNCompiledCache] ReadCacheModelFile failed, fail to get the real path of cacheInfoPath.");
+        LOGE("[NNCompiledCache] ReadCacheModelFile failed, fail to get the real path of filePath.");
         return OH_NN_INVALID_PARAMETER;
     }
     if (access(path, 0) != 0) {
