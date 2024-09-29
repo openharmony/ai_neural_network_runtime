@@ -39,8 +39,13 @@
 #ifndef NEURAL_NETWORK_RUNTIME_TYPE_H
 #define NEURAL_NETWORK_RUNTIME_TYPE_H
 
+#ifdef __cplusplus
 #include <cstddef>
 #include <cstdint>
+#else
+#include <stddef.h>
+#include <stdint.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
