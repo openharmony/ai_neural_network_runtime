@@ -86,13 +86,13 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
         LOGE("[NNCompiledCache] Restore failed, fail to get the real path of cacheInfoPath.");
         return OH_NN_INVALID_PARAMETER;
     }
-    if (access(cacheInfoPath.c_str(), F_OK) != 0) {
+    if (access(path, F_OK) != 0) {
         LOGE("[NNCompiledCache] Restore failed, cacheInfoPath is not exist.");
         return OH_NN_INVALID_PARAMETER;
     }
 
     NNCompiledCacheInfo cacheInfo;
-    OH_NN_ReturnCode ret = CheckCacheInfo(cacheInfo, cacheInfoPath);
+    OH_NN_ReturnCode ret = CheckCacheInfo(cacheInfo, path);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiledCache] Restore failed, error happened when calling CheckCacheInfo.");
         return ret;
@@ -111,11 +111,6 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
 
     for (uint32_t i = 0; i < cacheInfo.fileNumber; ++i) {
         std::string cacheModelPath = cacheDir + "/" + m_modelName + std::to_string(i) + ".nncache";
-        if (access(cacheModelPath.c_str(), 0) != 0) {
-            LOGE("[NNCompiledCache] Restore failed, %{public}s is not exist.", cacheModelPath.c_str());
-            return OH_NN_INVALID_PARAMETER;
-        }
-
         OHOS::NeuralNetworkRuntime::Buffer modelBuffer;
         ret = ReadCacheModelFile(cacheModelPath, modelBuffer);
         if (ret != OH_NN_SUCCESS) {
@@ -342,8 +337,17 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
 OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath,
                                                      OHOS::NeuralNetworkRuntime::Buffer& cache) const
 {
-    // filePath is validate in NNCompiledCache::Restore, no need to check again.
-    FILE* pFile = fopen(filePath.c_str(), "rb");
+    char path[PATH_MAX];
+    if (realpath(filePath.c_str(), path) == nullptr) {
+        LOGE("[NNCompiledCache] ReadCacheModelFile failed, fail to get the real path of filePath.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    if (access(path, 0) != 0) {
+        LOGE("[NNCompiledCache] ReadCacheModelFile failed, %{public}s is not exist.", path);
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    FILE* pFile = fopen(path, "rb");
     if (pFile == NULL) {
         LOGE("[NNCompiledCache] ReadCacheModelFile failed, file fopen failed.");
         return OH_NN_INVALID_FILE;

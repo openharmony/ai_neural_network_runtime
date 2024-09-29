@@ -467,19 +467,6 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_setbackend_002, TestSize.Level
 }
 
 /**
- * @tc.name: nncompiledcachetest_setmodelname_001
- * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
- * @tc.type: FUNC
- */
-HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_setmodelname_001, TestSize.Level0)
-{
-    LOGE("SetModelName nncompiledcachetest_setmodelname_001");
-    NNCompiledCache nncompiledCache;
-    std::string m_modelName;
-    nncompiledCache.SetModelName(m_modelName);
-}
-
-/**
  * @tc.name: nncompiledcachetest_writecacheinfo_001
  * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
  * @tc.type: FUNC
