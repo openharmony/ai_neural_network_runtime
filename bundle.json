@@ -29,7 +29,8 @@
                 "hilog",
                 "hitrace",
                 "ipc",
-                "mindspore"
+                "mindspore",
+                "init"
             ],
             "third_party": []
         },
