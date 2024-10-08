@@ -19,7 +19,7 @@
 #include <functional>
 #include <memory>
 #include <limits>
-#include <stdio.h>
+#include <cstdio>
 
 #include "common/utils.h"
 #include "backend_manager.h"
