@@ -31,6 +31,7 @@ const int CACHE_INPUT_TENSORDESC_OFFSET = 2;
 const int CACHE_OUTPUT_TENSORDESC_OFFSET = 1;
 constexpr int32_t  NUMBER_CACHE_INFO_MEMBERS = 3;
 const std::string EXTENSION_KEY_MODEL_NAME = "ModelName";
+const std::string EXTENSION_KEY_FM_SHARED = "NPU_FM_SHARED";
 const int OPVERSION_SUBSTR_NUM = 2;
 const std::string CURRENT_VERSION = "0x00000000";
 const std::string HIAI_VERSION_PATH = "/data/data/hiai/version";
@@ -623,6 +624,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     config.enableFloat16 = m_enableFp16;
     config.mode = m_performance;
     config.priority = m_priority;
+    config.extensionConfig.isNpuFmShared = m_extensionConfig.isNpuFmShared;
     std::vector<Buffer> modelOnlyCaches(caches.begin(), caches.end() - CACHE_INPUT_TENSORDESC_OFFSET);
     bool isUpdatable = false;
     ret = m_device->PrepareModelFromModelCache(modelOnlyCaches, config, m_preparedModel, isUpdatable);
@@ -644,7 +646,6 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
             }
             inf.close();
         }
-
         int currentOpVersion = std::stoi(currentVersion.substr(OPVERSION_SUBSTR_NUM));
 
         NNCompiledCacheInfo modelCacheInfo;
@@ -718,6 +719,10 @@ OH_NN_ReturnCode NNCompiler::SetExtensionConfig(const std::unordered_map<std::st
         }
         m_extensionConfig.modelName.assign(value.data(), value.data() + value.size());
         LOGI("[NNCompiler] SetExtensionConfig get model name:%{public}s.", m_extensionConfig.modelName.c_str());
+    }
+    if (configs.find(EXTENSION_KEY_FM_SHARED) != configs.end()) {
+        m_extensionConfig.isNpuFmShared = true;
+        LOGI("[NNCompiler] SetExtensionConfig NpuFmShared enabled.");
     }
     return OH_NN_SUCCESS;
 }
