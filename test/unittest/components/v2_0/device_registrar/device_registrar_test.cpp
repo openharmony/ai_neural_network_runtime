@@ -192,7 +192,7 @@ sptr<IRegisterDevice> IRegisterDevice::Get(const std::string& serviceName, bool 
         return nullptr;
     }
 
-    auto mockIDevice = std::make_shared<MockIDeviceImp>();
+    auto mockIDevice = OHOS::NeuralNetworkRuntime::CreateSharedPtr<MockIDeviceImp>();
     if (!mockIDevice) {
         LOGE("Failed to new MockIDeviceImp object.");
         return nullptr;

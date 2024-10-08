@@ -47,9 +47,6 @@ nnrt_sources = [
   "ops_builder.cpp",
   "ops_registry.cpp",
   "quant_param.cpp",
-  "register_hdi_device_v1_0.cpp",
-  "register_hdi_device_v2_0.cpp",
-  "register_hdi_device_v2_1.cpp",
   "transform.cpp",
 ]
 
@@ -192,6 +189,7 @@ ohos_shared_library("libneural_network_runtime") {
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "mindspore:mindir",
   ]
