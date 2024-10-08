@@ -48,11 +48,13 @@ NNRtServiceApi& NNRtServiceApi::GetInstance()
 
     // Assumes there can be multiple instances of NN API
     std::string nnrtLibraryName = "libdllite_service_client.z.so";
-    libNNRtService = dlopen(nnrtLibraryName.c_str(), RTLD_LAZY | RTLD_NODELETE);
     if (libNNRtService == nullptr) {
-        LOGE("LoadNNRtService error: unable to open library %{public}s", nnrtLibraryName.c_str());
-        nnrtService.m_serviceAvailable = false;
-        return nnrtService;
+        libNNRtService = dlopen(nnrtLibraryName.c_str(), RTLD_LAZY | RTLD_NODELETE);
+        if (libNNRtService == nullptr) {
+            LOGE("LoadNNRtService error: unable to open library %{public}s", nnrtLibraryName.c_str());
+            nnrtService.m_serviceAvailable = false;
+            return nnrtService;
+        }
     }
 
     LoadFunction(libNNRtService, "CheckModelSizeFromPath", &nnrtService.CheckModelSizeFromPath);

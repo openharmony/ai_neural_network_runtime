@@ -37,7 +37,7 @@ public:
     int (*IsSupportAuthentication)(bool* supportStat) = nullptr;
     int (*IsSupportScheduling)(bool* supportStat) = nullptr;
     int (*Authentication)(int callingPid) = nullptr;
-    int (*Scheduling)(uint32_t hiaiModelId, bool* needModelLatency) = nullptr;
+    int (*Scheduling)(uint32_t hiaiModelId, bool* needModelLatency, const char* cachePath) = nullptr;
     int (*UpdateModelLatency)(uint32_t hiaiModelId, int modelLatency) = nullptr;
     int (*Unload)(uint32_t hiaiModelId) = nullptr;
 
