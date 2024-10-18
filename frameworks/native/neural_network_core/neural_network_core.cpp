@@ -755,7 +755,7 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation)
         configContents.push_back('0');
     }
 
-    configContents["isExceedRamLimit"] = configContents;
+    configs["isExceedRamLimit"] = configContents;
     compilationImpl->compiler->SetExtensionConfig(configs);
 
     bool isBuild = compilationImpl->compiler->IsBuild();

@@ -728,7 +728,7 @@ OH_NN_ReturnCode NNCompiler::SetExtensionConfig(const std::unordered_map<std::st
         m_extensionConfig.isNpuFmShared = true;
         LOGI("[NNCompiler] SetExtensionConfig NpuFmShared enabled.");
     }
-    if (cofigs.find(EXTENSION_KEY_IS_EXCEED_RAMLIMIT) != configs.end()) {
+    if (configs.find(EXTENSION_KEY_IS_EXCEED_RAMLIMIT) != configs.end()) {
         std::vector<char> value = configs.at(EXTENSION_KEY_IS_EXCEED_RAMLIMIT);
         if (value.empty()) {
             LOGE("[NNCompiler] SetExtensionConfig get empty model name from configs");
