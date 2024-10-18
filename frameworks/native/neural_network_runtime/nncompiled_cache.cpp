@@ -41,6 +41,7 @@ OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRunt
                                        const std::string& cacheDir,
                                        uint32_t version)
 {
+    LOGI("[NNCompiledCache::Save] m_isExceedRamLimit: %{public}d", static_cast<int>(m_isExceedRamLimit));
     if (caches.empty()) {
         LOGE("[NNCompiledCache] Save failed, caches is empty.");
         return OH_NN_INVALID_PARAMETER;
@@ -156,6 +157,11 @@ void NNCompiledCache::SetModelName(const std::string& modelName)
     m_modelName = modelName;
 }
 
+void NNCompiledCache::SetIsExceedRamLimit(const bool isExceedRamLimit)
+{
+    m_isExceedRamLimit = isExceedRamLimit;
+}
+
 OH_NN_ReturnCode NNCompiledCache::GenerateCacheFiles(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
                                                      const std::string& cacheDir,
                                                      uint32_t version) const
@@ -244,6 +250,13 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
 
     int currentOpVersion = std::stoi(currentVersion.substr(OPVERSION_SUBSTR_NUM));
     *cacheInfoPtr++ = currentOpVersion;
+
+    LOGI("[NNCompiledCache::GenerateCacheModel] m_isExceedRamLimit: %{public}d", static_cast<int>(m_isExceedRamLimit));
+    if (m_isExceedRamLimit) {
+        *cacheInfoPtr++ = 1;
+    } else {
+        *cacheInfoPtr++ = 0;
+    }
 
     return OH_NN_SUCCESS;
 }
