@@ -30,6 +30,7 @@ namespace NeuralNetworkRuntime {
 constexpr int32_t MAX_MODEL_SIZE = 200 * 1024 * 1024; // 200MB
 constexpr int32_t NULL_PTR_LENGTH = 0;
 constexpr int32_t NUMBER_CACHE_INFO_MEMBERS = 3;
+constexpr int32_t NUMBER_CACHE_INFO_EXTENSION_MEMBERS = 2;
 constexpr int32_t HEX_UNIT = 16;
 constexpr char ROOT_DIR_STR = '/';
 constexpr char DOUBLE_SLASH_STR[] = "//";
@@ -167,7 +168,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheFiles(const std::vector<OHOS::Neu
                                                      uint32_t version) const
 {
     const size_t cacheNumber = caches.size();
-    uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber + 1;
+    uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber + NUMBER_CACHE_INFO_EXTENSION_MEMBERS;
     std::unique_ptr<int64_t[]> cacheInfo = CreateUniquePtr<int64_t[]>(cacheSize);
     if (cacheInfo == nullptr) {
         LOGE("[NNCompiledCache] GenerateCacheFiles failed, fail to create cacheInfo instance.");
@@ -435,7 +436,7 @@ OH_NN_ReturnCode NNCompiledCache::GetCacheFileLength(FILE* pFile, long& fileSize
         return OH_NN_INVALID_FILE;
     }
 
-    if ((handleValue > MAX_MODEL_SIZE) || (handleValue == NULL_PTR_LENGTH)) {
+    if (handleValue == NULL_PTR_LENGTH) {
         LOGE("[NNCompiledCache] GetCacheFileLength failed, unable to read huge or empty input stream, "
              "get cache file size=%{public}ld",
              handleValue);
