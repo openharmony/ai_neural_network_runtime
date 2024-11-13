@@ -604,14 +604,11 @@ OH_NN_ReturnCode Authentication(Compilation** compilation, bool &exceedRamLimit)
         return OH_NN_SUCCESS;
     }
 
-    bool isExceedRamLimit = false;
     OH_NN_ReturnCode ret = AuthenticateModel(compilationImpl, isExceedRamLimit);
     if (ret != OH_NN_SUCCESS) {
         LOGE("Authentication failed, fail to authenticate model.");
         return ret;
     }
-    // 入参，传出模型大小是否超过限制
-    exceedRamLimit = isExceedRamLimit;
 
     LOGI("Authentication success.");
     return OH_NN_SUCCESS;

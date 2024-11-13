@@ -559,7 +559,6 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
     tensorBuffers.emplace_back(outputTensorDescBuffer);
 
     compiledCache.SetModelName(m_extensionConfig.modelName);
-    LOGI("[NNCompiler::SaveToCacheFile] m_extensionConfig.isExceedRamLimit: %{public}d", static_cast<int>(m_extensionConfig.isExceedRamLimit));
     compiledCache.SetIsExceedRamLimit(m_extensionConfig.isExceedRamLimit);
     ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion);
     if (ret != OH_NN_SUCCESS) {
