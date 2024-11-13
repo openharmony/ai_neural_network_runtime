@@ -585,7 +585,7 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &exceedR
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Authentication(Compilation** compilation, bool &exceedRamLimit)
+OH_NN_ReturnCode Authentication(Compilation** compilation, bool &isExceedRamLimit)
 {
     if (compilation == nullptr) {
         LOGE("Authentication failed, compilation is nullptr.");
