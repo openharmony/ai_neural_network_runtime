@@ -510,7 +510,9 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
     } else if (compilation->offlineModelPath != nullptr) {
         ret = nnrtService.CheckModelSizeFromPath(compilation->offlineModelPath, isExceedRamLimit);
     } else if (compilation->cachePath != nullptr) {
-        ret = nnrtService.CheckModelSizeFromPath(compilation->cachePath, isExceedRamLimit);
+        std::string modelName;
+        compilation->compiler->GetModelName(modelName);
+        ret = nnrtService.CheckModelSizeFromCache(compilation->cachePath, modelName, isExceedRamLimit);
     } else if ((compilation->offlineModelBuffer.first != nullptr) && \
                (compilation->offlineModelBuffer.second != size_t(0))) {
         ret = nnrtService.CheckModelSizeFromBuffer(
@@ -532,7 +534,7 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation)
+OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &exceedRamLimit)
 {
     bool isExceedRamLimit = false;
     OH_NN_ReturnCode retCode = CheckExceedRamLimit(compilation, isExceedRamLimit);
@@ -540,6 +542,7 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation)
         LOGE("AuthenticateModel failed, fail to check if model exceed ram limit.");
         return retCode;
     }
+    exceedRamLimit = isExceedRamLimit;
 
     if (!isExceedRamLimit) {
         LOGI("Model accupy memory less then limit, no need authenticating.");
@@ -582,7 +585,7 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Authentication(Compilation** compilation)
+OH_NN_ReturnCode Authentication(Compilation** compilation, bool &isExceedRamLimit)
 {
     if (compilation == nullptr) {
         LOGE("Authentication failed, compilation is nullptr.");
@@ -601,7 +604,7 @@ OH_NN_ReturnCode Authentication(Compilation** compilation)
         return OH_NN_SUCCESS;
     }
 
-    OH_NN_ReturnCode ret = AuthenticateModel(compilationImpl);
+    OH_NN_ReturnCode ret = AuthenticateModel(compilationImpl, isExceedRamLimit);
     if (ret != OH_NN_SUCCESS) {
         LOGE("Authentication failed, fail to authenticate model.");
         return ret;
@@ -732,11 +735,25 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation)
         return ret;
     }
 
-    ret = Authentication(&compilationImpl);
+    bool isExceedRamLimit = false;
+    ret = Authentication(&compilationImpl, isExceedRamLimit);
     if (ret != OH_NN_SUCCESS) {
         LOGE("OH_NNCompilation_Build failed, fail to create compiler.");
         return ret;
     }
+
+    std::unordered_map<std::string, std::vector<char>> configs;
+    LOGI("[OH_NNCompilation_Build] isExceedRamLimit: %{public}d", static_cast<int>(isExceedRamLimit));
+
+    std::vector<char> configContents;
+    if (isExceedRamLimit) {
+        configContents.push_back('1');
+    } else {
+        configContents.push_back('0');
+    }
+
+    configs["isExceedRamLimit"] = configContents;
+    compilationImpl->compiler->SetExtensionConfig(configs);
 
     bool isBuild = compilationImpl->compiler->IsBuild();
     if (isBuild) {
