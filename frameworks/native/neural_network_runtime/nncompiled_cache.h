@@ -34,7 +34,6 @@ struct NNCompiledCacheInfo {
     int64_t deviceId{0};
     std::vector<unsigned short> modelCheckSum;
     int64_t opVersion{0};
-    int64_t isExceedRamLimit{0};
 };
 
 class NNCompiledCache {
@@ -51,7 +50,6 @@ public:
 
     OH_NN_ReturnCode SetBackend(size_t backendID);
     void SetModelName(const std::string& modelName);
-    void SetIsExceedRamLimit(const bool isExceedRamLimit);
     OH_NN_ReturnCode WriteCacheInfo(uint32_t cacheSize,
                                     std::unique_ptr<int64_t[]>& cacheInfo,
                                     const std::string& cacheDir) const;
@@ -74,7 +72,6 @@ private:
     size_t m_backendID {0};
     std::string m_modelName;
     std::shared_ptr<Device> m_device {nullptr};
-    bool m_isExceedRamLimit {false};
 };
 
 } // namespace NeuralNetworkRuntime
