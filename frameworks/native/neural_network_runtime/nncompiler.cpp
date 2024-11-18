@@ -32,7 +32,6 @@ const int CACHE_OUTPUT_TENSORDESC_OFFSET = 1;
 constexpr int32_t  NUMBER_CACHE_INFO_MEMBERS = 3;
 const std::string EXTENSION_KEY_MODEL_NAME = "ModelName";
 const std::string EXTENSION_KEY_FM_SHARED = "NPU_FM_SHARED";
-const std::string EXTENSION_KEY_IS_EXCEED_RAMLIMIT = "isExceedRamLimit";
 const int OPVERSION_SUBSTR_NUM = 2;
 const std::string CURRENT_VERSION = "0x00000000";
 const std::string HIAI_VERSION_PATH = "/data/data/hiai/version";
@@ -559,7 +558,6 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
     tensorBuffers.emplace_back(outputTensorDescBuffer);
 
     compiledCache.SetModelName(m_extensionConfig.modelName);
-    compiledCache.SetIsExceedRamLimit(m_extensionConfig.isExceedRamLimit);
     ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] SaveToCacheFile failed, error happened when saving model cache.");
@@ -726,21 +724,6 @@ OH_NN_ReturnCode NNCompiler::SetExtensionConfig(const std::unordered_map<std::st
     if (configs.find(EXTENSION_KEY_FM_SHARED) != configs.end()) {
         m_extensionConfig.isNpuFmShared = true;
         LOGI("[NNCompiler] SetExtensionConfig NpuFmShared enabled.");
-    }
-    if (configs.find(EXTENSION_KEY_IS_EXCEED_RAMLIMIT) != configs.end()) {
-        std::vector<char> value = configs.at(EXTENSION_KEY_IS_EXCEED_RAMLIMIT);
-        if (value.empty()) {
-            LOGE("[NNCompiler] SetExtensionConfig get empty model name from configs");
-            return OH_NN_INVALID_PARAMETER;
-        }
-
-        if (value[0] == '1') {
-            m_extensionConfig.isExceedRamLimit = true;
-        } else {
-            m_extensionConfig.isExceedRamLimit = false;
-        }
-
-        LOGI("[NNCompiler] SetExtensionConfig isExceedRamLimit enabled.");
     }
     return OH_NN_SUCCESS;
 }

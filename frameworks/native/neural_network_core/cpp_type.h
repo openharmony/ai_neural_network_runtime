@@ -56,7 +56,6 @@ struct ExtensionConfig {
     std::vector<std::vector<int32_t>> inputDims;
     std::vector<std::vector<int32_t>> dynamicDims;
     bool isNpuFmShared = false;
-    bool isExceedRamLimit = false;
 };
 
 struct ModelConfig {
