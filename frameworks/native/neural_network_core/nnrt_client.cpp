@@ -58,7 +58,6 @@ NNRtServiceApi& NNRtServiceApi::GetInstance()
     }
 
     LoadFunction(libNNRtService, "CheckModelSizeFromPath", &nnrtService.CheckModelSizeFromPath);
-    LoadFunction(libNNRtService, "CheckModelSizeFromCache", &nnrtService.CheckModelSizeFromCache);
     LoadFunction(libNNRtService, "CheckModelSizeFromBuffer", &nnrtService.CheckModelSizeFromBuffer);
     LoadFunction(libNNRtService, "CheckModelSizeFromModel", &nnrtService.CheckModelSizeFromModel);
     LoadFunction(libNNRtService, "GetNNRtModelIDFromPath", &nnrtService.GetNNRtModelIDFromPath);

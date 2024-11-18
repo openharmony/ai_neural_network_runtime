@@ -27,9 +27,9 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
+constexpr int32_t MAX_MODEL_SIZE = 200 * 1024 * 1024; // 200MB
 constexpr int32_t NULL_PTR_LENGTH = 0;
 constexpr int32_t NUMBER_CACHE_INFO_MEMBERS = 3;
-constexpr int32_t NUMBER_CACHE_INFO_EXTENSION_MEMBERS = 2;
 constexpr int32_t HEX_UNIT = 16;
 constexpr char ROOT_DIR_STR = '/';
 constexpr char DOUBLE_SLASH_STR[] = "//";
@@ -41,7 +41,6 @@ OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRunt
                                        const std::string& cacheDir,
                                        uint32_t version)
 {
-    LOGI("[NNCompiledCache::Save] m_isExceedRamLimit: %{public}d", static_cast<int>(m_isExceedRamLimit));
     if (caches.empty()) {
         LOGE("[NNCompiledCache] Save failed, caches is empty.");
         return OH_NN_INVALID_PARAMETER;
@@ -157,17 +156,12 @@ void NNCompiledCache::SetModelName(const std::string& modelName)
     m_modelName = modelName;
 }
 
-void NNCompiledCache::SetIsExceedRamLimit(const bool isExceedRamLimit)
-{
-    m_isExceedRamLimit = isExceedRamLimit;
-}
-
 OH_NN_ReturnCode NNCompiledCache::GenerateCacheFiles(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
                                                      const std::string& cacheDir,
                                                      uint32_t version) const
 {
     const size_t cacheNumber = caches.size();
-    uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber + NUMBER_CACHE_INFO_EXTENSION_MEMBERS;
+    uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber + 1;
     std::unique_ptr<int64_t[]> cacheInfo = CreateUniquePtr<int64_t[]>(cacheSize);
     if (cacheInfo == nullptr) {
         LOGE("[NNCompiledCache] GenerateCacheFiles failed, fail to create cacheInfo instance.");
@@ -250,13 +244,6 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
 
     int currentOpVersion = std::stoi(currentVersion.substr(OPVERSION_SUBSTR_NUM));
     *cacheInfoPtr++ = currentOpVersion;
-
-    LOGI("[NNCompiledCache::GenerateCacheModel] m_isExceedRamLimit: %{public}d", static_cast<int>(m_isExceedRamLimit));
-    if (m_isExceedRamLimit) {
-        *cacheInfoPtr++ = 1;
-    } else {
-        *cacheInfoPtr++ = 0;
-    }
 
     return OH_NN_SUCCESS;
 }
@@ -435,7 +422,7 @@ OH_NN_ReturnCode NNCompiledCache::GetCacheFileLength(FILE* pFile, long& fileSize
         return OH_NN_INVALID_FILE;
     }
 
-    if (handleValue == NULL_PTR_LENGTH) {
+    if ((handleValue > MAX_MODEL_SIZE) || (handleValue == NULL_PTR_LENGTH)) {
         LOGE("[NNCompiledCache] GetCacheFileLength failed, unable to read huge or empty input stream, "
              "get cache file size=%{public}ld",
              handleValue);
