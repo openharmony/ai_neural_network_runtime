@@ -534,7 +534,7 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &exceedRamLimit)
+OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &isExceedRamLimit)
 {
     bool isExceedRamLimit = false;
     OH_NN_ReturnCode retCode = CheckExceedRamLimit(compilation, isExceedRamLimit);
@@ -542,7 +542,6 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &exceedR
         LOGE("AuthenticateModel failed, fail to check if model exceed ram limit.");
         return retCode;
     }
-    exceedRamLimit = isExceedRamLimit;
 
     if (!isExceedRamLimit) {
         LOGI("Model accupy memory less then limit, no need authenticating.");
