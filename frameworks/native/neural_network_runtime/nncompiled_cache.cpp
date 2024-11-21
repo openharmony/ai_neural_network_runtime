@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-constexpr int32_t MAX_MODEL_SIZE = 200 * 1024 * 1024; // 200MB
+constexpr int32_t MAX_MODEL_SIZE = 500 * 1024 * 1024; // 200MB
 constexpr int32_t NULL_PTR_LENGTH = 0;
 constexpr int32_t NUMBER_CACHE_INFO_MEMBERS = 3;
 constexpr int32_t HEX_UNIT = 16;
