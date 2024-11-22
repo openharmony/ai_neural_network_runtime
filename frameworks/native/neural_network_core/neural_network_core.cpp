@@ -536,7 +536,6 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
 
 OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &isExceedRamLimit)
 {
-    bool isExceedRamLimit = false;
     OH_NN_ReturnCode retCode = CheckExceedRamLimit(compilation, isExceedRamLimit);
     if (retCode != OH_NN_SUCCESS) {
         LOGE("AuthenticateModel failed, fail to check if model exceed ram limit.");
