@@ -27,6 +27,7 @@
 
 #include <cstring>
 #include <fstream>
+#include <filesystem>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -46,6 +47,7 @@ const std::string NULL_HARDWARE_NAME = "default";
 const std::string HARDWARE_NAME = "const.ai.nnrt_deivce";
 const std::string HARDWARE_VERSION = "v5_0";
 constexpr size_t HARDWARE_NAME_MAX_LENGTH = 128;
+constexpr size_t FILE_NUMBER_MAX = 100;
 
 NNRT_API NN_QuantParam *OH_NNQuantParam_Create()
 {
@@ -594,11 +596,22 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, u
         return false;
     }
 
+    if (fileNumber > FILE_NUMBER_MAX) {
+        LOGE("OH_NNModel_HasCache fileNumber is more than 100");
+        std::filesystem::remove_all(cacheInfoPath);
+        return false;
+    }
+
     // determine whether cache model files exist
     for (int64_t i = 0; i < fileNumber; ++i) {
         std::string cacheModelPath =
             std::string(cacheDir) + "/" + std::string(modelName) + std::to_string(i) + ".nncache";
         exist = (exist && (stat(cacheModelPath.c_str(), &buffer) == 0));
+        if (!exist) {
+            LOGE("OH_NNModel_HasCache cacheModelPath is not existed.");
+            std::filesystem::remove_all(cacheInfoPath);
+            return false;
+        }
     }
 
     if (cacheVersion != version) {
