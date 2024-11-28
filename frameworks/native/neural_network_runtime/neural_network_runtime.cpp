@@ -47,7 +47,7 @@ const std::string NULL_HARDWARE_NAME = "default";
 const std::string HARDWARE_NAME = "const.ai.nnrt_deivce";
 const std::string HARDWARE_VERSION = "v5_0";
 constexpr size_t HARDWARE_NAME_MAX_LENGTH = 128;
-constexpr size_t FILE_NUMBER_MAX = 100;
+constexpr size_t FILE_NUMBER_MAX = 100; // 限制cache文件数量最大为100
 
 NNRT_API NN_QuantParam *OH_NNQuantParam_Create()
 {
