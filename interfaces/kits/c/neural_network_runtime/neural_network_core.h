@@ -14,7 +14,7 @@
  */
 
 /**
- * @addtogroup NeuralNeworkRuntime
+ * @addtogroup NeuralNetworkRuntime
  * @{
  *
  * @brief Provides APIs of Neural Network Runtime for accelerating the model inference.
