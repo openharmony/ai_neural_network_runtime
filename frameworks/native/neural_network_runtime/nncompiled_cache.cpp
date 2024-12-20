@@ -190,6 +190,10 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
                                                      uint32_t version) const
 {
     size_t cacheNumber = caches.size();
+    if (cacheNumber == 0 || cacheNumber > NN_CACHE_FILE_NUMBER_MAX) {
+        LOGE("[NNCompiledCache] Caches size is equal 0 or greater than 100.");
+        return OH_NN_FAILED;
+    }
 
     auto cacheInfoPtr = cacheInfo.get();
     *cacheInfoPtr++ = static_cast<int64_t>(cacheNumber);
