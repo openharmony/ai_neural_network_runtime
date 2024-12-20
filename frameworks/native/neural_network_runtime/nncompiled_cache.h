@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 const uint32_t INVALID_CAHCE_VERSION = UINT32_MAX; // UINT32_MAX is reserved for invalid cache version.
+constexpr size_t NN_CACHE_FILE_NUMBER_MAX = 100; // 限制cache文件数量最大为100
 
 struct NNCompiledCacheInfo {
     int64_t fileNumber{0};

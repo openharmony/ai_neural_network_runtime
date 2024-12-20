@@ -531,6 +531,12 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
         return ret;
     }
 
+    size_t cacheNumber = caches.size();
+    if (cacheNumber == 0 || cacheNumber > NN_CACHE_FILE_NUMBER_MAX) {
+        LOGE("[NNCompiler] Caches size is equal 0 or greater than 100.");
+        return OH_NN_FAILED;
+    }
+
     NNCompiledCache compiledCache;
     ret = compiledCache.SetBackend(m_backendID);
     if (ret != OH_NN_SUCCESS) {
