@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
-constexpr int32_t MAX_MODEL_SIZE = 200 * 1024 * 1024; // 200MB
+constexpr int32_t MAX_MODEL_SIZE = 500 * 1024 * 1024; // 200MB
 constexpr int32_t NULL_PTR_LENGTH = 0;
 constexpr int32_t NUMBER_CACHE_INFO_MEMBERS = 3;
 constexpr int32_t HEX_UNIT = 16;
@@ -194,6 +194,10 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
                                                      uint32_t version) const
 {
     size_t cacheNumber = caches.size();
+    if (cacheNumber == 0 || cacheNumber > NN_CACHE_FILE_NUMBER_MAX) {
+        LOGE("[NNCompiledCache] Caches size is equal 0 or greater than 100.");
+        return OH_NN_FAILED;
+    }
 
     auto cacheInfoPtr = cacheInfo.get();
     *cacheInfoPtr++ = static_cast<int64_t>(cacheNumber);
