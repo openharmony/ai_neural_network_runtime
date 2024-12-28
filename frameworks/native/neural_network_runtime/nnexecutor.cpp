@@ -344,7 +344,6 @@ OH_NN_ReturnCode NNExecutor::CheckInputDimRanges(NN_Tensor* inputTensors[], size
     std::vector<std::vector<uint32_t>> maxInputDims;
     OH_NN_ReturnCode oldRet = m_preparedModel->GetInputDimRanges(minInputDims, maxInputDims);
     if (oldRet != OH_NN_SUCCESS) {
-        LOGW("NNExecutor::CheckInputDimRanges failed, current version don't support get input dim ranges.");
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
