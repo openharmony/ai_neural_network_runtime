@@ -30,8 +30,10 @@ namespace {
 const int CACHE_INPUT_TENSORDESC_OFFSET = 2;
 const int CACHE_OUTPUT_TENSORDESC_OFFSET = 1;
 constexpr int32_t  NUMBER_CACHE_INFO_MEMBERS = 3;
+constexpr int32_t NUMBER_CACHE_INFO_EXTENSION_MEMBERS = 2;
 const std::string EXTENSION_KEY_MODEL_NAME = "ModelName";
 const std::string EXTENSION_KEY_FM_SHARED = "NPU_FM_SHARED";
+const std::string EXTENSION_KEY_IS_EXCEED_RAMLIMIT = "isExceedRamLimit";
 const int OPVERSION_SUBSTR_NUM = 2;
 const std::string CURRENT_VERSION = "0x00000000";
 const std::string HIAI_VERSION_PATH = "/data/data/hiai/version";
@@ -565,6 +567,7 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
 
     compiledCache.SetModelName(m_extensionConfig.modelName);
     ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion);
+    compiledCache.SetIsExceedRamLimit(m_extensionConfig.isExceedRamLimit);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] SaveToCacheFile failed, error happened when saving model cache.");
         ReleaseBuffer(tensorBuffers);
@@ -668,7 +671,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
 
         if (currentOpVersion > modelCacheInfo.opVersion) {
             const size_t cacheNumber = caches.size();
-            uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber + 1;
+            uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber + NUMBER_CACHE_INFO_EXTENSION_MEMBERS;
             uint32_t infoCharNumber = cacheSize * sizeof(int64_t);
 
             std::unique_ptr<int64_t[]> cacheInfo = CreateUniquePtr<int64_t[]>(cacheSize);
@@ -730,6 +733,21 @@ OH_NN_ReturnCode NNCompiler::SetExtensionConfig(const std::unordered_map<std::st
     if (configs.find(EXTENSION_KEY_FM_SHARED) != configs.end()) {
         m_extensionConfig.isNpuFmShared = true;
         LOGI("[NNCompiler] SetExtensionConfig NpuFmShared enabled.");
+    }
+    if (configs.find(EXTENSION_KEY_IS_EXCEED_RAMLIMIT) != configs.end()) {
+        std::vector<char> value = configs.at(EXTENSION_KEY_IS_EXCEED_RAMLIMIT);
+        if (value.empty()) {
+            LOGE("[NNCompiler] SetExtensionConfig get empty model name from configs");
+            return OH_NN_INVALID_PARAMETER;
+        }
+
+        if (value[0] == '1') {
+            m_extensionConfig.isExceedRamLimit = true;
+        } else {
+            m_extensionConfig.isExceedRamLimit = false;
+        }
+
+        LOGI("[NNCompiler] SetExtensionConfig isExceedRamLimit enabled.");
     }
     return OH_NN_SUCCESS;
 }
