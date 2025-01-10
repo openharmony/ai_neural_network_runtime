@@ -42,6 +42,7 @@ const std::string EXTENSION_KEY_OP_LAYOUT = "opLayout";
 const std::string EXTENSION_KEY_INPUT_DIMS = "InputDims";
 const std::string EXTENSION_KEY_DYNAMIC_DIMS = "DynamicDims";
 const std::string EXTENSION_KEY_FM_SHARED = "NPU_FM_SHARED";
+const std::string EXTENSION_KEY_IS_EXCEED_RAMLIMIT = "isExceedRamLimit";
 
 const std::string NULL_HARDWARE_NAME = "default";
 const std::string HARDWARE_NAME = "const.ai.nnrt_deivce";
