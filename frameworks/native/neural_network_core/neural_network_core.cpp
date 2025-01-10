@@ -512,7 +512,7 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
     } else if (compilation->cachePath != nullptr) {
         std::string modelName;
         compilation->compiler->GetModelName(modelName);
-        ret = nnrtService.CheckModelSizeFromPath(compilation->cachePath, modelName, isExceedRamLimit);
+        ret = nnrtService.CheckModelSizeFromCache(compilation->cachePath, modelName, isExceedRamLimit);
     } else if ((compilation->offlineModelBuffer.first != nullptr) && \
                (compilation->offlineModelBuffer.second != size_t(0))) {
         ret = nnrtService.CheckModelSizeFromBuffer(
@@ -741,7 +741,7 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation)
     }
 
     std::unordered_map<std::string, std::vector<char>> configs;
-    LOGI("[OH_NNCompilation_Build] isExceedRamLimit: %{public}d", static_cast<int>(isExceedRamLimit));
+    LOGI("[OH_NNCompilation_Build] model isExceedRamLimit: %{public}d", static_cast<int>(isExceedRamLimit));
 
     std::vector<char> configContents;
     if (isExceedRamLimit) {
