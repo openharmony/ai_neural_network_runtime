@@ -439,7 +439,7 @@ OH_NN_ReturnCode NNCompiledCache::GetCacheFileLength(FILE* pFile, long& fileSize
         return OH_NN_INVALID_FILE;
     }
 
-    if ((handleValue == NULL_PTR_LENGTH)) {
+    if (handleValue == NULL_PTR_LENGTH) {
         LOGE("[NNCompiledCache] GetCacheFileLength failed, unable to read huge or empty input stream, "
              "get cache file size=%{public}ld",
              handleValue);
