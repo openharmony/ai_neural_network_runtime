@@ -27,6 +27,7 @@ public:
     bool IsServiceAvaliable() const;
 
     int (*CheckModelSizeFromPath)(const char* path, bool& exceedLimit) = nullptr;
+    int (*CheckModelSizeFromCache)(const char* path, const std::string& modelName, bool& exceedLimit) = nullptr;
     int (*CheckModelSizeFromBuffer)(const void* buffer, size_t size, bool& exceedLimit) = nullptr;
     int (*CheckModelSizeFromModel)(void* model, bool& exceedLimit) = nullptr;
     size_t (*GetNNRtModelIDFromPath)(const char*) = nullptr;
