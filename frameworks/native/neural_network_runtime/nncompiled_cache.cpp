@@ -347,6 +347,10 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
         LOGW("[NNCompiledCache] opVersion failed.");
     }
 
+    if (!infoCacheFile.read(reinterpret_cast<char*>(&(modelCacheInfo.isExceedRamLimit)), sizeof(uint64_t))) {
+        LOGW("[NNCompiledCache] isExceedRamLimit failed.");
+    }
+
     infoCacheFile.close();
     return OH_NN_SUCCESS;
 }

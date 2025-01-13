@@ -691,6 +691,12 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
 
             *cacheInfoPtr++ = currentOpVersion;
 
+            if (modelCacheInfo.isExceedRamLimit) {
+                *cacheInfoPtr++ = 1;
+            } else {
+                *cacheInfoPtr++ = 0;
+            }
+
             ret = compiledCache.WriteCacheInfo(infoCharNumber, cacheInfo, m_cachePath);
             if (ret != OH_NN_SUCCESS) {
                 LOGE("[NNCompiledCache] isUpdatable is true to write cache info failed.");
