@@ -273,7 +273,7 @@ HWTEST_F(EltwiseBuilderTest, eltwise_getprimitive_001, TestSize.Level1)
     LiteGraphTensorPtr expectPrimitive = {nullptr, DestroyLiteGraphPrimitive};
     EXPECT_NE(expectPrimitive, primitive);
     bool eltwiseModeReturn = mindspore::lite::MindIR_Eltwise_GetMode(primitive.get());
-    EXPECT_EQ(eltwiseModeReturn, eltwiseModeReturn);
+    EXPECT_EQ(false, eltwiseModeReturn);
 }
 
 /**
