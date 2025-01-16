@@ -191,12 +191,16 @@ OH_NN_ReturnCode NNExecutor::SetExtensionConfig(const std::unordered_map<std::st
 {
     if (m_executorConfig == nullptr) {
         m_executorConfig = new (std::nothrow) ExecutorConfig();
+        if (m_executorConfig == nullptr) {
+            LOGE("[NNExecutor] SetExtensionConfig, m_executorConfig create failed.");
+            return OH_NN_FAILED;
+        }
     }
 
     for (auto config : configs) {
         char* configData = reinterpret_cast<char*>(config.second.data());
         if (configData == nullptr) {
-            LOGD("[NNExecutor] SetExtensionConfig, key: %s, configData is nullptr.", config.first.c_str());
+            LOGE("[NNExecutor] SetExtensionConfig, key: %s, configData is nullptr.", config.first.c_str());
             return OH_NN_FAILED;
         }
 
