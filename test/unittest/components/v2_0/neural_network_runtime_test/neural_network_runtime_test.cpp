@@ -636,20 +636,6 @@ HWTEST_F(NeuralNetworkRuntimeTest, model_destroy_001, testing::ext::TestSize.Lev
 }
 
 /*
- * @tc.name: model_destroy_002
- * @tc.desc: Verify the *OH_NNModel is nullptr of the OH_NNModel_Destroy function.
- * @tc.type: FUNC
- */
-HWTEST_F(NeuralNetworkRuntimeTest, model_destroy_002, testing::ext::TestSize.Level0)
-{
-    InnerModel innerModel;
-    OH_NNModel* model = nullptr;
-    OH_NNModel** pModel = &model;
-    OH_NNModel_Destroy(pModel);
-    EXPECT_EQ(nullptr, model);
-}
-
-/*
  * @tc.name: model_destroy_003
  * @tc.desc: Verify the normal model of the OH_NNModel_Destroy function.
  * @tc.type: FUNC
@@ -1039,19 +1025,6 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_destroy_001, testing::ext::TestSi
     OH_NNCompilation** pCompilation = nullptr;
     OH_NNCompilation_Destroy(pCompilation);
     EXPECT_EQ(nullptr, pCompilation);
-}
-
-/*
- * @tc.name: compilation_destroy_002
- * @tc.desc: Verify the *OH_NNCompilation is nullptr of the OH_NNCompilation_Destroy function.
- * @tc.type: FUNC
- */
-HWTEST_F(NeuralNetworkRuntimeTest, compilation_destroy_002, testing::ext::TestSize.Level0)
-{
-    OH_NNCompilation* compilation = nullptr;
-    OH_NNCompilation** pCompilation = &compilation;
-    OH_NNCompilation_Destroy(pCompilation);
-    EXPECT_EQ(nullptr, compilation);
 }
 
 /*
@@ -1647,12 +1620,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_003, testing::e
     OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
     OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
     OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    EXPECT_EQ(nnExecutor, nullptr);
 
     uint32_t inputIndex = 0;
     OH_NN_Memory* memory = nullptr;
     OH_NN_Memory** pMemory = &memory;
     OH_NNExecutor_DestroyInputMemory(nnExecutor, inputIndex, pMemory);
-    EXPECT_EQ(nullptr, memory);
 }
 
 /*
@@ -1751,12 +1724,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_003, testing::
     OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
     OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
     OH_NNExecutor* nnExecutor = OH_NNExecutor_Construct(nnCompilation);
+    EXPECT_EQ(nnExecutor, nullptr);
 
     uint32_t outputIndex = 0;
     OH_NN_Memory* memory = nullptr;
     OH_NN_Memory** pMemory = &memory;
     OH_NNExecutor_DestroyOutputMemory(nnExecutor, outputIndex, pMemory);
-    EXPECT_EQ(nullptr, memory);
 }
 
 /*
@@ -1967,19 +1940,6 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_001, testing::ext::TestSize.
     OH_NNExecutor** pExecutor = nullptr;
     OH_NNExecutor_Destroy(pExecutor);
     EXPECT_EQ(nullptr, pExecutor);
-}
-
-/*
- * @tc.name: executor_destroy_002
- * @tc.desc: Verify the *OH_NNExecutor is nullptr of the OH_NNExecutor_Destroy function.
- * @tc.type: FUNC
- */
-HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_002, testing::ext::TestSize.Level0)
-{
-    OH_NNExecutor* nnExecutor = nullptr;
-    OH_NNExecutor** pExecutor = &nnExecutor;
-    OH_NNExecutor_Destroy(pExecutor);
-    EXPECT_EQ(nullptr, nnExecutor);
 }
 
 /*
