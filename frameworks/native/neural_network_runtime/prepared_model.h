@@ -42,6 +42,8 @@ public:
 
     virtual OH_NN_ReturnCode GetModelID(uint32_t& modelId) const = 0;
 
+    virtual OH_NN_ReturnCode ReleaseBuiltModel() = 0;
+
     virtual OH_NN_ReturnCode GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
                                                std::vector<std::vector<uint32_t>>& maxInputDims)
     {
