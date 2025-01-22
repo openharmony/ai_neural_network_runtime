@@ -53,7 +53,7 @@ public:
     OH_NN_ReturnCode GetInputDimRanges(std::vector<std::vector<uint32_t>>& minInputDims,
                                        std::vector<std::vector<uint32_t>>& maxInputDims) override;
 
-    OH_NN_ReturnCode ReleaseBuiltModel();
+    OH_NN_ReturnCode ReleaseBuiltModel() override;
 
 private:
     // first: major version, second: minor version

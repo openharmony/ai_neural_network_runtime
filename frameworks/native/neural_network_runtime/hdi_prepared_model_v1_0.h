@@ -49,7 +49,7 @@ public:
 
     OH_NN_ReturnCode GetModelID(uint32_t& modelId) const override;
 
-    OH_NN_ReturnCode ReleaseBuiltModel();
+    OH_NN_ReturnCode ReleaseBuiltModel() override;
 
 private:
     // first: major version, second: minor version
