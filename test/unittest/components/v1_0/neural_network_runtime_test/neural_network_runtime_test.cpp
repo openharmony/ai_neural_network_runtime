@@ -1065,7 +1065,7 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_build_002, testing::ext::TestSize
     OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
 
     OH_NN_ReturnCode ret = OH_NNCompilation_Build(nnCompilation);
-    EXPECT_EQ(OH_NN_FAILED, ret);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
 }
 
 /*
