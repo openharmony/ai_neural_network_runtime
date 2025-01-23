@@ -575,6 +575,12 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
     }
 
     ReleaseBuffer(tensorBuffers);
+    ret = m_preparedModel->ReleaseBuiltModel();
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNCompiler] ReleaseBuiltModel failed, error happened when release model cache.");
+        return ret;
+    }
+
     LOGI("[NNCompiler] Export model cache successfully.");
     return OH_NN_SUCCESS;
 }

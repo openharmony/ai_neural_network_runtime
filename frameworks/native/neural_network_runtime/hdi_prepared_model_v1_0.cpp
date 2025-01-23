@@ -286,5 +286,11 @@ OH_NN_ReturnCode HDIPreparedModelV1_0::GetModelID(uint32_t& modelId) const
     LOGE("hdi preparedModel V1_0 not support get model ID.");
     return OH_NN_SUCCESS;
 }
+
+OH_NN_ReturnCode HDIPreparedModelV1_0::ReleaseBuiltModel()
+{
+    LOGE("hdi preparedModel V1_0 not support ReleaseBuiltModel.");
+    return OH_NN_SUCCESS;
+}
 } // namespace NeuralNetworkRuntime
 } // OHOS
