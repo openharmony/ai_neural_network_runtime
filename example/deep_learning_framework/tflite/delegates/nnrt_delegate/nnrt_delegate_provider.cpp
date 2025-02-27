@@ -19,7 +19,7 @@
 #include "tensorflow/lite/tools/delegates/delegate_provider.h"
 
 #include "nnrt_delegate.h"
-#include "../nnrt/nnrt_implementation.h"
+#include "nnrt_implementation.h"
 
 namespace tflite {
 namespace tools {

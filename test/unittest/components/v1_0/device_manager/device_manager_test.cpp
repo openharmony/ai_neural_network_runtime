@@ -17,13 +17,13 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "common/log.h"
+#include "log.h"
 #include "hdi_device_v1_0.h"
 #include "test/unittest/common/v1_0/mock_idevice.h"
 
 #include "lite_graph_to_hdi_model_v1_0.h"
 #include "device.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
+#include "neural_network_runtime/neural_network_runtime_type.h"
 #include "nnbackend.h"
 #include "ops_registry.h"
 #include "transform.h"

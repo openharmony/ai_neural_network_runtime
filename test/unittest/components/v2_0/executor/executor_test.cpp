@@ -15,7 +15,7 @@
 
 #include "executor_test.h"
 
-#include "common/scoped_trace.h"
+#include "scoped_trace.h"
 #include "compilation.h"
 #include "inner_model.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"

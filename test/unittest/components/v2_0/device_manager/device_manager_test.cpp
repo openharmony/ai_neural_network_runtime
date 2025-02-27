@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "common/log.h"
+#include "log.h"
 #include "device_manager.h"
 #include "hdi_device_v2_0.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"

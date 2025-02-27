@@ -19,7 +19,7 @@
 #include <refbase.h>
 #include <gtest/gtest.h>
 
-#include "common/log.h"
+#include "log.h"
 #include "hdi_device_v2_0.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"
 

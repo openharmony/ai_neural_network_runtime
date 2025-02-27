@@ -18,7 +18,7 @@
 #include <functional>
 #include <string>
 
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime.h"
+#include "neural_network_runtime/neural_network_runtime.h"
 
 using namespace testing;
 using namespace testing::ext;

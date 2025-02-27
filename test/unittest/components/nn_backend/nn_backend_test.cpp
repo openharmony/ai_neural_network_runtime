@@ -18,7 +18,7 @@
 
 #include "nnbackend.h"
 #include "device.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
+#include "neural_network_runtime/neural_network_runtime_type.h"
 #include "backend_manager.h"
 
 using namespace testing;

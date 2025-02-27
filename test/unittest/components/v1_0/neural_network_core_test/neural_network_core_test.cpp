@@ -17,7 +17,7 @@
 #include <gmock/gmock.h>
 
 #include "nnbackend.h"
-#include "common/utils.h"
+#include "utils.h"
 #include "neural_network_core_test.h"
 #include "compilation.h"
 #include "tensor.h"
@@ -25,8 +25,8 @@
 #include "backend.h"
 #include "backend_manager.h"
 #include "backend_registrar.h"
-#include "common/log.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_core.h"
+#include "log.h"
+#include "neural_network_runtime/neural_network_core.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

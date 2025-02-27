@@ -16,7 +16,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "common/utils.h"
+#include "utils.h"
 #include "inner_model.h"
 #include "hdi_device_v1_0.h"
 #include "ops/div_builder.h"

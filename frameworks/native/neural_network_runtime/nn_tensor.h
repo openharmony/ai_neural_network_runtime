@@ -21,8 +21,8 @@
 
 #include "cpp_type.h"
 #include "tensor_desc.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
-#include "interfaces/innerkits/c/neural_network_runtime_inner.h"
+#include "neural_network_runtime/neural_network_runtime_type.h"
+#include "neural_network_runtime_inner.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

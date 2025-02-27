@@ -16,7 +16,7 @@
 #ifndef NEURAL_NETWORK_RUNTIME_TRANSFORM_H
 #define NEURAL_NETWORK_RUNTIME_TRANSFORM_H
 
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
+#include "neural_network_runtime/neural_network_runtime_type.h"
 #include "cpp_type.h"
 #include "mindir.h"
 #include "mindir_types.h"

@@ -20,7 +20,7 @@
 #include <vector>
 #include <memory>
 
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
+#include "neural_network_runtime/neural_network_runtime_type.h"
 #include "cpp_type.h"
 #include "tensor_desc.h"
 #include "prepared_model.h"

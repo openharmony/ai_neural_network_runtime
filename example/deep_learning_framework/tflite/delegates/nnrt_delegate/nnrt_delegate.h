@@ -24,7 +24,7 @@
 #include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/delegates/serialization.h"
 
-#include "../nnrt/nnrt_implementation.h"
+#include "nnrt_implementation.h"
 
 namespace tflite {
 namespace delegate {

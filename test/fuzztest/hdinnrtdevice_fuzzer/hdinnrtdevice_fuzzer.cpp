@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 #include "hdinnrtdevice_fuzzer.h"
-#include "../data.h"
-#include "../nnrt_device_impl.h"
-#include "../../../common/log.h"
+#include "data.h"
+#include "nnrt_device_impl.h"
+#include "log.h"
 
 #include <v2_0/nnrt_device_stub.h>
 #include "message_parcel.h"
