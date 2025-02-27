@@ -21,7 +21,7 @@
 #include <memory>
 #include <vector>
 
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime.h"
+#include "neural_network_runtime/neural_network_runtime.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

@@ -16,11 +16,11 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "common/log.h"
+#include "log.h"
 #include "backend_manager.h"
 #include "nnbackend.h"
 #include "nntensor.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
+#include "neural_network_runtime/neural_network_runtime_type.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

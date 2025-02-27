@@ -22,8 +22,8 @@
 #include "mindir.h"
 #include "ops_builder.h"
 #include "tensor_desc.h"
-#include "interfaces/innerkits/c/neural_network_runtime_inner.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime.h"
+#include "neural_network_runtime_inner.h"
+#include "neural_network_runtime/neural_network_runtime.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

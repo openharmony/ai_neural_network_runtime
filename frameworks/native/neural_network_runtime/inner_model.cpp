@@ -21,8 +21,8 @@
 
 #include "securec.h"
 
-#include "common/utils.h"
-#include "common/scoped_trace.h"
+#include "utils.h"
+#include "scoped_trace.h"
 #include "backend_manager.h"
 #include "validation.h"
 #include "ops_builder.h"

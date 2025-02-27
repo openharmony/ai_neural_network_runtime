@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "interfaces/innerkits/c/neural_network_runtime_inner.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime.h"
+#include "neural_network_runtime_inner.h"
+#include "neural_network_runtime/neural_network_runtime.h"
 
 #include "compilation.h"
 #include "executor.h"
 #include "inner_model.h"
-#include "common/log.h"
+#include "log.h"
 #include "quant_param.h"
 #include "validation.h"
 #include "syspara/parameter.h"

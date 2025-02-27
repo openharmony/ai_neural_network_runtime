@@ -21,7 +21,7 @@
 #include <memory>
 
 #include "device.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime.h"
+#include "neural_network_runtime/neural_network_runtime.h"
 #include "tensor_desc.h"
 
 namespace OHOS {

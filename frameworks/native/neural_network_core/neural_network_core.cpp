@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "interfaces/kits/c/neural_network_runtime/neural_network_core.h"
+#include "neural_network_runtime/neural_network_core.h"
 
 #include <string>
 #include <securec.h>
@@ -22,7 +22,7 @@
 #include <future>
 #include <thread>
 
-#include "common/log.h"
+#include "log.h"
 #include "executor.h"
 #include "tensor.h"
 #include "compilation.h"

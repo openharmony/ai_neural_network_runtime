@@ -21,7 +21,7 @@
 #include <limits>
 #include <cstdio>
 
-#include "common/utils.h"
+#include "utils.h"
 #include "backend_manager.h"
 #include "nnbackend.h"
 

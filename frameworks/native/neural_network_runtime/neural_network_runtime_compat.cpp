@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "interfaces/innerkits/c/neural_network_runtime_inner.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime.h"
+#include "neural_network_runtime_inner.h"
+#include "neural_network_runtime/neural_network_runtime.h"
 
 #include "compilation.h"
 #include "nnexecutor.h"
 #include "inner_model.h"
-#include "common/log.h"
+#include "log.h"
 
 
 using namespace OHOS::NeuralNetworkRuntime;
