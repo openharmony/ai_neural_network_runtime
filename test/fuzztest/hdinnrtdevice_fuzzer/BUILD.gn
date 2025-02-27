@@ -34,13 +34,13 @@ ohos_fuzztest("HdiNnrtDeviceFuzzTest") {
   sources = [ "hdinnrtdevice_fuzzer.cpp" ]
 
   external_deps = [
-    "bounds_checking_function::libsec_shared",
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_stub_2.0",
     "hdf_core:libhdi",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "neural_network_runtime::neural_network_core",
-    "neural_network_runtime::neural_network_runtime",
+    "neural_network_runtime:libneural_network_core",
+    "neural_network_runtime:libneural_network_runtime",
   ]
 }
