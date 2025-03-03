@@ -18,9 +18,7 @@ module_output_path = "neural_network_runtime/"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [
-    "../../..",
-  ]
+  include_dirs = [ "../../.." ]
 }
 
 ohos_unittest("OpsUnittest") {
@@ -151,10 +149,10 @@ ohos_unittest("OpsUnittest") {
 
   external_deps = [
     "drivers_interface_nnrt:libnnrt_proxy_2.1",
-    "hilog:libhilog",
-    "hitrace:hitrace_meter",
     "googletest:gmock_main",
     "googletest:gtest_main",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",

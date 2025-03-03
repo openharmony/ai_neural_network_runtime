@@ -37,10 +37,10 @@ ohos_unittest("NeuralNetworkRuntimeInnerTest") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
+    "googletest:gtest_main",
     "hdf_core:libhdf_utils",
     "hilog:libhilog",
     "hitrace:libhitracechain",
-    "googletest:gtest_main",
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
