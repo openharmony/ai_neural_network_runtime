@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "common/log.h"
+#include "log.h"
 #include "hdi_prepared_model_v1_0.h"
 #include "memory_manager.h"
 #include "transform.h"

@@ -20,8 +20,8 @@
 #include "device.h"
 #include "nnbackend.h"
 #include "backend_manager.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
-#include "common/utils.h"
+#include "neural_network_runtime/neural_network_runtime_type.h"
+#include "utils.h"
 
 using namespace testing;
 using namespace testing::ext;

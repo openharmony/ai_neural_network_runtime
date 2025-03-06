@@ -16,8 +16,8 @@
 #include <string>
 
 #include "hdi_device_v1_0.h"
-#include "common/log.h"
-#include "common/utils.h"
+#include "log.h"
+#include "utils.h"
 #include "nnbackend.h"
 #include "backend_registrar.h"
 

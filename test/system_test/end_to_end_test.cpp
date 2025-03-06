@@ -23,8 +23,8 @@
 
 #include "securec.h"
 
-#include "common/log.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime.h"
+#include "log.h"
+#include "neural_network_runtime/neural_network_runtime.h"
 
 namespace fs = std::filesystem;
 

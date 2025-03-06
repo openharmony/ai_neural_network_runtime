@@ -18,6 +18,7 @@ config("nnrt_config") {
   cflags_cc = [ "-fexceptions" ]
   include_dirs = [
     "./",
+    "../../../common",
     "../neural_network_core",
     "../../../interfaces/innerkits/c",
     "../../../interfaces/kits/c",
@@ -194,7 +195,7 @@ ohos_shared_library("libneural_network_runtime") {
     "hitrace:libhitracechain",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "mindspore:mindir",
+    "mindspore:mindir_lib",
   ]
 
   deps = [ "../neural_network_core:libneural_network_core" ]

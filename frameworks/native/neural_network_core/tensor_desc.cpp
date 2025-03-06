@@ -15,7 +15,7 @@
 
 #include "tensor_desc.h"
 #include "validation.h"
-#include "common/log.h"
+#include "log.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

@@ -16,8 +16,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "common/utils.h"
-#include "common/log.h"
+#include "utils.h"
+#include "log.h"
 #include "nn_tensor.h"
 #include "inner_model.h"
 
@@ -25,7 +25,7 @@
 
 #include "lite_graph_to_hdi_model_v2_1.h"
 #include "device.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
+#include "neural_network_runtime/neural_network_runtime_type.h"
 #include "nnbackend.h"
 #include "ops_registry.h"
 #include "transform.h"

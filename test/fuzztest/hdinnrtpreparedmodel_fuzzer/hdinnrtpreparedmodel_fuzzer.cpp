@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 #include "hdinnrtpreparedmodel_fuzzer.h"
-#include "../data.h"
-#include "../nnrt_prepare_model_impl.h"
-#include "../../../common/log.h"
+#include "data.h"
+#include "nnrt_prepare_model_impl.h"
+#include "log.h"
 
 #include <v2_0/prepared_model_stub.h>
 #include "message_parcel.h"

@@ -21,9 +21,9 @@
 #include "nnbackend.h"
 #include "device.h"
 #include "prepared_model.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
-#include "common/utils.h"
-#include "common/log.h"
+#include "neural_network_runtime/neural_network_runtime_type.h"
+#include "utils.h"
+#include "log.h"
 
 using namespace testing;
 using namespace testing::ext;

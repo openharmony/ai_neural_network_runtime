@@ -14,7 +14,7 @@
  */
 #ifndef OHOS_HDI_NNRT_V2_0_NNRTDEVICEIMPL_H
 #define OHOS_HDI_NNRT_V2_0_NNRTDEVICEIMPL_H
-#include "../../common/log.h"
+#include "log.h"
 
 #include "v2_0/innrt_device.h"
 

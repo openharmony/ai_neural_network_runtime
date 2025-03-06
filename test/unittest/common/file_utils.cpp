@@ -18,7 +18,7 @@
 #include <unistd.h>
 #include <fstream>
 
-#include "common/log.h"
+#include "log.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

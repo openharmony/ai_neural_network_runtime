@@ -16,7 +16,7 @@
 #ifndef TENSORFLOW_LITE_EXAMPLES_LABEL_CLASSIFY_UTILS_H
 #define TENSORFLOW_LITE_EXAMPLES_LABEL_CLASSIFY_UTILS_H
 
-#include "../label_classify/label_classify.h"
+#include "label_classify.h"
 
 #include "sys/time.h"
 

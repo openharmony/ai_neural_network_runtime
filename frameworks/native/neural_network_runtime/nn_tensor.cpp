@@ -20,7 +20,7 @@
 #include "nn_tensor.h"
 #include "validation.h"
 #include "transform.h"
-#include "common/log.h"
+#include "log.h"
 #include "mindir.h"
 #include "mindir_types.h"
 #include "quant_param.h"

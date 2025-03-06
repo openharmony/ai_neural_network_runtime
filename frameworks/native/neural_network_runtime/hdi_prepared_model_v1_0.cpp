@@ -15,7 +15,7 @@
 
 #include "hdi_prepared_model_v1_0.h"
 
-#include "common/log.h"
+#include "log.h"
 #include "memory_manager.h"
 #include "nntensor.h"
 

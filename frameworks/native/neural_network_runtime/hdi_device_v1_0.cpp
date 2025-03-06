@@ -22,8 +22,8 @@
 #include "lite_graph_to_hdi_model_v1_0.h"
 #include "memory_manager.h"
 #include "transform.h"
-#include "common/log.h"
-#include "common/utils.h"
+#include "log.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

@@ -16,8 +16,8 @@
 #include "nnbackend.h"
 
 #include <new>
-#include "common/log.h"
-#include "common/utils.h"
+#include "log.h"
+#include "utils.h"
 #include "nncompiler.h"
 #include "nnexecutor.h"
 #include "nntensor.h"
