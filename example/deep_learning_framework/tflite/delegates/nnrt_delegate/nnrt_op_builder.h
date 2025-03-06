@@ -23,7 +23,7 @@
 #include "tensorflow/lite/kernels/kernel_util.h"
 #include "tensorflow/lite/minimal_logging.h"
 
-#include "../nnrt/nnrt_implementation.h"
+#include "nnrt_implementation.h"
 #include "tensor_mapping.h"
 
 namespace tflite {

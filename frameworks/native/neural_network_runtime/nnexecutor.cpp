@@ -16,12 +16,12 @@
 
 #include "nnexecutor.h"
 #include "nntensor.h"
-#include "common/log.h"
+#include "log.h"
 #include "cpp_type.h"
 
 #include "securec.h"
-#include "common/utils.h"
-#include "common/scoped_trace.h"
+#include "utils.h"
+#include "scoped_trace.h"
 #include "transform.h"
 
 namespace OHOS {

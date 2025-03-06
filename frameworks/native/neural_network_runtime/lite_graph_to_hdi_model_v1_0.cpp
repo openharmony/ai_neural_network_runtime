@@ -17,7 +17,7 @@
 #include <vector>
 #include <algorithm>
 #include <sys/mman.h>
-#include "common/log.h"
+#include "log.h"
 #include "message_parcel.h"
 #include "nnrt/v1_0/nnrt_types.h"
 #include "nnrt/v1_0/node_attr_types.h"

@@ -17,7 +17,7 @@
 
 #include "mindir.h"
 
-#include "common/utils.h"
+#include "utils.h"
 #include "compilation.h"
 #include "hdi_device_v1_0.h"
 #include "test/unittest/common/v1_0/mock_idevice.h"

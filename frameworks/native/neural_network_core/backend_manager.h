@@ -26,7 +26,7 @@
 #include <functional>
 
 #include "backend.h"
-#include "common/log.h"
+#include "log.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

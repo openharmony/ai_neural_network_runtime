@@ -18,7 +18,7 @@
 #include <dlfcn.h>
 #include <string>
 
-#include "common/log.h"
+#include "log.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

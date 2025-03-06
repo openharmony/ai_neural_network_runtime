@@ -18,7 +18,7 @@
 
 #include <cstdint>
 
-#include "../../common/log.h"
+#include "log.h"
 #include "securec.h"
 
 namespace OHOS {

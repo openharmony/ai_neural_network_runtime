@@ -21,6 +21,7 @@ config("nnrt_config") {
 config("nnrt_public_config") {
   include_dirs = [
     "./",
+    "../../../common",
     "../neural_network_runtime",
     "../../../interfaces/innerkits/c",
     "../../../interfaces/kits/c",

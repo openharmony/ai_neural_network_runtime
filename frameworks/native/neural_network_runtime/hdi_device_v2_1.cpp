@@ -24,8 +24,8 @@
 #include "hdi_returncode_utils_v2_1.h"
 #include "memory_manager.h"
 #include "transform.h"
-#include "common/log.h"
-#include "common/utils.h"
+#include "log.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

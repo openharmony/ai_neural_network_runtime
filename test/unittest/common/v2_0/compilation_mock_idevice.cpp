@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "common/utils.h"
+#include "utils.h"
 #include "hdi_device_v2_0.h"
 #include "nn_tensor.h"
 #include "test/unittest/common/v2_0/mock_idevice.h"

@@ -20,7 +20,7 @@
 #include <unistd.h>
 
 #include "cpp_type.h"
-#include "common/log.h"
+#include "log.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

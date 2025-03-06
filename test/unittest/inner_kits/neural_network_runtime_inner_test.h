@@ -16,7 +16,7 @@
 #ifndef NEURAL_NETWORK_RUNTIME_INNER_UNITTEST_H
 #define NEURAL_NETWORK_RUNTIME_INNER_UNITTEST_H
 
-#include "interfaces/innerkits/c/neural_network_runtime_inner.h"
+#include "neural_network_runtime_inner.h"
 #include <gtest/gtest.h>
 
 namespace OHOS {

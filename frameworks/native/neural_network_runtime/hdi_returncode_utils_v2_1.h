@@ -20,7 +20,7 @@
 #include <cstring>
 #include <unordered_map>
 #include <v2_1/nnrt_types.h>
-#include "common/log.h"
+#include "log.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

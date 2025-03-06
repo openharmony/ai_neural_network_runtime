@@ -22,7 +22,7 @@
 
 #include "validation.h"
 #include "nncompiled_cache.h"
-#include "common/utils.h"
+#include "utils.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {

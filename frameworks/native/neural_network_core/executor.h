@@ -23,7 +23,7 @@
 #include "compiler.h"
 #include "tensor_desc.h"
 #include "executor_config.h"
-#include "interfaces/kits/c/neural_network_runtime/neural_network_runtime_type.h"
+#include "neural_network_runtime/neural_network_runtime_type.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
