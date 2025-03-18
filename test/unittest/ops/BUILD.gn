@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 
-module_output_path = "neural_network_runtime/"
+module_output_path = "neural_network_runtime/neural_network_runtime"
 
 config("module_private_config") {
   visibility = [ ":*" ]
