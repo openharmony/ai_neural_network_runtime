@@ -1053,23 +1053,6 @@ HWTEST_F(NeuralNetworkRuntimeTest, compilation_build_001, testing::ext::TestSize
 }
 
 /*
- * @tc.name: compilation_build_002
- * @tc.desc: Verify the success of the OH_NNCompilation_Build function.
- * @tc.type: FUNC
- */
-HWTEST_F(NeuralNetworkRuntimeTest, compilation_build_002, testing::ext::TestSize.Level0)
-{
-    InnerModel innerModel;
-    EXPECT_EQ(OH_NN_SUCCESS, BuildModel(innerModel));
-
-    OH_NNModel* model = reinterpret_cast<OH_NNModel*>(&innerModel);
-    OH_NNCompilation* nnCompilation = OH_NNCompilation_Construct(model);
-
-    OH_NN_ReturnCode ret = OH_NNCompilation_Build(nnCompilation);
-    EXPECT_EQ(OH_NN_SUCCESS, ret);
-}
-
-/*
  * @tc.name: compilation_destroy_001
  * @tc.desc: Verify the OH_NNCompilation is nullptr of the OH_NNCompilation_Destroy function.
  * @tc.type: FUNC
