@@ -28,6 +28,7 @@
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 const uint32_t SUPPORT_NUM_BIT = 8; // Currently support 8-bit quantization only
+constexpr size_t DIM_MAX_NUM = 200;
 
 void DestroyLiteGraphTensor(void* tensor)
 {
@@ -234,6 +235,10 @@ OH_NN_ReturnCode NNTensor::ValidateDimensions(const std::vector<int32_t>& dimens
     uint64_t elementCount {1};
     uint64_t dataLength {static_cast<uint64_t>(GetTypeSize(m_dataType))};
     m_isDynamicShape = false;
+    if (dimensions.size() > DIM_MAX_NUM) {
+        LOGE("ParseDimension failed, dimensions more than 200.");
+        return OH_NN_INVALID_PARAMETER;
+    }
     for (int32_t dim : dimensions) {
         if (dim < -1 || dim == 0) {
             LOGE("ParseDimension failed, dimension of OH_NN_Tensor cannot be 0 or less than -1, receive %d.", dim);

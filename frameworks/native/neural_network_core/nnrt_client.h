@@ -41,6 +41,7 @@ public:
     int (*Scheduling)(uint32_t hiaiModelId, bool* needModelLatency, const char* cachePath) = nullptr;
     int (*UpdateModelLatency)(uint32_t hiaiModelId, int modelLatency) = nullptr;
     int (*Unload)(uint32_t hiaiModelId) = nullptr;
+    bool (*PullUpDlliteService)() = nullptr;
 
 private:
     bool m_serviceAvailable = false;
