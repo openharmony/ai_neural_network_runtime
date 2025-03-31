@@ -418,7 +418,7 @@ OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath
     struct stat sb;
     if (fstat(fd, &sb) == -1) {
         close(fd);
-        LOGE("[NNCompiledCache] ReadCacheModelFile failed, get file %{public}s state failed.", filePath,c_str());
+        LOGE("[NNCompiledCache] ReadCacheModelFile failed, get file %{public}s state failed.", filePath.c_str());
         return OH_NN_MEMORY_ERROR;
     }
 
