@@ -195,8 +195,8 @@ ohos_shared_library("libneural_network_runtime") {
     "hitrace:libhitracechain",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "mindspore:mindir_lib",
     "json:nlohmann_json_static",
+    "mindspore:mindir_lib",
   ]
 
   deps = [ "../neural_network_core:libneural_network_core" ]
