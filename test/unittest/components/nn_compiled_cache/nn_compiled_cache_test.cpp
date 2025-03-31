@@ -69,6 +69,7 @@ public:
     MOCK_METHOD1(ReleaseBuffer, OH_NN_ReturnCode(const void*));
     MOCK_METHOD2(AllocateBuffer, OH_NN_ReturnCode(size_t, int&));
     MOCK_METHOD2(ReleaseBuffer, OH_NN_ReturnCode(int, size_t));
+    MOCK_METHOD1(ReadOpVersion, OH_NN_ReturnCode(int&));
 };
 
 /**
@@ -477,7 +478,7 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_writecacheinfo_001, TestSize.L
     NNCompiledCache nncompiledCache;
 
     uint32_t cacheSize = 1;
-    std::unique_ptr<int64_t[]> cacheInfo = std::make_unique<int64_t[]>(cacheSize);
+    nlohmann::json cacheInfo;
     std::string cacheDir = "mock";
 
     OH_NN_ReturnCode ret = nncompiledCache.WriteCacheInfo(cacheSize, cacheInfo, cacheDir);
@@ -495,7 +496,7 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_writecacheinfo_002, TestSize.L
     NNCompiledCache nncompiledCache;
 
     uint32_t cacheSize = 1;
-    std::unique_ptr<int64_t[]> cacheInfo = std::make_unique<int64_t[]>(cacheSize);
+    nlohmann::json cacheInfo;
     std::string cacheDir = "/data/data";
 
     OH_NN_ReturnCode ret = nncompiledCache.WriteCacheInfo(cacheSize, cacheInfo, cacheDir);
