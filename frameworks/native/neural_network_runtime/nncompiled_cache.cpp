@@ -253,7 +253,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
         LOGE("ParseStr failed due to strncpy_s error");
         return OH_NN_INVALID_PARAMETER;
     }
-    
+
     cacheInfo["CheckSum"] = static_cast<int64_t>(CacheInfoGetCrc16(cacheInfoData, dataLength));
 
     return OH_NN_SUCCESS;
@@ -303,14 +303,13 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
 
     std::string content((std::istreambuf_iterator<char>(infoCacheFile)), std::istreambuf_iterator<char>());
     infoCacheFile.close();
-
     if (!nlohmann::json::accept(content)) {
         LOGE("[NNCompiledCache] CheckCacheInfo JSON parse error");
         return OH_NN_INVALID_FILE;
     }
 
-    // Parse the json string
-    nlohmann::json j = nlomann::json::parse(content);
+    // Parse the JSON string
+    nlohmann::json j = nlohmann::json::parse(content);
     // modelCacheInfo.deviceId type is int64_t,
     // it is transformed from size_t value, so the transform here will not truncate value.
     if (j.find("data") == j.end()) {
@@ -318,13 +317,13 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
         return OH_NN_INVALID_FILE;
     }
 
-    if(j["data"].find("deviceId") == j["data"].end()) {
+    if (j["data"].find("deviceId") == j["data"].end()) {
         LOGE("[NNCompiledCache] CheckCacheInfo read deviceId from cache info file failed.");
         return OH_NN_INVALID_FILE;
     }
     modelCacheInfo.deviceId = j["data"]["deviceId"].get<int64_t>();
 
-    if(j["data"].find("version") == j["data"].end()) {
+    if (j["data"].find("version") == j["data"].end()) {
         LOGE("[NNCompiledCache] CheckCacheInfo read version from cache info file failed.");
         return OH_NN_INVALID_FILE;
     }
@@ -338,7 +337,7 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
         return OH_NN_INVALID_PARAMETER;
     }
 
-    if(j["data"].find("fileNumber") == j["data"].end()) {
+    if (j["data"].find("fileNumber") == j["data"].end()) {
         LOGE("[NNCompiledCache] CheckCacheInfo read fileNumber from cache info file failed.");
         return OH_NN_INVALID_FILE;
     }
@@ -347,11 +346,12 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
     return CheckCacheInfoExtension(modelCacheInfo, j);
 }
 
-OH_NN_ReturnCode NNCompiledCache::CheckCacheInfoExtension(NNCompiledCacheInfo& modelCacheInfo, nlohmann::json& j) const
+OH_NN_ReturnCode NNCompiledCache::CheckCacheInfoExtension(NNCompiledCacheInfo& modelCacheInfo,
+                                                          nlohmann::json& j) const
 {
     const size_t dataLength = j["data"].dump().length();
     char jData[dataLength + 1];
-    if (strncpy(jData, dataLength+1, j["data"].dump().c_str(), dataLength != 0)) {
+    if (strncpy_s(jData, dataLength+1, j["data"].dump().c_str(), dataLength) != 0) {
         LOGE("[NNCompiledCache] ParseStr failed due to strncpy_s error.");
         return OH_NN_INVALID_FILE;
     }
@@ -368,8 +368,8 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfoExtension(NNCompiledCacheInfo& m
     std::vector<int64_t> modelCheckSum;
     modelCheckSum.resize(modelCacheInfo.fileNumber);
     modelCacheInfo.modelCheckSum.resize(modelCacheInfo.fileNumber);
-    if(j["data"].find("modelCheckSum") == j["data"].end()) {
-        LOGE("[NNCompiledCache] CheckCacheInfo read cache file failed.");
+    if (j["data"].find("modelCheckSum") == j["data"].end()) {
+        LOGE("[NNCompiledCache] CheckCacheInfo read modelCheckSum from cache file failed.");
         return OH_NN_INVALID_FILE;
     }
     for (uint32_t i = 0; i < modelCacheInfo.fileNumber; ++i) {
@@ -422,6 +422,8 @@ OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath
         return OH_NN_MEMORY_ERROR;
     }
 
+    off_t fsize = sb.st_size;
+
     void *ptr = mmap(NULL, fsize, PROT_READ, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
         LOGE("[NNCompiledCache] ReadCacheModelFile failed, failed to mmap file.");
@@ -448,14 +450,14 @@ unsigned short NNCompiledCache::GetCrc16(char* buffer, size_t length) const
     } else {
         size_t step = length / MAX_CACHE_SIZE;
         while (length > sizeof(unsigned short) * step + 1) {
-            sum += *(reinterpret_cast<unsigned short *>(buffer));
+            sum += *(reinterpret_cast<unsigned short*>(buffer));
             length -= step * sizeof(unsigned short);
             buffer += step * sizeof(unsigned short);
         }
     }
 
     if (length > 0) {
-        buffer += length -1;
+        buffer += length - 1;
         sum += *(reinterpret_cast<unsigned char*>(buffer));
     }
 

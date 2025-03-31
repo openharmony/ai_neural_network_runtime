@@ -14,7 +14,7 @@
  */
 
 #include "nncompiler.h"
-#include "neural_network_runtime/neural_network_core.h"
+#include "neural_network_runtime/neural_network_runtime.h"
 
 #include <sys/stat.h>
 #include <fstream>
@@ -562,8 +562,8 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
     tensorBuffers.emplace_back(outputTensorDescBuffer);
 
     compiledCache.SetModelName(m_extensionConfig.modelName);
-    ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion);
     compiledCache.SetIsExceedRamLimit(m_extensionConfig.isExceedRamLimit);
+    ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] SaveToCacheFile failed, error happened when saving model cache.");
         ReleaseBuffer(tensorBuffers);
@@ -684,9 +684,9 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
             cacheInfo["data"]["opVersion"] = currentOpVersion;
             cacheInfo["data"]["isExceedRamLimit"] = modelCacheInfo.isExceedRamLimit ? 1 : 0;
 
-            const size_t dataLength cacheInfo["data"].dump().length();
+            const size_t dataLength = cacheInfo["data"].dump().length();
             char cacheInfoData[dataLength + 1];
-            if (strncpy_s(cacheInfoData, dataLength+1, cacheInfo["data"].dump().c_str(), dataLength != 0)) {
+            if (strncpy_s(cacheInfoData, dataLength+1, cacheInfo["data"].dump().c_str(), dataLength) != 0) {
                 LOGE("ParseStr failed due to strncpy_s error");
                 return OH_NN_INVALID_PARAMETER;
             }
