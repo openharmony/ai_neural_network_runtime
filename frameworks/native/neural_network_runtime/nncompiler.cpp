@@ -14,7 +14,6 @@
  */
 
 #include "nncompiler.h"
-#include "neural_network_runtime/neural_network_runtime.h"
 
 #include <sys/stat.h>
 #include <fstream>

@@ -20,10 +20,10 @@
 #include "executor.h"
 #include "inner_model.h"
 #include "log.h"
+#include "utils.h"
 #include "quant_param.h"
 #include "validation.h"
 #include "syspara/parameter.h"
-#include "securec.h"
 
 #include <cstring>
 #include <fstream>
@@ -54,26 +54,6 @@ constexpr size_t FILE_NUMBER_MAX = 100; // 限制cache文件数量最大为100
 constexpr size_t EXTENSION_MAX_SIZE = 200; // 限制MS传过来的参数最多为200
 constexpr size_t INPUT_MAX_COUNT = 200; // 限制模型最大输入个数为200
 constexpr int32_t HEX_UNIT = 16;
-
-unsigned short CacheInfoGetCrc16(char* buffer, size_t length)
-{
-    unsigned int sum = 0;
-    while (length > 1) {
-        sum += *(reinterpret_cast<unsigned short*>(buffer));
-        length -= sizeof(unsigned short);
-        buffer += sizeof(unsigned short);
-    }
-
-    if (length > 0) {
-        sum += *(reinterpret_cast<unsigned char*>(buffer));
-    }
-
-    while (sum >> HEX_UNIT) {
-        sum = (sum >> HEX_UNIT) + (sum & 0xffff);
-    }
-
-    return static_cast<unsigned short>(~sum);
-}
 
 NNRT_API NN_QuantParam *OH_NNQuantParam_Create()
 {
