@@ -1706,7 +1706,8 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunSync(OH_NNExecutor *executor,
         LOGE("OH_NNExecutor_RunSync failed, inputTensor is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
-    if (inputCount == 0 || (inputCount > INPUT_OUTPUT_MAX_INDICES)) {
+
+    if ((inputCount == 0) || (inputCount > INPUT_OUTPUT_MAX_INDICES)) {
         LOGE("OH_NNExecutor_RunSync failed, inputCount is 0 or more than 200.");
         return OH_NN_INVALID_PARAMETER;
     }
@@ -1714,7 +1715,7 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunSync(OH_NNExecutor *executor,
         LOGE("OH_NNExecutor_RunSync failed, outputTensor is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
-    if (outputCount == 0 || (outputCount > INPUT_OUTPUT_MAX_INDICES)) {
+    if ((outputCount == 0) || (outputCount > INPUT_OUTPUT_MAX_INDICES)) {
         LOGE("OH_NNExecutor_RunSync failed, outputCount is 0 or more than 200.");
         return OH_NN_INVALID_PARAMETER;
     }
@@ -1739,7 +1740,7 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunAsync(OH_NNExecutor *executor,
         LOGE("OH_NNExecutor_RunAsync failed, inputTensor is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
-    if (inputCount == 0 || (inputCount > INPUT_OUTPUT_MAX_INDICES)) {
+    if ((inputCount == 0) || (inputCount > INPUT_OUTPUT_MAX_INDICES)) {
         LOGE("OH_NNExecutor_RunAsync failed, inputCount is 0 or more than 200.");
         return OH_NN_INVALID_PARAMETER;
     }
@@ -1747,7 +1748,7 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunAsync(OH_NNExecutor *executor,
         LOGE("OH_NNExecutor_RunAsync failed, outputTensor is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
-    if (outputCount == 0 || (outputCount > INPUT_OUTPUT_MAX_INDICES)) {
+    if ((outputCount == 0) || (outputCount > INPUT_OUTPUT_MAX_INDICES)) {
         LOGE("OH_NNExecutor_RunAsync failed, outputCount is 0 or more than 200.");
         return OH_NN_INVALID_PARAMETER;
     }

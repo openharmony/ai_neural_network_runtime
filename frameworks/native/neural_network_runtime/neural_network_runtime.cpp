@@ -51,9 +51,9 @@ const std::string HARDWARE_NAME = "const.ai.nnrt_deivce";
 const std::string HARDWARE_VERSION = "v5_0";
 constexpr size_t HARDWARE_NAME_MAX_LENGTH = 128;
 constexpr size_t FILE_NUMBER_MAX = 100; // 限制cache文件数量最大为100
-constexpr size_t EXTENSION_MAX_SIZE =200; // 限制MS传过来的参数最多为200
+constexpr size_t EXTENSION_MAX_SIZE = 200; // 限制MS传过来的参数最多为200
 constexpr size_t INPUT_MAX_COUNT = 200; // 限制模型最大输入个数为200
-constexpr int32_t HEX_UINT = 16;
+constexpr int32_t HEX_UNIT = 16;
 
 unsigned short CacheInfoGetCrc16(char* buffer, size_t length)
 {
@@ -536,7 +536,7 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
     }
 
     if (extensionSize > EXTENSION_MAX_SIZE) {
-        LOGE("OH_NNModel_BuildFromLiteGraph failed, extension more than 200.");
+        LOGE("OH_NNModel_BuildFromLiteGraph failed, extensionSize more than 200.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -607,13 +607,13 @@ OH_NN_ReturnCode CheckCacheFileExtension(const std::string& content, int64_t& fi
         return OH_NN_INVALID_FILE;
     }
 
-    if(j["data"].find("fileNumber") == j["data"].end()) {
+    if (j["data"].find("fileNumber") == j["data"].end()) {
         LOGE("OH_NNModel_HasCache read fileNumber from cache info file failed.");
         return OH_NN_INVALID_FILE;
     }
     fileNumber = j["data"]["fileNumber"].get<int>();
 
-    if(j["data"].find("version") == j["data"].end()) {
+    if (j["data"].find("version") == j["data"].end()) {
         LOGE("OH_NNModel_HasCache read version from cache info file failed.");
         return OH_NN_INVALID_FILE;
     }
@@ -626,7 +626,7 @@ OH_NN_ReturnCode CheckCacheFileExtension(const std::string& content, int64_t& fi
     const size_t dataLength = j["data"].dump().length();
     char jData[dataLength + 1];
 
-    if (strncpy(jData, dataLength+1, j["data"].dump().c_str(), dataLength != 0)) {
+    if (strncpy_s(jData, dataLength+1, j["data"].dump().c_str(), dataLength) != 0) {
         LOGE("OH_NNModel_HasCache ParseStr failed due to strncpy_s error.");
         return OH_NN_INVALID_FILE;
     }

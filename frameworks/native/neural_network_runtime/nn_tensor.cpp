@@ -239,6 +239,7 @@ OH_NN_ReturnCode NNTensor::ValidateDimensions(const std::vector<int32_t>& dimens
         LOGE("ParseDimension failed, dimensions more than 200.");
         return OH_NN_INVALID_PARAMETER;
     }
+
     for (int32_t dim : dimensions) {
         if (dim < -1 || dim == 0) {
             LOGE("ParseDimension failed, dimension of OH_NN_Tensor cannot be 0 or less than -1, receive %d.", dim);

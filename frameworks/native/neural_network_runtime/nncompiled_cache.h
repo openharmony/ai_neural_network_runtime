@@ -24,7 +24,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "nlohmann/json.cpp"
+#include "nlohmann/json.hpp"
 
 #include "device.h"
 #include "neural_network_runtime/neural_network_runtime.h"
