@@ -51,25 +51,6 @@ std::unique_ptr<T> CreateUniquePtr(Args&&... args)
 
 std::string GenUniqueName(const std::string&, const std::string&, const std::string&);
 
-unsigned short CacheInfoGetCrc16(char* buffer, size_t length)
-{
-    unsigned int sum = 0;
-    while (length > 1) {
-        sum += *(reinterpret_cast<unsigned short*>(buffer));
-        length -= sizeof(unsigned short);
-        buffer += sizeof(unsigned short);
-    }
-
-    if (length > 0) {
-        sum += *(reinterpret_cast<unsigned char*>(buffer));
-    }
-
-    while (sum >> HEX_UNIT) {
-        sum = (sum >> HEX_UNIT) + (sum & 0xffff);
-    }
-
-    return static_cast<unsigned short>(~sum);
-}
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS
 #endif // NEURAL_NETWORK_RUNTIME_UTILS_H
