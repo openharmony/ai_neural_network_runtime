@@ -20,6 +20,7 @@
 #include <memory>
 #include <limits>
 #include <cstdio>
+#include <securec.h>
 
 #include "utils.h"
 #include "backend_manager.h"
@@ -31,11 +32,9 @@ constexpr int32_t NULL_PTR_LENGTH = 0;
 constexpr int32_t NUMBER_CACHE_INFO_MEMBERS = 3;
 constexpr int32_t NUMBER_CACHE_INFO_EXTENSION_MEMBERS = 2;
 constexpr int32_t HEX_UNIT = 16;
+constexpr size_t MAX_CACHE_SIZE = 2 * 1024 * 1024; // 限制最大校验内存为2MB
 constexpr char ROOT_DIR_STR = '/';
 constexpr char DOUBLE_SLASH_STR[] = "//";
-constexpr int OPVERSION_SUBSTR_NUM = 2;
-const std::string CURRENT_VERSION = "0x00000000";
-const std::string HIAI_VERSION_PATH = "/data/data/hiai/version";
 
 OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
                                        const std::string& cacheDir,
@@ -168,11 +167,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheFiles(const std::vector<OHOS::Neu
 {
     const size_t cacheNumber = caches.size();
     uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber + NUMBER_CACHE_INFO_EXTENSION_MEMBERS;
-    std::unique_ptr<int64_t[]> cacheInfo = CreateUniquePtr<int64_t[]>(cacheSize);
-    if (cacheInfo == nullptr) {
-        LOGE("[NNCompiledCache] GenerateCacheFiles failed, fail to create cacheInfo instance.");
-        return OH_NN_MEMORY_ERROR;
-    }
+    nlohmann::json cacheInfo;
 
     OH_NN_ReturnCode ret = GenerateCacheModel(caches, cacheInfo, cacheDir, version);
     if (ret != OH_NN_SUCCESS) {
@@ -191,7 +186,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheFiles(const std::vector<OHOS::Neu
 }
 
 OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
-                                                     std::unique_ptr<int64_t[]>& cacheInfo,
+                                                     nlohmann::json& cacheInfo,
                                                      const std::string& cacheDir,
                                                      uint32_t version) const
 {
@@ -201,10 +196,9 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
         return OH_NN_FAILED;
     }
 
-    auto cacheInfoPtr = cacheInfo.get();
-    *cacheInfoPtr++ = static_cast<int64_t>(cacheNumber);
-    *cacheInfoPtr++ = static_cast<int64_t>(version);
-    *cacheInfoPtr++ = static_cast<int64_t>(m_backendID); // Should call SetBackend first.
+    cacheInfo["data"]["fileNumber"] = static_cast<int64_t>(cacheNumber);
+    cacheInfo["data"]["version"] = static_cast<int64_t>(version);
+    cacheInfo["data"]["deviceId"] = static_cast<int64_t>(m_backendID); // Should call SetBackend first.
 
     // standardize the input dir
     OH_NN_ReturnCode ret = OH_NN_SUCCESS;
@@ -232,7 +226,7 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
 
         uint64_t checkSum =
             static_cast<int64_t>(GetCrc16(static_cast<char*>(caches[i].data), caches[i].length));
-        *cacheInfoPtr++ = checkSum;
+        cacheInfo["data"]["modelCheckSum"][i] = checkSum;
         if (!cacheModelStream.write(static_cast<const char*>(caches[i].data), caches[i].length)) {
             LOGE("[NNCompiledCache] GenerateCacheModel failed, fail to write cache model.");
             cacheModelStream.close();
@@ -242,31 +236,31 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
         cacheModelStream.close();
     }
 
-    std::string currentVersion = CURRENT_VERSION;
-    char versionPath[PATH_MAX];
-    if (realpath(HIAI_VERSION_PATH.c_str(), versionPath) != nullptr) {
-        std::ifstream inf(versionPath);
-        if (inf.is_open()) {
-            getline(inf, currentVersion);
-        }
-        inf.close();
+    int currentOpVersion = 0;
+    ret = m_device->ReadOpVersion(currentOpVersion);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNCompiledCache] GenerateCacheModel failed, fail to read op version.");
+        return ret;
     }
+    cacheInfo["data"]["opVersion"] = currentOpVersion;
 
-    int currentOpVersion = std::stoi(currentVersion.substr(OPVERSION_SUBSTR_NUM));
-    *cacheInfoPtr++ = currentOpVersion;
+    LOGI("[NNCompiledCache] GenerateCacheModel m_isExceedRamLimit: %{public}d", static_cast<int>(m_isExceedRamLimit));
+    cacheInfo["data"]["isExceedRamLimit"] = m_isExceedRamLimit ? 1 : 0;
 
-    LOGI("[NNCompiledCache::GenerateCacheModel] m_isExceedRamLimit: %{public}d", static_cast<int>(m_isExceedRamLimit));
-    if (m_isExceedRamLimit) {
-        *cacheInfoPtr++ = 1;
-    } else {
-        *cacheInfoPtr++ = 0;
+    const size_t dataLength = cacheInfo["data"].dump().length();
+    char cacheInfoData[dataLength + 1];
+    if (strncpy_s(cacheInfoData, dataLength+1, cacheInfo["data"].dump().c_str(), dataLength) != 0) {
+        LOGE("ParseStr failed due to strncpy_s error");
+        return OH_NN_INVALID_PARAMETER;
     }
+    
+    cacheInfo["CheckSum"] = static_cast<int64_t>(CacheInfoGetCrc16(cacheInfoData, dataLength));
 
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode NNCompiledCache::WriteCacheInfo(uint32_t cacheSize,
-                                                 std::unique_ptr<int64_t[]>& cacheInfo,
+                                                 nlohmann::json& cacheInfo,
                                                  const std::string& cacheDir) const
 {
     // standardize the input dir
@@ -291,11 +285,7 @@ OH_NN_ReturnCode NNCompiledCache::WriteCacheInfo(uint32_t cacheSize,
         return OH_NN_INVALID_FILE;
     }
 
-    if (!cacheInfoStream.write(reinterpret_cast<const char*>(cacheInfo.get()), cacheSize)) {
-        LOGE("[NNCompiledCache] WriteCacheInfo failed, fail to write cache info.");
-        cacheInfoStream.close();
-        return OH_NN_SAVE_CACHE_EXCEPTION;
-    }
+    cacheInfoStream << cacheInfo << std::endl;
 
     cacheInfoStream.close();
     return OH_NN_SUCCESS;
@@ -311,52 +301,103 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
         return OH_NN_INVALID_FILE;
     }
 
-    int charNumber = NUMBER_CACHE_INFO_MEMBERS * sizeof(uint64_t);
-    if (!infoCacheFile.read(reinterpret_cast<char*>(&(modelCacheInfo)), charNumber)) {
-        LOGE("[NNCompiledCache] CheckCacheInfo failed, error happened when reading cache info file.");
-        infoCacheFile.close();
+    std::string content((std::istreambuf_iterator<char>(infoCacheFile)), std::istreambuf_iterator<char>());
+    infoCacheFile.close();
+
+    if (!nlohmann::json::accept(content)) {
+        LOGE("[NNCompiledCache] CheckCacheInfo JSON parse error");
         return OH_NN_INVALID_FILE;
     }
 
+    // Parse the json string
+    nlohmann::json j = nlomann::json::parse(content);
     // modelCacheInfo.deviceId type is int64_t,
     // it is transformed from size_t value, so the transform here will not truncate value.
+    if (j.find("data") == j.end()) {
+        LOGE("[NNCompiledCache] CheckCacheInfo read cache info file failed.");
+        return OH_NN_INVALID_FILE;
+    }
+
+    if(j["data"].find("deviceId") == j["data"].end()) {
+        LOGE("[NNCompiledCache] CheckCacheInfo read deviceId from cache info file failed.");
+        return OH_NN_INVALID_FILE;
+    }
+    modelCacheInfo.deviceId = j["data"]["deviceId"].get<int64_t>();
+
+    if(j["data"].find("version") == j["data"].end()) {
+        LOGE("[NNCompiledCache] CheckCacheInfo read version from cache info file failed.");
+        return OH_NN_INVALID_FILE;
+    }
+    modelCacheInfo.version = j["data"]["version"].get<int64_t>();
+
     size_t deviceId = static_cast<size_t>(modelCacheInfo.deviceId);
     if (deviceId != m_backendID) {
         LOGE("[NNCompiledCache] CheckCacheInfo failed. The deviceId in the cache files "
              "is different from current deviceId,"
              "please change the cache directory or current deviceId.");
-        infoCacheFile.close();
         return OH_NN_INVALID_PARAMETER;
     }
 
+    if(j["data"].find("fileNumber") == j["data"].end()) {
+        LOGE("[NNCompiledCache] CheckCacheInfo read fileNumber from cache info file failed.");
+        return OH_NN_INVALID_FILE;
+    }
+    modelCacheInfo.fileNumber = j["data"]["fileNumber"].get<int64_t>();
+
+    return CheckCacheInfoExtension(modelCacheInfo, j);
+}
+
+OH_NN_ReturnCode NNCompiledCache::CheckCacheInfoExtension(NNCompiledCacheInfo& modelCacheInfo, nlohmann::json& j) const
+{
+    const size_t dataLength = j["data"].dump().length();
+    char jData[dataLength + 1];
+    if (strncpy(jData, dataLength+1, j["data"].dump().c_str(), dataLength != 0)) {
+        LOGE("[NNCompiledCache] ParseStr failed due to strncpy_s error.");
+        return OH_NN_INVALID_FILE;
+    }
+
+    if (j.find("CheckSum") == j.end()) {
+        LOGE("[NNCompiledCache] read CheckSum from cache info file failed.");
+        return OH_NN_INVALID_FILE;
+    }
+
+    if (static_cast<int64_t>(CacheInfoGetCrc16(jData, dataLength)) != j["CheckSum"].get<int64_t>()) {
+        LOGE("[NNCompiledCache] cache_info CheckSum is not correct.");
+        return OH_NN_INVALID_FILE;
+    }
     std::vector<int64_t> modelCheckSum;
     modelCheckSum.resize(modelCacheInfo.fileNumber);
     modelCacheInfo.modelCheckSum.resize(modelCacheInfo.fileNumber);
-    if (!infoCacheFile.read(reinterpret_cast<char*>(&modelCheckSum[0]),
-        modelCacheInfo.fileNumber * sizeof(uint64_t))) {
-        LOGE("[NNCompiledCache] CheckCacheInfo failed. The info cache file has been changed.");
-        infoCacheFile.close();
+    if(j["data"].find("modelCheckSum") == j["data"].end()) {
+        LOGE("[NNCompiledCache] CheckCacheInfo read cache file failed.");
         return OH_NN_INVALID_FILE;
+    }
+    for (uint32_t i = 0; i < modelCacheInfo.fileNumber; ++i) {
+        modelCheckSum[i] = static_cast<int64_t>(j["data"]["modelCheckSum"][i]);
     }
 
     for (uint32_t i = 0; i < modelCacheInfo.fileNumber; ++i) {
         modelCacheInfo.modelCheckSum[i] = static_cast<unsigned short>(modelCheckSum[i]);
     }
 
-    if (!infoCacheFile.read(reinterpret_cast<char*>(&(modelCacheInfo.opVersion)), sizeof(uint64_t))) {
-        LOGW("[NNCompiledCache] opVersion failed.");
+    if (j["data"].find("opVersion") == j["data"].end()) {
+        LOGW("[NNCompiledCache] CheckCacheInfo read opVersion from cache info file failed.");
+    } else {
+        modelCacheInfo.opVersion = j["data"]["opVersion"].get<int64_t>();
     }
 
-    if (!infoCacheFile.read(reinterpret_cast<char*>(&(modelCacheInfo.isExceedRamLimit)), sizeof(uint64_t))) {
-        LOGW("[NNCompiledCache] isExceedRamLimit failed.");
+    if (j["data"].find("isExceedRamLimit") == j["data"].end()) {
+        LOGE("[NNCompiledCache] CheckCacheInfo read isExceedRamLimit from cache info file failed.");
+        return OH_NN_INVALID_FILE;
+    } else {
+        modelCacheInfo.isExceedRamLimit = j["data"]["isExceedRamLimit"].get<int64_t>();
     }
 
-    infoCacheFile.close();
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath,
-                                                     OHOS::NeuralNetworkRuntime::Buffer& cache) const
+                                                     OHOS::NeuralNetworkRuntime::Buffer& cache)
 {
     char path[PATH_MAX];
     if (realpath(filePath.c_str(), path) == nullptr) {
@@ -368,56 +409,53 @@ OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath
         return OH_NN_INVALID_PARAMETER;
     }
 
-    FILE* pFile = fopen(path, "rb");
-    if (pFile == NULL) {
+    int fd = open(path, O_RDONLY);
+    if (fd == -1) {
         LOGE("[NNCompiledCache] ReadCacheModelFile failed, file fopen failed.");
         return OH_NN_INVALID_FILE;
     }
 
-    long fsize{-1};
-    OH_NN_ReturnCode ret = GetCacheFileLength(pFile, fsize);
-    if (ret != OH_NN_SUCCESS) {
-        fclose(pFile);
-        LOGE("[NNCompiledCache] ReadCacheModelFile failed, get file %{public}s length fialed.", filePath.c_str());
-        return ret;
-    }
-
-    rewind(pFile);
-
-    char* ptr = static_cast<char*>(m_device->AllocateBuffer(fsize));
-    if (ptr == nullptr) {
-        LOGE("[NNCompiledCache] ReadCacheModelFile failed, failed to allocate memory.");
-        fclose(pFile);
+    struct stat sb;
+    if (fstat(fd, &sb) == -1) {
+        close(fd);
+        LOGE("[NNCompiledCache] ReadCacheModelFile failed, get file %{public}s state failed.", filePath,c_str());
         return OH_NN_MEMORY_ERROR;
     }
 
-    LOGI("ReadCacheModelFile read start.");
-    size_t result = fread(ptr, 1, fsize, pFile); // size of each object in bytes is 1
-    LOGI("ReadCacheModelFile read end.");
-    if (result != static_cast<size_t>(fsize)) {
-        LOGE("[NNCompiledCache] ReadCacheModelFile failed, failed to read file.");
-        fclose(pFile);
-        m_device->ReleaseBuffer(ptr);
-        ptr = nullptr;
+    void *ptr = mmap(NULL, fsize, PROT_READ, MAP_SHARED, fd, 0);
+    if (ptr == MAP_FAILED) {
+        LOGE("[NNCompiledCache] ReadCacheModelFile failed, failed to mmap file.");
+        close(fd);
         return OH_NN_INVALID_FILE;
     }
 
-    fclose(pFile);
     cache.data = ptr;
     cache.length = static_cast<size_t>(fsize); // fsize should be non-negative, safe to cast.
+    cache.fd = fd;
     return OH_NN_SUCCESS;
 }
 
 unsigned short NNCompiledCache::GetCrc16(char* buffer, size_t length) const
 {
     unsigned int sum = 0;
-    while (length > 1) {
-        sum += *(reinterpret_cast<unsigned short*>(buffer));
-        length -= sizeof(unsigned short);
-        buffer += sizeof(unsigned short);
+
+    if (length < MAX_CACHE_SIZE) {
+        while (length > 1) {
+            sum += *(reinterpret_cast<unsigned short*>(buffer));
+            length -= sizeof(unsigned short);
+            buffer += sizeof(unsigned short);
+        }
+    } else {
+        size_t step = length / MAX_CACHE_SIZE;
+        while (length > sizeof(unsigned short) * step + 1) {
+            sum += *(reinterpret_cast<unsigned short *>(buffer));
+            length -= step * sizeof(unsigned short);
+            buffer += step * sizeof(unsigned short);
+        }
     }
 
     if (length > 0) {
+        buffer += length -1;
         sum += *(reinterpret_cast<unsigned char*>(buffer));
     }
 
@@ -473,6 +511,15 @@ OH_NN_ReturnCode NNCompiledCache::VerifyCachePath(const std::string& cachePath) 
     }
 
     return OH_NN_SUCCESS;
+}
+
+void NNCompiledCache::ReleaseCacheBuffer(std::vector<Buffer>& buffers)
+{
+    for (auto buffer : buffers) {
+        munmap(buffer.data, buffer.length);
+        close(buffer.fd);
+    }
+    buffers.clear();
 }
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS

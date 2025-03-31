@@ -72,6 +72,7 @@ NNRtServiceApi& NNRtServiceApi::GetInstance()
     LoadFunction(libNNRtService, "Scheduling", &nnrtService.Scheduling);
     LoadFunction(libNNRtService, "UpdateModelLatency", &nnrtService.UpdateModelLatency);
     LoadFunction(libNNRtService, "Unload", &nnrtService.Unload);
+    LoadFunction(libNNRtService, "PullUpDlliteService", &nnrtService.PullUpDlliteService);
 
     nnrtService.m_serviceAvailable = true;
     return nnrtService;
