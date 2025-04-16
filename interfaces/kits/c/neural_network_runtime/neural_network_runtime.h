@@ -635,7 +635,6 @@ OH_NN_ReturnCode OH_NNExecutor_SetOutputWithMemory(OH_NNExecutor *executor,
                                                    uint32_t outputIndex,
                                                    const OH_NN_Memory *memory);
 
-unsigned short CacheInfoGetCrc16(char* buffer, size_t length);
 #ifdef __cplusplus
 }
 #endif // __cplusplus
