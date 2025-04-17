@@ -65,7 +65,6 @@ public:
 
     OH_NN_ReturnCode AllocateBuffer(size_t length, int& fd) override;
     OH_NN_ReturnCode ReleaseBuffer(int fd, size_t length) override;
-    OH_NN_ReturnCode ReadOpVersion(int& currentOpVersion) override;
 
 private:
     OH_NN_ReturnCode ReleaseSharedBuffer(const V2_0::SharedBuffer& buffer);
