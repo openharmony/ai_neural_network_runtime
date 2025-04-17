@@ -153,18 +153,6 @@ bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, uint32_t v
  */
 OH_NN_ReturnCode OH_NN_GetDeviceID(char *nnrtDevice, size_t len);
 
-/**
- * @brief 对cache进行crc校验和检验
- *
- * 本接口不作为Neural Network Runtime接口对外开放。\n
- *
- * @param buffer 传入buffer参数。
- * @param length 传入length参数。
- * @return unsigned short值，函数的crc校验和。
- * @since 11
- * @version 1.0
- */
-unsigned short CacheInfoGetCrc16(char* buffer, size_t length);
 #ifdef __cplusplus
 }
 #endif // __cpluscplus
