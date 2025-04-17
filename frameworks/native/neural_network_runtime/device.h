@@ -69,7 +69,6 @@ public:
 
     virtual OH_NN_ReturnCode AllocateBuffer(size_t length, int& fd) = 0;
     virtual OH_NN_ReturnCode ReleaseBuffer(int fd, size_t length) = 0;
-    virtual OH_NN_ReturnCode ReadOpVersion(int& currentOpVersion) = 0;
 };
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS

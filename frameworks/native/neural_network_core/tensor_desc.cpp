@@ -23,7 +23,6 @@ const uint32_t BIT8_TO_BYTE = 1;
 const uint32_t BIT16_TO_BYTE = 2;
 const uint32_t BIT32_TO_BYTE = 4;
 const uint32_t BIT64_TO_BYTE = 8;
-const size_t SHAPE_MAX_NUM = 10;
 
 uint32_t GetTypeSize(OH_NN_DataType type)
 {
@@ -115,11 +114,10 @@ OH_NN_ReturnCode TensorDesc::SetShape(const int32_t* shape, size_t shapeNum)
         LOGE("SetShape failed, shape is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
-    if (shapeNum == 0 || shapeNum > SHAPE_MAX_NUM) {
-        LOGE("SetShape failed, shapeNum is 0 or greater than 10.");
+    if (shapeNum == 0) {
+        LOGE("SetShape failed, shapeNum is 0.");
         return OH_NN_INVALID_PARAMETER;
     }
-
     m_shape.clear();
     for (size_t i = 0; i < shapeNum; ++i) {
         m_shape.emplace_back(shape[i]);

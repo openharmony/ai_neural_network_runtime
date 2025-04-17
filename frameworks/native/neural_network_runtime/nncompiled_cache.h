@@ -19,12 +19,6 @@
 #include <vector>
 #include <fstream>
 #include <memory>
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-#include "nlohmann/json.hpp"
 
 #include "device.h"
 #include "neural_network_runtime/neural_network_runtime.h"
@@ -60,22 +54,20 @@ public:
     void SetModelName(const std::string& modelName);
     void SetIsExceedRamLimit(const bool isExceedRamLimit);
     OH_NN_ReturnCode WriteCacheInfo(uint32_t cacheSize,
-                                    nlohmann::json& cacheInfo,
+                                    std::unique_ptr<int64_t[]>& cacheInfo,
                                     const std::string& cacheDir) const;
     OH_NN_ReturnCode CheckCacheInfo(NNCompiledCacheInfo& modelCacheInfo, const std::string& cacheInfoPath) const;
-    OH_NN_ReturnCode CheckCacheInfoExtension(NNCompiledCacheInfo& modelCacheInfo, nlohmann::json& j) const;
-    void ReleaseCacheBuffer(std::vector<Buffer>& buffers);
-    unsigned short GetCrc16(char* buffer, size_t length) const;
 
 private:
     OH_NN_ReturnCode GenerateCacheFiles(const std::vector<Buffer>& caches,
                                         const std::string& cacheDir,
                                         uint32_t version) const;
     OH_NN_ReturnCode GenerateCacheModel(const std::vector<Buffer>& caches,
-                                        nlohmann::json& cacheInfo,
+                                        std::unique_ptr<int64_t[]>& cacheInfo,
                                         const std::string& cacheDir,
                                         uint32_t version) const;
-    OH_NN_ReturnCode ReadCacheModelFile(const std::string& file, Buffer& cache);
+    OH_NN_ReturnCode ReadCacheModelFile(const std::string& file, Buffer& cache) const;
+    unsigned short GetCrc16(char* buffer, size_t length) const;
     OH_NN_ReturnCode GetCacheFileLength(FILE* pFile, long& fileSize) const;
     OH_NN_ReturnCode VerifyCachePath(const std::string& cachePath) const;
 

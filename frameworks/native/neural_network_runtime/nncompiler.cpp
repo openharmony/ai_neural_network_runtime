@@ -14,7 +14,6 @@
  */
 
 #include "nncompiler.h"
-#include "neural_network_runtime/neural_network_runtime.h"
 
 #include <sys/stat.h>
 #include <fstream>
@@ -24,7 +23,6 @@
 #include "validation.h"
 #include "nncompiled_cache.h"
 #include "utils.h"
-#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -36,7 +34,9 @@ constexpr int32_t NUMBER_CACHE_INFO_EXTENSION_MEMBERS = 2;
 const std::string EXTENSION_KEY_MODEL_NAME = "ModelName";
 const std::string EXTENSION_KEY_FM_SHARED = "NPU_FM_SHARED";
 const std::string EXTENSION_KEY_IS_EXCEED_RAMLIMIT = "isExceedRamLimit";
-constexpr size_t INPUT_OUTPUT_MAX_NUM = 200;
+const int OPVERSION_SUBSTR_NUM = 2;
+const std::string CURRENT_VERSION = "0x00000000";
+const std::string HIAI_VERSION_PATH = "/data/data/hiai/version";
 
 struct SerializedTensorDesc {
 public:
@@ -499,6 +499,15 @@ void NNCompiler::ReleaseBuffer(std::vector<Buffer>& buffers) const
     buffers.clear();
 }
 
+void NNCompiler::ReleaseBufferByDevice(std::vector<Buffer>& buffers) const
+{
+    for (size_t i = 0; i < buffers.size(); ++i) {
+        // release cache buffer which is allocated by idevice.
+        m_device->ReleaseBuffer(buffers[i].data);
+    }
+    buffers.clear();
+}
+
 OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
 {
     if (m_cachePath.empty()) {
@@ -537,11 +546,6 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
         return ret;
     }
 
-    if ((m_inputTensorDescs.size() > INPUT_OUTPUT_MAX_NUM) || (m_outputTensorDescs.size() > INPUT_OUTPUT_MAX_NUM)) {
-        LOGE("[NNCompiler] SaveToCacheFile failed, m_inputTensorDescs or m_outputTensorDescs is more than 200.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     Buffer inputTensorDescBuffer;
     ret = SerializeTensorsToBuffer(m_inputTensorDescs, inputTensorDescBuffer);
     if (ret != OH_NN_SUCCESS) {
@@ -562,8 +566,8 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
     tensorBuffers.emplace_back(outputTensorDescBuffer);
 
     compiledCache.SetModelName(m_extensionConfig.modelName);
-    compiledCache.SetIsExceedRamLimit(m_extensionConfig.isExceedRamLimit);
     ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion);
+    compiledCache.SetIsExceedRamLimit(m_extensionConfig.isExceedRamLimit);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] SaveToCacheFile failed, error happened when saving model cache.");
         ReleaseBuffer(tensorBuffers);
@@ -610,7 +614,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     ret = compiledCache.Restore(m_cachePath, m_cacheVersion, caches);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when restoring model cache.");
-        compiledCache.ReleaseCacheBuffer(caches);
+        ReleaseBufferByDevice(caches);
         return ret;
     }
 
@@ -619,7 +623,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_INPUT_TENSORDESC_OFFSET], inputTensorDescs);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when deserializing input tensor desc.");
-        compiledCache.ReleaseCacheBuffer(caches);
+        ReleaseBufferByDevice(caches);
         return ret;
     }
 
@@ -627,7 +631,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_OUTPUT_TENSORDESC_OFFSET], outputTensorDescs);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when deserializing output tensor desc.");
-        compiledCache.ReleaseCacheBuffer(caches);
+        ReleaseBufferByDevice(caches);
         return ret;
     }
 
@@ -641,19 +645,24 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
     ret = m_device->PrepareModelFromModelCache(modelOnlyCaches, config, m_preparedModel, isUpdatable);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when preparing model from cache.");
-        compiledCache.ReleaseCacheBuffer(caches);
+        ReleaseBufferByDevice(caches);
         return ret;
     }
 
     if (isUpdatable) {
         LOGI("isUpdatable is true");
 
-        int currentOpVersion = 0;
-        ret = m_device->ReadOpVersion(currentOpVersion);
-        if (ret != OH_NN_SUCCESS) {
-            LOGE("[NNCompiledCache] GenerateCacheModel failed, fail to read op version.");
-            return ret;
+        std::string currentVersion = CURRENT_VERSION;
+        char versionPath[PATH_MAX];
+        if (realpath(HIAI_VERSION_PATH.c_str(), versionPath) != nullptr) {
+            std::ifstream inf(versionPath);
+            if (inf.is_open()) {
+                getline(inf, currentVersion);
+            }
+            inf.close();
         }
+
+        int currentOpVersion = std::stoi(currentVersion.substr(OPVERSION_SUBSTR_NUM));
 
         NNCompiledCacheInfo modelCacheInfo;
         std::string cacheInfoPath = m_cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
@@ -671,27 +680,28 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
             uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber + NUMBER_CACHE_INFO_EXTENSION_MEMBERS;
             uint32_t infoCharNumber = cacheSize * sizeof(int64_t);
 
-            nlohmann::json cacheInfo;
+            std::unique_ptr<int64_t[]> cacheInfo = CreateUniquePtr<int64_t[]>(cacheSize);
+            if (cacheInfo == nullptr) {
+                LOGE("[NNCompiledCache] isUpdatable is true to create unique failed.");
+                return OH_NN_MEMORY_ERROR;
+            }
 
-            cacheInfo["data"]["fileNumber"] = modelCacheInfo.fileNumber;
-            cacheInfo["data"]["version"] = modelCacheInfo.version - 1;
-            cacheInfo["data"]["deviceId"] = modelCacheInfo.deviceId;
+            auto cacheInfoPtr = cacheInfo.get();
+            *cacheInfoPtr++ = modelCacheInfo.fileNumber;
+            *cacheInfoPtr++ = modelCacheInfo.version - 1;
+            *cacheInfoPtr++ = modelCacheInfo.deviceId;
 
             for (size_t i = 0; i < modelCacheInfo.modelCheckSum.size(); ++i) {
-                cacheInfo["data"]["modelCheckSum"][i] = modelCacheInfo.modelCheckSum[i];
+                *cacheInfoPtr++ = static_cast<int64_t>(modelCacheInfo.modelCheckSum[i]);
             }
 
-            cacheInfo["data"]["opVersion"] = currentOpVersion;
-            cacheInfo["data"]["isExceedRamLimit"] = modelCacheInfo.isExceedRamLimit ? 1 : 0;
+            *cacheInfoPtr++ = currentOpVersion;
 
-            const size_t dataLength = cacheInfo["data"].dump().length();
-            char cacheInfoData[dataLength + 1];
-            if (strncpy_s(cacheInfoData, dataLength+1, cacheInfo["data"].dump().c_str(), dataLength) != 0) {
-                LOGE("ParseStr failed due to strncpy_s error");
-                return OH_NN_INVALID_PARAMETER;
+            if (modelCacheInfo.isExceedRamLimit) {
+                *cacheInfoPtr++ = 1;
+            } else {
+                *cacheInfoPtr++ = 0;
             }
-
-            cacheInfo["CheckSum"] = static_cast<int64_t>(CacheInfoGetCrc16(cacheInfoData, dataLength));
 
             ret = compiledCache.WriteCacheInfo(infoCharNumber, cacheInfo, m_cachePath);
             if (ret != OH_NN_SUCCESS) {
@@ -701,7 +711,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
         }
     }
 
-    compiledCache.ReleaseCacheBuffer(caches);
+    ReleaseBufferByDevice(caches);
 
     m_inputTensorDescs = inputTensorDescs;
     m_outputTensorDescs = outputTensorDescs;
@@ -986,5 +996,6 @@ OH_NN_ReturnCode NNCompiler::DeserializedTensorsFromBuffer(
     ReleaseDescShape(immediateTensorDescs);
     return ret;
 }
+
 } // NeuralNetworkRuntime
 } // OHOS
