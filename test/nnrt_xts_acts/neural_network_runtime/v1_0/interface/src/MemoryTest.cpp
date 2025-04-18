@@ -818,7 +818,8 @@ HWTEST_F(MemoryTest, SUB_AI_NNRt_Func_North_Executor_Memory_Run_0100, Function |
             ASSERT_NE(nullptr, inputMemory);
             ASSERT_EQ(OH_NN_SUCCESS, OH_NNExecutor_SetInputWithMemory(executor, inputIndex, &operand, inputMemory));
 
-            ASSERT_EQ(EOK, memcpy_s(inputMemory->data, operandTem.length, static_cast<void*>(operandTem.data), operandTem.length));
+            ASSERT_EQ(EOK, memcpy_s(inputMemory->data,
+                operandTem.length, static_cast<void*>(operandTem.data), operandTem.length));
 
             OH_NNExecutor_DestroyInputMemory(executor, inputIndex, &inputMemory);
             ASSERT_EQ(nullptr, inputMemory);
