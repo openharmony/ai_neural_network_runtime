@@ -566,8 +566,8 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
     tensorBuffers.emplace_back(outputTensorDescBuffer);
 
     compiledCache.SetModelName(m_extensionConfig.modelName);
-    ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion);
     compiledCache.SetIsExceedRamLimit(m_extensionConfig.isExceedRamLimit);
+    ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] SaveToCacheFile failed, error happened when saving model cache.");
         ReleaseBuffer(tensorBuffers);
@@ -661,7 +661,6 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
             }
             inf.close();
         }
-
         int currentOpVersion = std::stoi(currentVersion.substr(OPVERSION_SUBSTR_NUM));
 
         NNCompiledCacheInfo modelCacheInfo;
