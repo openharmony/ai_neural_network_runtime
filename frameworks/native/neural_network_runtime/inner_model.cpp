@@ -36,6 +36,7 @@ namespace OHOS {
 namespace NeuralNetworkRuntime {
 const std::string NNR_MODEL = "NNR_Model";
 const std::string LOADED_NNR_MODEL = "Loaded_NNR_Model";
+const size_t INPUT_OUTPUT_MAX_INDICES = 200;
 
 namespace {
 class LiteGraphDeleter {
@@ -76,7 +77,7 @@ OH_NN_ReturnCode ConstructNNTensorsFromLiteGraph(const MSLITE::LiteGraph* liteGr
                                                  const std::vector<uint32_t>& indices,
                                                  std::vector<std::shared_ptr<NNTensor>>& nnTensors)
 {
-    if (indices.empty()) {
+    if ((indices.empty()) || (indices.size() > INPUT_OUTPUT_MAX_INDICES)) {
         LOGE("ConstructNNTensorsFromLiteGraph failed, passed empty indices list.");
         return OH_NN_INVALID_PARAMETER;
     }
@@ -324,6 +325,16 @@ OH_NN_ReturnCode InnerModel::SetTensorValue(uint32_t index, const void* buffer, 
 OH_NN_ReturnCode InnerModel::ValidateInputAndOutput(
     const OH_NN_UInt32Array& inputIndices, const OH_NN_UInt32Array& outputIndices) const
 {
+    if (inputIndices.size == 0 || inputIndices.size > INPUT_OUTPUT_MAX_INDICES) {
+        LOGE("ValidateInputAndOutput failed, passed empty input indices.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (outputIndices.size == 0 || outputIndices.size > INPUT_OUTPUT_MAX_INDICES) {
+        LOGE("ValidateInputAndOutput failed, passed empty output indices.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
     OH_NN_ReturnCode ret = ValidateTensorArray(inputIndices);
     if (ret != OH_NN_SUCCESS) {
         LOGE("ValidateInputAndOutput failed, please check input indices.");
@@ -334,16 +345,6 @@ OH_NN_ReturnCode InnerModel::ValidateInputAndOutput(
     if (ret != OH_NN_SUCCESS) {
         LOGE("ValidateInputAndOutput failed, please check output indices.");
         return ret;
-    }
-
-    if (inputIndices.size == 0) {
-        LOGE("ValidateInputAndOutput failed, passed empty input indices.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (outputIndices.size == 0) {
-        LOGE("ValidateInputAndOutput failed, passed empty output indices.");
-        return OH_NN_INVALID_PARAMETER;
     }
 
     std::shared_ptr<NNTensor> tensor{nullptr};
@@ -719,6 +720,11 @@ std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> InnerModel
 {
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> inputTensorDescs;
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> tensorDescPair;
+    if (m_inputTensors.size() > INPUT_OUTPUT_MAX_INDICES) {
+        LOGE("Input tensor descs more than 200.");
+        return inputTensorDescs;
+    }
+
     for (auto inputTensor : m_inputTensors) {
         tensorDescPair.first = OHOS::NeuralNetworkRuntime::CreateSharedPtr<TensorDesc>();
         inputTensor->ConvertToTensorDesc(*(tensorDescPair.first.get()));
@@ -733,6 +739,11 @@ std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> InnerModel
 {
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> outputTensorDescs;
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> tensorDescPair;
+    if (m_outputTensors.size() > INPUT_OUTPUT_MAX_INDICES) {
+        LOGE("Output tensor descs more than 200.");
+        return outputTensorDescs;
+    }
+
     for (auto outputTensor : m_outputTensors) {
         tensorDescPair.first = OHOS::NeuralNetworkRuntime::CreateSharedPtr<TensorDesc>();
         outputTensor->ConvertToTensorDesc(*(tensorDescPair.first.get()));

@@ -67,6 +67,7 @@ public:
     MOCK_METHOD1(ReleaseBuffer, OH_NN_ReturnCode(const void*));
     MOCK_METHOD2(AllocateBuffer, OH_NN_ReturnCode(size_t, int&));
     MOCK_METHOD2(ReleaseBuffer, OH_NN_ReturnCode(int, size_t));
+    MOCK_METHOD1(ReadOpVersion, OH_NN_ReturnCode(int&));
 };
 
 /**

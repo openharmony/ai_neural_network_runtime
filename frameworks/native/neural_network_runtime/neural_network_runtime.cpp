@@ -23,13 +23,14 @@
 #include "quant_param.h"
 #include "validation.h"
 #include "syspara/parameter.h"
-#include "securec.h"
 
 #include <cstring>
 #include <fstream>
 #include <filesystem>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "nlohmann/json.hpp"
+#include "securec.h"
 
 using namespace OHOS::NeuralNetworkRuntime;
 
@@ -49,6 +50,29 @@ const std::string HARDWARE_NAME = "const.ai.nnrt_deivce";
 const std::string HARDWARE_VERSION = "v5_0";
 constexpr size_t HARDWARE_NAME_MAX_LENGTH = 128;
 constexpr size_t FILE_NUMBER_MAX = 100; // 限制cache文件数量最大为100
+constexpr size_t EXTENSION_MAX_SIZE = 200; // 限制MS传过来的参数最多为200
+constexpr size_t INPUT_MAX_COUNT = 200; // 限制模型最大输入个数为200
+constexpr int32_t HEX_UNIT = 16;
+
+unsigned short CacheInfoGetCrc16(char* buffer, size_t length)
+{
+    unsigned int sum = 0;
+    while (length > 1) {
+        sum += *(reinterpret_cast<unsigned short*>(buffer));
+        length -= sizeof(unsigned short);
+        buffer += sizeof(unsigned short);
+    }
+
+    if (length > 0) {
+        sum += *(reinterpret_cast<unsigned char*>(buffer));
+    }
+
+    while (sum >> HEX_UNIT) {
+        sum = (sum >> HEX_UNIT) + (sum & 0xffff);
+    }
+
+    return static_cast<unsigned short>(~sum);
+}
 
 NNRT_API NN_QuantParam *OH_NNQuantParam_Create()
 {
@@ -326,6 +350,11 @@ OH_NN_ReturnCode ParseInputDimsFromExtensions(char* data, size_t dataSize, const
 
     size_t inputCount = liteGraph->input_indices_.size(); // LiteGraph输入个数
     size_t allTensorSize = liteGraph->all_tensors_.size(); // LiteGraph所有tensor个数
+    if (inputCount > INPUT_MAX_COUNT) {
+        LOGE("ParseInputDimsFromExtensions failed, inputCount more than 200.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
     std::vector<int32_t> inputDim;
     size_t dataIndex = 0;
     for (size_t i = 0; i < inputCount; ++i) {
@@ -505,6 +534,11 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
         return OH_NN_INVALID_PARAMETER;
     }
 
+    if (extensionSize > EXTENSION_MAX_SIZE) {
+        LOGE("OH_NNModel_BuildFromLiteGraph failed, extensionSize more than 200.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
     auto *pLiteGraph = reinterpret_cast<const mindspore::lite::LiteGraph*>(liteGraph);
     ExtensionConfig extensionConfig;
     std::unordered_map<std::string, std::vector<std::pair<char*, size_t>>> extensionMap;
@@ -531,40 +565,75 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
 }
 
 namespace {
+OH_NN_ReturnCode CheckCacheFileExtension(const std::string& content, int64_t& fileNumber, int64_t& cacheVersion)
+{
+    if (!nlohmann::json::accept(content)) {
+        LOGE("OH_NNModel_HasCache CheckCacheFile JSON parse error");
+        return OH_NN_INVALID_FILE;
+    }
+
+    nlohmann::json j = nlohmann::json::parse(content);
+    if (j.find("data") == j.end()) {
+        LOGE("OH_NNModel_HasCache read data from cache info file failed.");
+        return OH_NN_INVALID_FILE;
+    }
+
+    if (j["data"].find("fileNumber") == j["data"].end()) {
+        LOGE("OH_NNModel_HasCache read fileNumber from cache info file failed.");
+        return OH_NN_INVALID_FILE;
+    }
+    fileNumber = j["data"]["fileNumber"].get<int>();
+
+    if (j["data"].find("version") == j["data"].end()) {
+        LOGE("OH_NNModel_HasCache read version from cache info file failed.");
+        return OH_NN_INVALID_FILE;
+    }
+    cacheVersion = j["data"]["version"].get<int>();
+
+    if (j.find("CheckSum") == j.end()) {
+        LOGE("OH_NNModel_HasCache read CheckSum from cache info file failed.");
+        return OH_NN_INVALID_FILE;
+    }
+    const size_t dataLength = j["data"].dump().length();
+    char jData[dataLength + 1];
+
+    if (strncpy_s(jData, dataLength+1, j["data"].dump().c_str(), dataLength) != 0) {
+        LOGE("OH_NNModel_HasCache ParseStr failed due to strncpy_s error.");
+        return OH_NN_INVALID_FILE;
+    }
+
+    if (static_cast<int64_t>(CacheInfoGetCrc16(jData, dataLength)) != j["CheckSum"].get<int64_t>()) {
+        LOGE("OH_NNModel_HasCache cache_info CheckSum is not correct.");
+        return OH_NN_INVALID_FILE;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
 OH_NN_ReturnCode CheckCacheFile(const std::string& cacheInfoPath, int64_t& fileNumber, int64_t& cacheVersion)
 {
-    // read number of cache models
     char path[PATH_MAX];
     if (realpath(cacheInfoPath.c_str(), path) == nullptr) {
         LOGE("OH_NNModel_HasCache get real path of cache info failed.");
-        return OH_NN_INVALID_PARAMETER;
+        return OH_NN_INVALID_FILE;
     }
 
     if (access(path, F_OK) != 0) {
         LOGE("OH_NNModel_HasCache access cache info file failed.");
-        return OH_NN_INVALID_PARAMETER;
+        return OH_NN_INVALID_FILE;
     }
 
     std::ifstream ifs(path, std::ios::in | std::ios::binary);
     if (!ifs) {
         LOGE("OH_NNModel_HasCache open cache info file failed.");
-        return OH_NN_INVALID_PARAMETER;
+        return OH_NN_INVALID_FILE;
     }
 
-    if (!ifs.read(reinterpret_cast<char*>(&(fileNumber)), sizeof(fileNumber))) {
-        LOGI("OH_NNModel_HasCache read cache info file failed.");
-        ifs.close();
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (!ifs.read(reinterpret_cast<char*>(&(cacheVersion)), sizeof(cacheVersion))) {
-        LOGI("OH_NNModel_HasCache read cache info file failed.");
-        ifs.close();
-        return OH_NN_INVALID_PARAMETER;
-    }
-
+    // Read the entire file into a string
+    std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
     ifs.close();
-    return OH_NN_SUCCESS;
+
+    return CheckCacheFileExtension(content, fileNumber, cacheVersion);
 }
 }
 
@@ -577,7 +646,6 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, u
 
     if (modelName == nullptr) {
         LOGI("OH_NNModel_HasCache get empty model name.");
-        return false;
     }
 
     std::string cacheInfoPath = std::string(cacheDir) + "/" + std::string(modelName) + "cache_info.nncache";
@@ -594,6 +662,7 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, u
     OH_NN_ReturnCode returnCode = CheckCacheFile(cacheInfoPath, fileNumber, cacheVersion);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("OH_NNModel_HasCache get fileNumber or cacheVersion fail.");
+        std::filesystem::remove_all(cacheInfoPath);
         return false;
     }
 
