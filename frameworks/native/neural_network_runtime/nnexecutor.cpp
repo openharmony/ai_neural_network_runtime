@@ -25,6 +25,8 @@
 #include "transform.h"
 
 namespace OHOS {
+constexpr size_t EXTENSION_MAX_SIZE = 200;
+
 namespace NeuralNetworkRuntime {
 NNExecutor::NNExecutor(size_t backendID, std::shared_ptr<Device> device, std::shared_ptr<PreparedModel> preparedModel,
     const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& inputTensorDescs,
@@ -195,6 +197,11 @@ OH_NN_ReturnCode NNExecutor::SetExtensionConfig(const std::unordered_map<std::st
             LOGE("[NNExecutor] SetExtensionConfig, m_executorConfig create failed.");
             return OH_NN_FAILED;
         }
+    }
+
+    if (configs.size() > EXTENSION_MAX_SIZE) {
+        LOGE("[NNExecutor] SetExtensionConfig, configs size more than 200.");
+        return OH_NN_FAILED;
     }
 
     for (auto config : configs) {
