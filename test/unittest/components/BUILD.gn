@@ -230,6 +230,7 @@ ohos_unittest("NNCompiledCacheTest") {
     "googletest:gtest_main",
     "hilog:libhilog",
     "hitrace:libhitracechain",
+    "json:nlohmann_json_static",
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",

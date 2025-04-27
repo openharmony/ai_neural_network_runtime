@@ -302,17 +302,9 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModelFromModelCache(const std::vector<Buf
     const ModelConfig& config, std::shared_ptr<PreparedModel>& preparedModel, bool& isUpdatable)
 {
     std::vector<V1_0::SharedBuffer> iBuffers;
-    auto memManager = MemoryManager::GetInstance();
-    Memory memory;
-    OH_NN_ReturnCode ret;
     size_t modelCacheSize = modelCache.size();
     for (size_t i = 0; i < modelCacheSize; i++) {
-        ret = memManager->GetMemory(modelCache[i].data, memory);
-        if (ret != OH_NN_SUCCESS) {
-            LOGE("The %zuth model cache is invalid. Please put valid model cache.", i + 1);
-            return ret;
-        }
-        iBuffers.emplace_back(V1_0::SharedBuffer {memory.fd, memory.length, 0, memory.length});
+        iBuffers.emplace_back(V1_0::SharedBuffer {modelCache[i].fd, modelCache[i].length, 0, modelCache[i].length});
     }
 
     V1_0::ModelConfig iModelConfig;
@@ -450,6 +442,12 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareOfflineModel(std::shared_ptr<const mindsp
 {
     LOGE("HDIDeviceV1.0 not support PrepareOfflineModel.");
     return OH_NN_OPERATION_FORBIDDEN;
+}
+
+OH_NN_ReturnCode HDIDeviceV1_0::ReadOpVersion(int& currentOpVersion)
+{
+    LOGE("HDIDeviceV1.0 not support ReadOpVersion.");
+    return OH_NN_SUCCESS;
 }
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS

@@ -30,7 +30,9 @@
                 "hitrace",
                 "ipc",
                 "mindspore",
-                "init"
+                "init",
+                "json",
+                "jsoncpp"
             ],
             "third_party": []
         },
