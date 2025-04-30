@@ -1124,6 +1124,7 @@ NNRT_API NN_Tensor* OH_NNTensor_CreateWithFd(size_t deviceID,
 
 NNRT_API OH_NN_ReturnCode OH_NNTensor_Destroy(NN_Tensor **tensor)
 {
+    LOGI("start OH_NNTensor_Destroy");
     if (tensor == nullptr) {
         LOGE("OH_NNTensor_Destroy failed, tensor is nullptr.");
         return OH_NN_INVALID_PARAMETER;
@@ -1134,6 +1135,11 @@ NNRT_API OH_NN_ReturnCode OH_NNTensor_Destroy(NN_Tensor **tensor)
     }
 
     Tensor* tensorImpl = reinterpret_cast<Tensor*>(*tensor);
+    if (tensorImpl == nullptr) {
+        LOGE("OH_NNTensor_Destroy failed, tensorImpl is nullptr.");
+        return OH_NN_NULL_PTR;
+    }
+
     size_t backendID = tensorImpl->GetBackendID();
     BackendManager& backendManager = BackendManager::GetInstance();
     std::shared_ptr<Backend> backend = backendManager.GetBackend(backendID);
