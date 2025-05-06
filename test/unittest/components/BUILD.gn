@@ -280,6 +280,7 @@ ohos_unittest("NNTensor2_0Test") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "googletest:gmock_main",
     "googletest:gtest_main",
