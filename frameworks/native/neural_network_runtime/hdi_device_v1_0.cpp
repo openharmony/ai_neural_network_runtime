@@ -319,6 +319,11 @@ OH_NN_ReturnCode HDIDeviceV1_0::PrepareModelFromModelCache(const std::vector<Buf
         return OH_NN_UNAVAILABLE_DEVICE;
     }
 
+    if (iPreparedModel == nullptr) {
+        LOGE("iPreparedModel is nullptr");
+        return OH_NN_NULL_PTR;
+    }
+
     preparedModel = CreateSharedPtr<HDIPreparedModelV1_0>(iPreparedModel);
     if (preparedModel == nullptr) {
         LOGE("Prepare model from model cache failed, because fail to create preparedModel instance.");
