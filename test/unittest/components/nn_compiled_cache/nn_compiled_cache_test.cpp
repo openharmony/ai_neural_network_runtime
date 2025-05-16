@@ -377,12 +377,12 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_006, TestSize.Level0)
     OH_NN_ReturnCode ret = nncompiledCache.SetBackend(backendID);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
 
-    std::string m_cachePath = "/data/data";
+    std::string m_cachePath = "/data/local/tmp";
     uint32_t m_cacheVersion = 1;
     std::vector<Buffer> caches;
 
     OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches);
-    EXPECT_EQ(OH_NN_MEMORY_ERROR, retRestore);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, retRestore);
 }
 
 /**
@@ -399,12 +399,12 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_007, TestSize.Level0)
     OH_NN_ReturnCode ret = nncompiledCache.SetBackend(backendID);
     EXPECT_EQ(OH_NN_SUCCESS, ret);
 
-    std::string m_cachePath = "/data/data";
+    std::string m_cachePath = "/data/local/tmp";
     uint32_t m_cacheVersion = 1;
     std::vector<Buffer> caches;
 
     OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches);
-    EXPECT_EQ(OH_NN_MEMORY_ERROR, retRestore);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, retRestore);
 }
 
 /**
