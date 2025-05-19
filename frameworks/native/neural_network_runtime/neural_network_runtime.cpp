@@ -643,7 +643,7 @@ OH_NN_ReturnCode CheckCacheFile(const std::string& cacheInfoPath, int64_t& fileN
     return CheckCacheFileExtension(content, fileNumber, cacheVersion, deviceId);
 }
 
-OH_NN_ReturnCode CheckDeviceId(nt64_t& deviceId)
+OH_NN_ReturnCode CheckDeviceId(int64_t& deviceId)
 {
     std::string deviceName;
     char cName[HARDWARE_NAME_MAX_LENGTH];
