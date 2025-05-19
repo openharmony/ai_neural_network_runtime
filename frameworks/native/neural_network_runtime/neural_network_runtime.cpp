@@ -643,7 +643,8 @@ OH_NN_ReturnCode CheckCacheFile(const std::string& cacheInfoPath, int64_t& fileN
     return CheckCacheFileExtension(content, fileNumber, cacheVersion, deviceId);
 }
 
-OH_NN_ReturnCode CheckDeviceId(nt64_t& deviceId) {
+OH_NN_ReturnCode CheckDeviceId(nt64_t& deviceId)
+{
     std::string deviceName;
     char cName[HARDWARE_NAME_MAX_LENGTH];
     int ret = GetParameter(HARDWARE_NAME.c_str(), NULL_HARDWARE_NAME.c_str(), cName, HARDWARE_NAME_MAX_LENGTH);
@@ -654,7 +655,7 @@ OH_NN_ReturnCode CheckDeviceId(nt64_t& deviceId) {
 
     deviceName = HARDWARE_NAME + "." +cName;
     if (deviceId != std::hash<std::string>{}(deviceName)) {
-        LOGE("OH_NNModel_HasCache the deviceID in the cache files is different from current deviceID.");
+        LOGE("OH_NNModel_HasCache the deviceId in the cache files is different from current deviceID.");
         return OH_NN_FAILED;
     }
 
