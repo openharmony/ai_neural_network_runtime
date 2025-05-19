@@ -653,9 +653,9 @@ OH_NN_ReturnCode CheckDeviceId(int64_t& deviceId)
         return OH_NN_FAILED;
     }
 
-    deviceName = HARDWARE_NAME + "." +cName;
+    deviceName = HARDWARE_NAME + "." + cName;
     if (deviceId != std::hash<std::string>{}(deviceName)) {
-        LOGE("OH_NNModel_HasCache the deviceId in the cache files is different from current deviceID.");
+        LOGE("OH_NNModel_HasCache the deviceId in the cache files is different from current deviceId.");
         return OH_NN_FAILED;
     }
 
