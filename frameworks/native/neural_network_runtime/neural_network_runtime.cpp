@@ -566,7 +566,8 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromLiteGraph(OH_NNModel *model, const
 }
 
 namespace {
-OH_NN_ReturnCode CheckCacheFileExtension(const std::string& content, int64_t& fileNumber, int64_t& cacheVersion, int64_t& deviceId)
+OH_NN_ReturnCode CheckCacheFileExtension(const std::string& content, int64_t& fileNumber,
+                                         int64_t& cacheVersion, int64_t& deviceId)
 {
     if (!nlohmann::json::accept(content)) {
         LOGE("OH_NNModel_HasCache CheckCacheFile JSON parse error");
@@ -617,7 +618,8 @@ OH_NN_ReturnCode CheckCacheFileExtension(const std::string& content, int64_t& fi
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode CheckCacheFile(const std::string& cacheInfoPath, int64_t& fileNumber, int64_t& cacheVersion, int64_t& deviceId)
+OH_NN_ReturnCode CheckCacheFile(const std::string& cacheInfoPath, int64_t& fileNumber,
+                                int64_t& cacheVersion, int64_t& deviceId)
 {
     char path[PATH_MAX];
     if (realpath(cacheInfoPath.c_str(), path) == nullptr) {
