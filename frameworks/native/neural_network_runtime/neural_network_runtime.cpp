@@ -702,7 +702,8 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, u
         return false;
     }
 
-    if (fileNumber <= 0 || fileNumber > FILE_NUMBER_MAX) {
+    size_t sizeNumber = fileNumber;
+    if (sizeNumber <= 0 || sizeNumber > FILE_NUMBER_MAX) {
         LOGE("OH_NNModel_HasCache fileNumber is invalid or more than 100");
         std::filesystem::remove_all(cacheInfoPath);
         return false;
