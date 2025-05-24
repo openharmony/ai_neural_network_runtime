@@ -648,6 +648,33 @@ OH_NN_ReturnCode GetNnrtModelId(Compilation* compilationImpl, NNRtServiceApi& nn
 
     return OH_NN_SUCCESS;
 }
+
+OH_NN_ReturnCode IsCompilationAvaliable(Compilation* compilationImpl)
+{
+    if (compilationImpl == nullptr) {
+        LOGE("IsCompilationAvaliable failed, compilation implementation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (((compilationImpl->nnModel != nullptr) && (compilationImpl->offlineModelPath != nullptr)) ||
+        ((compilationImpl->nnModel != nullptr) &&
+         ((compilationImpl->offlineModelBuffer.first != nullptr) ||
+          (compilationImpl->offlineModelBuffer.second != static_cast<size_t>(0)))) ||
+        ((compilationImpl->offlineModelPath != nullptr) &&
+         ((compilationImpl->offlineModelBuffer.first != nullptr) ||
+          (compilationImpl->offlineModelBuffer.second != static_cast<size_t>(0))))) {
+        LOGE("IsCompilationAvaliable failed, find multi model to build compilation.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (compilationImpl->compiler != nullptr) {
+        LOGE("IsCompilationAvaliable failed, the compiler in compilation is not nullptr, "
+             "please input a new compilation.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    return OH_NN_SUCCESS;
+}
 }
 
 OH_NN_ReturnCode GetModelId(Compilation** compilation)
@@ -700,24 +727,12 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation)
         return OH_NN_INVALID_PARAMETER;
     }
 
-    Compilation* compilationImpl = reinterpret_cast<Compilation*>(compilation);
-
-    if (((compilationImpl->nnModel != nullptr) && (compilationImpl->offlineModelPath != nullptr)) ||
-        ((compilationImpl->nnModel != nullptr) &&
-         ((compilationImpl->offlineModelBuffer.first != nullptr) ||
-          (compilationImpl->offlineModelBuffer.second != static_cast<size_t>(0)))) ||
-        ((compilationImpl->offlineModelPath != nullptr) &&
-         ((compilationImpl->offlineModelBuffer.first != nullptr) ||
-          (compilationImpl->offlineModelBuffer.second != static_cast<size_t>(0))))) {
-        LOGE("OH_NNCompilation_Build failed, find multi model to build compilation.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     OH_NN_ReturnCode ret = OH_NN_SUCCESS;
-    if (compilationImpl->compiler != nullptr) {
-        LOGE("OH_NNCompilation_Build failed, the compiler in compilation is not nullptr, "
-             "please input a new compilation.");
-        return OH_NN_INVALID_PARAMETER;
+    Compilation* compilationImpl = reinterpret_cast<Compilation*>(compilation);
+    ret = IsCompilationAvaliable(compilationImpl);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("OH_NNCompilation_Build failed, fail to compiler parameter.");
+        return ret;
     }
 
     Compiler* compiler = nullptr;
@@ -755,7 +770,7 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation)
     if (nnrtService.IsServiceAvaliable()) {
         bool retCode = nnrtService.PullUpDlliteService();
         if (!retCode) {
-            LOGI("OH_NNCompilation_Build failed, PullUpDlliteService failed.");
+            LOGW("OH_NNCompilation_Build failed, PullUpDlliteService failed.");
         }
     }
 
@@ -1126,7 +1141,6 @@ NNRT_API NN_Tensor* OH_NNTensor_CreateWithFd(size_t deviceID,
 
 NNRT_API OH_NN_ReturnCode OH_NNTensor_Destroy(NN_Tensor **tensor)
 {
-    LOGI("start OH_NNTensor_Destroy");
     if (tensor == nullptr) {
         LOGE("OH_NNTensor_Destroy failed, tensor is nullptr.");
         return OH_NN_INVALID_PARAMETER;
