@@ -752,9 +752,11 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation)
     }
 
     NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
-    bool retCode = nnrtService.PullUpDlliteService();
-    if (!retCode) {
-        LOGI("OH_NNCompilation_Build failed, PullUpDlliteService failed.");
+    if (nnrtService.IsServiceAvaliable()) {
+        bool retCode = nnrtService.PullUpDlliteService();
+        if (!retCode) {
+            LOGI("OH_NNCompilation_Build failed, PullUpDlliteService failed.");
+        }
     }
 
     configs["isExceedRamLimit"] = configContents;
