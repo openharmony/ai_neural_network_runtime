@@ -36,6 +36,7 @@ using namespace OHOS::NeuralNetworkRuntime;
 
 #define NNRT_API __attribute__((visibility("default")))
 
+namespace {
 const std::string EXTENSION_KEY_QUANT_BUFFER = "QuantBuffer";
 const std::string EXTENSION_KEY_MODEL_NAME = "ModelName";
 const std::string EXTENSION_KEY_IS_PROFILING = "isProfiling";
@@ -54,6 +55,7 @@ constexpr size_t FILE_NUMBER_MAX = 100; // 限制cache文件数量最大为100
 constexpr size_t EXTENSION_MAX_SIZE = 200; // 限制MS传过来的参数最多为200
 constexpr size_t INPUT_MAX_COUNT = 200; // 限制模型最大输入个数为200
 constexpr int32_t HEX_UNIT = 16;
+}
 
 unsigned short CacheInfoGetCrc16(char* buffer, size_t length)
 {
@@ -656,7 +658,7 @@ OH_NN_ReturnCode CheckDeviceId(int64_t& deviceId)
     }
 
     deviceName = HARDWARE_NAME + "." + cName;
-    if (deviceId != std::hash<std::string>{}(deviceName)) {
+    if (deviceId != static_cast<int64_t>(std::hash<std::string>{}(deviceName))) {
         LOGE("OH_NNModel_HasCache the deviceId in the cache files is different from current deviceId.");
         return OH_NN_FAILED;
     }
