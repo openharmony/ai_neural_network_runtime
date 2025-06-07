@@ -122,7 +122,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
             cacheInfo.modelCheckSum[i]) {
             LOGE("[NNCompiledCache] Restore failed, the cache model file %{public}s has been changed.",
                  cacheModelPath.c_str());
-            return OH_NN_INVALID_FILE;
+            close(modelBuffer.fd);  return OH_NN_INVALID_FILE;
         }
 
         caches.emplace_back(std::move(modelBuffer));
@@ -424,7 +424,7 @@ OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath
 
     off_t fsize = sb.st_size;
 
-    void *ptr = mmap(NULL, fsize, PROT_READ, MAP_SHARED, fd, 0);
+    void *ptr = mmap(nullptr, fsize, PROT_READ, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
         LOGE("[NNCompiledCache] ReadCacheModelFile failed, failed to mmap file.");
         close(fd);
@@ -440,6 +440,10 @@ OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath
 unsigned short NNCompiledCache::GetCrc16(char* buffer, size_t length) const
 {
     unsigned int sum = 0;
+
+    if (buffer == nullptr) {
+        return static_cast<unsigned short>(~sum);
+    }
 
     if (length < MAX_CACHE_SIZE) {
         while (length > 1) {
