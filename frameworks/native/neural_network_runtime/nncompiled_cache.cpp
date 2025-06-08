@@ -61,10 +61,9 @@ OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRunt
     return OH_NN_SUCCESS;
 }
 
-namespace {
-OH_NN_ReturnCode CheckCache(const std::string& cacheDir,
-                            uint32_t version,
-                            std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches)
+OH_NN_ReturnCode NNCompiledCache::CheckCache(const std::string& cacheDir,
+                                             uint32_t version,
+                                             std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches)
 {
     if (cacheDir.empty()) {
         LOGE("[NNCompiledCache] Restore failed, cacheDir is empty.");
@@ -81,7 +80,6 @@ OH_NN_ReturnCode CheckCache(const std::string& cacheDir,
         return OH_NN_INVALID_PARAMETER;
     }
     return OH_NN_SUCCESS;
-}
 }
 
 OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,

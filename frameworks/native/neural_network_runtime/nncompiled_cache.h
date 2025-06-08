@@ -52,6 +52,9 @@ public:
     OH_NN_ReturnCode Save(const std::vector<Buffer>& caches,
                           const std::string& cacheDir,
                           uint32_t version);
+    OH_NN_ReturnCode CheckCache(const std::string& cacheDir,
+                                int32_t version,
+                                std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches);
     OH_NN_ReturnCode Restore(const std::string& cacheDir,
                              uint32_t version,
                              std::vector<Buffer>& caches);
