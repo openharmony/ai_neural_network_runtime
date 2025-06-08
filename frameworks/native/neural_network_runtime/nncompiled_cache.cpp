@@ -61,9 +61,10 @@ OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRunt
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
-                                          uint32_t version,
-                                          std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches)
+namespace {
+OH_NN_ReturnCode CheckCache(const std::string& cacheDir,
+                            uint32_t version,
+                            std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches)
 {
     if (cacheDir.empty()) {
         LOGE("[NNCompiledCache] Restore failed, cacheDir is empty.");
@@ -79,6 +80,18 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
         LOGE("[NNCompiledCache] Restore failed, m_device is empty.");
         return OH_NN_INVALID_PARAMETER;
     }
+    return OH_NN_SUCCESS;
+}
+}
+
+OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
+                                          uint32_t version,
+                                          std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches)
+{
+    OH_NN_ReturnCode ret = CheckCache(cacheDir,version,caches);
+    if (ret != OH_NN_SUCCESS) {
+        return ret;
+    }
 
     std::string cacheInfoPath = cacheDir + "/" + m_modelName + "cache_info.nncache";
     char path[PATH_MAX];
@@ -92,7 +105,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
     }
 
     NNCompiledCacheInfo cacheInfo;
-    OH_NN_ReturnCode ret = CheckCacheInfo(cacheInfo, path);
+    ret = CheckCacheInfo(cacheInfo, path);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiledCache] Restore failed, error happened when calling CheckCacheInfo.");
         return ret;
