@@ -122,7 +122,8 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
             cacheInfo.modelCheckSum[i]) {
             LOGE("[NNCompiledCache] Restore failed, the cache model file %{public}s has been changed.",
                  cacheModelPath.c_str());
-            close(modelBuffer.fd);  return OH_NN_INVALID_FILE;
+            close(modelBuffer.fd);
+            return OH_NN_INVALID_FILE;
         }
 
         caches.emplace_back(std::move(modelBuffer));
