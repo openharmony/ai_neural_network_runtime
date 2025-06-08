@@ -86,7 +86,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
                                           uint32_t version,
                                           std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches)
 {
-    OH_NN_ReturnCode ret = CheckCache(cacheDir,version,caches);
+    OH_NN_ReturnCode ret = CheckCache(cacheDir, version, caches);
     if (ret != OH_NN_SUCCESS) {
         return ret;
     }
