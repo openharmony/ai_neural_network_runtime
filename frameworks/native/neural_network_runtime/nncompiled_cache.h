@@ -68,6 +68,9 @@ public:
     unsigned short GetCrc16(char* buffer, size_t length) const;
 
 private:
+    OH_NN_ReturnCode CheckCache(const std::string& cacheDir,
+                                uint32_t version,
+                                std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches);
     OH_NN_ReturnCode GenerateCacheFiles(const std::vector<Buffer>& caches,
                                         const std::string& cacheDir,
                                         uint32_t version) const;
