@@ -1697,7 +1697,6 @@ OH_NN_ReturnCode RunSync(Executor *executor,
         int32_t modelLatency = static_cast<int32_t>((timeEnd - timeStart));
         std::thread t(UpdateModelLatency, configPtr, modelLatency);
         t.detach();
-        LOGE("update async start.");
 
         configPtr->isNeedModelLatency = false;
         std::unordered_map<std::string, std::vector<char>> configMap;
