@@ -968,7 +968,7 @@ OHOS::HDI::Nnrt::V1_0::SharedBuffer Copy_MindIR_Tensor_Data_To_HDIBuffer(const T
     const OHOS::HDI::Nnrt::V1_0::SharedBuffer &bufferTemplete, uint8_t *mmapPtr, unsigned int offset)
 {
     if (tensor == nullptr) {
-        LOGE("");
+        LOGE("MindIR_LiteGraph_To_Model v1 tensor is nullptr.");
         return {-1, 0, offset, 0};
     }
     if (mmapPtr == nullptr) {
@@ -1004,8 +1004,6 @@ OHOS::HDI::Nnrt::V1_0::Model *LiteGraph_To_HDIModel(const mindspore::lite::LiteG
         LOGE("MindIR_LiteGraph_To_Model v1 failed, lite graph is nullptr.");
         return nullptr;
     }
-
-    LOGI("MindIR_LiteGraph_To_Model begin");
 
     std::vector<OHOS::HDI::Nnrt::V1_0::Node> nodes;
     std::vector<OHOS::HDI::Nnrt::V1_0::Tensor> allTensors;
