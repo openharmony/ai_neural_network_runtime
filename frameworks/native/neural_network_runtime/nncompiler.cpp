@@ -287,7 +287,6 @@ OH_NN_ReturnCode NNCompiler::CheckModelParameter() const
 {
     // If m_innerModel is not passed, the compiler must be construct from cache, jump check m_innerModel.
     if (m_innerModel == nullptr) {
-        LOGW("[NNCompiler] Restoring from cache not need to check model.");
         return OH_NN_SUCCESS;
     }
 
@@ -309,7 +308,6 @@ OH_NN_ReturnCode NNCompiler::IsOfflineModel(bool& isOfflineModel) const
 {
     // If m_innerModel is not passed, the compiler must be construct from cache, jump check m_innerModel.
     if (m_innerModel == nullptr) {
-        LOGW("[NNCompiler] Restoring from cache not need to judge offline model.");
         return OH_NN_SUCCESS;
     }
 
@@ -456,12 +454,7 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild()
     // cache存在，从cache直接复原prepareModel、input/output TensorDesc
     OH_NN_ReturnCode ret = RestoreFromCacheFile();
     if (ret != OH_NN_SUCCESS) {
-        LOGW("[NNCompiler] cache file is failed, to delete cache file.");
         char path[PATH_MAX];
-        if (realpath(m_cachePath.c_str(), path) == nullptr) {
-            LOGW("[NNCompiledCache] WriteCacheInfo failed, fail to get the real path of cacheDir.");
-        }
-
         std::string cachePath = path;
         std::string cacheInfo = cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
         if (std::filesystem::exists(cacheInfo)) {
@@ -474,7 +467,6 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild()
         return ret;
     }
     if (ret == OH_NN_SUCCESS) {
-        LOGI("[NNCompiler] Build success, restore from cache file.");
         m_isBuild = true;
     }
 
@@ -705,7 +697,6 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
 
     m_inputTensorDescs = inputTensorDescs;
     m_outputTensorDescs = outputTensorDescs;
-    LOGI("[NNCompiler] Restore model cache successfully.");
     return OH_NN_SUCCESS;
 }
 
@@ -730,7 +721,6 @@ OH_NN_ReturnCode NNCompiler::SetExtensionConfig(const std::unordered_map<std::st
             return OH_NN_INVALID_PARAMETER;
         }
         m_extensionConfig.modelName.assign(value.data(), value.data() + value.size());
-        LOGI("[NNCompiler] SetExtensionConfig get model name:%{public}s.", m_extensionConfig.modelName.c_str());
     }
     if (configs.find(EXTENSION_KEY_FM_SHARED) != configs.end()) {
         m_extensionConfig.isNpuFmShared = true;
@@ -748,15 +738,12 @@ OH_NN_ReturnCode NNCompiler::SetExtensionConfig(const std::unordered_map<std::st
         } else {
             m_extensionConfig.isExceedRamLimit = false;
         }
-
-        LOGI("[NNCompiler] SetExtensionConfig isExceedRamLimit enabled.");
     }
     return OH_NN_SUCCESS;
 }
 
 OH_NN_ReturnCode NNCompiler::SetOptions(const std::vector<std::shared_ptr<void>>& options)
 {
-    LOGE("[NNCompiler] SetOptions is not supported for NN compiler currently.");
     return OH_NN_UNSUPPORTED;
 }
 

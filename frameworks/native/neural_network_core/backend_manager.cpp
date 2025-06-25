@@ -34,7 +34,6 @@ BackendManager& BackendManager::GetInstance()
     if (dlopen("libneural_network_runtime.so", RTLD_NOLOAD) != nullptr) {
         // if libneural_network_runtime_ext.so not loaded, try to dlopen it
         if (dlopen("libneural_network_runtime_ext.so", RTLD_NOLOAD) == nullptr) {
-            LOGI("dlopen libneural_network_runtime_ext.so.");
             void* libHandle = dlopen("libneural_network_runtime_ext.so", RTLD_NOW | RTLD_GLOBAL);
             if (libHandle == nullptr) {
                 LOGW("Failed to dlopen libneural_network_runtime_ext.so.");
@@ -142,7 +141,6 @@ OH_NN_ReturnCode BackendManager::RegisterBackend(
 
 void BackendManager::RemoveBackend(const std::string& backendName)
 {
-    LOGI("[RemoveBackend] start remove backend for %{public}s.", backendName.c_str());
     const std::lock_guard<std::mutex> lock(m_mtx);
     if (m_backendIDGroup.find(backendName) == m_backendIDGroup.end()) {
         LOGI("[RemoveBackend] No need to remove backend for %{public}s.", backendName.c_str());
@@ -161,7 +159,6 @@ void BackendManager::RemoveBackend(const std::string& backendName)
         if (m_backendNames.find(backendID) != m_backendNames.end()) {
             m_backendNames.erase(backendID);
         }
-        LOGI("[RemoveBackend] remove backendID[%{public}zu] for %{public}s success.", backendID, backendName.c_str());
     }
     m_backendIDGroup.erase(backendName);
 }
