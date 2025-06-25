@@ -544,7 +544,6 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &isExcee
     }
 
     if (!isExceedRamLimit) {
-        LOGI("Model accupy memory less then limit, no need authenticating.");
         return OH_NN_SUCCESS; // If model ram is less than max limit, no need authenticating.
     }
 
@@ -609,7 +608,6 @@ OH_NN_ReturnCode Authentication(Compilation** compilation, bool &isExceedRamLimi
         return ret;
     }
 
-    LOGI("Authentication success.");
     return OH_NN_SUCCESS;
 }
 
@@ -617,10 +615,7 @@ namespace {
 OH_NN_ReturnCode GetNnrtModelId(Compilation* compilationImpl, NNRtServiceApi& nnrtService)
 {
     std::string modelName;
-    OH_NN_ReturnCode retCode = compilationImpl->compiler->GetModelName(modelName);
-    if (retCode != OH_NN_SUCCESS) {
-        LOGW("GetModelName is failed.");
-    }
+    compilationImpl->compiler->GetModelName(modelName);
 
     if (compilationImpl->nnModel != nullptr) {
         compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromCache(compilationImpl->cachePath,
@@ -757,7 +752,6 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation)
     }
 
     std::unordered_map<std::string, std::vector<char>> configs;
-    LOGI("[OH_NNCompilation_Build] model isExceedRamLimit: %{public}d", static_cast<int>(isExceedRamLimit));
 
     std::vector<char> configContents;
     if (isExceedRamLimit) {
@@ -1663,7 +1657,6 @@ OH_NN_ReturnCode UpdateModelLatency(const ExecutorConfig* config, int32_t modelL
         return static_cast<OH_NN_ReturnCode>(ret);
     }
 
-    LOGI("UpdateModelLatency success.");
     return OH_NN_SUCCESS;
 }
 
