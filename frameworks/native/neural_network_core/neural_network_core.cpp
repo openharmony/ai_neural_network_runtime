@@ -615,7 +615,7 @@ namespace {
 OH_NN_ReturnCode GetNnrtModelId(Compilation* compilationImpl, NNRtServiceApi& nnrtService)
 {
     std::string modelName;
-    OH_NN_ReturnCode retCode = compilationImpl->compiler->GetModelName(modelName);
+    compilationImpl->compiler->GetModelName(modelName);
 
     if (compilationImpl->nnModel != nullptr) {
         compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromCache(compilationImpl->cachePath,
