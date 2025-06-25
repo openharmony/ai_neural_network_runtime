@@ -40,7 +40,6 @@ OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRunt
                                        const std::string& cacheDir,
                                        uint32_t version)
 {
-    LOGI("[NNCompiledCache::Save] m_isExceedRamLimit: %{public}d", static_cast<int>(m_isExceedRamLimit));
     if (caches.empty()) {
         LOGE("[NNCompiledCache] Save failed, caches is empty.");
         return OH_NN_INVALID_PARAMETER;
@@ -57,7 +56,6 @@ OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRunt
         return ret;
     }
 
-    LOGI("[NNCompiledCache] Save success. %zu caches are saved.", caches.size());
     return OH_NN_SUCCESS;
 }
 
@@ -256,7 +254,6 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
     }
     cacheInfo["data"]["opVersion"] = currentOpVersion;
 
-    LOGI("[NNCompiledCache] GenerateCacheModel m_isExceedRamLimit: %{public}d", static_cast<int>(m_isExceedRamLimit));
     cacheInfo["data"]["isExceedRamLimit"] = m_isExceedRamLimit ? 1 : 0;
 
     const size_t dataLength = cacheInfo["data"].dump().length();
