@@ -455,6 +455,7 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild()
     OH_NN_ReturnCode ret = RestoreFromCacheFile();
     if (ret != OH_NN_SUCCESS) {
         char path[PATH_MAX];
+        realpath(m_cachePath.c_str(), path);
         std::string cachePath = path;
         std::string cacheInfo = cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
         if (std::filesystem::exists(cacheInfo)) {
