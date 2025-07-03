@@ -551,7 +551,7 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_checkcacheinfo_003, TestSize.L
     std::string cacheInfoPath = "/data/data/testcache_info.nncache";
 
     OH_NN_ReturnCode ret = nncompiledCache.CheckCacheInfo(modelCacheInfo, cacheInfoPath);
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
+    EXPECT_EQ(OH_NN_INVALID_FILE, ret);
 }
 
 /**
