@@ -197,6 +197,7 @@ ohos_shared_library("libneural_network_runtime") {
     "ipc:ipc_core",
     "json:nlohmann_json_static",
     "mindspore:mindir_lib",
+    "eventhandler:libeventhandler",
   ]
 
   deps = [ "../neural_network_core:libneural_network_core" ]

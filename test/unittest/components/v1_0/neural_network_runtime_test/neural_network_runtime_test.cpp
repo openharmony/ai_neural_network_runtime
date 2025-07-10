@@ -1250,8 +1250,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_006, testing::ext::TestSize.
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t inputIndex = 0;
@@ -1282,8 +1286,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_007, testing::ext::TestSize.
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t inputIndex = 0;
@@ -1312,8 +1320,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_008, testing::ext::TestSize.
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t inputIndex = 0;
@@ -1342,8 +1354,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setinput_009, testing::ext::TestSize.
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t inputIndex = 0;
@@ -1450,8 +1466,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setoutput_005, testing::ext::TestSize
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
@@ -1477,8 +1497,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setoutput_006, testing::ext::TestSize
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
@@ -1503,8 +1527,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_setoutput_007, testing::ext::TestSize
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
@@ -1664,8 +1692,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, excutor_run_003, testing::ext::TestSize.Level
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     int32_t inputDims[2] = {3, 4};
@@ -1769,8 +1801,12 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_input_memory_005, testing::
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
@@ -1810,13 +1846,17 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_input_memory_006, testing::
     m_inputTensorDescs.emplace_back(pair2);
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
 
     size_t length = 9 * sizeof(float);
     EXPECT_CALL(*((MockIDevice *) device.get()), AllocateTensorBuffer(length, m_inputTensorDescs[0].first))
         .WillRepeatedly(::testing::Return(reinterpret_cast<void*>(0x1000)));
 
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     EXPECT_NE(nullptr, executor);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
@@ -1843,8 +1883,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_input_memory_007, testing::
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
@@ -1949,8 +1994,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_output_memory_005, testing:
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
@@ -1990,13 +2040,17 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_output_memory_006, testing:
     m_inputTensorDescs.emplace_back(pair2);
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
 
     size_t length = 9 * sizeof(float);
     EXPECT_CALL(*((MockIDevice *) device.get()), AllocateTensorBuffer(length, m_outputTensorDescs[0].first))
         .WillRepeatedly(::testing::Return(reinterpret_cast<void*>(0x1000)));
 
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     EXPECT_NE(nullptr, executor);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
@@ -2023,8 +2077,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_allocate_output_memory_007, testing:
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
@@ -2071,8 +2130,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_002, testing::e
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t inputIndex = 0;
@@ -2098,8 +2162,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_003, testing::e
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     EXPECT_NE(executor, nullptr);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
@@ -2126,8 +2195,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_input_memory_004, testing::e
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t inputIndex = 6;
@@ -2173,8 +2247,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_002, testing::
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
@@ -2200,8 +2279,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_003, testing::
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     EXPECT_NE(executor, nullptr);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
@@ -2228,8 +2312,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_004, testing::
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 6;
@@ -2258,8 +2347,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_destroy_output_memory_005, testing::
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -2308,8 +2402,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_002, testing::
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     OH_NN_Tensor* operand = nullptr;
@@ -2340,8 +2439,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_003, testing::
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     SetTensor();
@@ -2369,8 +2473,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_input_with_memory_004, testing::
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t inputIndex = 0;
@@ -2419,8 +2528,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_output_with_memory_002, testing:
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;
@@ -2446,8 +2560,13 @@ HWTEST_F(NeuralNetworkRuntimeTest, executor_set_output_with_memory_003, testing:
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* executor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     OH_NNExecutor* nnExecutor = reinterpret_cast<OH_NNExecutor*>(executor);
 
     uint32_t outputIndex = 0;

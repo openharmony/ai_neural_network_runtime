@@ -38,6 +38,7 @@ ohos_unittest("CompilationV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -58,6 +59,7 @@ ohos_unittest("ExecutorV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -78,6 +80,7 @@ ohos_unittest("DeviceManagerV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -98,6 +101,7 @@ ohos_unittest("DeviceRegistrarV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -119,6 +123,7 @@ ohos_unittest("HDIDeviceV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -140,6 +145,7 @@ ohos_unittest("HDIPreparedModelV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -151,6 +157,7 @@ ohos_unittest("MemoryManagerTest") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -159,6 +166,7 @@ ohos_unittest("MemoryManagerTest") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -179,6 +187,7 @@ ohos_unittest("NeuralNetworkCoreV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -189,6 +198,7 @@ ohos_unittest("QuantParamsTest") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -197,6 +207,7 @@ ohos_unittest("QuantParamsTest") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -207,6 +218,7 @@ ohos_unittest("NNBackendTest") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -215,6 +227,7 @@ ohos_unittest("NNBackendTest") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -225,6 +238,7 @@ ohos_unittest("NNCompiledCacheTest") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -234,6 +248,7 @@ ohos_unittest("NNCompiledCacheTest") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -244,6 +259,7 @@ ohos_unittest("NNCompilerTest") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -252,6 +268,7 @@ ohos_unittest("NNCompilerTest") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -262,6 +279,7 @@ ohos_unittest("NNExecutorTest") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -270,6 +288,7 @@ ohos_unittest("NNExecutorTest") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -289,6 +308,7 @@ ohos_unittest("NNTensor2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -299,6 +319,7 @@ ohos_unittest("TransformV1_0Test") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_1.0",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -307,6 +328,7 @@ ohos_unittest("TransformV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -328,6 +350,7 @@ ohos_unittest("InnerModelV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -348,6 +371,7 @@ ohos_unittest("NnTensorV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -368,6 +392,7 @@ ohos_unittest("NnTensorDescV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -388,6 +413,7 @@ ohos_unittest("NnValidationV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -408,6 +434,7 @@ ohos_unittest("OpsRegistryV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -431,6 +458,7 @@ ohos_unittest("NeuralNetworkRuntimeV1_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -451,6 +479,7 @@ ohos_unittest("CompilationV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -471,6 +500,7 @@ ohos_unittest("ExecutorV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -491,6 +521,7 @@ ohos_unittest("DeviceManagerV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -511,6 +542,7 @@ ohos_unittest("DeviceRegistrarV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -532,6 +564,7 @@ ohos_unittest("HDIDeviceV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -553,6 +586,7 @@ ohos_unittest("HDIPreparedModelV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -574,6 +608,7 @@ ohos_unittest("HDIPreparedModelV2_1Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -584,6 +619,7 @@ ohos_unittest("TransformV2_0Test") {
   configs = [ ":module_private_config" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_nnrt:libnnrt_proxy_2.0",
     "googletest:gmock_main",
     "googletest:gtest_main",
@@ -592,6 +628,7 @@ ohos_unittest("TransformV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -613,6 +650,7 @@ ohos_unittest("InnerModelV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -633,6 +671,7 @@ ohos_unittest("NnTensorV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -653,6 +692,7 @@ ohos_unittest("NnValidationV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -673,6 +713,7 @@ ohos_unittest("OpsRegistryV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 
@@ -696,6 +737,7 @@ ohos_unittest("NeuralNetworkRuntimeV2_0Test") {
     "mindspore:mindir_lib",
     "neural_network_runtime:libneural_network_core",
     "neural_network_runtime:libneural_network_runtime",
+    "eventhandler:libeventhandler",
   ]
 }
 

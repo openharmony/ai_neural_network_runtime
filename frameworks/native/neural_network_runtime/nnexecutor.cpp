@@ -16,8 +16,11 @@
 
 #include "nnexecutor.h"
 #include "nntensor.h"
-#include "log.h"
+#include "nncompiled_cache.h"
 #include "cpp_type.h"
+#include "neural_network_runtime_inner.h"
+#include "nnrt_client.h"
+#include "log.h"
 
 #include "securec.h"
 #include "utils.h"
@@ -26,16 +29,130 @@
 
 namespace OHOS {
 constexpr size_t EXTENSION_MAX_SIZE = 200;
+constexpr int AUTOUNLOAD_TIME = 15 * 60 * 1000;
 
 namespace NeuralNetworkRuntime {
+constexpr int CACHE_INPUT_TENSORDESC_OFFSET = 2;
+constexpr int CACHE_OUTPUT_TENSORDESC_OFFSET = 1;
+struct SerializedTensorDesc {
+public:
+    SerializedTensorDesc() = default;
+    ~SerializedTensorDesc() = default;
+
+    OH_NN_ReturnCode CopyFromTensorDesc(const std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>& tensorDesc)
+    {
+        if (tensorDesc.first == nullptr) {
+            LOGE("CopyFromTensorDesc failed, tensor desc is nullptr.");
+            return OH_NN_NULL_PTR;
+        }
+        OH_NN_ReturnCode ret = tensorDesc.first->GetDataType(&m_dataType);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("CopyFromTensorDesc failed, error happened when getting data type from tensor desc.");
+            return ret;
+        }
+
+        ret = tensorDesc.first->GetFormat(&m_format);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("CopyFromTensorDesc failed, error happened when getting format from tensor desc.");
+            return ret;
+        }
+
+        ret = tensorDesc.first->GetShape(&m_shape, &m_shapeNum);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("CopyFromTensorDesc failed, error happened when getting shape from tensor desc.");
+            return ret;
+        }
+
+        ret = tensorDesc.first->GetName(&m_name);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("CopyFromTensorDesc failed, error happened when getting name from tensor desc.");
+            return ret;
+        }
+
+        m_tensorType = tensorDesc.second;
+
+        return ret;
+    }
+
+    OH_NN_ReturnCode CopyToTensorDesc(TensorDesc& tensorDesc) const
+    {
+        OH_NN_ReturnCode ret = tensorDesc.SetDataType(m_dataType);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("CopyToTensorDesc failed, error happened when setting data type to tensor desc.");
+            return ret;
+        }
+
+        ret = tensorDesc.SetFormat(m_format);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("CopyToTensorDesc failed, error happened when setting format to tensor desc.");
+            return ret;
+        }
+
+        ret = tensorDesc.SetShape(m_shape, m_shapeNum);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("CopyToTensorDesc failed, error happened when setting shape to tensor desc.");
+            return ret;
+        }
+
+        ret = tensorDesc.SetName(m_name);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("CopyToTensorDesc failed, error happened when setting name to tensor desc.");
+        }
+
+        return ret;
+    }
+
+public:
+    OH_NN_DataType m_dataType{OH_NN_UNKNOWN};
+    OH_NN_Format m_format{OH_NN_FORMAT_NONE};
+    OH_NN_TensorType m_tensorType{OH_NN_TENSOR};
+    size_t m_shapeNum{0};
+    int32_t* m_shape{nullptr};
+    const char* m_name{nullptr}; // null-terminated
+};
+const size_t SIZE_OF_DATATYPE = sizeof(SerializedTensorDesc::m_dataType);
+const size_t SIZE_OF_FORMAT = sizeof(SerializedTensorDesc::m_format);
+const size_t SIZE_OF_TENSOR_TYPE = sizeof(SerializedTensorDesc::m_tensorType);
+const size_t SIZE_OF_SHAPE_NUM = sizeof(SerializedTensorDesc::m_shapeNum);
+
+uint64_t GenRandom(void)
+{
+    uint64_t random = 0;
+    int fd = open("/dev/random", O_RDONLY);
+    if (fd >= 0) {
+        read(fd, &random, sizeof(random));
+        close(fd);
+    }
+    return random;
+}
+
 NNExecutor::NNExecutor(size_t backendID, std::shared_ptr<Device> device, std::shared_ptr<PreparedModel> preparedModel,
     const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& inputTensorDescs,
-    const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& outputTensorDescs)
+    const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& outputTensorDescs,
+    std::string cachePath, uint32_t cacheVersion, ExtensionConfig extensionConfig, bool enableFp16,
+    OH_NN_PerformanceMode performance, OH_NN_Priority priority)
     : m_backendID(backendID),
     m_device(device),
     m_preparedModel(preparedModel),
     m_inputTensorDescs(inputTensorDescs),
-    m_outputTensorDescs(outputTensorDescs) {}
+    m_outputTensorDescs(outputTensorDescs),
+    m_cachePath(cachePath),
+    m_cacheVersion(cacheVersion),
+    m_extensionConfig(extensionConfig),
+    m_enableFp16(enableFp16),
+    m_performance(performance),
+    m_priority(priority),
+    m_loadtime(std::chrono::steady_clock::now()) {
+        m_executorid = GenRandom();
+        m_autoUnloadRunner = OHOS::AppExecFwk::EventRunner::Create
+            ("nnexecutor_autounload" + std::to_string(m_executorid));
+        m_autoUnloadHandler = std::make_shared<OHOS::AppExecFwk::EventHandler>(m_autoUnloadRunner);
+        auto AutoUnloadTask = [this]() {
+            DeinitModel("DelayUnload");
+        };
+        m_autoUnloadHandler->PostTask(AutoUnloadTask,
+            "nnexecutor_autounload" + std::to_string(m_executorid), AUTOUNLOAD_TIME);
+    }
 
 OH_NN_ReturnCode NNExecutor::GetInputDimVec() const
 {
@@ -248,81 +365,281 @@ OH_NN_ReturnCode NNExecutor::SetOnServiceDied(NN_OnServiceDied onServiceDied)
     return OH_NN_OPERATION_FORBIDDEN;
 }
 
+void ReleaseDescShape(std::vector<SerializedTensorDesc>& immediateTensorDescs)
+{
+    for (auto desc : immediateTensorDescs) {
+        delete[] desc.m_shape;
+    }
+    immediateTensorDescs.clear();
+}
+
+OH_NN_ReturnCode NNExecutor::DeserializedTensorsFromBuffer(
+    const Buffer& buffer, std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& tensorDescs)
+{
+    std::vector<SerializedTensorDesc> immediateTensorDescs;
+    const char* ptr = static_cast<const char*>(buffer.data);
+    const char* end = ptr + buffer.length;
+    while (ptr < end) {
+        SerializedTensorDesc desc;
+
+        auto memRet = memcpy_s(&desc.m_dataType, SIZE_OF_DATATYPE, ptr, sizeof(desc.m_dataType));
+        if (memRet != EOK) {
+            LOGE("[NNExecutor] DeserializedTensorsFromBuffer failed, failed to memcpy_s data type.");
+            ReleaseDescShape(immediateTensorDescs);
+            return OH_NN_MEMORY_ERROR;
+        }
+        ptr += sizeof(desc.m_dataType);
+
+        memRet = memcpy_s(&desc.m_format, SIZE_OF_FORMAT, ptr, sizeof(desc.m_format));
+        if (memRet != EOK) {
+            LOGE("[NNExecutor] DeserializedTensorsFromBuffer failed, failed to memcpy_s format.");
+            ReleaseDescShape(immediateTensorDescs);
+            return OH_NN_MEMORY_ERROR;
+        }
+        ptr += sizeof(desc.m_format);
+
+        memRet = memcpy_s(&desc.m_tensorType, SIZE_OF_TENSOR_TYPE, ptr, sizeof(desc.m_tensorType));
+        if (memRet != EOK) {
+            LOGE("[NNExecutor] DeserializedTensorsFromBuffer failed, failed to memcpy_s tensor type.");
+            ReleaseDescShape(immediateTensorDescs);
+            return OH_NN_MEMORY_ERROR;
+        }
+        ptr += sizeof(desc.m_tensorType);
+
+        memRet = memcpy_s(&desc.m_shapeNum, SIZE_OF_SHAPE_NUM, ptr, sizeof(desc.m_shapeNum));
+        if (memRet != EOK) {
+            LOGE("[NNExecutor] DeserializedTensorsFromBuffer failed, failed to memcpy_s shape num.");
+            ReleaseDescShape(immediateTensorDescs);
+            return OH_NN_MEMORY_ERROR;
+        }
+        ptr += sizeof(desc.m_shapeNum);
+
+        desc.m_shape = new (std::nothrow) int32_t[desc.m_shapeNum];
+        if (desc.m_shape == nullptr) {
+            LOGE("[NNExecutor] DeserializedTensorsFromBuffer failed, failed to create shape buffer.");
+            ReleaseDescShape(immediateTensorDescs);
+            return OH_NN_NULL_PTR;
+        }
+        memRet = memcpy_s(desc.m_shape, desc.m_shapeNum * sizeof(int32_t), ptr, desc.m_shapeNum * sizeof(int32_t));
+        if (memRet != EOK) {
+            LOGE("[NNExecutor] DeserializedTensorsFromBuffer failed, failed to memcpy_s shape.");
+            ReleaseDescShape(immediateTensorDescs);
+            return OH_NN_MEMORY_ERROR;
+        }
+        ptr += desc.m_shapeNum * sizeof(int32_t);
+
+        desc.m_name = ptr;
+        ptr += std::strlen(desc.m_name) + 1; // +1 for null terminator
+
+        immediateTensorDescs.push_back(desc);
+    }
+
+    OH_NN_ReturnCode ret {OH_NN_SUCCESS};
+    for (const auto& immediateTensorDesc : immediateTensorDescs) {
+        std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> tensorDescPair;
+        tensorDescPair.first = CreateSharedPtr<TensorDesc>();
+        if (tensorDescPair.first == nullptr) {
+            LOGE("[NNExecutor] DeserializedTensorsFromBuffer failed, failed to create tensor desc.");
+            tensorDescs.clear();
+            ReleaseDescShape(immediateTensorDescs);
+            return OH_NN_NULL_PTR;
+        }
+        ret = immediateTensorDesc.CopyToTensorDesc(*(tensorDescPair.first.get()));
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("[NNExecutor] DeserializedTensorsFromBuffer failed, error happened when copying "
+                 "SerializedTensorDesc to TensorDesc.");
+            tensorDescs.clear();
+            ReleaseDescShape(immediateTensorDescs);
+            return ret;
+        }
+        tensorDescPair.second = immediateTensorDesc.m_tensorType;
+
+        tensorDescs.emplace_back(tensorDescPair);
+    }
+
+    ReleaseDescShape(immediateTensorDescs);
+    return ret;
+}
+
+OH_NN_ReturnCode NNExecutor::Reload()
+{
+    if (m_cachePath.empty()) {
+        LOGE("[NNExecutor] RestoreFromCacheFile failed, path is empty.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (m_cacheVersion == INVALID_CAHCE_VERSION) {
+        LOGE("[NNExecutor] RestoreFromCacheFile failed, cache version is invalid. Please set a valid cache version.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (m_preparedModel != nullptr) {
+        LOGE("[NNExecutor] RestoreFromCacheFile failed, m_preparedModel is not nullptr.");
+        return OH_NN_FAILED;
+    }
+
+    NNCompiledCache compiledCache;
+    OH_NN_ReturnCode ret = compiledCache.SetBackend(m_backendID);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNExecutor] RestoreFromCacheFile failed, fail to set backend.");
+        return ret;
+    }
+
+    std::vector<Buffer> caches;
+    compiledCache.SetModelName(m_extensionConfig.modelName);
+    ret = compiledCache.Restore(m_cachePath, m_cacheVersion, caches);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNExecutor] RestoreFromCacheFile failed, error happened when restoring model cache.");
+        compiledCache.ReleaseCacheBuffer(caches);
+        return ret;
+    }
+
+    size_t cacheNum = caches.size();
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> inputTensorDescs;
+    ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_INPUT_TENSORDESC_OFFSET], inputTensorDescs);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNExecutor] RestoreFromCacheFile failed, error happened when deserializing input tensor desc.");
+        compiledCache.ReleaseCacheBuffer(caches);
+        return ret;
+    }
+
+    std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> outputTensorDescs;
+    ret = DeserializedTensorsFromBuffer(caches[cacheNum - CACHE_OUTPUT_TENSORDESC_OFFSET], outputTensorDescs);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNExecutor] RestoreFromCacheFile failed, error happened when deserializing output tensor desc.");
+        compiledCache.ReleaseCacheBuffer(caches);
+        return ret;
+    }
+
+    ModelConfig config;
+    config.enableFloat16 = m_enableFp16;
+    config.mode = m_performance;
+    config.priority = m_priority;
+    config.extensionConfig.isNpuFmShared = m_extensionConfig.isNpuFmShared;
+    std::vector<Buffer> modelOnlyCaches(caches.begin(), caches.end() - CACHE_INPUT_TENSORDESC_OFFSET);
+    bool isUpdatable = false;
+    ret = m_device->PrepareModelFromModelCache(modelOnlyCaches, config, m_preparedModel, isUpdatable);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNExecutor] RestoreFromCacheFile failed, error happened when preparing model from cache.");
+        compiledCache.ReleaseCacheBuffer(caches);
+        return ret;
+    }
+
+    compiledCache.ReleaseCacheBuffer(caches);
+
+    m_inputTensorDescs = inputTensorDescs;
+    m_outputTensorDescs = outputTensorDescs;
+    LOGI("[NNExecutor] Restore model cache successfully.");
+    return OH_NN_SUCCESS;
+}
+
 OH_NN_ReturnCode NNExecutor::RunSync(NN_Tensor* inputTensors[], size_t inputSize,
     NN_Tensor* outputTensors[], size_t outputSize)
 {
-    if (m_inputTensorDescs.size() != inputSize) {
-        LOGE("NNExecutor::RunSync failed, inputSize:%{public}zu is not equal to model input size:%{public}zu",
-            inputSize, m_inputTensorDescs.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
-    if (m_outputTensorDescs.size() != outputSize) {
-        LOGE("NNExecutor::RunSync failed, outputSize:%{public}zu is not equal to model output size:%{public}zu",
-            outputSize, m_outputTensorDescs.size());
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    OH_NN_ReturnCode ret {OH_NN_FAILED};
-    ret = CheckInputDimRanges(inputTensors, inputSize);
-    if (ret != OH_NN_OPERATION_FORBIDDEN && ret != OH_NN_SUCCESS) {
-        LOGE("NNExecutor::RunSync failed, failed to check input dim ranges.");
-        return ret;
-    }
-
-    OHOS::NeuralNetworkRuntime::IOTensor tensor;
-    std::vector<NN_Tensor*> inputTensorsVec;
-    for (size_t i = 0; i < inputSize; ++i) {
-        if (inputTensors[i] == nullptr) {
-            LOGE("NNExecutor::RunSync failed, input[%{public}zu] is nullptr.", i);
+    std::lock_guard<std::mutex> lock(m_mutex);
+    {
+        uint32_t modelId;
+        GetModelID(modelId);
+        LOGI("NNExecutor::RunSync pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
+            getpid(), originHiaiModelId_, modelId);
+        m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
+        if (m_inputTensorDescs.size() != inputSize) {
+            LOGE("NNExecutor::RunSync failed, inputSize:%{public}zu is not equal to model input size:%{public}zu",
+                inputSize, m_inputTensorDescs.size());
             return OH_NN_INVALID_PARAMETER;
         }
-        inputTensorsVec.emplace_back(inputTensors[i]);
-    }
-
-    std::vector<NN_Tensor*> outputTensorsVec;
-    for (size_t i = 0; i < outputSize; ++i) {
-        if (outputTensors[i] == nullptr) {
-            LOGE("NNExecutor::RunSync failed, output[%{public}zu] is nullptr.", i);
+        if (m_outputTensorDescs.size() != outputSize) {
+            LOGE("NNExecutor::RunSync failed, outputSize:%{public}zu is not equal to model output size:%{public}zu",
+                outputSize, m_outputTensorDescs.size());
             return OH_NN_INVALID_PARAMETER;
         }
-        outputTensorsVec.emplace_back(outputTensors[i]);
-    }
 
-    std::vector<std::vector<int32_t>> outputsDims;
-    std::vector<bool> isSufficientDataBuffer;
+        if (m_preparedModel == nullptr) {
+            if (Reload() != OH_NN_SUCCESS) {
+                return OH_NN_INVALID_PARAMETER;
+            }
 
-    ret = m_preparedModel->Run(inputTensorsVec, outputTensorsVec, outputsDims, isSufficientDataBuffer);
-    if (ret != OH_NN_SUCCESS) {
-        LOGE("NNExecutor::RunSync failed, failed to run in prepared model.");
-        return ret;
-    }
-
-    // Set the output NNTensor2_0's dimensions from output IOTensor if it is dynamic.
-    // NNTensor2_0::SetDimensions will check if the tensor buffer is enough for the new dimensions.
-    if (outputsDims.size() != outputSize) {
-        LOGE("NNExecutor::RunSync failed, size of outputsDims is not equal to outputTensors.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-    for (size_t i = 0; i < outputSize; ++i) {
-        NNTensor2_0* nnTensor = reinterpret_cast<NNTensor2_0*>(outputTensors[i]);
-        TensorDesc* nnTensorDesc = nnTensor->GetTensorDesc();
-        if (nnTensorDesc == nullptr) {
-            LOGE("NNExecutor::RunSync failed, failed to get desc from tensor.");
-            return OH_NN_NULL_PTR;
+            auto _ret = GetModelID(modelId);
+            LOGI("AutoReload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
+                getpid(), originHiaiModelId_, modelId);
+            if (_ret != OH_NN_SUCCESS) {
+                LOGW("GetModelID failed, some error happen when get model id for device.");
+            }
+            _ret = ReinitScheduling(modelId, &m_executorConfig->isNeedModelLatency, m_cachePath.c_str());
+            if (_ret != OH_NN_SUCCESS) {
+                LOGW("ReinitScheduling failed, some error happen when ReinitScheduling model.");
+            }
         }
-        ret = nnTensorDesc->SetShape(outputsDims[i].data(), outputsDims[i].size());
-        if (ret != OH_NN_SUCCESS) {
-            LOGE("NNExecutor::RunSync failed, error happened when setting output tensor's dimensions,"
-                 " output id: %zu.", i);
+
+        OH_NN_ReturnCode ret {OH_NN_FAILED};
+        ret = CheckInputDimRanges(inputTensors, inputSize);
+        if (ret != OH_NN_OPERATION_FORBIDDEN && ret != OH_NN_SUCCESS) {
+            LOGE("NNExecutor::RunSync failed, failed to check input dim ranges.");
             return ret;
         }
-        ret = m_outputTensorDescs[i].first->SetShape(outputsDims[i].data(), outputsDims[i].size());
+
+        OHOS::NeuralNetworkRuntime::IOTensor tensor;
+        std::vector<NN_Tensor*> inputTensorsVec;
+        for (size_t i = 0; i < inputSize; ++i) {
+            if (inputTensors[i] == nullptr) {
+                LOGE("NNExecutor::RunSync failed, input[%{public}zu] is nullptr.", i);
+                return OH_NN_INVALID_PARAMETER;
+            }
+            inputTensorsVec.emplace_back(inputTensors[i]);
+        }
+
+        std::vector<NN_Tensor*> outputTensorsVec;
+        for (size_t i = 0; i < outputSize; ++i) {
+            if (outputTensors[i] == nullptr) {
+                LOGE("NNExecutor::RunSync failed, output[%{public}zu] is nullptr.", i);
+                return OH_NN_INVALID_PARAMETER;
+            }
+            outputTensorsVec.emplace_back(outputTensors[i]);
+        }
+
+        std::vector<std::vector<int32_t>> outputsDims;
+        std::vector<bool> isSufficientDataBuffer;
+
+        ret = m_preparedModel->Run(inputTensorsVec, outputTensorsVec, outputsDims, isSufficientDataBuffer);
         if (ret != OH_NN_SUCCESS) {
-            LOGE("NNExecutor::RunSync failed, error happened when setting inner output tensor's dimensions,"
-                 " output id: %zu.", i);
+            LOGE("NNExecutor::RunSync failed, failed to run in prepared model.");
             return ret;
         }
+
+        // Set the output NNTensor2_0's dimensions from output IOTensor if it is dynamic.
+        // NNTensor2_0::SetDimensions will check if the tensor buffer is enough for the new dimensions.
+        if (outputsDims.size() != outputSize) {
+            LOGE("NNExecutor::RunSync failed, size of outputsDims is not equal to outputTensors.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+        for (size_t i = 0; i < outputSize; ++i) {
+            NNTensor2_0* nnTensor = reinterpret_cast<NNTensor2_0*>(outputTensors[i]);
+            TensorDesc* nnTensorDesc = nnTensor->GetTensorDesc();
+            if (nnTensorDesc == nullptr) {
+                LOGE("NNExecutor::RunSync failed, failed to get desc from tensor.");
+                return OH_NN_NULL_PTR;
+            }
+            ret = nnTensorDesc->SetShape(outputsDims[i].data(), outputsDims[i].size());
+            if (ret != OH_NN_SUCCESS) {
+                LOGE("NNExecutor::RunSync failed, error happened when setting output tensor's dimensions,"
+                    " output id: %zu.", i);
+                return ret;
+            }
+            ret = m_outputTensorDescs[i].first->SetShape(outputsDims[i].data(), outputsDims[i].size());
+            if (ret != OH_NN_SUCCESS) {
+                LOGE("NNExecutor::RunSync failed, error happened when setting inner output tensor's dimensions,"
+                    " output id: %zu.", i);
+                return ret;
+            }
+        }
     }
+    auto AutoUnloadTask = [this]() {
+        DeinitModel("DelayUnload");
+    };
+    m_loadtime = std::chrono::steady_clock::now();
+    m_autoUnloadHandler->PostTask(AutoUnloadTask,
+        "nnexecutor_autounload" + std::to_string(m_executorid), AUTOUNLOAD_TIME);
+
     return OH_NN_SUCCESS;
 }
 
@@ -335,13 +652,16 @@ OH_NN_ReturnCode NNExecutor::RunAsync(NN_Tensor* inputTensors[], size_t inputSiz
 
 OH_NN_ReturnCode NNExecutor::GetModelID(uint32_t& modelId) const
 {
-    OH_NN_ReturnCode ret = m_preparedModel->GetModelID(modelId);
-    if (ret != OH_NN_SUCCESS) {
-        LOGE("GetModelID failed, some error happen when get model id for device.");
-        return ret;
+    if (m_preparedModel != nullptr) {
+        OH_NN_ReturnCode ret = m_preparedModel->GetModelID(modelId);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("GetModelID failed, some error happen when get model id for device.");
+            return ret;
+        }
+        return OH_NN_SUCCESS;
     }
 
-    return OH_NN_SUCCESS;
+    return OH_NN_OPERATION_FORBIDDEN;
 }
 
 size_t NNExecutor::GetBackendID()
@@ -1123,6 +1443,180 @@ NNExecutor::~NNExecutor()
         delete m_executorConfig;
         m_executorConfig = nullptr;
     }
+
+    UnSetDeinitModelCallBack();
+
+    uint32_t modelId;
+    GetModelID(modelId);
+    LOGI("manualUnload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
+        getpid(), originHiaiModelId_, modelId);
+}
+
+OH_NN_ReturnCode NNExecutor::SetDeinitModelCallBack()
+{
+    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+    if (!nnrtService.IsServiceAvaliable()) {
+        LOGW("SetDeinitModelCallBack failed, fail to get nnrt service, skip SetDeinitModelCallBack.");
+        return OH_NN_SUCCESS;
+    }
+
+    if (nnrtService.SetDeinitModelCallBack == nullptr) {
+        LOGE("SetDeinitModelCallBack failed, nnrtService SetDeinitModelCallBack func is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (m_preparedModel == nullptr) {
+        LOGE("SetDeinitModelCallBack failed, m_preparedModel is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    int ret = nnrtService.SetDeinitModelCallBack(m_executorid, reinterpret_cast<Executor*>(this));
+    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+        LOGE("SetDeinitModelCallBack failed, some error happened when SetDeinitModelCallBack.");
+        return static_cast<OH_NN_ReturnCode>(ret);
+    }
+
+    auto _ret = GetModelID(originHiaiModelId_);
+    if (_ret != OH_NN_SUCCESS) {
+        LOGW("GetModelID failed, some error happen when get model id for device.");
+    }
+
+    uint32_t modelId;
+    GetModelID(modelId);
+    LOGI("manualload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
+        getpid(), originHiaiModelId_, modelId);
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNExecutor::UnSetDeinitModelCallBack()
+{
+    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+    if (!nnrtService.IsServiceAvaliable()) {
+        LOGW("UnSetDeinitModelCallBack failed, fail to get nnrt service, skip UnSetDeinitModelCallBack.");
+        return OH_NN_SUCCESS;
+    }
+
+    if (nnrtService.UnSetDeinitModelCallBack == nullptr) {
+        LOGE("UnSetDeinitModelCallBack failed, nnrtService UnSetDeinitModelCallBack func is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    int ret = nnrtService.UnSetDeinitModelCallBack(m_executorid);
+    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+        LOGE("UnSetDeinitModelCallBack failed, some error happened when UnSetDeinitModelCallBack.");
+        return static_cast<OH_NN_ReturnCode>(ret);
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNExecutor::ReinitScheduling(uint32_t hiaimodelID, bool* needModelLatency, const char* cachePath)
+{
+    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+    if (!nnrtService.IsServiceAvaliable()) {
+        LOGE("[HiaiExecutorImpl] ReinitScheduling failed, fail to get nnrt service, skip ReinitScheduling.");
+        return OH_NN_SUCCESS;
+    }
+
+    if (nnrtService.AutoReinitSetModelID == nullptr) {
+        LOGE("HiaiExecutorImpl] ReinitScheduling failed, nnrtService AutoReinitSetModelId func is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    size_t nnrtmodelID = nnrtService.GetNNRtModelIDFromCache(m_cachePath.c_str(), m_extensionConfig.modelName.c_str());
+    if (nnrtmodelID == 0) {
+        LOGE("[HiaiExecutorImpl] ReinitScheduling is failed.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    int ret = nnrtService.AutoReinitSetModelID(hiaimodelID, nnrtmodelID);
+    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+        LOGE("[HiaiExecutorImpl] ReinitScheduling failed, some error happened when AutoReinitSetModelID.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (nnrtService.IsSupportScheduling == nullptr) {
+        LOGE("[HiaiExecutorImpl] ReinitScheduling failed, nnrtService IsSupportScheduling func is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    bool supportStat = false;
+    ret = nnrtService.IsSupportScheduling(&supportStat);
+    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+        LOGE("ReinitScheduling failed, some error happened when judge if support scheduling.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+    if (!supportStat) {
+        LOGW("device not support scheduling, jumper over scheduling.");
+        return OH_NN_SUCCESS;
+    }
+
+    if (nnrtService.AutoReinitScheduling == nullptr) {
+        LOGE("ReinitScheduling failed, nnrtService IsSupportScheduling func is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    ret = nnrtService.AutoReinitScheduling(originHiaiModelId_, hiaimodelID, needModelLatency, cachePath);
+    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+        LOGE("ReinitScheduling failed, some error happened when scheduling.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNExecutor::DeinitScheduling(uint32_t hiaimodelID)
+{
+    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+    if (nnrtService.AutoUnload == nullptr) {
+        LOGE("[HiaiExecutorImpl] AutoUnload failed, nnrtService AutoUnload func is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    int ret = nnrtService.AutoUnload(originHiaiModelId_, hiaimodelID);
+    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+        LOGE("[HiaiExecutorImpl] AutoUnload failed, some error happen when AutoUnload hiaiModelId.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+bool NNExecutor::DeinitModel(std::string mode)
+{
+    if (m_preparedModel == nullptr) {
+        return false;
+    }
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    if (m_preparedModel != nullptr &&
+        OH_NNModel_HasCache(m_cachePath.c_str(),
+                            m_extensionConfig.modelName.c_str(),
+                            m_cacheVersion)) {
+        uint32_t modelId;
+        auto _ret = GetModelID(modelId);
+        if (_ret != OH_NN_SUCCESS) {
+            LOGW("GetModelID failed, some error happen when get model id for device.");
+        }
+
+        _ret = DeinitScheduling(modelId);
+        if (_ret != OH_NN_SUCCESS) {
+            LOGW("DeinitScheduling failed, some error happen when DeinitScheduling model.");
+        }
+        m_preparedModel.reset();
+        std::chrono::duration<double> duration = std::chrono::steady_clock::now() - m_loadtime;
+        if (mode == "FrozenDeinit") {
+            m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
+            LOGI("FrozenDeinit pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d time=%{public}f",
+                getpid(), originHiaiModelId_, modelId, duration.count());
+        } else {
+            LOGI("AutoUnload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d time=%{public}f",
+                getpid(), originHiaiModelId_, modelId, duration.count());
+        }
+    }
+
+    return true;
 }
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS

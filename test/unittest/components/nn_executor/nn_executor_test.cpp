@@ -160,8 +160,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_construct_001, TestSize.Level0)
     EXPECT_CALL(*((MockIDevice *) device.get()), AllocateTensorBuffer(length, m_outputTensorDescs[m_index].first))
         .WillRepeatedly(::testing::Return(reinterpret_cast<void*>(0x1000)));
 
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
     EXPECT_NE(nullptr, nnExecutor);
 
     OH_NN_Memory** memory = nullptr;
@@ -198,8 +203,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_001, TestSize.Level0)
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 0;
     size_t min = 1;
@@ -229,8 +239,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_002, TestSize.Level0)
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 0;
     size_t max = 10;
@@ -258,8 +273,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_003, TestSize.Level0)
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 0;
     size_t min = 1;
@@ -287,8 +307,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_004, TestSize.Level0)
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 0;
     size_t min = 1;
@@ -317,8 +342,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_005, TestSize.Level0)
         .WillRepeatedly(::testing::Return(OH_NN_SUCCESS));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 0;
     size_t min = 1;
@@ -357,8 +387,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_006, TestSize.Level0)
             }));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 0;
     size_t min = 1;
@@ -397,8 +432,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_007, TestSize.Level0)
             }));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 0;
     size_t min = 1;
@@ -437,8 +477,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputdimrange_008, TestSize.Level0)
             }));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 0;
     size_t min = 1;
@@ -465,8 +510,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getoutputshape_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     int32_t expectDim[2] = {3, 3};
     int32_t* ptr = expectDim;
@@ -494,8 +544,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getoutputshape_002, TestSize.Level0)
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     int32_t expectDim[2] = {3, 3};
     int32_t* ptr = expectDim;
@@ -521,12 +576,17 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getoutputshape_003, TestSize.Level0)
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair1;
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     std::shared_ptr<TensorDesc> tensorDesr = std::make_shared<TensorDesc>();
     pair1.first = tensorDesr;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     int32_t expectDim[2] = {3, 3};
     int32_t* ptr = expectDim;
@@ -562,8 +622,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getoutputshape_004, TestSize.Level0)
     pair2.first = tensorDesr;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     int32_t expectDim2[2] = {3, 3};
     int32_t* ptr2 = expectDim2;
@@ -587,8 +652,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getinputnum_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t ret = nnExecutor->GetInputNum();
     EXPECT_EQ(0, ret);
@@ -607,8 +677,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getoutputnum_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
 
     size_t ret = nnExecutor->GetOutputNum();
@@ -628,8 +703,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createinputtensordesc_001, TestSize.Leve
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 1;
     NN_TensorDesc* ret = nnExecutor->CreateInputTensorDesc(index);
@@ -655,8 +735,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createinputtensordesc_002, TestSize.Leve
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
 
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 1;
     NN_TensorDesc* ret = nnExecutor->CreateInputTensorDesc(index);
@@ -688,9 +773,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createinputtensordesc_003, TestSize.Leve
     pair2.first = tensorDesr;
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
 
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 0;
     NN_TensorDesc* ret = nnExecutor->CreateInputTensorDesc(index);
@@ -710,8 +799,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createoutputtensordesc_001, TestSize.Lev
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 1;
     NN_TensorDesc* ret = nnExecutor->CreateOutputTensorDesc(index);
@@ -737,8 +831,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createoutputtensordesc_002, TestSize.Lev
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
 
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 1;
     NN_TensorDesc* ret = nnExecutor->CreateOutputTensorDesc(index);
@@ -771,8 +870,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createoutputtensordesc_003, TestSize.Lev
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
 
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t index = 1;
     NN_TensorDesc* ret = nnExecutor->CreateOutputTensorDesc(index);
@@ -806,8 +910,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setonrundone_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_ReturnCode ret = nnExecutor->SetOnRunDone(MyOnRunDone);
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, ret);
@@ -831,8 +940,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setonservicedied_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_ReturnCode ret = nnExecutor->SetOnServiceDied(MyOnServiceDied);
     EXPECT_EQ(OH_NN_OPERATION_FORBIDDEN, ret);
@@ -851,8 +965,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runsync_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t inputSize = 1;
     size_t outputSize = 1;
@@ -873,8 +992,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runsync_002, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t inputSize = 0;
     size_t outputSize = 1;
@@ -923,8 +1047,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runsync_003, TestSize.Level0)
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
 
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t backendID = 1;
     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
@@ -984,8 +1113,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runsync_004, TestSize.Level0)
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
 
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t backendID = 1;
     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
@@ -1044,8 +1178,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runsync_005, TestSize.Level0)
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
 
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t backendID = 1;
     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
@@ -1076,8 +1215,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runasync_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     void* buffer = m_dataArry;
     size_t inputSize = 1;
@@ -1100,8 +1244,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runasync_002, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     void* buffer = m_dataArry;
     size_t inputSize = 0;
@@ -1151,8 +1300,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_runasync_003, TestSize.Level0)
     m_inputTensorDescs.emplace_back(pair2);
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t backendID = 1;
     std::shared_ptr<MockIDevice> device = std::make_shared<MockIDevice>();
@@ -1185,8 +1339,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_getbackendid_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t ret = nnExecutor->GetBackendID();
     EXPECT_EQ(0, ret);
@@ -1207,8 +1366,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setinput_001, TestSize.Level0)
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Tensor tensor = SetTensor(OH_NN_FLOAT32, m_dimensionCount, m_dimArry, nullptr, OH_NN_TENSOR);
     void* buffer = m_dataArry;
@@ -1240,9 +1404,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setinput_002, TestSize.Level0)
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
 
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Tensor tensor = SetTensor(OH_NN_FLOAT32, m_dimensionCount, m_dimArry, nullptr, OH_NN_TENSOR);
     void* buffer = m_dataArry;
@@ -1281,9 +1449,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setinput_003, TestSize.Level0)
     pair2.first = tensorDesr;
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
 
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Tensor tensor = SetTensor(OH_NN_FLOAT32, m_dimensionCount, m_dimArry, nullptr, OH_NN_TENSOR);
     void* buffer = m_dataArry;
@@ -1310,8 +1482,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setinputfrommemory_001, TestSize.Level0)
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Tensor tensor = SetTensor(OH_NN_FLOAT32, m_dimensionCount, m_dimArry, nullptr, OH_NN_TENSOR);
     void* const data = m_dataArry;
@@ -1343,8 +1520,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setinputfrommemory_002, TestSize.Level0)
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Tensor tensor = SetTensor(OH_NN_FLOAT32, m_dimensionCount, m_dimArry, nullptr, OH_NN_TENSOR);
     void* const data = m_dataArry;
@@ -1383,8 +1565,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setinputfrommemory_003, TestSize.Level0)
     pair2.first = tensorDesr;
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Tensor tensor = SetTensor(OH_NN_FLOAT32, m_dimensionCount, m_dimArry, nullptr, OH_NN_TENSOR);
     void* const data = m_dataArry;
@@ -1409,8 +1596,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setoutput_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t length = 9 * sizeof(float);
     void* buffer = m_dataArry;
@@ -1437,8 +1629,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setoutput_002, TestSize.Level0)
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t length = 9 * sizeof(float);
     void* buffer = m_dataArry;
@@ -1472,8 +1669,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setoutput_003, TestSize.Level0)
     pair2.first = tensorDesr;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t length = 9 * sizeof(float);
     void* buffer = m_dataArry;
@@ -1495,8 +1697,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setoutputfrommemory_001, TestSize.Level0
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     void* const data = m_dataArry;
     OH_NN_Memory memory = {data, 9 * sizeof(float)};
@@ -1523,8 +1730,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setoutputfrommemory_002, TestSize.Level0
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     void* const data = m_dataArry;
     OH_NN_Memory memory = {data, 9 * sizeof(float)};
@@ -1558,8 +1770,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setoutputfrommemory_003, TestSize.Level0
     pair2.first = tensorDesr;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     void* const data = m_dataArry;
     OH_NN_Memory memory = {data, 9 * sizeof(float)};
@@ -1581,8 +1798,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createinputmemory_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Memory** memory = nullptr;
     float dataArry[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -1614,8 +1836,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createinputmemory_002, TestSize.Level0)
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Memory** memory = nullptr;
     float dataArry[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -1655,6 +1882,9 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createinputmemory_003, TestSize.Level0)
     pair2.first = tensorDesr;
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
 
     float dataArry[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     size_t length = 9 * sizeof(float);
@@ -1662,7 +1892,8 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createinputmemory_003, TestSize.Level0)
         .WillRepeatedly(::testing::Return(nullptr));
 
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Memory** memory = nullptr;
     void* const data = dataArry;
@@ -1702,6 +1933,9 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createinputmemory_004, TestSize.Level0)
     pair2.first = tensorDesr;
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
 
     float dataArry[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     size_t length = 9 * sizeof(float);
@@ -1709,7 +1943,8 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createinputmemory_004, TestSize.Level0)
         .WillRepeatedly(::testing::Return(reinterpret_cast<void*>(0x1000)));
 
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Memory** memory = nullptr;
     void* const data = dataArry;
@@ -1736,8 +1971,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_destroyinputmemory_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t length = 9 * sizeof(float);
     OH_NN_Memory** memory = nullptr;
@@ -1770,8 +2010,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_destroyinputmemory_002, TestSize.Level0)
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t length = 9 * sizeof(float);
     OH_NN_Memory** memory = nullptr;
@@ -1811,13 +2056,17 @@ HWTEST_F(NNExecutorTest, nnexecutortest_destroyinputmemory_003, TestSize.Level0)
     pair2.first = tensorDesr;
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
 
     float dataArry[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     size_t length = 9 * sizeof(float);
     EXPECT_CALL(*((MockIDevice *) device.get()), AllocateTensorBuffer(length, m_inputTensorDescs[m_index].first))
         .WillRepeatedly(::testing::Return(reinterpret_cast<void*>(0x1000)));
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Memory** memory = nullptr;
     void* const data = dataArry;
@@ -1845,8 +2094,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createoutputmemory_001, TestSize.Level0)
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t length = 9 * sizeof(float);
     OH_NN_Memory** memory = nullptr;
@@ -1878,8 +2132,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createoutputmemory_002, TestSize.Level0)
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Memory** memory = nullptr;
     float dataArry[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -1919,6 +2178,9 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createoutputmemory_003, TestSize.Level0)
     pair2.first = tensorDesr;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
 
     float dataArry[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     size_t length = 9 * sizeof(float);
@@ -1926,7 +2188,8 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createoutputmemory_003, TestSize.Level0)
         .WillRepeatedly(::testing::Return(nullptr));
 
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Memory** memory = nullptr;
     void* const data = dataArry;
@@ -1966,6 +2229,9 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createoutputmemory_004, TestSize.Level0)
     pair2.first = tensorDesr;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
 
     float dataArry[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     size_t length = 9 * sizeof(float);
@@ -1973,7 +2239,8 @@ HWTEST_F(NNExecutorTest, nnexecutortest_createoutputmemory_004, TestSize.Level0)
         .WillRepeatedly(::testing::Return(reinterpret_cast<void*>(0x1000)));
 
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Memory** memory = nullptr;
     void* const data = dataArry;
@@ -2000,8 +2267,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_destroyoutputmemory_001, TestSize.Level0
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t length = 9 * sizeof(float);
     OH_NN_Memory** memory = nullptr;
@@ -2034,8 +2306,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_destroyoutputmemory_002, TestSize.Level0
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t length = 9 * sizeof(float);
     OH_NN_Memory** memory = nullptr;
@@ -2075,13 +2352,17 @@ HWTEST_F(NNExecutorTest, nnexecutortest_destroyoutputmemory_003, TestSize.Level0
     pair2.first = tensorDesr;
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
 
     float dataArry[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     size_t length = 9 * sizeof(float);
     EXPECT_CALL(*((MockIDevice *) device.get()), AllocateTensorBuffer(length, m_outputTensorDescs[m_index].first))
         .WillRepeatedly(::testing::Return(reinterpret_cast<void*>(0x1000)));
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     OH_NN_Memory** memory = nullptr;
     void* const data = dataArry;
@@ -2111,8 +2392,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_run_001, TestSize.Level0)
         .WillRepeatedly(::testing::Return(OH_NN_FAILED));
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t length = 9 * sizeof(float);
     OH_NN_Tensor tensor = SetTensor(OH_NN_FLOAT32, m_dimensionCount, m_dimArry, nullptr, OH_NN_TENSOR);
@@ -2146,8 +2432,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_run_002, TestSize.Level0)
     std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType> pair2;
     m_inputTensorDescs.emplace_back(pair1);
     m_inputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t length = 9 * sizeof(float);
     OH_NN_Tensor tensor = SetTensor(OH_NN_FLOAT32, m_dimensionCount, m_dimArry, nullptr, OH_NN_TENSOR);
@@ -2183,8 +2474,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_run_003, TestSize.Level0)
     m_inputTensorDescs.emplace_back(pair2);
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     size_t length = 9 * sizeof(float);
     OH_NN_Tensor tensor = SetTensor(OH_NN_FLOAT32, m_dimensionCount, m_dimArry, nullptr, OH_NN_TENSOR);
@@ -2220,8 +2516,13 @@ HWTEST_F(NNExecutorTest, nnexecutortest_setextensionconfig_001, TestSize.Level0)
     m_inputTensorDescs.emplace_back(pair2);
     m_outputTensorDescs.emplace_back(pair1);
     m_outputTensorDescs.emplace_back(pair2);
+    ExtensionConfig extensionConfig;
+    OH_NN_PerformanceMode performance {OH_NN_PERFORMANCE_EXTREME};
+    OH_NN_Priority priority {OH_NN_PRIORITY_HIGH};
+
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, mockIPreparedMode, m_inputTensorDescs, m_outputTensorDescs, "", 0, extensionConfig,
+        false, performance, priority);
 
     std::unordered_map<std::string, std::vector<char>> configMap;
     std::string callingPidStr = "callingPid";
