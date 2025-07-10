@@ -16,8 +16,6 @@
 #ifndef NEURAL_NETWORK_RUNTIME_EXECUTOR_CONFIG_H
 #define NEURAL_NETWORK_RUNTIME_EXECUTOR_CONFIG_H
 
-#include "nnrt_client.h"
-
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 struct ExecutorConfig {

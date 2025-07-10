@@ -16,11 +16,17 @@
 #ifndef NEURAL_NETWORK_RUNTIME_NNEXECUTOR_H
 #define NEURAL_NETWORK_RUNTIME_NNEXECUTOR_H
 
+#include <mutex>
 #include "executor.h"
 #include "device.h"
 #include "prepared_model.h"
 #include "nn_tensor.h"
+#include "log.h"
 
+#include "event_handler.h"
+#include "event_runner.h"
+
+#include <chrono>
 namespace OHOS {
 namespace NeuralNetworkRuntime {
 class NNExecutor : public Executor {
@@ -29,7 +35,9 @@ public:
                std::shared_ptr<Device> device,
                std::shared_ptr<PreparedModel> preparedModel,
                const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& inputTensorDescs,
-               const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& outputTensorDescs);
+               const std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& outputTensorDescs,
+               std::string cachePath, uint32_t cacheVersion, ExtensionConfig extensionConfig, bool enableFp16,
+               OH_NN_PerformanceMode performance, OH_NN_Priority priority);
     ~NNExecutor() override;
 
     OH_NN_ReturnCode GetInputDimRange(size_t inputIndex,
@@ -73,6 +81,10 @@ public:
 
     OH_NN_ReturnCode Run();
 
+    bool DeinitModel(std::string mode) override;
+    OH_NN_ReturnCode SetDeinitModelCallBack() override;
+    OH_NN_ReturnCode UnSetDeinitModelCallBack() override;
+
 private:
     OH_NN_ReturnCode GetInputDimVec() const;
     OH_NN_ReturnCode CheckInputDimRanges(NN_Tensor* inputTensors[], size_t inputSize);
@@ -91,6 +103,11 @@ private:
     void SetInputTensorWithNewBuffer(uint32_t index, std::shared_ptr<NNTensor> inputTensor,
                                      const void* inputBuffer, size_t length, bool isInnerMem);
     OH_NN_ReturnCode CheckInputDimRanges(uint32_t index, const OH_NN_Tensor& nnTensor) const;
+    OH_NN_ReturnCode DeserializedTensorsFromBuffer(
+        const Buffer& buffer, std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& tensorDescs);
+    OH_NN_ReturnCode Reload();
+    OH_NN_ReturnCode ReinitScheduling(uint32_t hiaimodelID, bool* needModelLatency, const char* cachePath);
+    OH_NN_ReturnCode DeinitScheduling(uint32_t hiaimodelID);
 
 private:
     size_t m_backendID {0};
@@ -98,6 +115,13 @@ private:
     std::shared_ptr<PreparedModel> m_preparedModel {nullptr};
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
+    std::string m_cachePath;
+    uint32_t m_cacheVersion {0};
+    ExtensionConfig m_extensionConfig;
+    bool m_enableFp16 {false};
+    OH_NN_PerformanceMode m_performance {OH_NN_PERFORMANCE_NONE};
+    OH_NN_Priority m_priority {OH_NN_PRIORITY_NONE};
+    uint32_t originHiaiModelId_;
 
     // The following parameters are provided for compatibility with older versions
     struct ExeTensor {
@@ -114,6 +138,12 @@ private:
     std::unordered_map<int, std::vector<void*>> m_outputCreatedMem;
     mutable std::vector<std::vector<size_t>> m_minInputDimsVec;
     mutable std::vector<std::vector<size_t>> m_maxInputDimsVec;
+
+    std::shared_ptr<OHOS::AppExecFwk::EventRunner> m_autoUnloadRunner;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> m_autoUnloadHandler;
+    uint64_t m_executorid;
+    std::mutex m_mutex;
+    std::chrono::time_point<std::chrono::steady_clock> m_loadtime;
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
