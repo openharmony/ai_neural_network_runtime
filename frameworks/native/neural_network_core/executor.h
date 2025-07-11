@@ -17,7 +17,6 @@
 #define NEURAL_NETWORK_RUNTIME_EXECUTOR_H
 
 #include <string>
-#include <memory>
 #include <unordered_map>
 
 #include "compiler.h"
@@ -60,6 +59,18 @@ public:
     virtual size_t GetBackendID() = 0;
     virtual OH_NN_ReturnCode SetExtensionConfig(const std::unordered_map<std::string, std::vector<char>>& configs) = 0;
     virtual ExecutorConfig* GetExecutorConfig() const = 0;
+    virtual bool DeinitModel(std::string mode)
+    {
+        return true;
+    }
+    virtual OH_NN_ReturnCode SetDeinitModelCallBack()
+    {
+        return OH_NN_SUCCESS;
+    }
+    virtual OH_NN_ReturnCode UnSetDeinitModelCallBack()
+    {
+        return OH_NN_SUCCESS;
+    }
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS

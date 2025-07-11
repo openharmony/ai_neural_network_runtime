@@ -777,7 +777,8 @@ NNExecutor* NNCompiler::CreateExecutor()
     }
 
     NNExecutor* nnExecutor = new (std::nothrow) NNExecutor(
-        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs);
+        m_backendID, m_device, m_preparedModel, m_inputTensorDescs, m_outputTensorDescs,
+        m_cachePath, m_cacheVersion, m_extensionConfig, m_enableFp16, m_performance, m_priority);
     if (nnExecutor == nullptr) {
         LOGE("[NNCompiler] CreateExecutor failed, error happend when allocating NN Executor.");
         return nullptr;
