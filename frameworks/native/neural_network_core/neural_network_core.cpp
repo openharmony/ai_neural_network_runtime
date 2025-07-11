@@ -544,6 +544,7 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &isExcee
     }
 
     if (!isExceedRamLimit) {
+        LOGI("Model accupy memory less then limit, no need authenticating");
         return OH_NN_SUCCESS; // If model ram is less than max limit, no need authenticating.
     }
 
