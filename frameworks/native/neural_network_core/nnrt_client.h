@@ -17,7 +17,7 @@
 #define NEURAL_NETWORK_RUNTIME_CLIENT_H
 
 #include <cstddef>
-#include <memory>
+#include "executor.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -42,7 +42,12 @@ public:
     int (*UpdateModelLatency)(uint32_t hiaiModelId, int modelLatency) = nullptr;
     int (*Unload)(uint32_t hiaiModelId) = nullptr;
     bool (*PullUpDlliteService)() = nullptr;
-
+    int (*AutoReinitSetModelID)(uint32_t hiaimodelID, size_t nnrtModelID) = nullptr;
+    int (*AutoReinitScheduling)(uint32_t originHiaimodelID, uint32_t hiaiModelId,
+        bool* needModelLatency, const char* cachePath) = nullptr;
+    int (*AutoUnload)(uint32_t originHiaimodelID, uint32_t hiaiModelId) = nullptr;
+    int (*SetDeinitModelCallBack)(uint32_t hiaiModelId, OHOS::NeuralNetworkRuntime::Executor* callback) = nullptr;
+    int (*UnSetDeinitModelCallBack)(uint32_t hiaiModelId) = nullptr;
 private:
     bool m_serviceAvailable = false;
     NNRtServiceApi() = default;

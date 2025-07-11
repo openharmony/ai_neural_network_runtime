@@ -1390,6 +1390,12 @@ OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation)
         return ret;
     }
 
+    ret = executorImpl->SetDeinitModelCallBack();
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("SetDeinitModelCallBack failed, failed to set DeinitModelCallBack to client.");
+        return ret;
+    }
+
     return OH_NN_SUCCESS;
 }
 

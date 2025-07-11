@@ -32,7 +32,8 @@
                 "mindspore",
                 "init",
                 "json",
-                "jsoncpp"
+                "jsoncpp",
+                "eventhandler"
             ],
             "third_party": []
         },
