@@ -1476,15 +1476,6 @@ OH_NN_ReturnCode NNExecutor::SetDeinitModelCallBack()
         return static_cast<OH_NN_ReturnCode>(ret);
     }
 
-    auto _ret = GetModelID(originHiaiModelId_);
-    if (_ret != OH_NN_SUCCESS) {
-        LOGW("GetModelID failed, some error happen when get model id for device.");
-    }
-
-    uint32_t modelId;
-    GetModelID(modelId);
-    LOGI("manualload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
-        getpid(), originHiaiModelId_, modelId);
     return OH_NN_SUCCESS;
 }
 
