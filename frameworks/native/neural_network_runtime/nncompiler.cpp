@@ -453,12 +453,17 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild()
 {
     // cache存在，从cache直接复原prepareModel、input/output TensorDesc
     OH_NN_ReturnCode ret = RestoreFromCacheFile();
-    if (ret != OH_NN_SUCCESS) {
+    if (ret == OH_NN_INVALID_FILE) {
         char path[PATH_MAX];
-        realpath(m_cachePath.c_str(), path);
+        if (realpath(m_cachePath.c_str(), path) == nullptr) {
+            LOGE("[NNCompiler] Build failed, fail to get the real path of cacheDir.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+
         std::string cachePath = path;
         std::string cacheInfo = cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
         if (std::filesystem::exists(cacheInfo)) {
+            LOGW("[NNCompiler] cache file is failed, fail to delete cache file.");
             std::filesystem::remove_all(cacheInfo);
         }
     }

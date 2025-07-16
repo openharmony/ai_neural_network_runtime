@@ -17,6 +17,7 @@
 
 #include <string>
 #include <securec.h>
+#include <sys/stat.h>
 #include <utility>
 #include <unordered_map>
 #include <future>
@@ -32,6 +33,112 @@
 using namespace OHOS::NeuralNetworkRuntime;
 #define NNRT_API __attribute__((visibility("default")))
 const size_t INPUT_OUTPUT_MAX_INDICES = 200;
+
+namespace {
+OH_NN_ReturnCode GetNnrtModelId(Compilation* compilationImpl, NNRtServiceApi& nnrtService)
+{
+    std::string modelName;
+    compilationImpl->compiler->GetModelName(modelName);
+    if (compilationImpl->cachePath != nullptr) {
+        struct stat buffer;
+        if (stat(compilationImpl->cachePath, &buffer) != 0) {
+            LOGE("GetModelId failed, cachePath is not exit or permission.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+    }
+
+    if (compilationImpl->nnModel != nullptr) {
+        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromCache(compilationImpl->cachePath,
+            modelName.c_str());
+        if (compilationImpl->nnrtModelID == 1) {
+            compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromModel(compilationImpl->nnModel);
+        }
+    } else if (compilationImpl->offlineModelPath != nullptr) {
+        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromPath(compilationImpl->offlineModelPath);
+    } else if (compilationImpl->cachePath != nullptr) {
+        compilationImpl->nnrtModelID =
+            nnrtService.GetNNRtModelIDFromCache(compilationImpl->cachePath, modelName.c_str());
+    } else if ((compilationImpl->offlineModelBuffer.first != nullptr) && \
+               (compilationImpl->offlineModelBuffer.second != size_t(0))) {
+        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromBuffer(
+            compilationImpl->offlineModelBuffer.first, compilationImpl->offlineModelBuffer.second);
+    } else if ((compilationImpl->cacheBuffer.first != nullptr) && \
+               (compilationImpl->cacheBuffer.second != size_t(0))) {
+        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromBuffer(
+            compilationImpl->cacheBuffer.first, compilationImpl->cacheBuffer.second);
+    } else {
+        LOGE("GetModelId failed, no available model to set modelId, please check.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode IsCompilationAvaliable(Compilation* compilationImpl)
+{
+    if (compilationImpl == nullptr) {
+        LOGE("IsCompilationAvaliable failed, compilation implementation is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (((compilationImpl->nnModel != nullptr) && (compilationImpl->offlineModelPath != nullptr)) ||
+        ((compilationImpl->nnModel != nullptr) &&
+         ((compilationImpl->offlineModelBuffer.first != nullptr) ||
+          (compilationImpl->offlineModelBuffer.second != static_cast<size_t>(0)))) ||
+        ((compilationImpl->offlineModelPath != nullptr) &&
+         ((compilationImpl->offlineModelBuffer.first != nullptr) ||
+          (compilationImpl->offlineModelBuffer.second != static_cast<size_t>(0))))) {
+        LOGE("IsCompilationAvaliable failed, find multi model to build compilation.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (compilationImpl->compiler != nullptr) {
+        LOGE("IsCompilationAvaliable failed, the compiler in compilation is not nullptr, "
+             "please input a new compilation.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode CheckModelSize(const Compilation* compilation, NNRtServiceApi& nnrtService, bool& isExceedRamLimit)
+{
+    int ret = static_cast<OH_NN_ReturnCode>(OH_NN_SUCCESS);
+    if (compilation->nnModel != nullptr) {
+        ret = nnrtService.CheckModelSizeFromModel(compilation->nnModel, isExceedRamLimit);
+    } else if (compilation->offlineModelPath != nullptr) {
+        ret = nnrtService.CheckModelSizeFromPath(compilation->offlineModelPath, isExceedRamLimit);
+    } else if (compilation->cachePath != nullptr) {
+        struct stat buffer;
+        if (stat(compilation->cachePath, &buffer) != 0) {
+            LOGE("CheckExceedRamLimit failed, cachePath is not exit or permission.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+
+        std::string modelName;
+        compilation->compiler->GetModelName(modelName);
+        ret = nnrtService.CheckModelSizeFromCache(compilation->cachePath, modelName, isExceedRamLimit);
+    } else if ((compilation->offlineModelBuffer.first != nullptr) && \
+               (compilation->offlineModelBuffer.second != size_t(0))) {
+        ret = nnrtService.CheckModelSizeFromBuffer(
+            compilation->offlineModelBuffer.first, compilation->offlineModelBuffer.second, isExceedRamLimit);
+    } else if ((compilation->cacheBuffer.first != nullptr) && \
+               (compilation->cacheBuffer.second != size_t(0))) {
+        ret = nnrtService.CheckModelSizeFromBuffer(
+            compilation->cacheBuffer.first, compilation->cacheBuffer.second, isExceedRamLimit);
+    } else {
+        LOGE("CheckExceedRamLimit failed, no available model to check.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (ret != static_cast<OH_NN_ReturnCode>(OH_NN_SUCCESS)) {
+        LOGE("CheckExceedRamLimit failed, some error happened when check if model exceed ram limit.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    return OH_NN_SUCCESS;
+}
+}
 
 NNRT_API OH_NN_ReturnCode OH_NNDevice_GetAllDevicesID(const size_t **allDevicesID, uint32_t *deviceCount)
 {
@@ -505,33 +612,11 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
         return OH_NN_INVALID_PARAMETER;
     }
 
-    int ret = static_cast<OH_NN_ReturnCode>(OH_NN_SUCCESS);
-    if (compilation->nnModel != nullptr) {
-        ret = nnrtService.CheckModelSizeFromModel(compilation->nnModel, isExceedRamLimit);
-    } else if (compilation->offlineModelPath != nullptr) {
-        ret = nnrtService.CheckModelSizeFromPath(compilation->offlineModelPath, isExceedRamLimit);
-    } else if (compilation->cachePath != nullptr) {
-        std::string modelName;
-        compilation->compiler->GetModelName(modelName);
-        ret = nnrtService.CheckModelSizeFromCache(compilation->cachePath, modelName, isExceedRamLimit);
-    } else if ((compilation->offlineModelBuffer.first != nullptr) && \
-               (compilation->offlineModelBuffer.second != size_t(0))) {
-        ret = nnrtService.CheckModelSizeFromBuffer(
-            compilation->offlineModelBuffer.first, compilation->offlineModelBuffer.second, isExceedRamLimit);
-    } else if ((compilation->cacheBuffer.first != nullptr) && \
-               (compilation->cacheBuffer.second != size_t(0))) {
-        ret = nnrtService.CheckModelSizeFromBuffer(
-            compilation->cacheBuffer.first, compilation->cacheBuffer.second, isExceedRamLimit);
-    } else {
-        LOGE("CheckExceedRamLimit failed, no available model to check.");
+    OH_NN_ReturnCode ret = CheckModelSize(compilation, nnrtService, isExceedRamLimit);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("CheckExceedRamLimit failed, fail to check model size.");
         return OH_NN_INVALID_PARAMETER;
     }
-
-    if (ret != static_cast<OH_NN_ReturnCode>(OH_NN_SUCCESS)) {
-        LOGE("CheckExceedRamLimit failed, some error happened when check if model exceed ram limit.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
     return OH_NN_SUCCESS;
 }
 
@@ -610,67 +695,6 @@ OH_NN_ReturnCode Authentication(Compilation** compilation, bool &isExceedRamLimi
     }
 
     return OH_NN_SUCCESS;
-}
-
-namespace {
-OH_NN_ReturnCode GetNnrtModelId(Compilation* compilationImpl, NNRtServiceApi& nnrtService)
-{
-    std::string modelName;
-    compilationImpl->compiler->GetModelName(modelName);
-
-    if (compilationImpl->nnModel != nullptr) {
-        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromCache(compilationImpl->cachePath,
-            modelName.c_str());
-        if (compilationImpl->nnrtModelID == 0) {
-            compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromModel(compilationImpl->nnModel);
-        }
-    } else if (compilationImpl->offlineModelPath != nullptr) {
-        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromPath(compilationImpl->offlineModelPath);
-    } else if (compilationImpl->cachePath != nullptr) {
-        compilationImpl->nnrtModelID =
-            nnrtService.GetNNRtModelIDFromCache(compilationImpl->cachePath, modelName.c_str());
-    } else if ((compilationImpl->offlineModelBuffer.first != nullptr) && \
-               (compilationImpl->offlineModelBuffer.second != size_t(0))) {
-        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromBuffer(
-            compilationImpl->offlineModelBuffer.first, compilationImpl->offlineModelBuffer.second);
-    } else if ((compilationImpl->cacheBuffer.first != nullptr) && \
-               (compilationImpl->cacheBuffer.second != size_t(0))) {
-        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromBuffer(
-            compilationImpl->cacheBuffer.first, compilationImpl->cacheBuffer.second);
-    } else {
-        LOGE("GetModelId failed, no available model to set modelId, please check.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    return OH_NN_SUCCESS;
-}
-
-OH_NN_ReturnCode IsCompilationAvaliable(Compilation* compilationImpl)
-{
-    if (compilationImpl == nullptr) {
-        LOGE("IsCompilationAvaliable failed, compilation implementation is nullptr.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (((compilationImpl->nnModel != nullptr) && (compilationImpl->offlineModelPath != nullptr)) ||
-        ((compilationImpl->nnModel != nullptr) &&
-         ((compilationImpl->offlineModelBuffer.first != nullptr) ||
-          (compilationImpl->offlineModelBuffer.second != static_cast<size_t>(0)))) ||
-        ((compilationImpl->offlineModelPath != nullptr) &&
-         ((compilationImpl->offlineModelBuffer.first != nullptr) ||
-          (compilationImpl->offlineModelBuffer.second != static_cast<size_t>(0))))) {
-        LOGE("IsCompilationAvaliable failed, find multi model to build compilation.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (compilationImpl->compiler != nullptr) {
-        LOGE("IsCompilationAvaliable failed, the compiler in compilation is not nullptr, "
-             "please input a new compilation.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    return OH_NN_SUCCESS;
-}
 }
 
 OH_NN_ReturnCode GetModelId(Compilation** compilation)
