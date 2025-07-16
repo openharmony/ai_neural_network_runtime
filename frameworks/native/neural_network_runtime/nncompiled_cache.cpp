@@ -109,7 +109,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
 
     if (static_cast<int64_t>(version) > cacheInfo.version) {
         LOGE("[NNCompiledCache] Restore failed, version is not match.");
-        return OH_NN_INVALID_PARAMETER;
+        return OH_NN_INVALID_FILE;
     }
 
     if (static_cast<int64_t>(version) < cacheInfo.version) {
@@ -124,7 +124,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
         ret = ReadCacheModelFile(cacheModelPath, modelBuffer);
         if (ret != OH_NN_SUCCESS) {
             LOGE("[NNCompiledCache] Restore failed, error happened when calling ReadCacheModelFile.");
-            return ret;
+            return OH_NN_INVALID_FILE;
         }
 
         if (GetCrc16(static_cast<char*>(modelBuffer.data), modelBuffer.length) !=
@@ -344,7 +344,7 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
         LOGE("[NNCompiledCache] CheckCacheInfo failed. The deviceId in the cache files "
              "is different from current deviceId,"
              "please change the cache directory or current deviceId.");
-        return OH_NN_INVALID_PARAMETER;
+        return OH_NN_INVALID_FILE;
     }
 
     if (j["data"].find("fileNumber") == j["data"].end()) {
