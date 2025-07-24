@@ -573,6 +573,10 @@ OH_NN_ReturnCode NNExecutor::RunSync(NN_Tensor* inputTensors[], size_t inputSize
             if (_ret != OH_NN_SUCCESS) {
                 LOGW("ReinitScheduling failed, some error happen when ReinitScheduling model.");
             }
+            _ret = SetDeinitModelCallBack();
+            if (_ret != OH_NN_SUCCESS) {
+                LOGW("SetDeinitModelCallBack failed, some error happen when ReinitScheduling model.");
+            }
         }
 
         OH_NN_ReturnCode ret {OH_NN_FAILED};
