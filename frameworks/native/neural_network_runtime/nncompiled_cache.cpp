@@ -415,7 +415,7 @@ OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath
         return OH_NN_INVALID_PARAMETER;
     }
     if (access(path, 0) != 0) {
-        LOGE("[NNCompiledCache] ReadCacheModelFile failed, %{public}s is not exist.", path);
+        LOGE("[NNCompiledCache] ReadCacheModelFile failed, filePath is not exist.");
         return OH_NN_INVALID_PARAMETER;
     }
 
