@@ -1528,7 +1528,7 @@ OH_NN_ReturnCode NNExecutor::ReinitScheduling(uint32_t hiaimodelID, bool* needMo
         return OH_NN_INVALID_PARAMETER;
     }
 
-    int ret = nnrtService.AutoReinitSetModelID(hiaimodelID, nnrtmodelID);
+    int ret = nnrtService.AutoReinitSetModelID(m_originHiaiModelId, hiaimodelID, nnrtmodelID);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("[HiaiExecutorImpl] ReinitScheduling failed, some error happened when AutoReinitSetModelID.");
         return OH_NN_INVALID_PARAMETER;
