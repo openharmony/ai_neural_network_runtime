@@ -121,7 +121,7 @@ private:
     bool m_enableFp16 {false};
     OH_NN_PerformanceMode m_performance {OH_NN_PERFORMANCE_NONE};
     OH_NN_Priority m_priority {OH_NN_PRIORITY_NONE};
-    uint32_t originHiaiModelId_;
+    uint32_t m_originHiaiModelId;
 
     // The following parameters are provided for compatibility with older versions
     struct ExeTensor {
