@@ -473,7 +473,6 @@ OH_NN_ReturnCode NNCompiler::OnlineBuild()
         return ret;
     }
     if (ret == OH_NN_SUCCESS) {
-        LOGI("[NNCompiler] Build success, restore from cache file.");
         m_isBuild = true;
     }
 
