@@ -152,7 +152,7 @@ NNExecutor::NNExecutor(size_t backendID, std::shared_ptr<Device> device, std::sh
         };
         m_autoUnloadHandler->PostTask(AutoUnloadTask,
             "nnexecutor_autounload" + std::to_string(m_executorid), AUTOUNLOAD_TIME);
-        
+
         GetModelID(m_originHiaiModelId);
         LOGI("manualload pid=%{public}d originHiaiModelId=%{public}d",
             getpid(), m_originHiaiModelId);
@@ -388,7 +388,7 @@ OH_NN_ReturnCode NNExecutor::DeserializedTensorsFromBuffer(
 
         auto memRet = memcpy_s(&desc.m_dataType, SIZE_OF_DATATYPE, ptr, sizeof(desc.m_dataType));
         if (memRet != EOK) {
-            LOGE("[NNCompiler] DeserializedTensorsFromBuffer failed, failed to memcpy_s data type.");
+            LOGE("[NNExecutor] DeserializedTensorsFromBuffer failed, failed to memcpy_s data type.");
             ReleaseDescShape(immediateTensorDescs);
             return OH_NN_MEMORY_ERROR;
         }
@@ -396,7 +396,7 @@ OH_NN_ReturnCode NNExecutor::DeserializedTensorsFromBuffer(
 
         memRet = memcpy_s(&desc.m_format, SIZE_OF_FORMAT, ptr, sizeof(desc.m_format));
         if (memRet != EOK) {
-            LOGE("[NNCompiler] DeserializedTensorsFromBuffer failed, failed to memcpy_s format.");
+            LOGE("[NNExecutor] DeserializedTensorsFromBuffer failed, failed to memcpy_s format.");
             ReleaseDescShape(immediateTensorDescs);
             return OH_NN_MEMORY_ERROR;
         }
@@ -562,7 +562,6 @@ OH_NN_ReturnCode NNExecutor::RunSync(NN_Tensor* inputTensors[], size_t inputSize
             if (Reload() != OH_NN_SUCCESS) {
                 return OH_NN_INVALID_PARAMETER;
             }
-
             auto _ret = GetModelID(modelId);
             LOGI("AutoReload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
                 getpid(), m_originHiaiModelId, modelId);
@@ -1518,7 +1517,7 @@ OH_NN_ReturnCode NNExecutor::ReinitScheduling(uint32_t hiaimodelID, bool* needMo
     }
 
     if (nnrtService.AutoReinitSetModelID == nullptr) {
-        LOGE("HiaiExecutorImpl] ReinitScheduling failed, nnrtService AutoReinitSetModelId func is nullptr.");
+        LOGE("[HiaiExecutorImpl] ReinitScheduling failed, nnrtService AutoReinitSetModelId func is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -1554,7 +1553,7 @@ OH_NN_ReturnCode NNExecutor::ReinitScheduling(uint32_t hiaimodelID, bool* needMo
         LOGE("ReinitScheduling failed, nnrtService IsSupportScheduling func is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
-
+ 
     ret = nnrtService.AutoReinitScheduling(m_originHiaiModelId, hiaimodelID, needModelLatency, cachePath);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("ReinitScheduling failed, some error happened when scheduling.");
@@ -1571,7 +1570,6 @@ OH_NN_ReturnCode NNExecutor::DeinitScheduling(uint32_t hiaimodelID)
         LOGE("[HiaiExecutorImpl] AutoUnload failed, nnrtService AutoUnload func is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
-
     int ret = nnrtService.AutoUnload(m_originHiaiModelId, hiaimodelID);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("[HiaiExecutorImpl] AutoUnload failed, some error happen when AutoUnload hiaiModelId.");
