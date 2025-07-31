@@ -426,7 +426,7 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_008, TestSize.Level0)
     std::vector<Buffer> caches;
 
     OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches);
-    EXPECT_EQ(OH_NN_INVALID_PARAMETER, retRestore);
+    EXPECT_EQ(OH_NN_INVALID_FILE, retRestore);
 }
 
 /**
