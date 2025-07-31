@@ -42,7 +42,7 @@ public:
     int (*UpdateModelLatency)(uint32_t hiaiModelId, int modelLatency) = nullptr;
     int (*Unload)(uint32_t hiaiModelId) = nullptr;
     bool (*PullUpDlliteService)() = nullptr;
-    int (*AutoReinitSetModelID)(uint32_t originHiaimodelId, uint32_t hiaimodelID, size_t nnrtmodelID) = nullptr;
+    int (*AutoReinitSetModelID)(uint32_t originHiaimodelID, uint32_t hiaimodelID, size_t nnrtmodelID) = nullptr;
     int (*AutoReinitScheduling)(uint32_t originHiaimodelID, uint32_t hiaiModelId,
         bool* needModelLatency, const char* cachePath) = nullptr;
     int (*AutoUnload)(uint32_t originHiaimodelID, uint32_t hiaiModelId) = nullptr;
