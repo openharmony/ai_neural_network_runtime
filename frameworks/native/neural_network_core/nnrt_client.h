@@ -26,14 +26,6 @@ public:
     static NNRtServiceApi& GetInstance();
     bool IsServiceAvaliable() const;
 
-    int (*CheckModelSizeFromPath)(const char* path, bool& exceedLimit) = nullptr;
-    int (*CheckModelSizeFromCache)(const char* path, const std::string& modelName, bool& exceedLimit) = nullptr;
-    int (*CheckModelSizeFromBuffer)(const void* buffer, size_t size, bool& exceedLimit) = nullptr;
-    int (*CheckModelSizeFromModel)(void* model, bool& exceedLimit) = nullptr;
-    size_t (*GetNNRtModelIDFromPath)(const char*) = nullptr;
-    size_t (*GetNNRtModelIDFromCache)(const char* path, const char* modelName) = nullptr;
-    size_t (*GetNNRtModelIDFromBuffer)(const void* buffer, size_t size) = nullptr;
-    size_t (*GetNNRtModelIDFromModel)(void* model) = nullptr;
     int (*SetModelID)(uint32_t hiaimodelID, size_t nnrtModelID) = nullptr;
     int (*IsSupportAuthentication)(bool* supportStat) = nullptr;
     int (*IsSupportScheduling)(bool* supportStat) = nullptr;

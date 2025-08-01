@@ -108,6 +108,8 @@ private:
     OH_NN_ReturnCode Reload();
     OH_NN_ReturnCode ReinitScheduling(uint32_t hiaimodelID, bool* needModelLatency, const char* cachePath);
     OH_NN_ReturnCode DeinitScheduling(uint32_t hiaimodelID);
+    OH_NN_ReturnCode GetNNRtModelIDFromCache(const std::string& path, const std::string& modelName,
+        size_t& nnrtModelID);
 
 private:
     size_t m_backendID {0};

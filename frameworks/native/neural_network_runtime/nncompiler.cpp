@@ -37,6 +37,13 @@ const std::string EXTENSION_KEY_MODEL_NAME = "ModelName";
 const std::string EXTENSION_KEY_FM_SHARED = "NPU_FM_SHARED";
 const std::string EXTENSION_KEY_IS_EXCEED_RAMLIMIT = "isExceedRamLimit";
 constexpr size_t INPUT_OUTPUT_MAX_NUM = 200;
+constexpr size_t MORE_MODEL_MAX_LIMIT = 201 * 1024 * 1024; // 201MB
+constexpr size_t MODEL_MAX_LIMIT = 200 * 1024 * 1024; // 200MB
+constexpr size_t CHECK_SUM_ZERO = 0;
+constexpr size_t CHECK_SUM_ONE = 1;
+constexpr size_t CHECK_SUM_TWO = 2;
+constexpr size_t EXTRACT_NODE_LAYER = 3;
+constexpr int32_t MINDSPORE_CONST_NODE_TYPE = 0;
 
 struct SerializedTensorDesc {
 public:
@@ -980,6 +987,314 @@ OH_NN_ReturnCode NNCompiler::DeserializedTensorsFromBuffer(
 
     ReleaseDescShape(immediateTensorDescs);
     return ret;
+}
+
+size_t NNCompiler::DataTypeSize(mindspore::lite::DataType dataType)
+{
+    switch (dataType) {
+        case mindspore::lite::DATA_TYPE_BOOL:
+            return sizeof(bool);
+        case mindspore::lite::DATA_TYPE_INT8:
+            return sizeof(int8_t);
+        case mindspore::lite::DATA_TYPE_UINT8:
+            return sizeof(uint8_t);
+        case mindspore::lite::DATA_TYPE_INT16:
+            return sizeof(int16_t);
+        case mindspore::lite::DATA_TYPE_UINT16:
+        case mindspore::lite::DATA_TYPE_FLOAT16:
+            return sizeof(uint16_t);
+        case mindspore::lite::DATA_TYPE_INT32:
+            return sizeof(int32_t);
+        case mindspore::lite::DATA_TYPE_UINT32:
+            return sizeof(uint32_t);
+        case mindspore::lite::DATA_TYPE_INT64:
+            return sizeof(int64_t);
+        case mindspore::lite::DATA_TYPE_UINT64:
+            return sizeof(uint64_t);
+        case mindspore::lite::DATA_TYPE_FLOAT32:
+            return sizeof(float);
+        case mindspore::lite::DATA_TYPE_FLOAT64:
+            return sizeof(double);
+        case mindspore::lite::DATA_TYPE_UNKNOWN:
+            return 0;
+        default:
+            LOGE("Not support the type: %{public}d", dataType);
+            return 0;
+    }
+}
+
+size_t NNCompiler::GetFileSize(const char* fileName)
+{
+    if (fileName == nullptr) {
+        return 0;
+    }
+
+    // 这是一个存储文件(夹)信息的结构体，其中有文件大小和创建时间、访问时间、修改时间等
+    struct stat statbuf;
+
+    // 提供文件名字符串， 获得文件属性结构体
+    stat(fileName, &statbuf);
+
+    // 获取文件大小
+    size_t fileSize = static_cast<size_t>(statbuf.st_size);
+
+    return fileSize;
+}
+
+size_t NNCompiler::GetModelSizeFromModel(InnerModel* innerModel)
+{
+    auto liteGraph = innerModel->GetLiteGraphs();
+    if (liteGraph == nullptr) {
+        LOGE("GetModelSizeFromModel failed, failed to get liteGraph");
+        return 0;
+    }
+
+    size_t modelSize = 0;
+    std::vector<int32_t> shape;
+    mindspore::lite::DataType dtype = mindspore::lite::DATA_TYPE_UNKNOWN;
+    size_t num = 1;
+    LOGD("GetOnlineModelSize, all_tensors_size: %{public}zu.", liteGraph->all_tensors_.size());
+    for (const auto& tensor : liteGraph->all_tensors_) {
+        if (tensor == nullptr) {
+            LOGE("GetmodelSizeFromModel failed, failed to nullptr in model tensor");
+            return 0;
+        }
+
+        // non-const node type, skip
+        if (mindspore::lite::MindIR_Tensor_GetNodeType(tensor) != MINDSPORE_CONST_NODE_TYPE) {
+            continue;
+        }
+
+        shape = mindspore::lite::MindIR_Tensor_GetDims(tensor);
+        dtype = mindspore::lite::MindIR_Tensor_GetDataType(tensor);
+        size_t tensorSize = std::accumulate(shape.begin(), shape.end(), num, std::multiplies<size_t>());
+        if ((std::numeric_limits<size_t>::max() - modelSize) <= tensorSize) {
+            LOGE("model size exceed max limit size, please check.");
+            return 0;
+        }
+        modelSize +=  (tensorSize * DataTypeSize(dtype));
+    }
+
+    LOGD("GetModelSizeFromModel, modelSize: %{public}zu.", modelSize);
+    return modelSize;
+}
+
+size_t NNCompiler::GetModelSizeFromFile(std::string& path)
+{
+    // 读取omc文件大小
+    if (path.empty()) {
+        LOGE("[GetModelSizeFromFile] failed, path is empty.");
+        return 0;
+    }
+
+    // 获取模型文件大小
+    size_t modelSize = GetFileSize(path.c_str());
+
+    // 获取权重文件大小
+    const std::string& weightPath = path;
+    struct stat buffer;
+    if (stat(weightPath.c_str(), &buffer) == 0) {
+        modelSize += static_cast<size_t>(buffer.st_size);
+    } else {
+        LOGD("[GetModelSizeFromFile] weight file not exists: %{public}s.", weightPath.c_str());
+    }
+
+    LOGD("GetModelSizeFromFile, modelSize: %{public}zu.", modelSize);
+    return modelSize;
+}
+
+size_t NNCompiler::GetModelSizeFromCache(std::string& path, const std::string& modelName)
+{
+    size_t modelSize = 0;
+    if (std::filesystem::is_directory(path)) {
+        if (path.empty()) {
+            LOGE("GetModelSizeFromCache failed, path is nullptr");
+            return 0;
+        }
+
+        std::string modelPath = path + "/" + modelName + "cache_info.nncache";
+        char modelCachePath[PATH_MAX];
+        if (realpath(modelPath.c_str(), modelCachePath) == nullptr) {
+            LOGE("GetModelSizeFromCache failed to get the real path of cacheDir.");
+            return 0;
+        }
+
+        std::string cacheInfoPath(modelCachePath);
+
+        // cacheInfoPath is validated outside.
+        std::ifstream infoCacheFile(cacheInfoPath.c_str(), std::ios::in | std::ios::binary);
+        if (!infoCacheFile) {
+            LOGE("[GetModelSizeFromCache] checkCacheInfo failed, error happened when opening cache info file.");
+            return 0;
+        }
+
+        std::string content((std::istreambuf_iterator<char>(infoCacheFile)), std::istreambuf_iterator<char>());
+        infoCacheFile.close();
+
+        if (!nlohmann::json::accept(content)) {
+            LOGE("[GetModelSizeFromCache] checkCacheInfo JSON parse error.");
+            return 0;
+        }
+
+        // parse the JSON string
+        nlohmann::json j = nlohmann::json::parse(content);
+
+        int64_t isExceedRamLimit = -1;
+        if (j["data"].find("isExceedRamLimit") == j["data"].end()) {
+            LOGW("[GetModelSizeFromCache] checkCacheInfo read cache isExceedRamLimit failed.");
+        }
+
+        isExceedRamLimit = j["data"]["isExceedRamLimit"].get<int64_t>();
+        modelSize = isExceedRamLimit == 1 ? MORE_MODEL_MAX_LIMIT : MODEL_MAX_LIMIT;
+    } else {
+        modelSize = GetModelSizeFromFile(path);
+    }
+    return modelSize;
+}
+
+size_t NNCompiler::GetModelSize()
+{
+    size_t modelSize = 0;
+    if (m_innerModel != nullptr) {
+        modelSize = GetModelSizeFromModel(m_innerModel);
+    } else {
+        modelSize = GetModelSizeFromCache(m_cachePath, m_extensionConfig.modelName);
+    }
+
+    return modelSize;
+}
+
+std::vector<mindspore::lite::LiteGraph::Node*> NNCompiler::GetNodeIndices(
+    const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph, size_t layer)
+{
+    std::vector<mindspore::lite::LiteGraph::Node*> nodes;
+    size_t inputTensorSize = liteGraph->input_indices_.size();
+    size_t outputTensorSize = liteGraph->output_indices_.size();
+
+    size_t allnodeSize = liteGraph->all_nodes_.size();
+    if (((inputTensorSize + outputTensorSize) * layer) >= allnodeSize) {
+        LOGI("The all node size in model is too small, return all nodes.");
+        return liteGraph->all_nodes_;
+    }
+
+    for (size_t i = 0; i < inputTensorSize * layer; ++i) {
+        nodes.emplace_back(liteGraph->all_nodes_[i]);
+    }
+
+    for (size_t j = allnodeSize - 1; j >= (allnodeSize - (outputTensorSize * layer)); --j) {
+        nodes.emplace_back(liteGraph->all_nodes_[j]);
+    }
+
+    LOGD("nodes size : %{public}zu.", nodes.size());
+    return nodes;
+}
+
+size_t NNCompiler::GetOnlineModelID(const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph)
+{
+    size_t inputSize = liteGraph->input_indices_.size();
+    size_t outputSize = liteGraph->output_indices_.size();
+    size_t allTensorSize = liteGraph->all_tensors_.size();
+    size_t allNodesSize = liteGraph->all_nodes_.size();
+
+    std::string onlineModelId = "";
+    onlineModelId.append(std::to_string(inputSize));
+    onlineModelId.append(std::to_string(outputSize));
+    onlineModelId.append(std::to_string(allTensorSize));
+    onlineModelId.append(std::to_string(allNodesSize));
+
+    std::vector<mindspore::lite::LiteGraph::Node*> nodes = GetNodeIndices(liteGraph, EXTRACT_NODE_LAYER);
+
+    for (auto node : nodes) {
+        onlineModelId.append(node->name_);
+    }
+
+    return std::hash<std::string>{}(onlineModelId);
+}
+
+OH_NN_ReturnCode NNCompiler::GetNNRtModelIDFromModel(InnerModel* innerModel, size_t& nnrtModelID)
+{
+    if (innerModel == nullptr) {
+        LOGE("GetNNRtModelIDFromModel failed, model is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    auto liteGraph = innerModel->GetLiteGraphs();
+    if (liteGraph == nullptr) {
+        LOGE("GetNNRtModelIDFromModel failed, failed to get liteGraph.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    nnrtModelID = GetOnlineModelID(liteGraph);
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNCompiler::GetNNRtModelIDFromCache(const std::string& path, const std::string& modelName,
+    size_t& nnrtModelID)
+{
+    if (path.empty()) {
+        LOGE("GetNNRtModelIDFromCache failed, path is empty");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (modelName.empty()) {
+        LOGE("GetNNRtModelIDFromCache failed, modelName is empty");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (!std::filesystem::is_directory(path)) {
+        LOGW("GetNNRtModelIDFromCache cvache path is not directory.");
+        nnrtModelID = std::hash<std::string>{}(path);
+        return OH_NN_SUCCESS;
+    }
+
+    std::string modelPath = path + "/" + modelName + "cache_info.nncache";
+    char modelCachePath[PATH_MAX];
+    if (realpath(modelPath.c_str(), modelCachePath) == nullptr) {
+        LOGE("GetNNRtModelIDFromCache fail to get real path of cacheDir.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    NNCompiledCache compiledCache;
+    NNCompiledCacheInfo cacheInfo;
+    OH_NN_ReturnCode retCode = compiledCache.SetBackend(m_backendID);
+    if (retCode != OH_NN_SUCCESS) {
+        LOGE("GetNNRtmodelIDFromCache failed, fail to set backend.");
+        return retCode;
+    }
+
+    retCode = compiledCache.CheckCacheInfo(cacheInfo, modelCachePath);
+    if (retCode != OH_NN_SUCCESS) {
+        LOGE("GetNNRtmodelIDFromCache failed, fail to CheckCacheInfo.");
+        return retCode;
+    }
+
+    if (cacheInfo.modelCheckSum.size() != NUMBER_CACHE_INFO_MEMBERS) {
+        LOGE("GetNNRtmodelIDFromCache failed, fail to modelCheckSum.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    std::string cacheStr = std::to_string(cacheInfo.modelCheckSum[CHECK_SUM_ZERO]) +
+        std::to_string(cacheInfo.modelCheckSum[CHECK_SUM_ONE]) +
+        std::to_string(cacheInfo.modelCheckSum[CHECK_SUM_TWO]);
+    nnrtModelID = std::hash<std::string>{}(cacheStr);
+
+    return OH_NN_SUCCESS;
+}
+
+size_t NNCompiler::GetOnlineModelID()
+{
+    size_t nnrtModeId = 0;
+    OH_NN_ReturnCode ret = GetNNRtModelIDFromCache(m_cachePath, m_extensionConfig.modelName, nnrtModeId);
+    if (ret != OH_NN_SUCCESS && m_innerModel != nullptr) {
+        ret = GetNNRtModelIDFromModel(m_innerModel, nnrtModeId);
+    }
+
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("[NNCompiler] GetOnlineModelID failed.");
+        return 0;
+    }
+
+    return nnrtModeId;
 }
 } // NeuralNetworkRuntime
 } // OHOS
