@@ -59,6 +59,7 @@ ohos_shared_library("libneural_network_core") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "openssl:libcrypto_shared",
   ]
 
   subsystem_name = "ai"
