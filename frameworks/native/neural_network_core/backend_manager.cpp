@@ -20,12 +20,18 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
+void* BackendManager::m_libHandle = nullptr;
+
 BackendManager::~BackendManager()
 {
     m_backends.clear();
     m_backendNames.clear();
     m_backendIDs.clear();
     m_backendIDGroup.clear();
+    if (m_libHandle != nullptr) {
+        (void)dlclose(m_libHandle);
+        m_libHandle = nullptr;
+    }
 }
 
 BackendManager& BackendManager::GetInstance()
@@ -34,8 +40,8 @@ BackendManager& BackendManager::GetInstance()
     if (dlopen("libneural_network_runtime.so", RTLD_NOLOAD) != nullptr) {
         // if libneural_network_runtime_ext.so not loaded, try to dlopen it
         if (dlopen("libneural_network_runtime_ext.so", RTLD_NOLOAD) == nullptr) {
-            void* libHandle = dlopen("libneural_network_runtime_ext.so", RTLD_NOW | RTLD_GLOBAL);
-            if (libHandle == nullptr) {
+            m_libHandle = dlopen("libneural_network_runtime_ext.so", RTLD_NOW | RTLD_GLOBAL);
+            if (m_libHandle == nullptr) {
                 LOGW("Failed to dlopen libneural_network_runtime_ext.so.");
             }
         }
