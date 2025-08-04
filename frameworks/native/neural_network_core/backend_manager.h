@@ -58,6 +58,7 @@ private:
     std::unordered_map<size_t, std::shared_ptr<Backend>> m_backends;
     std::mutex m_mtx;
     std::unordered_map<std::string, std::vector<size_t>> m_backendIDGroup;
+    static void* m_libHandle;
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
