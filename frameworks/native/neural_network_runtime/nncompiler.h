@@ -52,6 +52,8 @@ public:
     OH_NN_ReturnCode SetExtensionConfig(const std::unordered_map<std::string, std::vector<char>>& configs) override;
     OH_NN_ReturnCode SetOptions(const std::vector<std::shared_ptr<void>>& options) override;
     OH_NN_ReturnCode GetModelName(std::string& modelName) override;
+    size_t GetModelSize() override;
+    size_t GetOnlineModelID() override;
 
     NNExecutor* CreateExecutor();
 
@@ -71,6 +73,18 @@ private:
     OH_NN_ReturnCode IsOfflineModel(bool& isOfflineModel) const;
     OH_NN_ReturnCode IsSupportedModel(const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph,
                                       bool& isSupportedModel) const;
+
+    size_t GetModelSizeFromCache(std::string& path, const std::string& modelName);
+    size_t GetModelSizeFromFile(std::string& path);
+    size_t GetModelSizeFromModel(InnerModel* innerModel);
+    OH_NN_ReturnCode GetNNRtModelIDFromCache(const std::string& path, const std::string& modelName,
+        size_t& nnrtModelID);
+    OH_NN_ReturnCode GetNNRtModelIDFromModel(InnerModel* innerModel, size_t& nnrtModelID);
+    size_t GetOnlineModelID(const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph);
+    std::vector<mindspore::lite::LiteGraph::Node*> GetNodeIndices(
+        const std::shared_ptr<mindspore::lite::LiteGraph>& liteGraph, size_t layer);
+    size_t DataTypeSize(mindspore::lite::DataType dataType);
+    size_t GetFileSize(const char* fileName);
 
 private:
     bool m_isBuild {false};

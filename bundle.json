@@ -33,7 +33,8 @@
                 "init",
                 "json",
                 "jsoncpp",
-                "eventhandler"
+                "eventhandler",
+                "openssl"
             ],
             "third_party": []
         },

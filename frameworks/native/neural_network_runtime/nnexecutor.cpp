@@ -34,6 +34,11 @@ constexpr int AUTOUNLOAD_TIME = 15 * 60 * 1000;
 namespace NeuralNetworkRuntime {
 constexpr int CACHE_INPUT_TENSORDESC_OFFSET = 2;
 constexpr int CACHE_OUTPUT_TENSORDESC_OFFSET = 1;
+constexpr size_t CHECK_SUM_ZERO = 0;
+constexpr size_t CHECK_SUM_ONE = 1;
+constexpr size_t CHECK_SUM_TWO = 2;
+constexpr int32_t  NUMBER_CACHE_INFO_MEMBERS = 3;
+
 struct SerializedTensorDesc {
 public:
     SerializedTensorDesc() = default;
@@ -544,8 +549,6 @@ OH_NN_ReturnCode NNExecutor::RunSync(NN_Tensor* inputTensors[], size_t inputSize
     {
         uint32_t modelId;
         GetModelID(modelId);
-        LOGI("NNExecutor::RunSync pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
-            getpid(), m_originHiaiModelId, modelId);
         m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
         if (m_inputTensorDescs.size() != inputSize) {
             LOGE("NNExecutor::RunSync failed, inputSize:%{public}zu is not equal to model input size:%{public}zu",
@@ -1508,6 +1511,59 @@ OH_NN_ReturnCode NNExecutor::UnSetDeinitModelCallBack()
     return OH_NN_SUCCESS;
 }
 
+OH_NN_ReturnCode NNExecutor::GetNNRtModelIDFromCache(const std::string& path, const std::string& modelName,
+    size_t& nnrtModelID)
+{
+    if (path.empty()) {
+        LOGE("GetNNRtmodelIDFromCache failed, path is empty");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (modelName.empty()) {
+        LOGE("GetNNRtmodelIDFromCache failed, modelName is empty");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (!std::filesystem::is_directory(path)) {
+        LOGW("GetNNRtmodelIDFromCache cvache path is not directory.");
+        nnrtModelID = std::hash<std::string>{}(path);
+        return OH_NN_SUCCESS;
+    }
+
+    std::string modelPath = path + "/" + modelName + "cache_info.nncache";
+    char modelCachePath[PATH_MAX];
+    if (realpath(modelPath.c_str(), modelCachePath) == nullptr) {
+        LOGE("GetNNRtmodelIDFromCache fail to get real path of cacheDir.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    NNCompiledCache compiledCache;
+    NNCompiledCacheInfo cacheInfo;
+    OH_NN_ReturnCode retCode = compiledCache.SetBackend(m_backendID);
+    if (retCode != OH_NN_SUCCESS) {
+        LOGE("GetNNRtmodelIDFromCache failed, fail to set backend.");
+        return retCode;
+    }
+
+    retCode = compiledCache.CheckCacheInfo(cacheInfo, modelCachePath);
+    if (retCode != OH_NN_SUCCESS) {
+        LOGE("GetNNRtmodelIDFromCache failed, fail to CheckCacheInfo.");
+        return retCode;
+    }
+
+    if (cacheInfo.modelCheckSum.size() != NUMBER_CACHE_INFO_MEMBERS) {
+        LOGE("GetNNRtmodelIDFromCache failed, fail to modelCheckSum.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    std::string cacheStr = std::to_string(cacheInfo.modelCheckSum[CHECK_SUM_ZERO]) +
+        std::to_string(cacheInfo.modelCheckSum[CHECK_SUM_ONE]) +
+        std::to_string(cacheInfo.modelCheckSum[CHECK_SUM_TWO]);
+    nnrtModelID = std::hash<std::string>{}(cacheStr);
+
+    return OH_NN_SUCCESS;
+}
+
 OH_NN_ReturnCode NNExecutor::ReinitScheduling(uint32_t hiaimodelID, bool* needModelLatency, const char* cachePath)
 {
     NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
@@ -1521,9 +1577,10 @@ OH_NN_ReturnCode NNExecutor::ReinitScheduling(uint32_t hiaimodelID, bool* needMo
         return OH_NN_INVALID_PARAMETER;
     }
 
-    size_t nnrtmodelID = nnrtService.GetNNRtModelIDFromCache(m_cachePath.c_str(), m_extensionConfig.modelName.c_str());
-    if (nnrtmodelID == 0) {
-        LOGE("[HiaiExecutorImpl] ReinitScheduling is failed.");
+    size_t nnrtmodelID = 0;
+    OH_NN_ReturnCode retCode = GetNNRtModelIDFromCache(m_cachePath, m_extensionConfig.modelName, nnrtmodelID);
+    if ((retCode != OH_NN_SUCCESS) || (nnrtmodelID == 0)) {
+        LOGE("[HiaiExecutorImpl] ReinitScheduling is failedm fail to GetNNRtModelIDFromCache.");
         return OH_NN_INVALID_PARAMETER;
     }
 

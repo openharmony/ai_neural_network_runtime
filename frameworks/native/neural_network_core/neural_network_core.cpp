@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <future>
 #include <thread>
+#include <openssl/sha.h>
 
 #include "log.h"
 #include "executor.h"
@@ -32,46 +33,109 @@
 
 using namespace OHOS::NeuralNetworkRuntime;
 #define NNRT_API __attribute__((visibility("default")))
-const size_t INPUT_OUTPUT_MAX_INDICES = 200;
+constexpr size_t INPUT_OUTPUT_MAX_INDICES = 200;
+constexpr size_t MODEL_MAX_LIMIT = 200 * 1024 * 1024; // 200MB
+constexpr size_t CACHE_ID_CALCULATE_SIZE = 512 * 1024; // 0.5MB
+constexpr size_t WIDTH = 4;
+constexpr size_t TWO = 2;
+constexpr size_t END = 1;
+constexpr unsigned char MASK = 0x0F;
 
 namespace {
-OH_NN_ReturnCode GetNnrtModelId(Compilation* compilationImpl, NNRtServiceApi& nnrtService)
+std::string Sha256(const std::vector<void*>& dataList, const std::vector<size_t>& sizeList, bool isUpper)
 {
-    std::string modelName;
-    compilationImpl->compiler->GetModelName(modelName);
+    unsigned char hash[SHA256_DIGEST_LENGTH * TWO + END] = "";
+
+    SHA256_CTX ctx;
+    SHA256_Init(&ctx);
+    for (size_t index = 0; index < dataList.size(); ++index) {
+        SHA256_Update(&ctx, dataList[index], sizeList[index]);
+    }
+    SHA256_Final(&hash[SHA256_DIGEST_LENGTH], &ctx);
+
+    // here we translate sha256 hash to hexadecimal.
+    // each 8-bit char will be presented by two characters([0-9a-f])
+    const char* hexCode = isUpper ? "0123456789ABCDEF" : "0123456789abcdef";
+    for (int32_t i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
+        unsigned char value = hash[SHA256_DIGEST_LENGTH + i];
+        // uint8_t is 2 digits in hexadecimal.
+        hash[i * TWO] = hexCode[(value >> WIDTH) & MASK];
+        hash[i * TWO + END] = hexCode[value & MASK];
+    }
+    hash[SHA256_DIGEST_LENGTH * TWO] = 0;
+    return reinterpret_cast<char*>(hash);
+}
+
+std::string GetBufferId(const void* buffer, size_t size)
+{
+    std::vector<void*> dataList;
+    std::vector<size_t> sizeList;
+
+    // 模型buffer小于等于1MB，整个模型cache用于计算cache的ID
+    if (size <= (CACHE_ID_CALCULATE_SIZE + CACHE_ID_CALCULATE_SIZE)) {
+        dataList.emplace_back(const_cast<void*>(buffer));
+        sizeList.emplace_back(size);
+    } else { // 模型buffer大于1M，分别取模型buffer的前0.5MB 和 后0.5MB计算buffer的ID
+        dataList.emplace_back(const_cast<void*>(buffer));
+        sizeList.emplace_back(CACHE_ID_CALCULATE_SIZE);
+
+        size_t offset = size - CACHE_ID_CALCULATE_SIZE;
+        const char* convertBuffer = static_cast<const char*>(buffer);
+        char* convertConstBuffer = const_cast<char*>(convertBuffer);
+        dataList.emplace_back(reinterpret_cast<void*>(convertConstBuffer + offset));
+        sizeList.emplace_back(CACHE_ID_CALCULATE_SIZE);
+    }
+
+    return Sha256(dataList, sizeList, false);
+}
+
+OH_NN_ReturnCode GetNnrtModelId(Compilation* compilationImpl)
+{
+    // 模型在线构图场景获取modelID
+    if (compilationImpl->nnModel != nullptr) {
+        compilationImpl->nnrtModelID = compilationImpl->compiler->GetOnlineModelID();
+        return OH_NN_SUCCESS;
+    }
+
+    // omc路径加载场景获取modelID
+    if (compilationImpl->offlineModelPath != nullptr) {
+        std::string pathStr{compilationImpl->offlineModelPath};
+        compilationImpl->nnrtModelID = std::hash<std::string>{}(pathStr);
+        return OH_NN_SUCCESS;
+    }
+
+    // 模型缓存路径加载场景获取modelID
     if (compilationImpl->cachePath != nullptr) {
         struct stat buffer;
         if (stat(compilationImpl->cachePath, &buffer) != 0) {
             LOGE("GetModelId failed, cachePath is not exit or permission.");
             return OH_NN_INVALID_PARAMETER;
         }
+
+        compilationImpl->nnrtModelID = compilationImpl->compiler->GetOnlineModelID();
+        return OH_NN_SUCCESS;
     }
 
-    if (compilationImpl->nnModel != nullptr) {
-        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromCache(compilationImpl->cachePath,
-            modelName.c_str());
-        if (compilationImpl->nnrtModelID == 1) {
-            compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromModel(compilationImpl->nnModel);
-        }
-    } else if (compilationImpl->offlineModelPath != nullptr) {
-        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromPath(compilationImpl->offlineModelPath);
-    } else if (compilationImpl->cachePath != nullptr) {
-        compilationImpl->nnrtModelID =
-            nnrtService.GetNNRtModelIDFromCache(compilationImpl->cachePath, modelName.c_str());
-    } else if ((compilationImpl->offlineModelBuffer.first != nullptr) && \
-               (compilationImpl->offlineModelBuffer.second != size_t(0))) {
-        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromBuffer(
-            compilationImpl->offlineModelBuffer.first, compilationImpl->offlineModelBuffer.second);
-    } else if ((compilationImpl->cacheBuffer.first != nullptr) && \
-               (compilationImpl->cacheBuffer.second != size_t(0))) {
-        compilationImpl->nnrtModelID = nnrtService.GetNNRtModelIDFromBuffer(
-            compilationImpl->cacheBuffer.first, compilationImpl->cacheBuffer.second);
-    } else {
-        LOGE("GetModelId failed, no available model to set modelId, please check.");
-        return OH_NN_INVALID_PARAMETER;
+    // omc buffer加载场景获取modelID
+    if ((compilationImpl->offlineModelBuffer.first != nullptr) &&
+        (compilationImpl->offlineModelBuffer.second != size_t(0))) {
+        std::string bufferSha = GetBufferId(compilationImpl->offlineModelBuffer.first,
+            compilationImpl->offlineModelBuffer.second);
+        compilationImpl->nnrtModelID = std::hash<std::string>{}(bufferSha);
+        return OH_NN_SUCCESS;
     }
 
-    return OH_NN_SUCCESS;
+    // 模型缓存buffer场景获取modelID
+    if ((compilationImpl->cacheBuffer.first != nullptr) &&
+        (compilationImpl->cacheBuffer.second != size_t(0))) {
+        std::string bufferSha = GetBufferId(compilationImpl->cacheBuffer.first,
+            compilationImpl->cacheBuffer.second);
+        compilationImpl->nnrtModelID = std::hash<std::string>{}(bufferSha);
+        return OH_NN_SUCCESS;
+    }
+
+    LOGE("GetModelId failed, no available model to set modelId, please check.");
+    return OH_NN_INVALID_PARAMETER;
 }
 
 OH_NN_ReturnCode IsCompilationAvaliable(Compilation* compilationImpl)
@@ -101,42 +165,48 @@ OH_NN_ReturnCode IsCompilationAvaliable(Compilation* compilationImpl)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode CheckModelSize(const Compilation* compilation, NNRtServiceApi& nnrtService, bool& isExceedRamLimit)
+OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
 {
-    int ret = static_cast<OH_NN_ReturnCode>(OH_NN_SUCCESS);
+    // 模型在线构图场景获取modelSize
     if (compilation->nnModel != nullptr) {
-        ret = nnrtService.CheckModelSizeFromModel(compilation->nnModel, isExceedRamLimit);
-    } else if (compilation->offlineModelPath != nullptr) {
-        ret = nnrtService.CheckModelSizeFromPath(compilation->offlineModelPath, isExceedRamLimit);
-    } else if (compilation->cachePath != nullptr) {
+        modelSize = compilation->compiler->GetModelSize();
+        return OH_NN_SUCCESS;
+    }
+
+    // omc路径加载场景获取modelSize
+    if (compilation->offlineModelPath != nullptr) {
+        modelSize = compilation->compiler->GetModelSize();
+        return OH_NN_SUCCESS;
+    }
+
+    // 模型缓存路径加载场景获取modelSize
+    if (compilation->cachePath != nullptr) {
         struct stat buffer;
         if (stat(compilation->cachePath, &buffer) != 0) {
             LOGE("CheckExceedRamLimit failed, cachePath is not exit or permission.");
             return OH_NN_INVALID_PARAMETER;
         }
 
-        std::string modelName;
-        compilation->compiler->GetModelName(modelName);
-        ret = nnrtService.CheckModelSizeFromCache(compilation->cachePath, modelName, isExceedRamLimit);
-    } else if ((compilation->offlineModelBuffer.first != nullptr) && \
+        modelSize = compilation->compiler->GetModelSize();
+        return OH_NN_SUCCESS;
+    }
+
+    // omc buffer加载场景获取modelSize
+    if ((compilation->offlineModelBuffer.first != nullptr) &&
                (compilation->offlineModelBuffer.second != size_t(0))) {
-        ret = nnrtService.CheckModelSizeFromBuffer(
-            compilation->offlineModelBuffer.first, compilation->offlineModelBuffer.second, isExceedRamLimit);
-    } else if ((compilation->cacheBuffer.first != nullptr) && \
-               (compilation->cacheBuffer.second != size_t(0))) {
-        ret = nnrtService.CheckModelSizeFromBuffer(
-            compilation->cacheBuffer.first, compilation->cacheBuffer.second, isExceedRamLimit);
-    } else {
-        LOGE("CheckExceedRamLimit failed, no available model to check.");
-        return OH_NN_INVALID_PARAMETER;
+        modelSize = compilation->offlineModelBuffer.second;
+        return OH_NN_SUCCESS;
     }
 
-    if (ret != static_cast<OH_NN_ReturnCode>(OH_NN_SUCCESS)) {
-        LOGE("CheckExceedRamLimit failed, some error happened when check if model exceed ram limit.");
-        return OH_NN_INVALID_PARAMETER;
+    // 模型缓存buffer场景获取modelSize
+    if ((compilation->cacheBuffer.first != nullptr) &&
+        (compilation->cacheBuffer.second != size_t(0))) {
+        modelSize = compilation->cacheBuffer.second;
+        return OH_NN_SUCCESS;
     }
 
-    return OH_NN_SUCCESS;
+    LOGE("CheckExceedRamLimit failed, no available model to check.");
+    return OH_NN_INVALID_PARAMETER;
 }
 }
 
@@ -591,32 +661,19 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
         return OH_NN_INVALID_PARAMETER;
     }
 
-    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
-    if (!nnrtService.IsServiceAvaliable()) {
-        LOGW("CheckExceedRamLimit failed, fail to get nnrt service, skip check exceed ram limit.");
-        return OH_NN_SUCCESS;
-    }
-
-    if (nnrtService.CheckModelSizeFromBuffer == nullptr) {
-        LOGE("CheckExceedRamLimit failed, nnrtService CheckModelSizeFromBuffer func is nullptr.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (nnrtService.CheckModelSizeFromModel == nullptr) {
-        LOGE("CheckExceedRamLimit failed, nnrtService CheckModelSizeFromModel func is nullptr.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (nnrtService.CheckModelSizeFromPath == nullptr) {
-        LOGE("CheckExceedRamLimit failed, nnrtService CheckModelSizeFromPath func is nullptr.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    OH_NN_ReturnCode ret = CheckModelSize(compilation, nnrtService, isExceedRamLimit);
+    size_t modelSize = 0;
+    OH_NN_ReturnCode ret = GetModelSize(compilation, modelSize);
     if (ret != OH_NN_SUCCESS) {
-        LOGE("CheckExceedRamLimit failed, fail to check model size.");
+        LOGE("CheckExceedRamLimit failed, fail to get model size.");
         return OH_NN_INVALID_PARAMETER;
     }
+
+    if (modelSize == 0) {
+        LOGE("CheckExceedRamLimit failed, modelSize is 0.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    isExceedRamLimit = modelSize > MODEL_MAX_LIMIT ? true : false;
     return OH_NN_SUCCESS;
 }
 
@@ -710,28 +767,7 @@ OH_NN_ReturnCode GetModelId(Compilation** compilation)
         return OH_NN_INVALID_PARAMETER;
     }
 
-    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
-    if (!nnrtService.IsServiceAvaliable()) {
-        LOGW("GetModelId failed, fail to get nnrt service, skip get modelId.");
-        return OH_NN_SUCCESS;
-    }
-
-    if (nnrtService.GetNNRtModelIDFromPath == nullptr) {
-        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromPath func is nullptr.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (nnrtService.GetNNRtModelIDFromBuffer == nullptr) {
-        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromBuffer func is nullptr.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    if (nnrtService.GetNNRtModelIDFromModel == nullptr) {
-        LOGE("GetModelId failed, nnrtService GetNNRtModelIDFromModel func is nullptr.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    auto ret = GetNnrtModelId(compilationImpl, nnrtService);
+    auto ret = GetNnrtModelId(compilationImpl);
     if (ret != OH_NN_SUCCESS) {
         LOGE("GetNnrtModelId is failed.");
         return ret;
