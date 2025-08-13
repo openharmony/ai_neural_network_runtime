@@ -146,8 +146,7 @@ NNExecutor::NNExecutor(size_t backendID, std::shared_ptr<Device> device, std::sh
     m_extensionConfig(extensionConfig),
     m_enableFp16(enableFp16),
     m_performance(performance),
-    m_priority(priority),
-    m_loadtime(std::chrono::steady_clock::now()) {
+    m_priority(priority) {
         m_executorid = GenRandom();
         m_autoUnloadRunner = OHOS::AppExecFwk::EventRunner::Create
             ("nnexecutor_autounload" + std::to_string(m_executorid));
@@ -646,7 +645,6 @@ OH_NN_ReturnCode NNExecutor::RunSync(NN_Tensor* inputTensors[], size_t inputSize
     auto AutoUnloadTask = [this]() {
         DeinitModel("DelayUnload");
     };
-    m_loadtime = std::chrono::steady_clock::now();
     m_autoUnloadHandler->PostTask(AutoUnloadTask,
         "nnexecutor_autounload" + std::to_string(m_executorid), AUTOUNLOAD_TIME);
 
@@ -1659,14 +1657,13 @@ bool NNExecutor::DeinitModel(std::string mode)
             LOGW("DeinitScheduling failed, some error happen when DeinitScheduling model.");
         }
         m_preparedModel.reset();
-        std::chrono::duration<double> duration = std::chrono::steady_clock::now() - m_loadtime;
         if (mode == "FrozenDeinit") {
             m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
-            LOGI("FrozenDeinit pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d time=%{public}f",
-                getpid(), m_originHiaiModelId, modelId, duration.count());
+            LOGI("FrozenDeinit pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
+                getpid(), m_originHiaiModelId, modelId);
         } else {
-            LOGI("AutoUnload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d time=%{public}f",
-                getpid(), m_originHiaiModelId, modelId, duration.count());
+            LOGI("AutoUnload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
+                getpid(), m_originHiaiModelId, modelId);
         }
     }
 
