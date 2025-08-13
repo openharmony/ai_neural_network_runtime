@@ -145,7 +145,6 @@ private:
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> m_autoUnloadHandler;
     uint64_t m_executorid;
     std::mutex m_mutex;
-    std::chrono::time_point<std::chrono::steady_clock> m_loadtime;
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
