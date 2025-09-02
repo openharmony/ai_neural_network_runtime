@@ -154,6 +154,43 @@ bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, uint32_t v
 OH_NN_ReturnCode OH_NN_GetDeviceID(char *nnrtDevice, size_t len);
 
 /**
+ * @brief 获取NNRt isSupport AIPP信息
+ *
+ * 本接口不作为Neural Network Runtime接口对外开放。\n
+ *
+ * @param support 传出support参数。
+ * @return 函数执行的结果状态，执行成功返回OH_NN_SUCCESS，失败返回具体错误码，参考{@link OH_NN_ReturnCode}。
+ * @since 11
+ * @version 1.0
+ */
+OH_NN_ReturnCode OH_NN_IsSupportAIPP(bool& support);
+
+
+/**
+ * @brief Synchronous execution of the model inference with aipp.
+ *
+ * 本接口不作为Neural Network Runtime接口对外开放。\n
+ *
+ * @param executor Pointer to the {@link OH_NNExecutor} instance.
+ * @param inputTensor An array of input tensors {@link NN_Tensor}.
+ * @param inputCount Number of input tensors.
+ * @param outputTensor An array of output tensors {@link NN_Tensor}.
+ * @param outputCount Number of output tensors.
+ * @param aippString The factor of aipp.
+ * @return Execution result of the function. If the operation is successful, <b>OH_NN_SUCCESS</b> is returned.
+ *         If the operation fails, an error code is returned.
+ *         For details about the error codes, see {@link OH_NN_ReturnCode}.
+ * @since 11
+ * @version 1.0
+ */
+OH_NN_ReturnCode OH_NNExecutor_RunSyncWithAipp(OH_NNExecutor *executor,
+                                               NN_Tensor *inputTensor[],
+                                               size_t inputCount,
+                                               NN_Tensor *outputTensor[],
+                                               size_t outputCount,
+                                               const char* aippString);
+
+/**
  * @brief 对cache进行crc校验和检验
  *
  * 本接口不作为Neural Network Runtime接口对外开放。\n
