@@ -857,3 +857,18 @@ NNRT_API OH_NN_ReturnCode OH_NN_GetDeviceID(char *nnrtDevice, size_t len)
     }
     return OH_NN_SUCCESS;
 }
+
+NNRT_API OH_NN_ReturnCode OH_NN_IsSupportAIPP(bool& support)
+{
+    return OH_NN_UNSUPPORTED;
+}
+
+NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunSyncWithAipp(OH_NNExecutor *executor,
+                                                        NN_Tensor *inputTensor[],
+                                                        size_t inputCount,
+                                                        NN_Tensor *outputTensor[],
+                                                        size_t outputCount,
+                                                        const char* aippString)
+{
+    return OH_NN_UNSUPPORTED;
+}
