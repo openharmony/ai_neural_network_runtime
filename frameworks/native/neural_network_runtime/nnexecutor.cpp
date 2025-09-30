@@ -29,7 +29,7 @@
 
 namespace OHOS {
 constexpr size_t EXTENSION_MAX_SIZE = 200;
-constexpr int AUTOUNLOAD_TIME = 15 * 60 * 1000;
+constexpr int AUTOUNLOAD_TIME = 5 * 60 * 1000;
 
 namespace NeuralNetworkRuntime {
 constexpr int CACHE_INPUT_TENSORDESC_OFFSET = 2;
