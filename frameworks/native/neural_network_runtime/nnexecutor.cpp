@@ -1659,11 +1659,11 @@ bool NNExecutor::DeinitModel(std::string mode)
         m_preparedModel.reset();
         if (mode == "FrozenDeinit") {
             m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
-            LOGI("FrozenDeinit pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
-                getpid(), m_originHiaiModelId, modelId);
+            LOGI("FrozenDeinit pid=%{public}ld originHiaiModelId=%{public}u hiaiModelId=%{public}u",
+                static_cast<long>(getpid()), m_originHiaiModelId, modelId);
         } else {
-            LOGI("AutoUnload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
-                getpid(), m_originHiaiModelId, modelId);
+            LOGI("AutoUnload pid=%{public}ld originHiaiModelId=%{public}u hiaiModelId=%{public}u",
+                static_cast<long>(getpid()), m_originHiaiModelId, modelId);
         }
     }
 
