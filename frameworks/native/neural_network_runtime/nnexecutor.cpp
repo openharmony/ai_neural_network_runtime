@@ -158,8 +158,6 @@ NNExecutor::NNExecutor(size_t backendID, std::shared_ptr<Device> device, std::sh
             "nnexecutor_autounload" + std::to_string(m_executorid), AUTOUNLOAD_TIME);
 
         GetModelID(m_originHiaiModelId);
-        LOGI("manualload pid=%{public}d originHiaiModelId=%{public}d",
-            getpid(), m_originHiaiModelId);
     }
 
 OH_NN_ReturnCode NNExecutor::GetInputDimVec() const
@@ -565,8 +563,8 @@ OH_NN_ReturnCode NNExecutor::RunSync(NN_Tensor* inputTensors[], size_t inputSize
                 return OH_NN_INVALID_PARAMETER;
             }
             auto _ret = GetModelID(modelId);
-            LOGI("AutoReload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
-                getpid(), m_originHiaiModelId, modelId);
+            LOGI("AutoReload pid=%{public}ld originHiaiModelId=%{public}u hiaiModelId=%{public}u",
+                static_cast<long>(getpid()), m_originHiaiModelId, modelId);
             if (_ret != OH_NN_SUCCESS) {
                 LOGW("GetModelID failed, some error happen when get model id for device.");
             }
@@ -1456,8 +1454,6 @@ NNExecutor::~NNExecutor()
 
     uint32_t modelId;
     GetModelID(modelId);
-    LOGI("manualUnload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
-        getpid(), m_originHiaiModelId, modelId);
 }
 
 OH_NN_ReturnCode NNExecutor::SetDeinitModelCallBack()
