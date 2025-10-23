@@ -71,6 +71,11 @@ public:
     {
         return OH_NN_SUCCESS;
     }
+
+    virtual OH_NN_ReturnCode DestroyPreparedModel()
+    {
+        return OH_NN_SUCCESS;
+    }
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
