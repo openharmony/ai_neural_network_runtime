@@ -1456,6 +1456,18 @@ NNExecutor::~NNExecutor()
     GetModelID(modelId);
 }
 
+OH_NN_ReturnCode NNExecutor::DestroyPreparedModel()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_preparedModel == nullptr) {
+        LOGE("DestroyPreparedModel failed, m_preparedModel is nullpter");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    m_preparedModel.reset();
+    return OH_NN_SUCCESS;
+}
+
 OH_NN_ReturnCode NNExecutor::SetDeinitModelCallBack()
 {
     NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
