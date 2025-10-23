@@ -1552,6 +1552,11 @@ NNRT_API void OH_NNExecutor_Destroy(OH_NNExecutor **executor)
         LOGE("Unload failed, some error happened when unload nnrt service.");
     }
 
+    ret = executorImpl->DestroyPreparedModel();
+    if (ret != OH_NN_SUCCESS) {
+        LOGW("OH_NNExecutor_Destroy failed, failed to destroy preparedModel");
+    }
+
     auto returnCode = backend->DestroyExecutor(executorImpl);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("OH_NNExecutor_Destroy failed, failed to destroy executor.");
