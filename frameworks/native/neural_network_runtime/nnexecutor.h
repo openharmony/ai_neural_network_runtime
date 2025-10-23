@@ -84,6 +84,7 @@ public:
     bool DeinitModel(std::string mode) override;
     OH_NN_ReturnCode SetDeinitModelCallBack() override;
     OH_NN_ReturnCode UnSetDeinitModelCallBack() override;
+    OH_NN_ReturnCode DestroyPreparedModel() override;
 
 private:
     OH_NN_ReturnCode GetInputDimVec() const;
