@@ -1034,6 +1034,9 @@ size_t NNCompiler::GetFileSize(const char* fileName)
 
     // 提供文件名字符串， 获得文件属性结构体
     stat(fileName, &statbuf);
+    if (statbuf.st_size == 0) {
+        return 0;
+    }
 
     // 获取文件大小
     size_t fileSize = static_cast<size_t>(statbuf.st_size);
