@@ -29,7 +29,7 @@
 
 namespace OHOS {
 constexpr size_t EXTENSION_MAX_SIZE = 200;
-constexpr int AUTOUNLOAD_TIME = 5 * 60 * 1000;
+constexpr int AUTOUNLOAD_TIME = 10 * 60 * 1000;
 
 namespace NeuralNetworkRuntime {
 constexpr int CACHE_INPUT_TENSORDESC_OFFSET = 2;
@@ -154,8 +154,10 @@ NNExecutor::NNExecutor(size_t backendID, std::shared_ptr<Device> device, std::sh
         auto AutoUnloadTask = [this]() {
             DeinitModel("DelayUnload");
         };
-        m_autoUnloadHandler->PostTask(AutoUnloadTask,
-            "nnexecutor_autounload" + std::to_string(m_executorid), AUTOUNLOAD_TIME);
+        if (m_autoUnloadHandler != nullptr) {
+            m_autoUnloadHandler->PostTask(AutoUnloadTask,
+                "nnexecutor_autounload" + std::to_string(m_executorid), AUTOUNLOAD_TIME);
+        }
 
         GetModelID(m_originHiaiModelId);
     }
@@ -1459,6 +1461,12 @@ NNExecutor::~NNExecutor()
 OH_NN_ReturnCode NNExecutor::DestroyPreparedModel()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
+
+    if (m_autoUnloadHandler != nullptr) {
+        m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
+        m_autoUnloadHandler.reset();
+    }
+
     if (m_preparedModel == nullptr) {
         LOGE("DestroyPreparedModel failed, m_preparedModel is nullpter");
         return OH_NN_INVALID_PARAMETER;
@@ -1666,9 +1674,11 @@ bool NNExecutor::DeinitModel(std::string mode)
         }
         m_preparedModel.reset();
         if (mode == "FrozenDeinit") {
-            m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
-            LOGI("FrozenDeinit pid=%{public}ld originHiaiModelId=%{public}u hiaiModelId=%{public}u",
-                static_cast<long>(getpid()), m_originHiaiModelId, modelId);
+            if (m_autoUnloadHandler != nullptr) {
+                m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
+                LOGI("FrozenDeinit pid=%{public}ld originHiaiModelId=%{public}u hiaiModelId=%{public}u",
+                    static_cast<long>(getpid()), m_originHiaiModelId, modelId);
+            }
         } else {
             LOGI("AutoUnload pid=%{public}ld originHiaiModelId=%{public}u hiaiModelId=%{public}u",
                 static_cast<long>(getpid()), m_originHiaiModelId, modelId);
