@@ -40,6 +40,7 @@ public:
     int (*AutoUnload)(uint32_t originHiaimodelID, uint32_t hiaiModelId) = nullptr;
     int (*SetDeinitModelCallBack)(uint32_t hiaiModelId, OHOS::NeuralNetworkRuntime::Executor* callback) = nullptr;
     int (*UnSetDeinitModelCallBack)(uint32_t hiaiModelId) = nullptr;
+    int (*AddSessionId)(const int32_t pid, const int32_t tid) = nullptr;
 private:
     bool m_serviceAvailable = false;
     NNRtServiceApi() = default;

@@ -70,6 +70,7 @@ NNRtServiceApi& NNRtServiceApi::GetInstance()
     LoadFunction(libNNRtService, "AutoUnload", &nnrtService.AutoUnload);
     LoadFunction(libNNRtService, "SetDeinitModelCallBack", &nnrtService.SetDeinitModelCallBack);
     LoadFunction(libNNRtService, "UnSetDeinitModelCallBack", &nnrtService.UnSetDeinitModelCallBack);
+    LoadFunction(libNNRtService, "AddSessionId", &nnrtService.AddSessionId);
 
     nnrtService.m_serviceAvailable = true;
     return nnrtService;
