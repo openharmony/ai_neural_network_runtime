@@ -76,6 +76,8 @@ public:
     {
         return OH_NN_SUCCESS;
     }
+
+    bool isAddSession = false;
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
