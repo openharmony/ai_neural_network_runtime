@@ -23,6 +23,7 @@
 #include <future>
 #include <thread>
 #include <openssl/sha.h>
+#include <unistd.h>
 
 #include "log.h"
 #include "executor.h"
@@ -207,6 +208,22 @@ OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
 
     LOGE("CheckExceedRamLimit failed, no available model to check.");
     return OH_NN_INVALID_PARAMETER;
+}
+
+void AddSessionId(Executor *executorImpl)
+{
+    if (executorImpl->isAddSession == false) {
+        NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+        if ((nnrtService.IsServiceAvaliable()) && (nnrtService.AddSessionId != nullptr)) {
+            int32_t modelPid = static_cast<int32_t>(getpid());
+            int32_t modelTid = static_cast<int32_t>(gettid());
+            int ret = nnrtService.AddSessionId(modelPid, modelTid);
+            if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+                LOGW("OH_NNExecutor_RunSync failed, fail to add sessionId.");
+            }
+        }
+        executorImpl->isAddSession = true;
+    }
 }
 }
 
@@ -1427,9 +1444,6 @@ OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation)
         return ret;
     }
 
-    LOGD("ExecutorPrepare parameter, hiaiModelId: %{public}u, nnrtModelId: %{public}zu.",
-        compilationImpl->hiaiModelId, compilationImpl->nnrtModelID);
-
     ret = Scheduling(&compilationImpl);
     if (ret != OH_NN_SUCCESS) {
         LOGE("ExecutorPrepare failed, failed to create executor.");
@@ -1456,6 +1470,8 @@ OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation)
         LOGE("SetDeinitModelCallBack failed, failed to set DeinitModelCallBack to client.");
         return ret;
     }
+
+    executorImpl->isAddSession = false;
 
     return OH_NN_SUCCESS;
 }
@@ -1807,6 +1823,9 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunSync(OH_NNExecutor *executor,
     }
 
     Executor *executorImpl = reinterpret_cast<Executor *>(executor);
+
+    AddSessionId(executorImpl);
+
     return RunSync(executorImpl, inputTensor, inputCount, outputTensor, outputCount);
 }
 
