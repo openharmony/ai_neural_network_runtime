@@ -373,6 +373,126 @@ OH_NN_ReturnCode NNExecutor::SetOnServiceDied(NN_OnServiceDied onServiceDied)
     return OH_NN_OPERATION_FORBIDDEN;
 }
 
+OH_NN_ReturnCode NNExecutor::RunSyncWithAipp(NN_Tensor* inputTensors[], size_t inputSize,
+                NN_Tensor* outputTensors[], size_t outputSize, count char* aippStrings)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    {
+        uint32_t modelId;
+        GetModelID(modelId);
+        m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
+        if (m_inputTensorDescs.size() != inputSize) {
+            LOGE("NNExecutor::RunSyncWithAipp failed, input size:%{public}zu is not equal to model 
+            inputsize:%{public}zu", inputSize, m_inputTensorDescs.size());
+            return OH_NN_INVALID_PARAMETER;
+        }
+        if (m_outputTensorDescs.size() != outputSize) {
+            LOGE("NNExecutor::RunSyncWithAipp failed, outputSize:%{public}zu is not equal to model 
+            output size:%{public}zu", outputSize, m_outputTensorDescs.size());
+            return OH_NN_INVALID_PARAMETER;
+        }
+
+        if (m_preparedModel == nullptr) {
+            if (Reload() != OH_NN_SUCCESS) {
+                return OH_NN_INVALID_FILE;
+            }
+            auto _ret = GetModelID(modelId);
+            LOGE("AutoReload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
+                getpid(), m_originHiaiModelId, modelId);
+            if (_ret != OH_NN_SUCCESS) {
+                LOGW("GetModelID failed, some erroor happen when get model id for device.");
+            }
+            _ret = ReinitScheduling(modelId, &m_executorConfig->isNeedModelLatency, m_cachePath.c_str());
+
+            if (_ret != OH_NN_SUCCESS) {
+                LOGW("ReinitScheduling failed, some error happen when ReinirScheduling model.");
+            }
+            _ret = SetDeinitModelCallBack();
+            if (_ret != OH_NN_SUCCESS) {
+                LOGW("SetDeinitModelCallBack failed, some error happen when ReinitScheduling model.");
+            }
+        }
+
+        OH_NN_ReturnCode ret {OH_NN_FAILED};
+        ret = CheckInputDimRanges();
+        if (ret != OH_NN_OPERATION_FORBIDDEN && ret != OH_NN_SUCCESS) {
+            LOGE("NNExecutor::RunSyncWithAipp failed, failed to check input dim ranges.");
+            return ret;
+        }
+
+        OHOS:NeuralNetworkRuntime::IOTensor tensor;
+        std::vector<NN_Tensor*> inputTensorsVec;
+        for (size_t i = 0; i < inputSize; ++i) {
+            if (inputTensors[i] == nullptr) {
+                LOGE("NNExecutor::RunSyncWithAipp failed, input[%{public}zu] is nullptr.", i);
+                return OH_NN_INVALID_PARAMETER;
+            }
+            int32_t* shape{nullptr};
+            size_t shapeNum = 0;
+            const NNTensor2_0* nnTensor = reinterpret_cast<const NNTensor2_0*>(inputTensor[i]);
+            TensorDesc* tensorDesc = nnTensor->GetTensorDesc();
+            tensorDesc->GetShape(&shape, &shapeNum);
+            inputTensorsVec.emplace_back(inputTensors[i]);
+        }
+
+        std::vector<NN_Tensor*> outputTensorsVec;
+        for (size_t i = 0; i < outputSize; ++i) {
+            if (outputTensors[i] == nullptr) {
+                LOGE("NNExecutor::RunSyncWithAipp failed, output[%{public}zu] is nullptr.", i);
+                return OH_NN_INVALID_PARAMETER;
+            }
+            outputTensorsVec.emplace_back(outputTensors[i]);
+        }
+
+        std::vector<std::vector<int32_t>> outputsDims;
+        std::vector<bool> isSufficientDataBuffer;
+        ret = m_preparedModel->SetAippString(aippStrings);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("NNExecutor::RunSyncWithAipp failed, failed to set aipp para in prepared model.");
+            return ret;
+        }
+
+        ret = m_preparedModel->Run(inputTensorsVec, outputTensorsVec, outputsDims, isSufficientDataBuffer);
+        if (ret != OH_NN_SUCCESS) {
+            LOGE("NNExecutor::RunSyncWithAipp failed, failed to run in prepared model.");
+        }
+
+        // Set the output NNTensor2_0's dimensions from output IOTensor if it is dynamic
+        // NNTensor2_0::SetDimensions will check if the tensor buffer is enough for the new dimensions.
+        if (outputsDims.size() != outputSize) {
+            LOGE("NNExecutor::RunSyncWithAipp failed, size of outputsDims is not equal to outputTensors.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+
+        for (size_t i = 0; i < outputSize; ++i) {
+            NNTensor2_0* nnTensor = reinterpret_cast<NNTensor2_0*>(outputTensors[i]);
+            tensorDesc* nnTensorDesc = nnTensor->GetTensorDesc();
+            if (nnTensorDesc == nullptr) {
+                LOGE("NNExecutor::RunSyncWithAipp failed, failed to get desc from tensor");
+                return OH_NN_NULL_PTR;
+            }
+            ret = nnTensorDesc->SetShape(outputsDims[i].data(), outputsDims[i].size());
+            if (ret != OH_NN_SUCCESS) {
+                LOGE("NNExecutor::RunSyncWithAipp failed, error happened when setting output tensor's dimensions,"
+                " output id: %zu.", i);
+                return ret;
+            }
+            ret = m_outputTensorDescs[i].first->SetShape(outputsDims[i].data(), outputsDims[i].size());
+            if (ret != OH_NN_SUCCESS) {
+                LOGE("NNExecutor::RunSyncWithAipp failed, error happened when setting inner output tensor's dimensions,"
+                " output id: %zu.", i);
+                return ret;
+            }
+        }
+    }
+    auto AutoUnloadTask = [this]() {
+        DeinitModel("DelayUnload");
+    };
+    m_autoUnloadHandler->PostTask(AutoUnloadTask,
+        "nnexecutor_autounload" + std::to_string(m_executorid),AUTOUNLOAD_TIME);
+    return OH_NN_SUCCESS;
+}
+
 void ReleaseDescShape(std::vector<SerializedTensorDesc>& immediateTensorDescs)
 {
     for (auto desc : immediateTensorDescs) {
@@ -1468,7 +1588,7 @@ OH_NN_ReturnCode NNExecutor::DestroyPreparedModel()
     }
 
     if (m_preparedModel == nullptr) {
-        LOGE("DestroyPreparedModel failed, m_preparedModel is nullpter");
+        LOGE("DestroyPreparedModel failed, m_preparedModel is nullptr");
         return OH_NN_INVALID_PARAMETER;
     }
 
