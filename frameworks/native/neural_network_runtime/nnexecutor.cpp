@@ -382,7 +382,7 @@ OH_NN_ReturnCode NNExecutor::RunSyncWithAipp(NN_Tensor* inputTensors[], size_t i
         GetModelID(modelId);
         m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
         if (m_inputTensorDescs.size() != inputSize) {
-            LOGE("NNExecutor::RunSyncWithAipp failed, input size:%{public}zu is not equal to model input size:%{public}zu",
+            LOGE("NNExecutor::RunSyncWithAipp failed, inputSize:%{public}zu is not equal to model input size:%{public}zu",
             inputSize, m_inputTensorDescs.size());
             return OH_NN_INVALID_PARAMETER;
         }

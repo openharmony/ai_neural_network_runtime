@@ -50,7 +50,7 @@ public:
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
-    irtual OH_NN_ReturnCode SetAippString(const std::string& aippStrings) = 0;
+    virtual OH_NN_ReturnCode SetAippString(const std::string& aippStrings) = 0;
 };
 } // OHOS
 } // namespace NeuralNetworkRuntime
