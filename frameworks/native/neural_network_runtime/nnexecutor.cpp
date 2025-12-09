@@ -428,7 +428,7 @@ OH_NN_ReturnCode RunAippModel(NN_Tensor* inputTensors[], size_t inputSize,
 
     std::vector<std::vector<int32_t>> outputsDims;
     std::vector<bool> isSufficientDataBuffer;
-    ret = m_preparedModel->SetAippString(aippStrings);
+    OH_NN_ReturnCode ret = m_preparedModel->SetAippString(aippStrings);
     if (ret != OH_NN_SUCCESS) {
         LOGE("RunSyncWithAipp failed, failed to set aipp para in prepared model.");
         return ret;
