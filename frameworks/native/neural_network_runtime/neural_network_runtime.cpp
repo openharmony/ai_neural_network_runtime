@@ -903,7 +903,7 @@ NNRT_API OH_NN_ReturnCode OH_NN_IsSupportAIPP(bool& support)
 
     // 前两个字符精准匹配，后面三个字符模糊匹配，匹配K6012及以上的版本
     if ((deviceName.substr(CHECK_SUM_ZERO, CHECK_SUM_TWO) == SUPPORT_AIPP_DEVICE.substr(CHECK_SUM_ZERO, CHECK_SUM_TWO))
-    && (deviceName.substr(CHECK_SUM_TWO) >= SUPPORT_AIPP_DEVICE.substr(CHECK_SUM_TWO))) {
+        && (deviceName.substr(CHECK_SUM_TWO) >= SUPPORT_AIPP_DEVICE.substr(CHECK_SUM_TWO))) {
         support = true;
         return OH_NN_SUCCESS;
     }
