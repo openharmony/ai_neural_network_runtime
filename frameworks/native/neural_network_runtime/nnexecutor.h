@@ -58,10 +58,10 @@ public:
                              NN_Tensor* outputTensors[],
                              size_t outputSize) override;
     OH_NN_ReturnCode RunSyncWithAipp(NN_Tensor* inputTensors[],
-                              size_t inputSize,
-                              NN_Tensor* outputTensors[],
-                              size_t outputSize,
-                              const char* aippStrings) override;
+                             size_t inputSize,
+                             NN_Tensor* outputTensors[],
+                             size_t outputSize,
+                             const char* aippStrings) override;
     OH_NN_ReturnCode RunAsync(NN_Tensor* inputTensors[],
                               size_t inputSize,
                               NN_Tensor* outputTensors[],

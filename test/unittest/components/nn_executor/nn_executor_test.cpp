@@ -97,7 +97,7 @@ public:
     MOCK_METHOD2(GetInputDimRanges, OH_NN_ReturnCode(std::vector<std::vector<uint32_t>>&,
                                                std::vector<std::vector<uint32_t>>&));
     MOCK_METHOD0(ReleaseBuiltModel, OH_NN_ReturnCode());
-    MOCK_CONST_METHOD1(SetAippString, OH_NN_ReturnCode(const std::string&));
+    MOCK_METHOD1(SetAippString, OH_NN_ReturnCode(const std::string&));
 };
 
 class MockTensorDesc : public TensorDesc {

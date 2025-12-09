@@ -59,11 +59,10 @@ constexpr size_t FILE_NUMBER_MAX = 100; // 限制cache文件数量最大为100
 constexpr size_t EXTENSION_MAX_SIZE = 200; // 限制MS传过来的参数最多为200
 constexpr size_t INPUT_MAX_COUNT = 200; // 限制模型最大输入个数为200
 constexpr int32_t HEX_UNIT = 16;
-constexpr size_t DEVICE_NAME_SIZE = 5;
+constexpr size_t  DEVICE_NAME_SIZE = 5;
 constexpr size_t CHECK_SUM_ZERO = 0;
 constexpr size_t CHECK_SUM_TWO = 2;
 constexpr size_t INPUT_OUTPUT_MAX_INDICES = 200;
-
 }
 
 unsigned short CacheInfoGetCrc16(char* buffer, size_t length)
@@ -530,7 +529,7 @@ OH_NN_ReturnCode ParseExtensionConfigs(
         extensionConfig.isNpuFmShared = true;
         LOGI("NNRT enable fm shared success.");
     }
-    if (extensionMap.find(EXTENSION_KEY_AIPP) != extensionMap.size()) {
+    if (extensionMap.find(EXTENSION_KEY_AIPP) != extensionMap.end()) {
         const std::vector<std::pair<char*, size_t>>& value = extensionMap.at(EXTENSION_KEY_AIPP);
 
         if (value.empty()) {
@@ -883,7 +882,7 @@ NNRT_API OH_NN_ReturnCode OH_NN_IsSupportAIPP(bool& support)
     int ret = GetParameter(NNRT_DEVICE_NAME.c_str(), NULL_HARDWARE_NAME.c_str(), cName, HARDWARE_NAME_MAX_LENGTH);
     // 如果成功获取返回值为硬件名称的字节数
     if (ret <= 0) {
-        LOGE("[OH_NN_IsSupportAIPP] GetNNRtDeviceName failed, failed to get parameter");
+        LOGE("[OH_NN_IsSupportAIPP] GetNNRtDeviceName failed, failed to get parameter.");
         return OH_NN_FAILED;
     }
 
@@ -911,16 +910,16 @@ NNRT_API OH_NN_ReturnCode OH_NN_IsSupportAIPP(bool& support)
     return OH_NN_FAILED;
 }
 
-OH_NN_ReturnCode UpdateModelLatency(const ExecutorConfig* config. int32_t modelLatency)
+OH_NN_ReturnCode UpdateModelLatency(const ExecutorConfig* config, int32_t modelLatency)
 {
     if (config == nullptr) {
-        LOGE("UpdateModelLatency failed, config is nullptr");
+        LOGE("UpdateModelLatency failed, config is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
     NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
     if (!nnrtService.IsServiceAvaliable()) {
-        LOGW("UpdateModelLatency failed, fail to get nnrt serbice, skip update model latency.");
+        LOGW("UpdateModelLatency failed, fail to get nnrt service, skip update model latency.");
         return OH_NN_SUCCESS;
     }
 
@@ -933,22 +932,22 @@ OH_NN_ReturnCode UpdateModelLatency(const ExecutorConfig* config. int32_t modelL
 
     int ret = nnrtService.UpdateModelLatency(config->hiaiModelId, modelLatency);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
-        LOGE("UpdateModelLatency failed, nnrtService is not exist, jump over UpdateModelLatency");
+        LOGE("UpdateModelLatency failed, nnrtService is not exist, jump over UpdateModelLatency.");
         return static_cast<OH_NN_ReturnCode>(ret);
     }
     return OH_NN_SUCCESS;
 }
 
-NNRT_API OH_NN_ReturnCode RunSyncWithAipp(OH_NNExecutor *executor,
-                                        NN_Tensor *inputTensor[],
-                                        size_t inputCount,
-                                        NN_Tensor *outputTensor[],
-                                        size_t outputCount,
-                                        const char* aippString)
+OH_NN_ReturnCode RunSyncWithAipp(Executor *executor,
+                                 NN_Tensor *inputTensor[],
+                                 size_t inputCount,
+                                 NN_Tensor *outputTensor[],
+                                 size_t outputCount,
+                                 const char* aippStrings)
 {
     ExecutorConfig* configPtr = executor->GetExecutorConfig();
     if (configPtr == nullptr) {
-        LOGE("RunSyncWithAipp failed, executor config is nullptr");
+        LOGE("RunSyncWithAipp failed, executor config is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -960,7 +959,7 @@ NNRT_API OH_NN_ReturnCode RunSyncWithAipp(OH_NNExecutor *executor,
 
     OH_NN_ReturnCode ret = executor->RunSyncWithAipp(inputTensor, inputCount, outputTensor, outputCount, aippStrings);
     if (ret != OH_NN_SUCCESS) {
-        LOGE("OH_NNExecutor_RunSyncWithAipp failed, fail update executor config.");
+        LOGE("OH_NNExecutor_RunSyncWithAipp failed, fail to run executor.");
         return ret;
     }
 
@@ -987,19 +986,19 @@ NNRT_API OH_NN_ReturnCode RunSyncWithAipp(OH_NNExecutor *executor,
 }
 
 NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunSyncWithAipp(OH_NNExecutor *executor,
-                                        NN_Tensor *inputTensor[],
-                                        size_t inputCount,
-                                        NN_Tensor *outputTensor[],
-                                        size_t outputCount,
-                                        const char* aippString)
+                                                        NN_Tensor *inputTensor[],
+                                                        size_t inputCount,
+                                                        NN_Tensor *outputTensor[],
+                                                        size_t outputCount,
+                                                        const char* aippString)
 {
     if (executor == nullptr) {
-        LOGE("OH_NNExecutor_RunSyncWithAipp failed, executor is nullptr");
+        LOGE("OH_NNExecutor_RunSyncWithAipp failed, executor is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
     if (inputTensor == nullptr) {
-        LOGE("OH_NNExecutor_RunSyncWithAipp failed, inputTensor is nullptr");
+        LOGE("OH_NNExecutor_RunSyncWithAipp failed, inputTensor is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
@@ -1009,12 +1008,17 @@ NNRT_API OH_NN_ReturnCode OH_NNExecutor_RunSyncWithAipp(OH_NNExecutor *executor,
     }
 
     if (outputTensor == nullptr) {
-        LOGE("OH_NNExecutor_RunSyncWithAipp failed, outputTensor is nullptr");
+        LOGE("OH_NNExecutor_RunSyncWithAipp failed, outputTensor is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
 
-    if (aippString = nullptr || aippString[0] == '\0') {
-        LOGE("OH_NNExecutor_RunSyncWithAipp failed, aippString is empty");
+    if ((outputCount == 0) || (outputCount > INPUT_OUTPUT_MAX_INDICES)) {
+        LOGE("OH_NNExecutor_RunSyncWithAipp failed, outputCount is 0 or more than 200.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (aippString == nullptr || aippString[0] == '\0') {
+        LOGE("OH_NNExecutor_RunSyncWithAipp failed, aippString is empty.");
         return OH_NN_INVALID_PARAMETER;
     }
 

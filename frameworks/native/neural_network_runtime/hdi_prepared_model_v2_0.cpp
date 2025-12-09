@@ -312,7 +312,7 @@ OH_NN_ReturnCode HDIPreparedModelV2_0::ReleaseBuiltModel()
 
 OH_NN_ReturnCode HDIPreparedModelV2_0::SetAippString(const std::string& aippStrings)
 {
-    LOGE("hdi preparedModel V2_0 not support SetAippString");
+    LOGE("hdi preparedModel V2_0 not support SetAippString.");
     return OH_NN_SUCCESS;
 }
 } // namespace NeuralNetworkRuntime
