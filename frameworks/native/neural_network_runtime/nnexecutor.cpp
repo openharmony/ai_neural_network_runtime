@@ -507,7 +507,7 @@ OH_NN_ReturnCode NNExecutor::RunSyncWithAipp(NN_Tensor* inputTensors[], size_t i
             return ret;
         }
 
-        ret = RunAippModel(NN_Tensor* inputTensors[], size_t inputSize, NN_Tensor* outputTensors[], size_t outputSize);
+        ret = RunAippModel(inputTensors, inputSize, outputTensors, outputSize);
         if (ret != OH_NN_SUCCESS) {
             return ret;
         }
