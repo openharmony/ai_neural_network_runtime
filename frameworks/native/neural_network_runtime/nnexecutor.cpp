@@ -374,7 +374,7 @@ OH_NN_ReturnCode NNExecutor::SetOnServiceDied(NN_OnServiceDied onServiceDied)
 }
 
 OH_NN_ReturnCode NNExecutor::RunSyncWithAipp(NN_Tensor* inputTensors[], size_t inputSize,
-                NN_Tensor* outputTensors[], size_t outputSize, const char* aippStrings)
+                                             NN_Tensor* outputTensors[], size_t outputSize, const char* aippStrings)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     {
@@ -382,13 +382,13 @@ OH_NN_ReturnCode NNExecutor::RunSyncWithAipp(NN_Tensor* inputTensors[], size_t i
         GetModelID(modelId);
         m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
         if (m_inputTensorDescs.size() != inputSize) {
-            LOGE("NNExecutor::RunSyncWithAipp failed, inputSize:%{public}zu is not equal to model input size:%{public}zu",
+            LOGE("RunSyncWithAipp failed, inputSize:%{public}zu is not equal to model inputsize:%{public}zu",
             inputSize, m_inputTensorDescs.size());
             return OH_NN_INVALID_PARAMETER;
         }
         if (m_outputTensorDescs.size() != outputSize) {
-            LOGE("NNExecutor::RunSyncWithAipp failed, outputSize:%{public}zu is not equal to model output size:%{public}zu",
-            outputSize, m_outputTensorDescs.size());
+            LOGE("RunSyncWithAipp failed, outputSize:%{public}zu is not equal to model output "
+            "size:%{public}zu", outputSize, m_outputTensorDescs.size());
             return OH_NN_INVALID_PARAMETER;
         }
 
@@ -396,17 +396,19 @@ OH_NN_ReturnCode NNExecutor::RunSyncWithAipp(NN_Tensor* inputTensors[], size_t i
             if (Reload() != OH_NN_SUCCESS) {
                 return OH_NN_INVALID_PARAMETER;
             }
+            
             auto _ret = GetModelID(modelId);
             LOGI("AutoReload pid=%{public}d originHiaiModelId=%{public}d hiaiModelId=%{public}d",
                 getpid(), m_originHiaiModelId, modelId);
             if (_ret != OH_NN_SUCCESS) {
                 LOGW("GetModelID failed, some error happen when get model id for device.");
             }
-            _ret = ReinitScheduling(modelId, &m_executorConfig->isNeedModelLatency, m_cachePath.c_str());
 
+            _ret = ReinitScheduling(modelId, &m_executorConfig->isNeedModelLatency, m_cachePath.c_str());
             if (_ret != OH_NN_SUCCESS) {
                 LOGW("ReinitScheduling failed, some error happen when ReinitScheduling model.");
             }
+
             _ret = SetDeinitModelCallBack();
             if (_ret != OH_NN_SUCCESS) {
                 LOGW("SetDeinitModelCallBack failed, some error happen when ReinitScheduling model.");
@@ -490,7 +492,7 @@ OH_NN_ReturnCode NNExecutor::RunSyncWithAipp(NN_Tensor* inputTensors[], size_t i
         DeinitModel("DelayUnload");
     };
     m_autoUnloadHandler->PostTask(AutoUnloadTask,
-        "nnexecutor_autounload" + std::to_string(m_executorid),AUTOUNLOAD_TIME);
+        "nnexecutor_autounload" + std::to_string(m_executorid), AUTOUNLOAD_TIME);
 
     return OH_NN_SUCCESS;
 }
