@@ -116,6 +116,9 @@ private:
     OH_NN_ReturnCode DeinitScheduling(uint32_t hiaimodelID);
     OH_NN_ReturnCode GetNNRtModelIDFromCache(const std::string& path, const std::string& modelName,
         size_t& nnrtModelID);
+    OH_NN_ReturnCode ReloadAippModel(uint32_t modelId);
+    OH_NN_ReturnCode RunAippModel(NN_Tensor* inputTensors[], size_t inputSize,
+                                  NN_Tensor* outputTensors[], size_t outputSize);
 
 private:
     size_t m_backendID {0};
