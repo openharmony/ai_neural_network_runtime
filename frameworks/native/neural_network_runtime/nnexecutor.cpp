@@ -401,29 +401,16 @@ OH_NN_ReturnCode NNExecutor::ReloadAippModel(uint32_t modelId)
 }
 
 OH_NN_ReturnCode NNExecutor::RunAippModel(NN_Tensor* inputTensors[], size_t inputSize,
-                              NN_Tensor* outputTensors[], size_t outputSize, const char* aippStrings)
+                                          NN_Tensor* outputTensors[], size_t outputSize, const char* aippStrings)
 {
-    std::vector<NN_Tensor*> inputTensorsVec;
-    for (size_t i = 0; i < inputSize; ++i) {
-        if (inputTensors[i] == nullptr) {
-            LOGE("RunSyncWithAipp failed, input[%{public}zu] is nullptr.", i);
-            return OH_NN_INVALID_PARAMETER;
-        }
-        int32_t* shape{nullptr};
-        size_t shapeNum = 0;
-        const NNTensor2_0* nnTensor = reinterpret_cast<const NNTensor2_0*>(inputTensors[i]);
-        TensorDesc* tensordesc = nnTensor->GetTensorDesc();
-        tensordesc->GetShape(&shape, &shapeNum);
-        inputTensorsVec.emplace_back(inputTensors[i]);
+    if (inputTensors == nullptr) {
+        LOGE("RunSyncWithAipp failed, failed to check input");
+        return OH_NN_INVALID_PARAMETER;
     }
 
-    std::vector<NN_Tensor*> outputTensorsVec;
-    for (size_t i = 0; i < outputSize; ++i) {
-        if (outputTensors[i] == nullptr) {
-            LOGE("RunSyncWithAipp failed, output[%{public}zu] is nullptr.", i);
-            return OH_NN_INVALID_PARAMETER;
-        }
-        outputTensorsVec.emplace_back(outputTensors[i]);
+    if (outputTensors == nullptr) {
+        LOGE("RunSyncWithAipp failed, failed to check output");
+        return OH_NN_INVALID_PARAMETER;
     }
 
     std::vector<std::vector<int32_t>> outputsDims;
@@ -434,7 +421,7 @@ OH_NN_ReturnCode NNExecutor::RunAippModel(NN_Tensor* inputTensors[], size_t inpu
         return ret;
     }
 
-    ret = m_preparedModel->Run(inputTensorsVec, outputTensorsVec, outputsDims, isSufficientDataBuffer);
+    ret = m_preparedModel->Run(inputTensors, outputTensors, outputsDims, isSufficientDataBuffer);
     if (ret != OH_NN_SUCCESS) {
         LOGE("RunSyncWithAipp failed, failed to run in prepared model.");
         return ret;
@@ -491,7 +478,6 @@ OH_NN_ReturnCode NNExecutor::RunSyncWithAipp(NN_Tensor* inputTensors[], size_t i
         }
 
         OH_NN_ReturnCode ret {OH_NN_FAILED};
-
         if (m_preparedModel == nullptr) {
             ret = ReloadAippModel(modelId);
             if (ret != OH_NN_SUCCESS) {
@@ -509,7 +495,6 @@ OH_NN_ReturnCode NNExecutor::RunSyncWithAipp(NN_Tensor* inputTensors[], size_t i
         if (ret != OH_NN_SUCCESS) {
             return ret;
         }
-        
     }
     auto autoUnloadTask = [this]() {
         DeinitModel("DelayUnload");
