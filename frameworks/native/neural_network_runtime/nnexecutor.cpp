@@ -403,14 +403,22 @@ OH_NN_ReturnCode NNExecutor::ReloadAippModel(uint32_t modelId)
 OH_NN_ReturnCode NNExecutor::RunAippModel(NN_Tensor* inputTensors[], size_t inputSize,
                                           NN_Tensor* outputTensors[], size_t outputSize, const char* aippStrings)
 {
-    if (inputTensors == nullptr) {
-        LOGE("RunSyncWithAipp failed, failed to check input");
-        return OH_NN_INVALID_PARAMETER;
+    std::vector<NN_Tensor*> inputTensorsVec;
+    for (size_t i = 0; i < inputSize; ++i) {
+        if (inputTensors[i] == nullptr) {
+            LOGE("RunSyncWithAipp failed, failed to check input");
+            return OH_NN_INVALID_PARAMETER;
+        }
+        inputTensorsVec = inputTensors[i];
     }
-
-    if (outputTensors == nullptr) {
-        LOGE("RunSyncWithAipp failed, failed to check output");
-        return OH_NN_INVALID_PARAMETER;
+    
+    std::vector<NN_Tensor*> outputTensorsVec;
+    for (size_t i = 0; i < outputSize; ++i) {
+        if (outputTensors == nullptr) {
+            LOGE("RunSyncWithAipp failed, failed to check output");
+            return OH_NN_INVALID_PARAMETER;
+        }
+        outputTensorsVec = outputTensors[i];
     }
 
     std::vector<std::vector<int32_t>> outputsDims;
@@ -421,7 +429,7 @@ OH_NN_ReturnCode NNExecutor::RunAippModel(NN_Tensor* inputTensors[], size_t inpu
         return ret;
     }
 
-    ret = m_preparedModel->Run(inputTensors, outputTensors, outputsDims, isSufficientDataBuffer);
+    ret = m_preparedModel->Run(inputTensorsVec, outputTensorsVec, outputsDims, isSufficientDataBuffer);
     if (ret != OH_NN_SUCCESS) {
         LOGE("RunSyncWithAipp failed, failed to run in prepared model.");
         return ret;
@@ -435,18 +443,6 @@ OH_NN_ReturnCode NNExecutor::RunAippModel(NN_Tensor* inputTensors[], size_t inpu
     }
 
     for (size_t i = 0; i < outputSize; ++i) {
-        NNTensor2_0* nnTensor = reinterpret_cast<NNTensor2_0*>(outputTensors[i]);
-        TensorDesc* nnTensorDesc = nnTensor->GetTensorDesc();
-        if (nnTensorDesc == nullptr) {
-            LOGE("RunSyncWithAipp failed, failed to get desc from tensor.");
-            return OH_NN_NULL_PTR;
-        }
-        ret = nnTensorDesc->SetShape(outputsDims[i].data(), outputsDims[i].size());
-        if (ret != OH_NN_SUCCESS) {
-            LOGE("RunSyncWithAipp failed, error happened when setting output tensor's dimensions,"
-                " output id: %zu.", i);
-            return ret;
-        }
         ret = m_outputTensorDescs[i].first->SetShape(outputsDims[i].data(), outputsDims[i].size());
         if (ret != OH_NN_SUCCESS) {
             LOGE("RunSyncWithAipp failed, error happened when setting inner output tensor's dimensions,"
