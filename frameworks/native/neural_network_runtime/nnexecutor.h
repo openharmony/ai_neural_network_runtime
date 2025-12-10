@@ -118,7 +118,7 @@ private:
         size_t& nnrtModelID);
     OH_NN_ReturnCode ReloadAippModel(uint32_t modelId);
     OH_NN_ReturnCode RunAippModel(NN_Tensor* inputTensors[], size_t inputSize,
-                                  NN_Tensor* outputTensors[], size_t outputSize);
+                                  NN_Tensor* outputTensors[], size_t outputSize, const char* aippStrings);
 
 private:
     size_t m_backendID {0};

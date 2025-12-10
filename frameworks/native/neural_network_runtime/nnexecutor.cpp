@@ -374,7 +374,7 @@ OH_NN_ReturnCode NNExecutor::SetOnServiceDied(NN_OnServiceDied onServiceDied)
 }
 
 
-OH_NN_ReturnCode ReloadAippModel(uint32_t modelId)
+OH_NN_ReturnCode NNExecutor::ReloadAippModel(uint32_t modelId)
 {
     if (Reload() != OH_NN_SUCCESS) {
         return OH_NN_INVALID_PARAMETER;
@@ -400,7 +400,7 @@ OH_NN_ReturnCode ReloadAippModel(uint32_t modelId)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode RunAippModel(NN_Tensor* inputTensors[], size_t inputSize,
+OH_NN_ReturnCode NNExecutor::RunAippModel(NN_Tensor* inputTensors[], size_t inputSize,
                               NN_Tensor* outputTensors[], size_t outputSize, const char* aippStrings)
 {
     std::vector<NN_Tensor*> inputTensorsVec;
