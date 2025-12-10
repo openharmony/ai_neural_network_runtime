@@ -373,7 +373,7 @@ OH_NN_ReturnCode NNExecutor::SetOnServiceDied(NN_OnServiceDied onServiceDied)
     return OH_NN_OPERATION_FORBIDDEN;
 }
 
-namespace {
+
 OH_NN_ReturnCode ReloadAippModel(uint32_t modelId)
 {
     if (Reload() != OH_NN_SUCCESS) {
@@ -469,8 +469,6 @@ OH_NN_ReturnCode RunAippModel(NN_Tensor* inputTensors[], size_t inputSize,
     }
 
     return OH_NN_SUCCESS;
-}
-
 }
 
 OH_NN_ReturnCode NNExecutor::RunSyncWithAipp(NN_Tensor* inputTensors[], size_t inputSize,
