@@ -401,7 +401,7 @@ OH_NN_ReturnCode ReloadAippModel(uint32_t modelId)
 }
 
 OH_NN_ReturnCode RunAippModel(NN_Tensor* inputTensors[], size_t inputSize,
-                              NN_Tensor* outputTensors[], size_t outputSize)
+                              NN_Tensor* outputTensors[], size_t outputSize, const char* aippStrings)
 {
     std::vector<NN_Tensor*> inputTensorsVec;
     for (size_t i = 0; i < inputSize; ++i) {
@@ -505,7 +505,7 @@ OH_NN_ReturnCode NNExecutor::RunSyncWithAipp(NN_Tensor* inputTensors[], size_t i
             return ret;
         }
 
-        ret = RunAippModel(inputTensors, inputSize, outputTensors, outputSize);
+        ret = RunAippModel(inputTensors, inputSize, outputTensors, outputSize, aippStrings);
         if (ret != OH_NN_SUCCESS) {
             return ret;
         }
