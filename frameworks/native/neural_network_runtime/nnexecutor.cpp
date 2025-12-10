@@ -409,7 +409,7 @@ OH_NN_ReturnCode NNExecutor::RunAippModel(NN_Tensor* inputTensors[], size_t inpu
             LOGE("RunSyncWithAipp failed, failed to check input");
             return OH_NN_INVALID_PARAMETER;
         }
-        inputTensorsVec = inputTensors[i];
+        inputTensorsVec.emplace_back(inputTensors[i]);
     }
     
     std::vector<NN_Tensor*> outputTensorsVec;
@@ -418,7 +418,7 @@ OH_NN_ReturnCode NNExecutor::RunAippModel(NN_Tensor* inputTensors[], size_t inpu
             LOGE("RunSyncWithAipp failed, failed to check output");
             return OH_NN_INVALID_PARAMETER;
         }
-        outputTensorsVec = outputTensors[i];
+        outputTensorsVec.emplace_back(outputTensors[i]);
     }
 
     std::vector<std::vector<int32_t>> outputsDims;
