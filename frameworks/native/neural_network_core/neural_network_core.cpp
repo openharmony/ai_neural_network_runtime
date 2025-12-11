@@ -1382,7 +1382,7 @@ OH_NN_ReturnCode Scheduling(Compilation** compilation)
 
     compilationImpl->isNeedModelLatency = needModelLatency;
 
-    LOGI("Scheduling success.");
+    LOGD("Scheduling success.");
     return OH_NN_SUCCESS;
 }
 

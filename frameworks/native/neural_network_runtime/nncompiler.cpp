@@ -1235,7 +1235,7 @@ OH_NN_ReturnCode NNCompiler::GetNNRtModelIDFromCache(const std::string& path, co
     size_t& nnrtModelID)
 {
     if (path.empty()) {
-        LOGE("GetNNRtModelIDFromCache failed, path is empty");
+        LOGD("GetNNRtModelIDFromCache failed, path is empty");
         return OH_NN_INVALID_PARAMETER;
     }
 
