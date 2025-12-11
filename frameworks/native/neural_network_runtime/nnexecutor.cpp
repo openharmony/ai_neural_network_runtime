@@ -414,7 +414,7 @@ OH_NN_ReturnCode NNExecutor::RunAippModel(NN_Tensor* inputTensors[], size_t inpu
     
     std::vector<NN_Tensor*> outputTensorsVec;
     for (size_t i = 0; i < outputSize; ++i) {
-        if (outputTensors == nullptr) {
+        if (outputTensors[i] == nullptr) {
             LOGE("RunSyncWithAipp failed, failed to check output");
             return OH_NN_INVALID_PARAMETER;
         }
