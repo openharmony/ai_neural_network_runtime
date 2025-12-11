@@ -55,6 +55,8 @@ public:
 
     OH_NN_ReturnCode ReleaseBuiltModel() override;
 
+    OH_NN_ReturnCode SetAippString(const std::string& aippStrings) override;
+
 private:
     // first: major version, second: minor version
     std::pair<uint32_t, uint32_t> m_hdiVersion;

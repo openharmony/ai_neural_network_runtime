@@ -292,5 +292,11 @@ OH_NN_ReturnCode HDIPreparedModelV1_0::ReleaseBuiltModel()
     LOGE("hdi preparedModel V1_0 not support ReleaseBuiltModel.");
     return OH_NN_SUCCESS;
 }
+
+OH_NN_ReturnCode HDIPreparedModelV1_0::SetAippString(const std::string& aippStrings)
+{
+    LOGE("hdi preparedModel V1_0 not support SetAippString.");
+    return OH_NN_SUCCESS;
+}
 } // namespace NeuralNetworkRuntime
 } // OHOS

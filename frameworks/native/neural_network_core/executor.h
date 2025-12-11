@@ -77,6 +77,15 @@ public:
         return OH_NN_SUCCESS;
     }
 
+    virtual OH_NN_ReturnCode RunSyncWithAipp(NN_Tensor* inputTensors[],
+                                            size_t inputSize,
+                                            NN_Tensor* outputTensors[],
+                                            size_t outputSize,
+                                            const char* aippStrings)
+    {
+        return OH_NN_SUCCESS;
+    }
+
     bool isAddSession = false;
 };
 }  // namespace NeuralNetworkRuntime

@@ -57,6 +57,11 @@ public:
                              size_t inputSize,
                              NN_Tensor* outputTensors[],
                              size_t outputSize) override;
+    OH_NN_ReturnCode RunSyncWithAipp(NN_Tensor* inputTensors[],
+                             size_t inputSize,
+                             NN_Tensor* outputTensors[],
+                             size_t outputSize,
+                             const char* aippStrings) override;
     OH_NN_ReturnCode RunAsync(NN_Tensor* inputTensors[],
                               size_t inputSize,
                               NN_Tensor* outputTensors[],
@@ -111,6 +116,9 @@ private:
     OH_NN_ReturnCode DeinitScheduling(uint32_t hiaimodelID);
     OH_NN_ReturnCode GetNNRtModelIDFromCache(const std::string& path, const std::string& modelName,
         size_t& nnrtModelID);
+    OH_NN_ReturnCode ReloadAippModel(uint32_t modelId);
+    OH_NN_ReturnCode RunAippModel(NN_Tensor* inputTensors[], size_t inputSize,
+                                  NN_Tensor* outputTensors[], size_t outputSize, const char* aippStrings);
 
 private:
     size_t m_backendID {0};
@@ -146,6 +154,7 @@ private:
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> m_autoUnloadHandler;
     uint64_t m_executorid;
     std::mutex m_mutex;
+    std::string m_aippPara;
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS
