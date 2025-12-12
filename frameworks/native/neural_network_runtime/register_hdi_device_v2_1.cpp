@@ -43,7 +43,7 @@ std::shared_ptr<Backend> HDIDeviceV2_1Creator()
     // only one device from HDI now.
     OHOS::sptr<V2_1::INnrtDevice> iDevice = V2_1::INnrtDevice::Get();
     if (iDevice == nullptr) {
-        LOGW("Get HDI device failed.");
+        LOGD("Get HDI device failed.");
         return nullptr;
     }
 
