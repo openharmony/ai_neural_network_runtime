@@ -42,7 +42,7 @@
             "sub_component": [
                  "//foundation/ai/neural_network_runtime:nnrt_target"
              ],
-            "inner_api": [
+            "inner_kits": [
                 {
                     "type": "so",
                     "name": "//foundation/ai/neural_network_runtime:nnrt_target",
