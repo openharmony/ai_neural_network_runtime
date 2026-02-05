@@ -71,6 +71,8 @@ NNRtServiceApi& NNRtServiceApi::GetInstance()
     LoadFunction(libNNRtService, "SetDeinitModelCallBack", &nnrtService.SetDeinitModelCallBack);
     LoadFunction(libNNRtService, "UnSetDeinitModelCallBack", &nnrtService.UnSetDeinitModelCallBack);
     LoadFunction(libNNRtService, "AddSessionId", &nnrtService.AddSessionId);
+    LoadFunction(libNNRtService, "SetHiaiModelCallBack", &nnrtService.SetHiaiModelCallBack);
+    LoadFunction(libNNRtService, "UnSetHiaiModelCallBack", &nnrtService.UnSetHiaiModelCallBack);
 
     nnrtService.m_serviceAvailable = true;
     return nnrtService;
