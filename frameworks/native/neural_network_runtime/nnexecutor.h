@@ -113,12 +113,13 @@ private:
         const Buffer& buffer, std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>>& tensorDescs);
     OH_NN_ReturnCode Reload();
     OH_NN_ReturnCode ReinitScheduling(uint32_t hiaimodelID, bool* needModelLatency, const char* cachePath);
-    OH_NN_ReturnCode DeinitScheduling(uint32_t hiaimodelID);
+    OH_NN_ReturnCode DeinitScheduling(uint32_t hiaimodelID, std::string mode);
     OH_NN_ReturnCode GetNNRtModelIDFromCache(const std::string& path, const std::string& modelName,
         size_t& nnrtModelID);
     OH_NN_ReturnCode ReloadAippModel(uint32_t modelId);
     OH_NN_ReturnCode RunAippModel(NN_Tensor* inputTensors[], size_t inputSize,
                                   NN_Tensor* outputTensors[], size_t outputSize, const char* aippStrings);
+    OH_NN_ReturnCode UnSetHiaiModelCallBack();
 
 private:
     size_t m_backendID {0};
@@ -154,6 +155,7 @@ private:
     std::shared_ptr<OHOS::AppExecFwk::EventHandler> m_autoUnloadHandler;
     uint64_t m_executorid;
     std::mutex m_mutex;
+    bool isHiaiModel = false;
     std::string m_aippPara;
 };
 }  // namespace NeuralNetworkRuntime

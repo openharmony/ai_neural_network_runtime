@@ -37,10 +37,13 @@ public:
     int (*AutoReinitSetModelID)(uint32_t originHiaimodelID, uint32_t hiaimodelID, size_t nnrtmodelID) = nullptr;
     int (*AutoReinitScheduling)(uint32_t originHiaimodelID, uint32_t hiaiModelId,
         bool* needModelLatency, const char* cachePath) = nullptr;
-    int (*AutoUnload)(uint32_t originHiaimodelID, uint32_t hiaiModelId) = nullptr;
+    int (*AutoUnload)(uint32_t originHiaimodelID, uint32_t hiaiModelId, const char* mode) = nullptr;
     int (*SetDeinitModelCallBack)(uint32_t hiaiModelId, OHOS::NeuralNetworkRuntime::Executor* callback) = nullptr;
     int (*UnSetDeinitModelCallBack)(uint32_t hiaiModelId) = nullptr;
     int (*AddSessionId)(const int32_t pid, const int32_t tid) = nullptr;
+    int (*SetHiaiModelCallBack)(int32_t pid, const char* processName, const char* cachePath,
+        OHOS::NeuralNetworkRuntime::Executor* callback) = nullptr;
+    int (*UnSetHiaiModelCallBack)(const char* cachePath) = nullptr;
 private:
     bool m_serviceAvailable = false;
     NNRtServiceApi() = default;
