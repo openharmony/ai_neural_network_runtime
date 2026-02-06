@@ -29,27 +29,11 @@ extern "C" {
 #undef LOG_TAG
 #define LOG_TAG "NNRt"
 
-#define R_FILENAME (__builtin_strrchr(__FILE_NAME__, '/') ? __builtin_strrchr(__FILE_NAME__, '/') + 1: __FILE_NAME__)
-
-#define LOGD(fmt, ...)                                                                                     \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_DEBUG, LOG_DOMAIN, LOG_TAG, "[%{public}s(%{public}s:%{public}d)]" fmt, \
-        R_FILENAME, __FUNCTION__, __LINE__, ##__VA_ARGS__))
-
-#define LOGI(fmt, ...)                                                                                     \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_INFO, LOG_DOMAIN, LOG_TAG, "[%{public}s(%{public}s:%{public}d)]" fmt, \
-        R_FILENAME, __FUNCTION__, __LINE__, ##__VA_ARGS__))
-
-#define LOGW(fmt, ...)                                                                                     \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_WARN, LOG_DOMAIN, LOG_TAG, "[%{public}s(%{public}s:%{public}d)]" fmt, \
-        R_FILENAME, __FUNCTION__, __LINE__, ##__VA_ARGS__))
-
-#define LOGE(fmt, ...)                                                                                     \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_ERROR, LOG_DOMAIN, LOG_TAG, "[%{public}s(%{public}s:%{public}d)]" fmt, \
-        R_FILENAME, __FUNCTION__, __LINE__, ##__VA_ARGS__))
-
-#define LOGF(fmt, ...)                                                                                     \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_FATAL, LOG_DOMAIN, LOG_TAG, "[%{public}s(%{public}s:%{public}d)]" fmt, \
-        R_FILENAME, __FUNCTION__, __LINE__, ##__VA_ARGS__))
+#define LOGD(...) HILOG_DEBUG(LOG_CORE, __VA_ARGS__)
+#define LOGI(...) HILOG_INFO(LOG_CORE, __VA_ARGS__)
+#define LOGW(...) HILOG_WARN(LOG_CORE, __VA_ARGS__)
+#define LOGE(...) HILOG_ERROR(LOG_CORE, __VA_ARGS__)
+#define LOGF(...) HILOG_FATAL(LOG_CORE, __VA_ARGS__)
 
 #ifdef __cplusplus
 }

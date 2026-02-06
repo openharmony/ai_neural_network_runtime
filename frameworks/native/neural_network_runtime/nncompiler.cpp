@@ -1033,8 +1033,8 @@ size_t NNCompiler::GetFileSize(const char* fileName)
     struct stat statbuf;
 
     // 提供文件名字符串， 获得文件属性结构体
-    stat(fileName, &statbuf);
-    if (statbuf.st_size == 0) {
+    int32_t ret = stat(fileName, &statbuf);
+    if (ret != 0 || statbuf.st_size == 0) {
         return 0;
     }
 
