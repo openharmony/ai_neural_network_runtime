@@ -122,7 +122,7 @@ MockIDevice::~MockIDevice()
 
 MockIDevice::MockIDevice()
 {
-    m_bufferFd = 0; 
+    m_bufferFd = 0;
 }
 
 MockIPreparedModel::~MockIPreparedModel()
