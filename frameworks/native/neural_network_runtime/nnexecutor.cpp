@@ -119,6 +119,7 @@ const size_t SIZE_OF_DATATYPE = sizeof(SerializedTensorDesc::m_dataType);
 const size_t SIZE_OF_FORMAT = sizeof(SerializedTensorDesc::m_format);
 const size_t SIZE_OF_TENSOR_TYPE = sizeof(SerializedTensorDesc::m_tensorType);
 const size_t SIZE_OF_SHAPE_NUM = sizeof(SerializedTensorDesc::m_shapeNum);
+const std::vector<std::string> HIAI_PROCESS_LIST = {"app.hiai.vision", "app.hiai.voice"};
 
 uint64_t GenRandom(void)
 {
@@ -129,6 +130,23 @@ uint64_t GenRandom(void)
         close(fd);
     }
     return random;
+}
+
+static std::string GetProcessNameByPid(int32_t pid)
+{
+    std::string filePath = "/proc/" + std::to_string(pid) + "/comm";
+    char tmpPath[PATH_MAX] = { 0 };
+    if (!realpath(filePath.c_str(), tmpPath)) {
+        return "UNKNOWN";
+    }
+    std::ifstream infile(filePath);
+    if (!infile.is_open()) {
+        return "UNKNOWN";
+    }
+    std::string processName = "UNKNOWN";
+    std::getline(infile, processName);
+    infile.close();
+    return processName;
 }
 
 NNExecutor::NNExecutor(size_t backendID, std::shared_ptr<Device> device, std::shared_ptr<PreparedModel> preparedModel,
@@ -1583,6 +1601,10 @@ NNExecutor::~NNExecutor()
 
     UnSetDeinitModelCallBack();
 
+    if (isHiaiModel) {
+        UnSetHiaiModelCallBack();
+    }
+
     uint32_t modelId;
     GetModelID(modelId);
 }
@@ -1629,6 +1651,28 @@ OH_NN_ReturnCode NNExecutor::SetDeinitModelCallBack()
         return static_cast<OH_NN_ReturnCode>(ret);
     }
 
+    if (m_cachePath.empty()) {
+        return OH_NN_SUCCESS;
+    }
+
+    int32_t hiaiPid = static_cast<int32_t>(getpid());
+    std::string processName = GetProcessNameByPid(hiaiPid);
+    if (find(HIAI_PROCESS_LIST.begin(), HIAI_PROCESS_LIST.end(), processName) != HIAI_PROCESS_LIST.end()) {
+        if (nnrtService.SetHiaiModelCallBack == nullptr) {
+            LOGE("SetHiaiModelCallBack failed, nnrtService SetHiaiModelCallBack func is nullptr.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+
+        ret = nnrtService.SetHiaiModelCallBack(hiaiPid, processName.c_str(), m_cachePath.c_str(),
+            reinterpret_cast<Executor*>(this));
+        if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+            LOGE("SetHiaiModelCallBack failed, some error happened when SetHiaiModelCallBack.");
+            return static_cast<OH_NN_ReturnCode>(ret);
+        }
+
+        isHiaiModel = true;
+    }
+
     return OH_NN_SUCCESS;
 }
 
@@ -1648,6 +1692,28 @@ OH_NN_ReturnCode NNExecutor::UnSetDeinitModelCallBack()
     int ret = nnrtService.UnSetDeinitModelCallBack(m_executorid);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("UnSetDeinitModelCallBack failed, some error happened when UnSetDeinitModelCallBack.");
+        return static_cast<OH_NN_ReturnCode>(ret);
+    }
+
+    return OH_NN_SUCCESS;
+}
+
+OH_NN_ReturnCode NNExecutor::UnSetHiaiModelCallBack()
+{
+    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+    if (!nnrtService.IsServiceAvaliable()) {
+        LOGW("UnSetHiaiModelCallBack failed, fail to get nnrt service, skip UnSetHiaiModelCallBack.");
+        return OH_NN_SUCCESS;
+    }
+
+    if (nnrtService.UnSetHiaiModelCallBack == nullptr) {
+        LOGE("UnSetHiaiModelCallBack failed, nnrtService UnSetHiaiModelCallBack func is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    int ret = nnrtService.UnSetHiaiModelCallBack(m_cachePath.c_str());
+    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+        LOGE("UnSetHiaiModelCallBack failed, some error happened when UnSetHiaiModelCallBack.");
         return static_cast<OH_NN_ReturnCode>(ret);
     }
 
@@ -1763,14 +1829,14 @@ OH_NN_ReturnCode NNExecutor::ReinitScheduling(uint32_t hiaimodelID, bool* needMo
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode NNExecutor::DeinitScheduling(uint32_t hiaimodelID)
+OH_NN_ReturnCode NNExecutor::DeinitScheduling(uint32_t hiaimodelID, std::string mode)
 {
     NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
     if (nnrtService.AutoUnload == nullptr) {
         LOGE("[HiaiExecutorImpl] AutoUnload failed, nnrtService AutoUnload func is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
-    int ret = nnrtService.AutoUnload(m_originHiaiModelId, hiaimodelID);
+    int ret = nnrtService.AutoUnload(m_originHiaiModelId, hiaimodelID, mode.c_str());
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("[HiaiExecutorImpl] AutoUnload failed, some error happen when AutoUnload hiaiModelId.");
         return OH_NN_INVALID_PARAMETER;
@@ -1797,7 +1863,7 @@ bool NNExecutor::DeinitModel(std::string mode)
             LOGW("GetModelID failed, some error happen when get model id for device.");
         }
 
-        _ret = DeinitScheduling(modelId);
+        _ret = DeinitScheduling(modelId, mode);
         if (_ret != OH_NN_SUCCESS) {
             LOGW("DeinitScheduling failed, some error happen when DeinitScheduling model.");
         }
@@ -1806,6 +1872,12 @@ bool NNExecutor::DeinitModel(std::string mode)
             if (m_autoUnloadHandler != nullptr) {
                 m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
                 LOGI("FrozenDeinit pid=%{public}ld originHiaiModelId=%{public}u hiaiModelId=%{public}u",
+                    static_cast<long>(getpid()), m_originHiaiModelId, modelId);
+            }
+        } else if (mode == "HiaiAutoUnload") {
+            if (m_autoUnloadHandler != nullptr) {
+                m_autoUnloadHandler->RemoveTask("nnexecutor_autounload" + std::to_string(m_executorid));
+                LOGI("HiaiAutoUnload pid=%{public}ld originHiaiModelId=%{public}u hiaiModelId=%{public}u",
                     static_cast<long>(getpid()), m_originHiaiModelId, modelId);
             }
         } else {
