@@ -1,0 +1,18 @@
+{
+    "kits": [
+        {
+            "push": [
+                "ActsNnrtOpsTest->/data/local/tmp/ActsNnrtOpsTest"
+            ],
+            "type": "PushKit"
+        }
+    ],
+    "driver": {
+        "native-test-timeout": "600000",
+        "type": "CppTest",
+        "module-name": "ActsNnrtOpsTest",
+        "runtime-hint": "1s",
+        "native-test-device-path": "/data/local/tmp"
+    },
+    "description": "Configuration for ActsNnrtOpsTest Tests"
+}
