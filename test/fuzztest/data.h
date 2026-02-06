@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//gitcode test second
+
 #ifndef TEST_FUZZTEST_GETDATA_H
 #define TEST_FUZZTEST_GETDATA_H
 
