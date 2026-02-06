@@ -1570,7 +1570,7 @@ NNRT_API void OH_NNExecutor_Destroy(OH_NNExecutor **executor)
 
     ret = executorImpl->DestroyPreparedModel();
     if (ret != OH_NN_SUCCESS) {
-        LOGW("OH_NNExecutor_Destroy failed, failed to destroy preparedModel");
+        LOGW("OH_NNExecutor_Destroy failed, failed to destroy preparedModel.");
     }
 
     auto returnCode = backend->DestroyExecutor(executorImpl);
