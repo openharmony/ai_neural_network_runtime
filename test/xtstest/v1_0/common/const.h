@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//V2_0
+//V1_0
 #ifndef CONST_H
 #define CONST_H
 
