@@ -1,0 +1,100 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//test/xts/tools/build/suite.gni")
+module_output_path = "acts/nnrt"
+
+config("ops_config") {
+  include_dirs = [ "include" ]
+  cflags = [ "-Wno-error" ]
+  cflags_cc = [ "-fexceptions" ]
+}
+
+ohos_moduletest_suite("ActsNnrtOpsTest") {
+  module_out_path = module_output_path
+  sources = [
+    "src/abs_test.cpp",
+    "src/all_test.cpp",
+    "src/assert_test.cpp",
+    "src/broadcast_to_test.cpp",
+    "src/ceil_test.cpp",
+    "src/clip_test.cpp",
+    "src/constant_of_shape_test.cpp",
+    "src/cos_test.cpp",
+    "src/crop_test.cpp",
+    "src/depth_to_space_test.cpp",
+    "src/detection_post_process_test.cpp",
+    "src/equal_test.cpp",
+    "src/erf_test.cpp",
+    "src/exp_test.cpp",
+    "src/flatten_test.cpp",
+    "src/floor_test.cpp",
+    "src/gather_nd_test.cpp",
+    "src/greater_equal_test.cpp",
+    "src/greater_test.cpp",
+    "src/hard_sigmoid_test.cpp",
+    "src/instance_norm_test.cpp",
+    "src/l2_normalize_test.cpp",
+    "src/leaky_relu_test.cpp",
+    "src/less_test.cpp",
+    "src/log_softmax_test.cpp",
+    "src/log_test.cpp",
+    "src/logical_and_test.cpp",
+    "src/logical_not_test.cpp",
+    "src/logical_or_test.cpp",
+    "src/lrn_test.cpp",
+    "src/lstm_test.cpp",
+    "src/minimum_test.cpp",
+    "src/mock_idevice.cpp",
+    "src/mod_test.cpp",
+    "src/neg_test.cpp",
+    "src/nncore_utils.cpp",
+    "src/not_equal_test.cpp",
+    "src/pow_test.cpp",
+    "src/quant_dtype_cast_test.cpp",
+    "src/range_test.cpp",
+    "src/rank_test.cpp",
+    "src/reciprocal_test.cpp",
+    "src/reducel2_test.cpp",
+    "src/reducemax_test.cpp",
+    "src/reducemin_test.cpp",
+    "src/reducesum_test.cpp",
+    "src/round_test.cpp",
+    "src/scatter_nd_test.cpp",
+    "src/select_test.cpp",
+    "src/sin_test.cpp",
+    "src/space_to_depth_test.cpp",
+    "src/sparse_to_dense_test.cpp",
+    "src/square_test.cpp",
+    "src/swish_test.cpp",
+    "src/unstack_test.cpp",
+    "src/where_test.cpp",
+  ]
+
+  configs = [ ":ops_config" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_nnrt:libnnrt_proxy_2.1",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "mindspore:mindir_lib",
+    "neural_network_runtime:libneural_network_core",
+    "neural_network_runtime:libneural_network_runtime",
+  ]
+
+  subsystem_name = "ai"
+  part_name = "neural_network_runtime"
+}
