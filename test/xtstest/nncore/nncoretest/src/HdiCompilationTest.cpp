@@ -47,9 +47,10 @@ public:
     {
         OH_NNModel *model = nullptr;
         ConstructAddModel(&model);
+        int num = 1000;
         std::ofstream ofs(SUPPORTMODELPATH, std::ios::out | std::ios::binary);
         if (ofs) {
-            ofs.write(reinterpret_cast<char*>(model), sizeof(reinterpret_cast<char*>(model)));
+            ofs.write(reinterpret_cast<char*>(model), num);
             ofs.close();
         }
         OH_NNModel_Destroy(&model);
