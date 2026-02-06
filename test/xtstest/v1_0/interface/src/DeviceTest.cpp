@@ -167,7 +167,7 @@ HWTEST_F(DeviceTest, SUB_AI_NNRt_Func_North_Device_DeviceName_0400, Function | M
     EXPECT_GE(devicesCount, number);
 
     const char *name = nullptr;
-    std::string m_deviceName{"Device-CPU_TestVendor_v1_0"};
+    std::string mDeviceName{"Device-CPU_TestVendor_v1_0"};
     OH_NN_ReturnCode ret = OH_NN_FAILED;
     bool isHaveName = false;
     for (uint32_t i = 0; i < devicesCount; i++) {
@@ -175,7 +175,7 @@ HWTEST_F(DeviceTest, SUB_AI_NNRt_Func_North_Device_DeviceName_0400, Function | M
         ret = OH_NNDevice_GetName(devicesID[i], &name);
         EXPECT_EQ(OH_NN_SUCCESS, ret);
         std::string sName(name);
-        if (m_deviceName == sName) {
+        if (mDeviceName == sName) {
             isHaveName = true;
         }
     }

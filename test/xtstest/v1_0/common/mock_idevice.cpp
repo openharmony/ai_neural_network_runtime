@@ -97,7 +97,7 @@ sptr<INnrtDevice> INnrtDevice::Get(const std::string &serviceName, bool isStub)
 
 MockIDevice::MockIDevice()
 {
-    m_bufferFd = 0; 
+    m_bufferFd = 0;
 }
 
 MockIDevice::~MockIDevice()
