@@ -144,7 +144,7 @@ OH_NN_ReturnCode SetDevice(OH_NNCompilation *compilation)
     }
 
     const char *name = nullptr;
-    std::string m_deviceName{"Device-CPU_TestVendor_v1_0"};
+    std::string mDeviceName{"Device-CPU_TestVendor_v1_0"};
     for (uint32_t i = 0; i < devicesCount; i++) {
         name = nullptr;
         ret = OH_NNDevice_GetName(devicesID[i], &name);
@@ -154,7 +154,7 @@ OH_NN_ReturnCode SetDevice(OH_NNCompilation *compilation)
         }
 
         std::string sName(name);
-        if (m_deviceName == sName) {
+        if (mDeviceName == sName) {
             ret = OH_NNCompilation_SetDevice(compilation, devicesID[i]);
             if (ret != OH_NN_SUCCESS) {
                 LOGE("[NNRtTest] OH_NNCompilation_SetDevice failed! ret=%d\n", ret);
@@ -242,7 +242,7 @@ int ExecuteGraphMock(OH_NNExecutor *executor, const OHNNGraphArgs &graphArgs,
                 LOGE("[NNRtTest] OH_NNExecutor_SetOutput failed! ret=%d\n", ret);
                 return ret;
             }
-            if(expect!=nullptr) {
+            if (expect != nullptr) {
                 ret = device->MemoryCopy(expect, operandTem.length);
             }
             if (ret != OH_NN_SUCCESS) {

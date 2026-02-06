@@ -1062,7 +1062,7 @@ HWTEST_F(ModelTest, SUB_AI_NNRt_Func_North_Model_GetSupportedOperation_0700, Fun
     uint32_t count = 1;
     EXPECT_LE(count, devicesCount);
     const char *name = nullptr;
-    std::string m_DeviceName{"Device-CPU_TestVendor_v2_0"};
+    std::string mDeviceName{"Device-CPU_TestVendor_v2_0"};
     OH_NN_ReturnCode ret = OH_NN_FAILED;
     bool isHaveDevice = false;
     uint32_t deviceId = 0;
@@ -1071,7 +1071,7 @@ HWTEST_F(ModelTest, SUB_AI_NNRt_Func_North_Model_GetSupportedOperation_0700, Fun
         ret = OH_NNDevice_GetName(devicesID[i], &name);
         EXPECT_EQ(OH_NN_SUCCESS, ret);
         std::string sName(name);
-        if (m_DeviceName == sName) {
+        if (mDeviceName == sName) {
             isHaveDevice = true;
             deviceId = i;
         }
