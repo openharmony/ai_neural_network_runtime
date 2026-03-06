@@ -197,6 +197,29 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_settensordesc_001, TestSize.Level0)
 }
 
 /**
+ * @tc.name: nntensor2_0test_settensordesc_002
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NNTensor2Test, nntensor2_0test_settensordesc_002, TestSize.Level0)
+{
+    LOGE("SetTensorDesc nntensor2_0test_settensordesc_002");
+    size_t backendId = 1;
+    
+    NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
+    EXPECT_NE(nullptr, nnTensor);
+
+    TensorDesc* tensorDesc = new (std::nothrow) TensorDesc();
+    EXPECT_NE(nullptr, tensorDesc);
+
+    OH_NN_ReturnCode setTensorDescRet = nnTensor->SetTensorDesc(tensorDesc);
+    EXPECT_EQ(OH_NN_SUCCESS, setTensorDescRet);
+
+    OH_NN_ReturnCode ret = nnTensor->SetTensorDesc(tensorDesc);
+    EXPECT_EQ(OH_NN_SUCCESS, ret);
+}
+
+/**
  * @tc.name: nntensor2_0test_createdata_001
  * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
  * @tc.type: FUNC
@@ -559,6 +582,153 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_009, TestSize.Level0)
 
     OH_NN_ReturnCode ret = nnTensor->CreateData();
     EXPECT_EQ(OH_NN_FAILED, ret);
+}
+
+/**
+ * @tc.name: nntensor2_0test_createdata_010
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_010, TestSize.Level0)
+{
+    LOGE("CreateData nntensor2_0test_createdata_010");
+    size_t backendId = 4;
+    
+    NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
+    EXPECT_NE(nullptr, nnTensor);
+
+    nnTensor->m_data = 1;
+
+    OH_NN_ReturnCode ret = nnTensor->CreateData();
+    EXPECT_EQ(OH_NN_FAILED, ret);
+}
+
+/**
+ * @tc.name: nntensor2_0test_createdata_011
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_011, TestSize.Level0)
+{
+    LOGE("CreateData nntensor2_0test_createdata_011");
+    size_t backendId = 4;
+    
+    NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
+    EXPECT_NE(nullptr, nnTensor);
+
+    nnTensor->m_tensorDesc = nullptr;
+
+    OH_NN_ReturnCode ret = nnTensor->CreateData();
+    EXPECT_EQ(OH_NN_NULL_PTR, ret);
+}
+
+/**
+ * @tc.name: nntensor2_0test_createdata_012
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_012, TestSize.Level0)
+{
+    LOGE("CreateData nntensor2_0test_createdata_012");
+    size_t backendId = 4;
+    
+    NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
+    EXPECT_NE(nullptr, nnTensor);
+
+    size_t size = 1;
+    nnTensor->m_data = 1;
+
+    OH_NN_ReturnCode ret = nnTensor->CreateData(size);
+    EXPECT_EQ(OH_NN_FAILED, ret);
+}
+
+/**
+ * @tc.name: nntensor2_0test_createdata_013
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_013, TestSize.Level0)
+{
+    LOGE("CreateData nntensor2_0test_createdata_013");
+    size_t backendId = 4;
+    
+    NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
+    EXPECT_NE(nullptr, nnTensor);
+
+    size_t = 1;
+    nnTensor->m_tensorDesc = nullptr;
+
+    OH_NN_ReturnCode ret = nnTensor->CreateData(size);
+    EXPECT_EQ(OH_NN_NULL_PTR, ret);
+}
+
+/**
+ * @tc.name: nntensor2_0test_createdata_014
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_014, TestSize.Level0)
+{
+    LOGE("CreateData nntensor2_0test_createdata_014");
+    size_t backendId = 4;
+    
+    NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
+    EXPECT_NE(nullptr, nnTensor);
+
+    size_t size = 1;
+    int fd = 1;
+    size_t offset = 0;
+    nnTensor->m_data = 1;
+
+    OH_NN_ReturnCode ret = nnTensor->CreateData(fd, size, offset);
+    EXPECT_EQ(OH_NN_FAILED, ret);
+}
+
+/**
+ * @tc.name: nntensor2_0test_createdata_015
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_015, TestSize.Level0)
+{
+    LOGE("CreateData nntensor2_0test_createdata_015");
+    size_t backendId = 4;
+    
+    NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
+    EXPECT_NE(nullptr, nnTensor);
+
+    
+
+    size_t size = 1;
+    int fd = 1;
+    size_t offset = 0;
+    nnTensor->m_tensorDesc = nullptr;
+
+    OH_NN_ReturnCode ret = nnTensor->CreateData(fd, size, offset);
+    EXPECT_EQ(OH_NN_NULL_PTR, ret);
+}
+
+/**
+ * @tc.name: nntensor2_0test_createdata_016
+ * @tc.desc: Verify the QuantParams function return nullptr in case of fd -1.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_016, TestSize.Level0)
+{
+    LOGE("CreateData nntensor2_0test_createdata_016");
+    size_t backendId = 4;
+    
+    NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
+    EXPECT_NE(nullptr, nnTensor);
+
+    
+
+    size_t size = 1;
+    int fd = 1;
+    size_t offset = 0;
+
+    OH_NN_ReturnCode ret = nnTensor->CreateData(fd, size, offset);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
 /**
