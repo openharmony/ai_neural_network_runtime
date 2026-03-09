@@ -697,8 +697,6 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_015, TestSize.Level0)
     NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
     EXPECT_NE(nullptr, nnTensor);
 
-    
-
     size_t size = 1;
     int fd = 1;
     size_t offset = 0;
