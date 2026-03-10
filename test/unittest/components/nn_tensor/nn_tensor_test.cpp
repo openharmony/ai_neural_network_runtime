@@ -597,7 +597,9 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_010, TestSize.Level0)
     NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
     EXPECT_NE(nullptr, nnTensor);
 
-    nnTensor->m_data = 1;
+    int data = 1;
+    void* buffer = data;
+    nnTensor->SetData(buffer);
 
     OH_NN_ReturnCode ret = nnTensor->CreateData();
     EXPECT_EQ(OH_NN_FAILED, ret);
@@ -615,8 +617,6 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_011, TestSize.Level0)
     
     NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
     EXPECT_NE(nullptr, nnTensor);
-
-    nnTensor->m_tensorDesc = nullptr;
 
     OH_NN_ReturnCode ret = nnTensor->CreateData();
     EXPECT_EQ(OH_NN_NULL_PTR, ret);
@@ -636,7 +636,9 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_012, TestSize.Level0)
     EXPECT_NE(nullptr, nnTensor);
 
     size_t size = 1;
-    nnTensor->m_data = 1;
+    int data = 1;
+    void* buffer = data;
+    nnTensor->SetData(buffer);
 
     OH_NN_ReturnCode ret = nnTensor->CreateData(size);
     EXPECT_EQ(OH_NN_FAILED, ret);
@@ -656,7 +658,6 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_013, TestSize.Level0)
     EXPECT_NE(nullptr, nnTensor);
 
     size_t = 1;
-    nnTensor->m_tensorDesc = nullptr;
 
     OH_NN_ReturnCode ret = nnTensor->CreateData(size);
     EXPECT_EQ(OH_NN_NULL_PTR, ret);
@@ -678,7 +679,9 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_014, TestSize.Level0)
     size_t size = 1;
     int fd = 1;
     size_t offset = 0;
-    nnTensor->m_data = 1;
+    int data = 1;
+    void* buffer = data;
+    nnTensor->SetData(buffer);
 
     OH_NN_ReturnCode ret = nnTensor->CreateData(fd, size, offset);
     EXPECT_EQ(OH_NN_FAILED, ret);
@@ -700,7 +703,6 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_015, TestSize.Level0)
     size_t size = 1;
     int fd = 1;
     size_t offset = 0;
-    nnTensor->m_tensorDesc = nullptr;
 
     OH_NN_ReturnCode ret = nnTensor->CreateData(fd, size, offset);
     EXPECT_EQ(OH_NN_NULL_PTR, ret);
@@ -722,6 +724,16 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_016, TestSize.Level0)
     size_t size = 1;
     int fd = 1;
     size_t offset = 0;
+    TensorDesc desc;
+    desc.SetDataType(OH_NN_INT64);
+    size_t shapeNum = 1;
+    int32_t index = 10;
+    int32_t* shape = &index;
+    desc.SetShape(shape, shapeNum);
+    TensorDesc* tensorDesc = &desc;
+
+    OH_NN_ReturnCode retSetTensorDesc = nnTensor->SetTensorDesc(tensorDesc);
+    EXPECT_EQ(OH_NN_SUCCESS, retSetTensorDesc);
 
     OH_NN_ReturnCode ret = nnTensor->CreateData(fd, size, offset);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
