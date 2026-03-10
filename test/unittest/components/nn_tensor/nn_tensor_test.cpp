@@ -597,8 +597,8 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_010, TestSize.Level0)
     NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
     EXPECT_NE(nullptr, nnTensor);
 
-    int data = 1;
-    void* buffer = data;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* buffer = dataArry;
     nnTensor->SetData(buffer);
 
     OH_NN_ReturnCode ret = nnTensor->CreateData();
@@ -636,8 +636,8 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_012, TestSize.Level0)
     EXPECT_NE(nullptr, nnTensor);
 
     size_t size = 1;
-    int data = 1;
-    void* buffer = data;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* buffer = dataArry;
     nnTensor->SetData(buffer);
 
     OH_NN_ReturnCode ret = nnTensor->CreateData(size);
@@ -657,7 +657,7 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_013, TestSize.Level0)
     NNTensor2_0* nnTensor = new (std::nothrow) NNTensor2_0(backendId);
     EXPECT_NE(nullptr, nnTensor);
 
-    size_t = 1;
+    size_t size = 1;
 
     OH_NN_ReturnCode ret = nnTensor->CreateData(size);
     EXPECT_EQ(OH_NN_NULL_PTR, ret);
@@ -679,8 +679,8 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_014, TestSize.Level0)
     size_t size = 1;
     int fd = 1;
     size_t offset = 0;
-    int data = 1;
-    void* buffer = data;
+    float dataArry[9] {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    void* buffer = dataArry;
     nnTensor->SetData(buffer);
 
     OH_NN_ReturnCode ret = nnTensor->CreateData(fd, size, offset);
