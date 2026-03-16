@@ -325,7 +325,7 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_003, TestSize.Level0)
     OH_NN_ReturnCode ret = nnTensor->CreateData();
     EXPECT_EQ(OH_NN_MEMORY_ERROR, ret);
 
-    creator.reset();
+    backendManager.RemoveBackend(backendName);
 }
 
 /**
@@ -495,7 +495,7 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_007, TestSize.Level0)
     OH_NN_ReturnCode ret = nnTensor->CreateData();
     EXPECT_EQ(OH_NN_MEMORY_ERROR, ret);
 
-    creator.reset();
+    backendManager.RemoveBackend(backendName);
 }
 
 std::shared_ptr<Backend> Creator4()
@@ -566,7 +566,7 @@ HWTEST_F(NNTensor2Test, nntensor2_0test_createdata_008, TestSize.Level0)
     OH_NN_ReturnCode ret = nnTensor->CreateData();
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 
-    creator.reset();
+    backendManager.RemoveBackend(backendName);
 }
 
 /**
