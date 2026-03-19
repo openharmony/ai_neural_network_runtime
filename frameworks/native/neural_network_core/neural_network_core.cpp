@@ -697,8 +697,8 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
 
     isExceedRamLimit = modelSize > MODEL_MAX_LIMIT ? true : false;
     // buffer场景获取modelSize
-    if ((compilation->cacheBuffer.first != nullptr) && (compilation->cacheBuffer.second != size_t(0)) ||
-        (compilation->offlineModelBuffer.first != nullptr) && (compilation->offlineModelBuffer.second != size_t(0))) {
+    if (((compilation->cacheBuffer.first != nullptr) && (compilation->cacheBuffer.second != size_t(0))) ||
+        ((compilation->offlineModelBuffer.first != nullptr) && (compilation->offlineModelBuffer.second != size_t(0)))) {
         isExceedRamLimit = true;
         isBuffer = true;
     }
