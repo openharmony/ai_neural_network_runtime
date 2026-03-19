@@ -171,12 +171,14 @@ OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
     // 模型在线构图场景获取modelSize
     if (compilation->nnModel != nullptr) {
         modelSize = compilation->compiler->GetModelSize();
+        LOGD("model path nnmodelSize:%{public}zu", modelSize);
         return OH_NN_SUCCESS;
     }
 
     // omc路径加载场景获取modelSize
     if (compilation->offlineModelPath != nullptr) {
         modelSize = compilation->compiler->GetModelSize();
+        LOGD("omc path nnmodelSize:%{public}zu", modelSize);
         return OH_NN_SUCCESS;
     }
 
@@ -189,6 +191,7 @@ OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
         }
 
         modelSize = compilation->compiler->GetModelSize();
+        LOGD("cache path nnmodelSize:%{public}zu", modelSize);
         return OH_NN_SUCCESS;
     }
 
@@ -196,6 +199,7 @@ OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
     if ((compilation->offlineModelBuffer.first != nullptr) &&
                (compilation->offlineModelBuffer.second != size_t(0))) {
         modelSize = compilation->offlineModelBuffer.second;
+        LOGD("omc buffer nnmodelSize:%{public}zu", modelSize);
         return OH_NN_SUCCESS;
     }
 
@@ -203,6 +207,7 @@ OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
     if ((compilation->cacheBuffer.first != nullptr) &&
         (compilation->cacheBuffer.second != size_t(0))) {
         modelSize = compilation->cacheBuffer.second;
+        LOGD("model buffer nnmodelSize:%{public}zu", modelSize);
         return OH_NN_SUCCESS;
     }
 
@@ -691,6 +696,18 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
     }
 
     isExceedRamLimit = modelSize > MODEL_MAX_LIMIT ? true : false;
+    // omc buffer场景获取modelSize
+    if ((compilation->offlineModelBuffer.first != nullptr) &&
+               (compilation->offlineModelBuffer.second != size_t(0))) {
+        isExceedRamLimit = true;
+    }
+
+    // model buffer场景获取modelSize
+    if ((compilation->cacheBuffer.first != nullptr) &&
+        (compilation->cacheBuffer.second != size_t(0))) {
+        isExceedRamLimit = true;
+    }
+    
     return OH_NN_SUCCESS;
 }
 
@@ -734,7 +751,29 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &isExcee
         LOGE("Authentication failed, nnrtService Authentication func is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
-    ret = nnrtService.Authentication();
+
+    size_t modelSize = 0;
+    retCode = GetModelSize(compilation, modelSize);
+    if (retCode != OH_NN_SUCCESS) {
+        LOGE("Authentication failed to get model size");
+        return OH_NN_FAILED;
+    }
+    LOGD("largeModelSize:%{public}zu", modelSize);
+
+    bool isBuffer = false;
+    // omc buffer场景获取modelSize
+    if ((compilation->offlineModelBuffer.first != nullptr) &&
+               (compilation->offlineModelBuffer.second != size_t(0))) {
+        isBuffer = true;
+    }
+
+    // model buffer场景获取modelSize
+    if ((compilation->cacheBuffer.first != nullptr) &&
+        (compilation->cacheBuffer.second != size_t(0))) {
+        isBuffer = true;
+    }
+
+    ret = nnrtService.Authentication(static_cast<uint32_t>(modelSize), &isBuffer);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("Authentication failed, input model cannot run by npu.");
         return static_cast<OH_NN_ReturnCode>(ret);
