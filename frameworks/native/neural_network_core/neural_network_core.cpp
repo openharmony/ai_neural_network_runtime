@@ -676,7 +676,7 @@ OH_NN_ReturnCode SetCompilationOptions(Compilation* compilation)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExceedRamLimit)
+OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExceedRamLimit, bool& isBuffer)
 {
     if (compilation == nullptr) {
         LOGE("CheckExceedRamLimit failed, compilation is nullptr.");
@@ -697,9 +697,10 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
 
     isExceedRamLimit = modelSize > MODEL_MAX_LIMIT ? true : false;
     // buffer场景获取modelSize
-    if ((compilation->offlineModelBuffer.first != nullptr) && (compilation->offlineModelBuffer.second != size_t(0))
-        || (compilation->cacheBuffer.first != nullptr) && (compilation->cacheBuffer.second != size_t(0))) {
+    if ((compilation->cacheBuffer.first != nullptr) && (compilation->cacheBuffer.second != size_t(0)) ||
+        (compilation->offlineModelBuffer.first != nullptr) && (compilation->offlineModelBuffer.second != size_t(0))) {
         isExceedRamLimit = true;
+        isBuffer = true;
     }
     
     return OH_NN_SUCCESS;
@@ -707,7 +708,8 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
 
 OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &isExceedRamLimit)
 {
-    OH_NN_ReturnCode retCode = CheckExceedRamLimit(compilation, isExceedRamLimit);
+    bool isBuffer = false;
+    OH_NN_ReturnCode retCode = CheckExceedRamLimit(compilation, isExceedRamLimit, isBuffer);
     if (retCode != OH_NN_SUCCESS) {
         LOGE("AuthenticateModel failed, fail to check if model exceed ram limit.");
         return retCode;
@@ -751,13 +753,6 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &isExcee
     if (retCode != OH_NN_SUCCESS) {
         LOGE("Authentication failed to get model size");
         return OH_NN_FAILED;
-    }
-
-    bool isBuffer = false;
-    // buffer场景获取modelSize
-    if ((compilation->cacheBuffer.first != nullptr) && (compilation->cacheBuffer.second != size_t(0)) ||
-        (compilation->offlineModelBuffer.first != nullptr) && (compilation->offlineModelBuffer.second != size_t(0))) {
-        isBuffer = true;
     }
 
     ret = nnrtService.Authentication(static_cast<uint32_t>(modelSize), &isBuffer);
