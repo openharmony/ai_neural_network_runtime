@@ -752,12 +752,11 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &isExcee
         LOGE("Authentication failed to get model size");
         return OH_NN_FAILED;
     }
-    LOGD("largeModelSize:%{public}zu", modelSize);
 
     bool isBuffer = false;
     // buffer场景获取modelSize
-    if ((compilation->offlineModelBuffer.first != nullptr) && (compilation->offlineModelBuffer.second != size_t(0))
-        || (compilation->cacheBuffer.first != nullptr) && (compilation->cacheBuffer.second != size_t(0))) {
+    if ((compilation->cacheBuffer.first != nullptr) && (compilation->cacheBuffer.second != size_t(0)) ||
+        (compilation->offlineModelBuffer.first != nullptr) && (compilation->offlineModelBuffer.second != size_t(0))) {
         isBuffer = true;
     }
 
