@@ -696,15 +696,9 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
     }
 
     isExceedRamLimit = modelSize > MODEL_MAX_LIMIT ? true : false;
-    // omc buffer场景获取modelSize
-    if ((compilation->offlineModelBuffer.first != nullptr) &&
-               (compilation->offlineModelBuffer.second != size_t(0))) {
-        isExceedRamLimit = true;
-    }
-
-    // model buffer场景获取modelSize
-    if ((compilation->cacheBuffer.first != nullptr) &&
-        (compilation->cacheBuffer.second != size_t(0))) {
+    // buffer场景获取modelSize
+    if ((compilation->offlineModelBuffer.first != nullptr) && (compilation->offlineModelBuffer.second != size_t(0))
+        || (compilation->cacheBuffer.first != nullptr) && (compilation->cacheBuffer.second != size_t(0))) {
         isExceedRamLimit = true;
     }
     
@@ -761,15 +755,9 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &isExcee
     LOGD("largeModelSize:%{public}zu", modelSize);
 
     bool isBuffer = false;
-    // omc buffer场景获取modelSize
-    if ((compilation->offlineModelBuffer.first != nullptr) &&
-               (compilation->offlineModelBuffer.second != size_t(0))) {
-        isBuffer = true;
-    }
-
-    // model buffer场景获取modelSize
-    if ((compilation->cacheBuffer.first != nullptr) &&
-        (compilation->cacheBuffer.second != size_t(0))) {
+    // buffer场景获取modelSize
+    if ((compilation->offlineModelBuffer.first != nullptr) && (compilation->offlineModelBuffer.second != size_t(0))
+        || (compilation->cacheBuffer.first != nullptr) && (compilation->cacheBuffer.second != size_t(0))) {
         isBuffer = true;
     }
 
