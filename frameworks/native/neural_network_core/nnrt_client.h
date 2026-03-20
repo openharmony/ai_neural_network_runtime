@@ -29,7 +29,7 @@ public:
     int (*SetModelID)(uint32_t hiaimodelID, size_t nnrtModelID) = nullptr;
     int (*IsSupportAuthentication)(bool* supportStat) = nullptr;
     int (*IsSupportScheduling)(bool* supportStat) = nullptr;
-    int (*Authentication)() = nullptr;
+    int (*Authentication)(uint32_t modelSize, bool* isBuffer) = nullptr;
     int (*Scheduling)(uint32_t hiaiModelId, bool* needModelLatency, const char* cachePath) = nullptr;
     int (*UpdateModelLatency)(uint32_t hiaiModelId, int modelLatency) = nullptr;
     int (*Unload)(uint32_t hiaiModelId) = nullptr;
