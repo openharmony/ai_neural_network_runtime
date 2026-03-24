@@ -748,14 +748,7 @@ OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &isExcee
         return OH_NN_INVALID_PARAMETER;
     }
 
-    size_t modelSize = 0;
-    retCode = GetModelSize(compilation, modelSize);
-    if (retCode != OH_NN_SUCCESS) {
-        LOGE("Authentication failed to get model size");
-        return OH_NN_FAILED;
-    }
-
-    ret = nnrtService.Authentication(static_cast<uint32_t>(modelSize), &isBuffer);
+    ret = nnrtService.Authentication();
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("Authentication failed, input model cannot run by npu.");
         return static_cast<OH_NN_ReturnCode>(ret);
@@ -1349,6 +1342,57 @@ NNRT_API OH_NN_ReturnCode OH_NNTensor_GetOffset(const NN_Tensor *tensor, size_t 
     return OH_NN_SUCCESS;
 }
 
+namespace {
+OH_NN_ReturnCode GetLargeModelSize(const Compilation* compilation, size_t& modelSize, bool isBuffer)
+{
+    // 模型在线构图场景获取modelSize
+    if (compilation->nnModel != nullptr) {
+        modelSize = compilation->compiler->GetModelSize();
+        LOGD("model path nnmodelSize:%{public}zu", modelSize);
+        return OH_NN_SUCCESS;
+    }
+
+    // omc路径加载场景获取modelSize
+    if (compilation->offlineModelPath != nullptr) {
+        modelSize = compilation->compiler->GetModelSize();
+        LOGD("omc path nnmodelSize:%{public}zu", modelSize);
+        return OH_NN_SUCCESS;
+    }
+
+    // 模型缓存路径加载场景获取modelSize
+    if (compilation->cachePath != nullptr) {
+        struct stat buffer;
+        if (stat(compilation->cachePath, &buffer) != 0) {
+            LOGE("CheckExceedRamLimit failed, cachePath is not exit or permission.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+
+        modelSize = compilation->compiler->GetModelSize();
+        LOGD("cache path nnmodelSize:%{public}zu", modelSize);
+        return OH_NN_SUCCESS;
+    }
+
+    // omc buffer加载场景获取modelSize
+    if ((compilation->offlineModelBuffer.first != nullptr) &&
+               (compilation->offlineModelBuffer.second != size_t(0))) {
+        modelSize = compilation->offlineModelBuffer.second;
+        LOGD("omc buffer nnmodelSize:%{public}zu", modelSize);
+        return OH_NN_SUCCESS;
+    }
+
+    // 模型缓存buffer场景获取modelSize
+    if ((compilation->cacheBuffer.first != nullptr) &&
+        (compilation->cacheBuffer.second != size_t(0))) {
+        modelSize = compilation->cacheBuffer.second;
+        LOGD("model buffer nnmodelSize:%{public}zu", modelSize);
+        return OH_NN_SUCCESS;
+    }
+
+    LOGE("CheckExceedRamLimit failed, no available model to check.");
+    return OH_NN_INVALID_PARAMETER;
+}
+}
+
 OH_NN_ReturnCode Scheduling(Compilation** compilation)
 {
     if (compilation == nullptr) {
@@ -1395,7 +1439,14 @@ OH_NN_ReturnCode Scheduling(Compilation** compilation)
     }
 
     bool needModelLatency = false;
-    ret = nnrtService.Scheduling(compilationImpl->hiaiModelId, &needModelLatency, cachePath.c_str());
+    bool isBuffer = false;
+    OH_NN_ReturnCode retCode = GetLargeModelSize(*compilation, modelSize, isBuffer);
+    if (retCode != OH_NN_SUCCESS) {
+        LOGE("Scheduling failed to get model size");
+        return OH_NN_FAILED;
+    }
+    ret = nnrtService.Scheduling(compilationImpl->hiaiModelId, &needModelLatency,
+                                 cachePath.c_str(), modelSize, isBuffer);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("Scheduling failed, some error happened when scheduling.");
         return static_cast<OH_NN_ReturnCode>(ret);
