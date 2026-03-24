@@ -1404,6 +1404,17 @@ OH_NN_ReturnCode CheckScheduling(Compilation** compilation)
         LOGE("Scheduling failed, compilation implementation is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
+
+    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+    if (!nnrtService.IsServiceAvaliable()) {
+        LOGW("Scheduling failed, fail to get nnrt service, skip schedule.");
+        return OH_NN_SUCCESS;
+    }
+
+    if (nnrtService.IsSupportScheduling == nullptr) {
+        LOGE("Scheduling failed, nnrtService IsSupportScheduling func is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
     return OH_NN_SUCCESS;
 }
 }
@@ -1414,17 +1425,12 @@ OH_NN_ReturnCode Scheduling(Compilation** compilation)
     if (retCode != OH_NN_SUCCESS) {
         return retCode;
     }
-    
+
     Compilation* compilationImpl = *compilation;
     NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
     if (!nnrtService.IsServiceAvaliable()) {
         LOGW("Scheduling failed, fail to get nnrt service, skip schedule.");
         return OH_NN_SUCCESS;
-    }
-
-    if (nnrtService.IsSupportScheduling == nullptr) {
-        LOGE("Scheduling failed, nnrtService IsSupportScheduling func is nullptr.");
-        return OH_NN_INVALID_PARAMETER;
     }
 
     std::string cachePath = "";
