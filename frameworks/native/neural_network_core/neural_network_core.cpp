@@ -1449,6 +1449,7 @@ OH_NN_ReturnCode Scheduling(Compilation** compilation)
     }
 
     bool needModelLatency = false;
+    size_t modelSize = 0;
     bool isBuffer = false;
     retCode = GetLargeModelSize(*compilation, modelSize, isBuffer);
     if (retCode != OH_NN_SUCCESS) {
