@@ -1391,9 +1391,8 @@ OH_NN_ReturnCode GetLargeModelSize(const Compilation* compilation, size_t& model
     LOGE("CheckExceedRamLimit failed, no available model to check.");
     return OH_NN_INVALID_PARAMETER;
 }
-}
 
-OH_NN_ReturnCode Scheduling(Compilation** compilation)
+OH_NN_ReturnCode CheckScheduling(Compilation** compilation)
 {
     if (compilation == nullptr) {
         LOGE("Scheduling failed, compilation is nullptr.");
@@ -1416,7 +1415,18 @@ OH_NN_ReturnCode Scheduling(Compilation** compilation)
         LOGE("Scheduling failed, nnrtService IsSupportScheduling func is nullptr.");
         return OH_NN_INVALID_PARAMETER;
     }
+    return OH_NN_SUCCESS;
+}
+}
 
+OH_NN_ReturnCode Scheduling(Compilation** compilation)
+{
+    OH_NN_ReturnCode retCode = CheckScheduling(compilation);
+    if (retCode != OH_NN_SUCCESS) {
+        return retCode;
+    }
+    Compilation* compilationImpl = *compilation;
+    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
     std::string cachePath = "";
     if (compilationImpl->cachePath != nullptr) {
         cachePath = compilationImpl->cachePath;
@@ -1440,7 +1450,7 @@ OH_NN_ReturnCode Scheduling(Compilation** compilation)
 
     bool needModelLatency = false;
     bool isBuffer = false;
-    OH_NN_ReturnCode retCode = GetLargeModelSize(*compilation, modelSize, isBuffer);
+    retCode = GetLargeModelSize(*compilation, modelSize, isBuffer);
     if (retCode != OH_NN_SUCCESS) {
         LOGE("Scheduling failed to get model size");
         return OH_NN_FAILED;
