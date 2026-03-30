@@ -31,7 +31,7 @@ public:
     int (*IsSupportScheduling)(bool* supportStat) = nullptr;
     int (*Authentication)() = nullptr;
     int (*Scheduling)(uint32_t hiaiModelId, bool* needModelLatency, const char* cachePath,
-                      uint32_t modelSize, bool isBuffer) = nullptr;
+        size_t modelSize, bool isModelBuffer) = nullptr;
     int (*UpdateModelLatency)(uint32_t hiaiModelId, int modelLatency) = nullptr;
     int (*Unload)(uint32_t hiaiModelId) = nullptr;
     bool (*PullUpDlliteService)() = nullptr;
