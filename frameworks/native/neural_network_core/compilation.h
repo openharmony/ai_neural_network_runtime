@@ -43,6 +43,7 @@ struct Compilation {
     size_t nnrtModelID {0};
     uint32_t hiaiModelId {0};
     bool isNeedModelLatency {false};
+    size_t modelSize {0};
 
     ~Compilation()
     {
