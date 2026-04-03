@@ -171,14 +171,12 @@ OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
     // 模型在线构图场景获取modelSize
     if (compilation->nnModel != nullptr) {
         modelSize = compilation->compiler->GetModelSize();
-        LOGD("model path nnmodelSize:%{public}zu", modelSize);
         return OH_NN_SUCCESS;
     }
 
     // omc路径加载场景获取modelSize
     if (compilation->offlineModelPath != nullptr) {
         modelSize = compilation->compiler->GetModelSize();
-        LOGD("omc path nnmodelSize:%{public}zu", modelSize);
         return OH_NN_SUCCESS;
     }
 
@@ -191,7 +189,6 @@ OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
         }
 
         modelSize = compilation->compiler->GetModelSize();
-        LOGD("cache path nnmodelSize:%{public}zu", modelSize);
         return OH_NN_SUCCESS;
     }
 
@@ -199,7 +196,6 @@ OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
     if ((compilation->offlineModelBuffer.first != nullptr) &&
                (compilation->offlineModelBuffer.second != size_t(0))) {
         modelSize = compilation->offlineModelBuffer.second;
-        LOGD("omc buffer nnmodelSize:%{public}zu", modelSize);
         return OH_NN_SUCCESS;
     }
 
@@ -207,7 +203,6 @@ OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
     if ((compilation->cacheBuffer.first != nullptr) &&
         (compilation->cacheBuffer.second != size_t(0))) {
         modelSize = compilation->cacheBuffer.second;
-        LOGD("model buffer nnmodelSize:%{public}zu", modelSize);
         return OH_NN_SUCCESS;
     }
 
@@ -229,6 +224,59 @@ void AddSessionId(Executor *executorImpl)
         }
         executorImpl->isAddSession = true;
     }
+}
+
+OH_NN_ReturnCode ScheduleModel(Compilation* compilationImpl)
+{
+    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+    if (!nnrtService.IsServiceAvaliable()) {
+        LOGW("Scheduling failed, fail to get nnrt service, skip schedule.");
+        return OH_NN_SUCCESS;
+    }
+
+    if (nnrtService.IsSupportScheduling == nullptr) {
+        LOGE("Scheduling failed, nnrtService IsSupportScheduling func is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    std::string cachePath = "";
+    if (compilationImpl->cachePath != nullptr) {
+        cachePath = compilationImpl->cachePath;
+    }
+
+    bool supportStat = false;
+    int ret = nnrtService.IsSupportScheduling(&supportStat);
+    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+        LOGE("Scheduling failed, some error happened when judge if support scheduling.");
+        return static_cast<OH_NN_ReturnCode>(ret);
+    }
+    if (!supportStat) {
+        LOGW("device not support scheduling, jumper over scheduling.");
+        return OH_NN_SUCCESS;
+    }
+
+    if (nnrtService.Scheduling == nullptr) {
+        LOGE("Scheduling failed, nnrtService IsSupportScheduling func is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    bool isModelBuffer = false;
+    if (((compilationImpl->offlineModelBuffer.first != nullptr) &&
+        (compilationImpl->offlineModelBuffer.second != size_t(0))) ||
+        ((compilationImpl->cacheBuffer.first != nullptr) && (compilationImpl->cacheBuffer.second != size_t(0)))) {
+        isModelBuffer = true;
+    }
+
+    bool needModelLatency = false;
+    ret = nnrtService.Scheduling(compilationImpl->hiaiModelId, &needModelLatency, cachePath.c_str(),
+        compilationImpl->modelSize, isModelBuffer);
+    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+        LOGE("Scheduling failed, some error happened when scheduling.");
+        return static_cast<OH_NN_ReturnCode>(ret);
+    }
+
+    compilationImpl->isNeedModelLatency = needModelLatency;
+    return OH_NN_SUCCESS;
 }
 }
 
@@ -676,7 +724,7 @@ OH_NN_ReturnCode SetCompilationOptions(Compilation* compilation)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExceedRamLimit, bool& isBuffer)
+OH_NN_ReturnCode CheckExceedRamLimit(Compilation* compilation, bool& isExceedRamLimit)
 {
     if (compilation == nullptr) {
         LOGE("CheckExceedRamLimit failed, compilation is nullptr.");
@@ -695,21 +743,15 @@ OH_NN_ReturnCode CheckExceedRamLimit(const Compilation* compilation, bool& isExc
         return OH_NN_INVALID_PARAMETER;
     }
 
+    compilation->modelSize = modelSize;
+
     isExceedRamLimit = modelSize > MODEL_MAX_LIMIT ? true : false;
-    // buffer场景获取modelSize
-    if (((compilation->cacheBuffer.first != nullptr) && (compilation->cacheBuffer.second != size_t(0))) ||
-        ((compilation->offlineModelBuffer.first != nullptr) && (compilation->offlineModelBuffer.second != size_t(0)))) {
-        isExceedRamLimit = true;
-        isBuffer = true;
-    }
-    
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode AuthenticateModel(const Compilation* compilation, bool &isExceedRamLimit)
+OH_NN_ReturnCode AuthenticateModel(Compilation* compilation, bool &isExceedRamLimit)
 {
-    bool isBuffer = false;
-    OH_NN_ReturnCode retCode = CheckExceedRamLimit(compilation, isExceedRamLimit, isBuffer);
+    OH_NN_ReturnCode retCode = CheckExceedRamLimit(compilation, isExceedRamLimit);
     if (retCode != OH_NN_SUCCESS) {
         LOGE("AuthenticateModel failed, fail to check if model exceed ram limit.");
         return retCode;
@@ -1342,57 +1384,7 @@ NNRT_API OH_NN_ReturnCode OH_NNTensor_GetOffset(const NN_Tensor *tensor, size_t 
     return OH_NN_SUCCESS;
 }
 
-namespace {
-OH_NN_ReturnCode GetLargeModelSize(const Compilation* compilation, size_t& modelSize, bool isBuffer)
-{
-    // 模型在线构图场景获取modelSize
-    if (compilation->nnModel != nullptr) {
-        modelSize = compilation->compiler->GetModelSize();
-        LOGD("model path nnmodelSize:%{public}zu", modelSize);
-        return OH_NN_SUCCESS;
-    }
-
-    // omc路径加载场景获取modelSize
-    if (compilation->offlineModelPath != nullptr) {
-        modelSize = compilation->compiler->GetModelSize();
-        LOGD("omc path nnmodelSize:%{public}zu", modelSize);
-        return OH_NN_SUCCESS;
-    }
-
-    // 模型缓存路径加载场景获取modelSize
-    if (compilation->cachePath != nullptr) {
-        struct stat buffer;
-        if (stat(compilation->cachePath, &buffer) != 0) {
-            LOGE("CheckExceedRamLimit failed, cachePath is not exit or permission.");
-            return OH_NN_INVALID_PARAMETER;
-        }
-
-        modelSize = compilation->compiler->GetModelSize();
-        LOGD("cache path nnmodelSize:%{public}zu", modelSize);
-        return OH_NN_SUCCESS;
-    }
-
-    // omc buffer加载场景获取modelSize
-    if ((compilation->offlineModelBuffer.first != nullptr) &&
-               (compilation->offlineModelBuffer.second != size_t(0))) {
-        modelSize = compilation->offlineModelBuffer.second;
-        LOGD("omc buffer nnmodelSize:%{public}zu", modelSize);
-        return OH_NN_SUCCESS;
-    }
-
-    // 模型缓存buffer场景获取modelSize
-    if ((compilation->cacheBuffer.first != nullptr) &&
-        (compilation->cacheBuffer.second != size_t(0))) {
-        modelSize = compilation->cacheBuffer.second;
-        LOGD("model buffer nnmodelSize:%{public}zu", modelSize);
-        return OH_NN_SUCCESS;
-    }
-
-    LOGE("CheckExceedRamLimit failed, no available model to check.");
-    return OH_NN_INVALID_PARAMETER;
-}
-
-OH_NN_ReturnCode CheckScheduling(Compilation** compilation)
+OH_NN_ReturnCode Scheduling(Compilation** compilation)
 {
     if (compilation == nullptr) {
         LOGE("Scheduling failed, compilation is nullptr.");
@@ -1405,73 +1397,12 @@ OH_NN_ReturnCode CheckScheduling(Compilation** compilation)
         return OH_NN_INVALID_PARAMETER;
     }
 
-    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
-    if (!nnrtService.IsServiceAvaliable()) {
-        LOGW("Scheduling failed, fail to get nnrt service, skip schedule.");
-        return OH_NN_SUCCESS;
+    OH_NN_ReturnCode ret = ScheduleModel(compilationImpl);
+    if (ret != OH_NN_SUCCESS) {
+        LOGE("Scheduling failed, fail to schedule model.");
+        return ret;
     }
 
-    if (nnrtService.IsSupportScheduling == nullptr) {
-        LOGE("Scheduling failed, nnrtService IsSupportScheduling func is nullptr.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-    return OH_NN_SUCCESS;
-}
-}
-
-OH_NN_ReturnCode Scheduling(Compilation** compilation)
-{
-    OH_NN_ReturnCode retCode = CheckScheduling(compilation);
-    if (retCode != OH_NN_SUCCESS) {
-        return retCode;
-    }
-
-    Compilation* compilationImpl = *compilation;
-    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
-    if (!nnrtService.IsServiceAvaliable()) {
-        LOGW("Scheduling failed, fail to get nnrt service, skip schedule.");
-        return OH_NN_SUCCESS;
-    }
-
-    std::string cachePath = "";
-    if (compilationImpl->cachePath != nullptr) {
-        cachePath = compilationImpl->cachePath;
-    }
-
-    bool supportStat = false;
-    int ret = nnrtService.IsSupportScheduling(&supportStat);
-    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
-        LOGE("Scheduling failed, some error happened when judge if support scheduling.");
-        return static_cast<OH_NN_ReturnCode>(ret);
-    }
-    if (!supportStat) {
-        LOGW("device not support scheduling, jumper over scheduling.");
-        return OH_NN_SUCCESS;
-    }
-
-    if (nnrtService.Scheduling == nullptr) {
-        LOGE("Scheduling failed, nnrtService IsSupportScheduling func is nullptr.");
-        return OH_NN_INVALID_PARAMETER;
-    }
-
-    bool needModelLatency = false;
-    size_t modelSize = 0;
-    bool isBuffer = false;
-    retCode = GetLargeModelSize(*compilation, modelSize, isBuffer);
-    if (retCode != OH_NN_SUCCESS) {
-        LOGE("Scheduling failed to get model size");
-        return OH_NN_FAILED;
-    }
-    ret = nnrtService.Scheduling(compilationImpl->hiaiModelId, &needModelLatency,
-                                 cachePath.c_str(), modelSize, isBuffer);
-    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
-        LOGE("Scheduling failed, some error happened when scheduling.");
-        return static_cast<OH_NN_ReturnCode>(ret);
-    }
-
-    compilationImpl->isNeedModelLatency = needModelLatency;
-
-    LOGD("Scheduling success.");
     return OH_NN_SUCCESS;
 }
 
@@ -1659,7 +1590,7 @@ NNRT_API void OH_NNExecutor_Destroy(OH_NNExecutor **executor)
 
     ret = executorImpl->DestroyPreparedModel();
     if (ret != OH_NN_SUCCESS) {
-        LOGW("OH_NNExecutor_Destroy failed, failed to destroy preparedModel");
+        LOGW("OH_NNExecutor_Destroy failed, failed to destroy preparedModel.");
     }
 
     auto returnCode = backend->DestroyExecutor(executorImpl);
