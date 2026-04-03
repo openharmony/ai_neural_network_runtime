@@ -687,13 +687,9 @@ OH_NN_ReturnCode CheckDeviceId(int64_t& deviceId)
 
 NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, uint32_t version)
 {
-    if (cacheDir == nullptr) {
-        LOGI("OH_NNModel_HasCache get empty cache directory.");
+    if ((cacheDir == nullptr) || (modelName == nullptr)) {
+        LOGI("OH_NNModel_HasCache get empty cache directory or empty model name.");
         return false;
-    }
-
-    if (modelName == nullptr) {
-        LOGI("OH_NNModel_HasCache get empty model name.");
     }
 
     std::string cacheInfoPath = std::string(cacheDir) + "/" + std::string(modelName) + "cache_info.nncache";
