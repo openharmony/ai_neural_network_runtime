@@ -353,6 +353,11 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
     }
     modelCacheInfo.fileNumber = j["data"]["fileNumber"].get<int64_t>();
 
+    if (modelCacheInfo.fileNumber <= 0 || static_cast<size_t>(modelCacheInfo.fileNumber) > NN_CACHE_FILE_NUMBER_MAX) {
+        LOGE("[NNCompiledCache] CheckCacheInfo failed, fileNumber is invalid or more than 100");
+        return OH_NN_INVALID_FILE;
+    }
+
     return CheckCacheInfoExtension(modelCacheInfo, j);
 }
 
