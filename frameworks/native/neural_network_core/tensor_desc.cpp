@@ -145,6 +145,12 @@ OH_NN_ReturnCode TensorDesc::GetElementNum(size_t* elementNum) const
             *elementNum = 0;
             return OH_NN_DYNAMIC_SHAPE;
         }
+
+        if (*elementNum > SIZE_MAX / static_cast<size_t>(m_shape[i])) {
+            LOGE("GetElementNum failed, elementNum overflow.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+
         (*elementNum) *= m_shape[i];
     }
     return OH_NN_SUCCESS;
@@ -169,6 +175,11 @@ OH_NN_ReturnCode TensorDesc::GetByteSize(size_t* byteSize) const
     uint32_t typeSize = GetTypeSize(m_dataType);
     if (typeSize == 0) {
         LOGE("GetByteSize failed, data type is invalid.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    if (elementNum > SIZE_MAX / typeSize) {
+        LOGE("GetByteSize failed, byteSize overflow.");
         return OH_NN_INVALID_PARAMETER;
     }
 
