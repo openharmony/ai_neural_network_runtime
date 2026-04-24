@@ -166,7 +166,7 @@ OH_NN_ReturnCode IsCompilationAvaliable(Compilation* compilationImpl)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize, bool& isOfflineBuffer)
+OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
 {
     // 模型在线构图场景获取modelSize
     if (compilation->nnModel != nullptr) {
@@ -196,8 +196,6 @@ OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize,
     if ((compilation->offlineModelBuffer.first != nullptr) &&
                (compilation->offlineModelBuffer.second != size_t(0))) {
         modelSize = compilation->offlineModelBuffer.second;
-
-        isOfflineBuffer = true;
         return OH_NN_SUCCESS;
     }
 
@@ -734,8 +732,7 @@ OH_NN_ReturnCode CheckExceedRamLimit(Compilation* compilation, bool& isExceedRam
     }
 
     size_t modelSize = 0;
-    bool isOfflineBuffer = false;
-    OH_NN_ReturnCode ret = GetModelSize(compilation, modelSize, isOfflineBuffer);
+    OH_NN_ReturnCode ret = GetModelSize(compilation, modelSize);
     if (ret != OH_NN_SUCCESS) {
         LOGE("CheckExceedRamLimit failed, fail to get model size.");
         return OH_NN_INVALID_PARAMETER;
@@ -749,11 +746,6 @@ OH_NN_ReturnCode CheckExceedRamLimit(Compilation* compilation, bool& isExceedRam
     compilation->modelSize = modelSize;
 
     isExceedRamLimit = modelSize > MODEL_MAX_LIMIT ? true : false;
-
-    if (isOfflineBuffer) {
-        isExceedRamLimit = true;
-    }
-
     return OH_NN_SUCCESS;
 }
 
