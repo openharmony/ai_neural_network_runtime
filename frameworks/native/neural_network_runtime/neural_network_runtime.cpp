@@ -757,6 +757,11 @@ NNRT_API OH_NN_ReturnCode OH_NNModel_BuildFromMetaGraph(OH_NNModel *model, const
         return OH_NN_INVALID_PARAMETER;
     }
 
+    if (extensionSize > EXTENSION_MAX_SIZE) {
+        LOGE("OH_NNModel_BuildFromMetaGraph failed, extensionSize more than 200.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
     ExtensionConfig extensionConfig;
     std::string ops;
     for (size_t i = 0; i < extensionSize; ++i) {
