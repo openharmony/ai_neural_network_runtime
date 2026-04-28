@@ -62,6 +62,8 @@ ohos_shared_library("libneural_network_core") {
     "openssl:libcrypto_shared",
   ]
 
+  version_script = "libneural_network_core.versionscript"
+
   subsystem_name = "ai"
   innerapi_tags = [ "ndk" ]
   part_name = "neural_network_runtime"

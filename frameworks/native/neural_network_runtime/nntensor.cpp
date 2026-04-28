@@ -24,6 +24,8 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
+NNTensor2_0::NNTensor2_0(size_t backendID) : m_backendID(backendID) {}
+
 NNTensor2_0::~NNTensor2_0()
 {
     ReleaseMemory();
