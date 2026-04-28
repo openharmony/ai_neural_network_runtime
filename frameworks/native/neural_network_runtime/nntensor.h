@@ -23,7 +23,7 @@ namespace OHOS {
 namespace NeuralNetworkRuntime {
 class NNTensor2_0 : public Tensor {
 public:
-    explicit NNTensor2_0(size_t backendID) : m_backendID(backendID) {}
+    explicit NNTensor2_0(size_t backendID);
     ~NNTensor2_0() override;
 
     OH_NN_ReturnCode SetTensorDesc(const TensorDesc* tensorDesc) override;
