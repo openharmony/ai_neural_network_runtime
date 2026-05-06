@@ -49,6 +49,14 @@ public:
     virtual OH_NN_ReturnCode GetModelName(std::string& modelName) = 0;
     virtual size_t GetModelSize() = 0;
     virtual size_t GetOnlineModelID() = 0;
+    virtual size_t GetLiteGraphModelId()
+    {
+        return 0;
+    }
+    virtual bool IsOnlineModel()
+    {
+        return false;
+    }
 };
 } // namespace NeuralNetworkRuntime
 } // namespace OHOS

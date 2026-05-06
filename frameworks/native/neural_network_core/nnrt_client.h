@@ -18,6 +18,7 @@
 
 #include <cstddef>
 #include "executor.h"
+#include "cpp_type.h"
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
@@ -30,10 +31,10 @@ public:
     int (*IsSupportAuthentication)(bool* supportStat) = nullptr;
     int (*IsSupportScheduling)(bool* supportStat) = nullptr;
     int (*Authentication)() = nullptr;
-    int (*Scheduling)(uint32_t hiaiModelId, bool* needModelLatency, const char* cachePath,
-        size_t modelSize, bool isModelBuffer) = nullptr;
+    int (*Scheduling)(SchedulingInfo& schedulingInfo) = nullptr;
     int (*UpdateModelLatency)(uint32_t hiaiModelId, int modelLatency) = nullptr;
-    int (*Unload)(uint32_t hiaiModelId) = nullptr;
+    int (*Unload)(uint32_t hiaiModelId, size_t nnrtModelId, int modelInferenceCount,
+        size_t modelInferenceTotalTime) = nullptr;
     bool (*PullUpDlliteService)() = nullptr;
     int (*AutoReinitSetModelID)(uint32_t originHiaimodelID, uint32_t hiaimodelID, size_t nnrtmodelID) = nullptr;
     int (*AutoReinitScheduling)(uint32_t originHiaimodelID, uint32_t hiaiModelId,

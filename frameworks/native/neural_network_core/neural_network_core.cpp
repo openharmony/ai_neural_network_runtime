@@ -41,6 +41,7 @@ constexpr size_t WIDTH = 4;
 constexpr size_t TWO = 2;
 constexpr size_t END = 1;
 constexpr unsigned char MASK = 0x0F;
+constexpr size_t CALCULATE_INVOKE_TIME = 5;
 
 namespace {
 std::string Sha256(const std::vector<void*>& dataList, const std::vector<size_t>& sizeList, bool isUpper)
@@ -267,9 +268,14 @@ OH_NN_ReturnCode ScheduleModel(Compilation* compilationImpl)
         isModelBuffer = true;
     }
 
+    bool isOnlineModel = compilationImpl->compiler->IsOnlineModel();
+    std::string modelType = isOnlineModel ? "online" : "offline";
+    size_t modelId = isOnlineModel ? compilationImpl->compiler->GetLiteGraphModelId() : compilationImpl->nnrtModelID;
+
     bool needModelLatency = false;
-    ret = nnrtService.Scheduling(compilationImpl->hiaiModelId, &needModelLatency, cachePath.c_str(),
-        compilationImpl->modelSize, isModelBuffer);
+    SchedulingInfo schedulingInfo = {compilationImpl->hiaiModelId, &needModelLatency, cachePath.c_str(),
+        compilationImpl->modelSize, isModelBuffer, modelId, modelType};
+    ret = nnrtService.Scheduling(schedulingInfo);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("Scheduling failed, some error happened when scheduling.");
         return static_cast<OH_NN_ReturnCode>(ret);
@@ -1524,6 +1530,10 @@ NNRT_API OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation)
         return nullptr;
     }
 
+    if (compilationImpl->compiler != nullptr) {
+        executorImpl->nnrtModelId = compilationImpl->compiler->GetLiteGraphModelId();
+    }
+
     ret = ExecutorPrepare(&executorImpl, &compilationImpl);
     if (ret != OH_NN_SUCCESS) {
         LOGE("OH_NNExecutor_Construct failed, failed to prepare executor.");
@@ -1535,7 +1545,8 @@ NNRT_API OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation)
     return executor;
 }
 
-OH_NN_ReturnCode Unload(const ExecutorConfig* config)
+OH_NN_ReturnCode Unload(const ExecutorConfig* config, size_t modelId, int modelInferenceCount,
+    size_t modelInferenceTotalTime)
 {
     if (config == nullptr) {
         LOGE("Unload failed, config is nullptr.");
@@ -1553,7 +1564,7 @@ OH_NN_ReturnCode Unload(const ExecutorConfig* config)
         return OH_NN_INVALID_PARAMETER;
     }
 
-    int ret = nnrtService.Unload(config->hiaiModelId);
+    int ret = nnrtService.Unload(config->hiaiModelId, modelId, modelInferenceCount, modelInferenceTotalTime);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("Unload failed, some error happen when unload hiaiModelId.");
         return static_cast<OH_NN_ReturnCode>(ret);
@@ -1583,7 +1594,8 @@ NNRT_API void OH_NNExecutor_Destroy(OH_NNExecutor **executor)
         return;
     }
 
-    OH_NN_ReturnCode ret = Unload(executorImpl->GetExecutorConfig());
+    OH_NN_ReturnCode ret = Unload(executorImpl->GetExecutorConfig(), executorImpl->nnrtModelId,
+        executorImpl->modelInferenceCount, executorImpl->modelInferenceTotalTime);
     if (ret != OH_NN_SUCCESS) {
         LOGE("Unload failed, some error happened when unload nnrt service.");
     }
@@ -1781,7 +1793,7 @@ OH_NN_ReturnCode RunSync(Executor *executor,
     }
 
     long timeStart = 0;
-    if (configPtr->isNeedModelLatency) {
+    if (configPtr->isNeedModelLatency || executor->modelInferenceCount % CALCULATE_INVOKE_TIME == 0) {
         timeStart = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
     }
@@ -1792,10 +1804,21 @@ OH_NN_ReturnCode RunSync(Executor *executor,
         return ret;
     }
 
-    if (configPtr->isNeedModelLatency) {
+    int32_t modelLatency = 0;
+    if (configPtr->isNeedModelLatency || executor->modelInferenceCount % CALCULATE_INVOKE_TIME == 0) {
         long timeEnd = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
-        int32_t modelLatency = static_cast<int32_t>((timeEnd - timeStart));
+        modelLatency = static_cast<int32_t>((timeEnd - timeStart));
+    }
+
+    if (executor->modelInferenceCount % CALCULATE_INVOKE_TIME == 0) {
+        executor->tempLatencyAccumulator = modelLatency;
+    }
+
+    executor->modelInferenceCount++;
+    executor->modelInferenceTotalTime += static_cast<size_t>(executor->tempLatencyAccumulator);
+
+    if (configPtr->isNeedModelLatency) {
         std::thread t(UpdateModelLatency, configPtr, modelLatency);
         t.detach();
 

@@ -87,6 +87,10 @@ public:
     }
 
     bool isAddSession = false;
+    int modelInferenceCount {0};
+    size_t modelInferenceTotalTime {0};
+    int32_t tempLatencyAccumulator {0};
+    size_t nnrtModelId {0};
 };
 }  // namespace NeuralNetworkRuntime
 }  // namespace OHOS

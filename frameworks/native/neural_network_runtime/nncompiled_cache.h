@@ -42,6 +42,7 @@ struct NNCompiledCacheInfo {
     std::vector<unsigned short> modelCheckSum;
     int64_t opVersion{0};
     int64_t isExceedRamLimit{0};
+    size_t liteGraphModelId{0};
 };
 
 class NNCompiledCache {
@@ -51,10 +52,12 @@ public:
 
     OH_NN_ReturnCode Save(const std::vector<Buffer>& caches,
                           const std::string& cacheDir,
-                          uint32_t version);
+                          uint32_t version,
+                          size_t liteGraphModelId);
     OH_NN_ReturnCode Restore(const std::string& cacheDir,
                              uint32_t version,
-                             std::vector<Buffer>& caches);
+                             std::vector<Buffer>& caches,
+                             size_t& liteGraphModelId);
 
     OH_NN_ReturnCode SetBackend(size_t backendID);
     void SetModelName(const std::string& modelName);
@@ -73,11 +76,13 @@ private:
                                 std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches);
     OH_NN_ReturnCode GenerateCacheFiles(const std::vector<Buffer>& caches,
                                         const std::string& cacheDir,
-                                        uint32_t version) const;
+                                        uint32_t version,
+                                        size_t liteGraphModelId) const;
     OH_NN_ReturnCode GenerateCacheModel(const std::vector<Buffer>& caches,
                                         nlohmann::json& cacheInfo,
                                         const std::string& cacheDir,
-                                        uint32_t version) const;
+                                        uint32_t version,
+                                        size_t liteGraphModelId) const;
     OH_NN_ReturnCode ReadCacheModelFile(const std::string& file, Buffer& cache);
     OH_NN_ReturnCode GetCacheFileLength(FILE* pFile, long& fileSize) const;
     OH_NN_ReturnCode VerifyCachePath(const std::string& cachePath) const;
