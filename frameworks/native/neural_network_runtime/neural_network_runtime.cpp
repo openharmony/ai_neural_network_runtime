@@ -223,7 +223,7 @@ OH_NN_ReturnCode OH_NNModel_SetTensorQuantParams(OH_NNModel* model, uint32_t ind
     }
 
     auto* innerModel = reinterpret_cast<OHOS::NeuralNetworkRuntime::InnerModel*>(model);
-    OH_NN_ReturnCode returnCode = innerModel->SetTensorQuantParam((uint32_t)(index), quantParam);
+    OH_NN_ReturnCode returnCode = innerModel->SetTensorQuantParam(static_cast<uint32_t>(index), quantParam);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("OH_NNModel_SetTensorQuantParams failed, error happened when setting tensor quantParam.");
     }
@@ -244,7 +244,7 @@ OH_NN_ReturnCode OH_NNModel_SetTensorType(OH_NNModel* model, uint32_t index, OH_
     }
 
     auto* innerModel = reinterpret_cast<OHOS::NeuralNetworkRuntime::InnerModel*>(model);
-    OH_NN_ReturnCode returnCode = innerModel->SetTensorType((uint32_t)(index), tensorType);
+    OH_NN_ReturnCode returnCode = innerModel->SetTensorType(static_cast<uint32_t>(index), tensorType);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("OH_NNModel_SetTensorType failed, error happened when setting tensor type.");
     }

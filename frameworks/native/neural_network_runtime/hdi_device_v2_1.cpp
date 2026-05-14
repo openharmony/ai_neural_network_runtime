@@ -487,7 +487,7 @@ OH_NN_ReturnCode HDIDeviceV2_1::GetOfflineModelFromLiteGraph(std::shared_ptr<con
     uint32_t index = graph->all_nodes_[0]->input_indices_[inputNum - 1];
     mindspore::lite::TensorPtr pTensor = graph->all_tensors_[index];
     std::vector<uint8_t> offlineModel = mindspore::lite::MindIR_Tensor_GetData(pTensor);
-    if (offlineModel.size() == (size_t) 0) {
+    if (offlineModel.size() == static_cast<size_t>(0)) {
         LOGE("Offline model has size of 0, please check the ms model.");
         return OH_NN_INVALID_PARAMETER;
     }
