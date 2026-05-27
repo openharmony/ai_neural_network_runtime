@@ -38,7 +38,8 @@ constexpr char DOUBLE_SLASH_STR[] = "//";
 
 OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
                                        const std::string& cacheDir,
-                                       uint32_t version)
+                                       uint32_t version,
+                                       size_t liteGraphModelId)
 {
     if (caches.empty()) {
         LOGE("[NNCompiledCache] Save failed, caches is empty.");
@@ -50,7 +51,7 @@ OH_NN_ReturnCode NNCompiledCache::Save(const std::vector<OHOS::NeuralNetworkRunt
         return OH_NN_INVALID_PARAMETER;
     }
 
-    OH_NN_ReturnCode ret = GenerateCacheFiles(caches, cacheDir, version);
+    OH_NN_ReturnCode ret = GenerateCacheFiles(caches, cacheDir, version, liteGraphModelId);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiledCache] Save failed, error happened when calling GenerateCacheFiles.");
         return ret;
@@ -82,7 +83,8 @@ OH_NN_ReturnCode NNCompiledCache::CheckCache(const std::string& cacheDir,
 
 OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
                                           uint32_t version,
-                                          std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches)
+                                          std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
+                                          size_t& liteGraphModelId)
 {
     OH_NN_ReturnCode ret = CheckCache(cacheDir, version, caches);
     if (ret != OH_NN_SUCCESS) {
@@ -127,10 +129,9 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
             return OH_NN_INVALID_FILE;
         }
 
-        if (GetCrc16(static_cast<char*>(modelBuffer.data), modelBuffer.length) !=
-            cacheInfo.modelCheckSum[i]) {
+        if (GetCrc16(static_cast<char*>(modelBuffer.data), modelBuffer.length) != cacheInfo.modelCheckSum[i]) {
             LOGE("[NNCompiledCache] Restore failed, the cache model file %{public}s has been changed.",
-                 cacheModelPath.c_str());
+                cacheModelPath.c_str());
             munmap(modelBuffer.data, modelBuffer.length);
             close(modelBuffer.fd);
             return OH_NN_INVALID_FILE;
@@ -138,6 +139,8 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
 
         caches.emplace_back(std::move(modelBuffer));
     }
+
+    liteGraphModelId = cacheInfo.liteGraphModelId;
 
     return ret;
 }
@@ -174,13 +177,14 @@ void NNCompiledCache::SetIsExceedRamLimit(const bool isExceedRamLimit)
 
 OH_NN_ReturnCode NNCompiledCache::GenerateCacheFiles(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
                                                      const std::string& cacheDir,
-                                                     uint32_t version) const
+                                                     uint32_t version,
+                                                     size_t liteGraphModelId) const
 {
     const size_t cacheNumber = caches.size();
     uint32_t cacheSize = NUMBER_CACHE_INFO_MEMBERS + cacheNumber + NUMBER_CACHE_INFO_EXTENSION_MEMBERS;
     nlohmann::json cacheInfo;
 
-    OH_NN_ReturnCode ret = GenerateCacheModel(caches, cacheInfo, cacheDir, version);
+    OH_NN_ReturnCode ret = GenerateCacheModel(caches, cacheInfo, cacheDir, version, liteGraphModelId);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiledCache] GenerateCacheFiles failed, error happened when calling GenerateCacheModel.");
         return ret;
@@ -199,7 +203,8 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheFiles(const std::vector<OHOS::Neu
 OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::NeuralNetworkRuntime::Buffer>& caches,
                                                      nlohmann::json& cacheInfo,
                                                      const std::string& cacheDir,
-                                                     uint32_t version) const
+                                                     uint32_t version,
+                                                     size_t liteGraphModelId) const
 {
     size_t cacheNumber = caches.size();
     if (cacheNumber == 0 || cacheNumber > NN_CACHE_FILE_NUMBER_MAX) {
@@ -210,6 +215,8 @@ OH_NN_ReturnCode NNCompiledCache::GenerateCacheModel(const std::vector<OHOS::Neu
     cacheInfo["data"]["fileNumber"] = static_cast<int64_t>(cacheNumber);
     cacheInfo["data"]["version"] = static_cast<int64_t>(version);
     cacheInfo["data"]["deviceId"] = static_cast<int64_t>(m_backendID); // Should call SetBackend first.
+
+    cacheInfo["data"]["liteGraphModelId"] = static_cast<size_t>(liteGraphModelId);
 
     // standardize the input dir
     OH_NN_ReturnCode ret = OH_NN_SUCCESS;
@@ -357,6 +364,12 @@ OH_NN_ReturnCode NNCompiledCache::CheckCacheInfo(NNCompiledCacheInfo& modelCache
         LOGE("[NNCompiledCache] CheckCacheInfo failed, fileNumber is invalid or more than 100");
         return OH_NN_INVALID_FILE;
     }
+
+    if ((j["data"].find("liteGraphModelId") == j["data"].end()) || (!j["data"]["liteGraphModelId"].is_number())) {
+        LOGE("[NNCompiledCache] checkCacheInfo read liteGraphModelId from cache info file failed.");
+        return OH_NN_INVALID_FILE;
+    }
+    modelCacheInfo.liteGraphModelId = j["data"]["liteGraphModelId"].get<size_t>();
 
     return CheckCacheInfoExtension(modelCacheInfo, j);
 }

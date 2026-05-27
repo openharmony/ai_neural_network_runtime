@@ -85,8 +85,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_save_001, TestSize.Level0)
     std::vector<Buffer> caches;
     std::string m_cachePath = "a";
     uint32_t m_cacheVersion = 1;
+    size_t liteGraphModelId = 1;
 
-    OH_NN_ReturnCode ret = nncompiledCache.Save(caches, m_cachePath, m_cacheVersion);
+    OH_NN_ReturnCode ret = nncompiledCache.Save(caches, m_cachePath, m_cacheVersion, liteGraphModelId);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
@@ -109,8 +110,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_save_002, TestSize.Level0)
     caches.emplace_back(buffer);
     std::string m_cachePath = "a";
     uint32_t m_cacheVersion = 1;
+    size_t liteGraphModelId = 1;
 
-    OH_NN_ReturnCode ret = nncompiledCache.Save(caches, m_cachePath, m_cacheVersion);
+    OH_NN_ReturnCode ret = nncompiledCache.Save(caches, m_cachePath, m_cacheVersion, liteGraphModelId);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
@@ -173,8 +175,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_save_003, TestSize.Level0)
     caches.emplace_back(buffer);
     std::string m_cachePath = "a";
     uint32_t m_cacheVersion = 1;
+    size_t liteGraphModelId = 1;
 
-    OH_NN_ReturnCode retSave = nncompiledCache.Save(caches, m_cachePath, m_cacheVersion);
+    OH_NN_ReturnCode retSave = nncompiledCache.Save(caches, m_cachePath, m_cacheVersion, liteGraphModelId);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, retSave);
 }
 
@@ -234,8 +237,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_save_004, TestSize.Level0)
     caches.emplace_back(buffer);
     std::string m_cachePath = "/data/data";
     uint32_t m_cacheVersion = 1;
+    size_t liteGraphModelId = 1;
 
-    OH_NN_ReturnCode retSave = nncompiledCache.Save(caches, m_cachePath, m_cacheVersion);
+    OH_NN_ReturnCode retSave = nncompiledCache.Save(caches, m_cachePath, m_cacheVersion, liteGraphModelId);
     EXPECT_EQ(OH_NN_SUCCESS, retSave);
 
     size_t backendID2 = 2;
@@ -252,7 +256,7 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_save_004, TestSize.Level0)
     std::string m_modelName = "test";
     nncompiledCache.SetModelName(m_modelName);
 
-    OH_NN_ReturnCode retSave2 = nncompiledCache.Save(caches, m_cachePath, m_cacheVersion);
+    OH_NN_ReturnCode retSave2 = nncompiledCache.Save(caches, m_cachePath, m_cacheVersion, liteGraphModelId);
     EXPECT_EQ(OH_NN_SUCCESS, retSave2);
 }
 
@@ -269,8 +273,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_001, TestSize.Level0)
     std::string m_cachePath = "a";
     uint32_t m_cacheVersion = 1;
     std::vector<Buffer> caches;
+    size_t liteGraphModelId = 0;
 
-    OH_NN_ReturnCode ret = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches);
+    OH_NN_ReturnCode ret = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches, liteGraphModelId);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
@@ -287,8 +292,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_002, TestSize.Level0)
     std::string m_cachePath;
     uint32_t m_cacheVersion = 1;
     std::vector<Buffer> caches;
+    size_t liteGraphModelId = 0;
 
-    OH_NN_ReturnCode ret = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches);
+    OH_NN_ReturnCode ret = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches, liteGraphModelId);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
@@ -311,8 +317,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_003, TestSize.Level0)
     buffer.length = 1;
     std::vector<Buffer> caches;
     caches.emplace_back(buffer);
+    size_t liteGraphModelId = 0;
 
-    OH_NN_ReturnCode ret = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches);
+    OH_NN_ReturnCode ret = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches, liteGraphModelId);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 }
 
@@ -333,8 +340,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_004, TestSize.Level0)
     std::string m_cachePath = "a";
     uint32_t m_cacheVersion = 1;
     std::vector<Buffer> caches;
+    size_t liteGraphModelId = 0;
 
-    OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches);
+    OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches, liteGraphModelId);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, retRestore);
 }
 
@@ -358,8 +366,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_005, TestSize.Level0)
     std::string m_cachePath = "/data";
     uint32_t m_cacheVersion = 1;
     std::vector<Buffer> caches;
+    size_t liteGraphModelId = 0;
 
-    OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches);
+    OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches, liteGraphModelId);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, retRestore);
 }
 
@@ -380,8 +389,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_006, TestSize.Level0)
     std::string m_cachePath = "/data/local/tmp";
     uint32_t m_cacheVersion = 1;
     std::vector<Buffer> caches;
+    size_t liteGraphModelId = 0;
 
-    OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches);
+    OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches, liteGraphModelId);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, retRestore);
 }
 
@@ -402,8 +412,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_007, TestSize.Level0)
     std::string m_cachePath = "/data/local/tmp";
     uint32_t m_cacheVersion = 1;
     std::vector<Buffer> caches;
+    size_t liteGraphModelId = 0;
 
-    OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches);
+    OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches, liteGraphModelId);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, retRestore);
 }
 
@@ -424,8 +435,9 @@ HWTEST_F(NNCompiledCacheTest, nncompiledcachetest_restore_008, TestSize.Level0)
     std::string m_cachePath = "/data/data";
     uint32_t m_cacheVersion = 1;
     std::vector<Buffer> caches;
+    size_t liteGraphModelId = 0;
 
-    OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches);
+    OH_NN_ReturnCode retRestore = nncompiledCache.Restore(m_cachePath, m_cacheVersion, caches, liteGraphModelId);
     EXPECT_EQ(OH_NN_INVALID_FILE, retRestore);
 }
 

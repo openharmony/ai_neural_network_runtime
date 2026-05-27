@@ -398,6 +398,8 @@ OH_NN_ReturnCode NNCompiler::NormalBuild()
     }
     m_isBuild = true;
 
+    GetNNRtModelIDFromModel(m_innerModel, m_liteGraphModelId);
+
     // 保存cache
     if (!m_cachePath.empty()) {
         ret = SaveToCacheFile();
@@ -569,7 +571,7 @@ OH_NN_ReturnCode NNCompiler::SaveToCacheFile() const
 
     compiledCache.SetModelName(m_extensionConfig.modelName);
     compiledCache.SetIsExceedRamLimit(m_extensionConfig.isExceedRamLimit);
-    ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion);
+    ret = compiledCache.Save(caches, m_cachePath, m_cacheVersion, m_liteGraphModelId);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] SaveToCacheFile failed, error happened when saving model cache.");
         ReleaseBuffer(tensorBuffers);
@@ -613,7 +615,7 @@ OH_NN_ReturnCode NNCompiler::RestoreFromCacheFile()
 
     std::vector<Buffer> caches;
     compiledCache.SetModelName(m_extensionConfig.modelName);
-    ret = compiledCache.Restore(m_cachePath, m_cacheVersion, caches);
+    ret = compiledCache.Restore(m_cachePath, m_cacheVersion, caches, m_liteGraphModelId);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNCompiler] RestoreFromCacheFile failed, error happened when restoring model cache.");
         compiledCache.ReleaseCacheBuffer(caches);
@@ -1298,6 +1300,19 @@ size_t NNCompiler::GetOnlineModelID()
     }
 
     return nnrtModeId;
+}
+
+size_t NNCompiler::GetLiteGraphModelId()
+{
+    if (m_liteGraphModelId == 0 && m_liteGraph != nullptr) {
+        m_liteGraphModelId = GetOnlineModelID(m_liteGraph);
+    }
+    return m_liteGraphModelId;
+}
+
+bool NNCompiler::IsOnlineModel()
+{
+    return true;
 }
 } // NeuralNetworkRuntime
 } // OHOS

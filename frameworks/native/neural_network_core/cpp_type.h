@@ -83,6 +83,16 @@ struct IOTensor {
     void* data;
     size_t length;
 };
+
+struct SchedulingInfo {
+    uint32_t hiaiModelId;
+    bool* needModelLatency;
+    const char* cachePath;
+    size_t modelSize;
+    bool isModelBuffer;
+    size_t nnrtModelId;
+    std::string modelType;
+};
 } // NeuralNetworkRuntime
 } // OHOS
 

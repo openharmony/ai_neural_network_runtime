@@ -641,7 +641,8 @@ OH_NN_ReturnCode NNExecutor::Reload()
 
     std::vector<Buffer> caches;
     compiledCache.SetModelName(m_extensionConfig.modelName);
-    ret = compiledCache.Restore(m_cachePath, m_cacheVersion, caches);
+    size_t liteGraphModelId = 0;
+    ret = compiledCache.Restore(m_cachePath, m_cacheVersion, caches, liteGraphModelId);
     if (ret != OH_NN_SUCCESS) {
         LOGE("[NNExecutor] RestoreFromCacheFile failed, error happened when restoring model cache.");
         compiledCache.ReleaseCacheBuffer(caches);

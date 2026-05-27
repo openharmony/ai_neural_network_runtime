@@ -54,6 +54,8 @@ public:
     OH_NN_ReturnCode GetModelName(std::string& modelName) override;
     size_t GetModelSize() override;
     size_t GetOnlineModelID() override;
+    size_t GetLiteGraphModelId() override;
+    bool IsOnlineModel() override;
 
     NNExecutor* CreateExecutor();
 
@@ -102,6 +104,7 @@ private:
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_inputTensorDescs;
     std::vector<std::pair<std::shared_ptr<TensorDesc>, OH_NN_TensorType>> m_outputTensorDescs;
     ExtensionConfig m_extensionConfig;
+    size_t m_liteGraphModelId {0};
 };
 } // NeuralNetworkRuntime
 } // OHOS
