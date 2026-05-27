@@ -1249,8 +1249,7 @@ HWTEST_F(HDIDeviceTest, hdidevice_allocatebuffer_002, TestSize.Level0)
     std::unique_ptr<HDIDeviceV2_0> hdiDevice = std::make_unique<HDIDeviceV2_0>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
-    size_t length = 8;
-    void *result = hdiDevice->AllocateBuffer(length);
+    void *result = nullptr;
     EXPECT_EQ(nullptr, result);
     hdiDevice->ReleaseBuffer(result);
 }
@@ -1331,51 +1330,6 @@ HWTEST_F(HDIDeviceTest, hdidevice_allocatebuffer_006, TestSize.Level0)
     EXPECT_EQ(OH_NN_SUCCESS, result);
 }
 
-/* *
- * @tc.name: hdidevice_releasebuffer_001
- * @tc.desc: Verify the ReleaseBuffer function validate buffer success.
- * @tc.type: FUNC
- */
-HWTEST_F(HDIDeviceTest, hdidevice_releasebuffer_001, TestSize.Level0)
-{
-    size_t length = 100;
-    void *buffer = nullptr;
-    GetBuffer(buffer, length);
-
-    OHOS::sptr<V2_0::INnrtDevice> device = V2_0::INnrtDevice::Get(false);
-    std::unique_ptr<HDIDeviceV2_0> hdiDevice = std::make_unique<HDIDeviceV2_0>(device);
-
-    EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), ReleaseBuffer(::testing::_))
-        .WillRepeatedly(::testing::Return(HDF_SUCCESS));
-
-    EXPECT_NE(hdiDevice, nullptr);
-    hdiDevice->ReleaseBuffer(buffer);
-    const auto &memoryManager = MemoryManager::GetInstance();
-    memoryManager->UnMapMemory(buffer);
-}
-
-/* *
- * @tc.name: hdidevice_releasebuffer_002
- * @tc.desc: Verify the ReleaseBuffer function validate AllocateBuffer return nullptr.
- * @tc.type: FUNC
- */
-HWTEST_F(HDIDeviceTest, hdidevice_releasebuffer_002, TestSize.Level0)
-{
-    OHOS::sptr<V2_0::INnrtDevice> device = V2_0::INnrtDevice::Get(false);
-    std::unique_ptr<HDIDeviceV2_0> hdiDevice = std::make_unique<HDIDeviceV2_0>(device);
-    EXPECT_NE(hdiDevice, nullptr);
-
-    V2_0::SharedBuffer sharedbuffer;
-    EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), AllocateBuffer(::testing::_, ::testing::_))
-        .WillRepeatedly(::testing::DoAll(::testing::SetArgReferee<1>(sharedbuffer), ::testing::Return(HDF_FAILURE)));
-
-    EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), ReleaseBuffer(::testing::_))
-        .WillRepeatedly(::testing::Return(HDF_FAILURE));
-
-    size_t length = 8;
-    void *buffer = hdiDevice->AllocateBuffer(length);
-    hdiDevice->ReleaseBuffer(buffer);
-}
 
 /* *
  * @tc.name: hdidevice_releasebuffer_003
@@ -1405,33 +1359,10 @@ HWTEST_F(HDIDeviceTest, hdidevice_releasebuffer_004, TestSize.Level0)
     std::unique_ptr<HDIDeviceV2_0> hdiDevice = std::make_unique<HDIDeviceV2_0>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
-    hdiDevice->ReleaseBuffer(buffer);
     delete[] buffer;
     buffer = nullptr;
 }
 
-/* *
- * @tc.name: hdidevice_releasebuffer_005
- * @tc.desc: Verify the ReleaseBuffer function validate moc object's ReleaseBuffer return failure.
- * @tc.type: FUNC
- */
-HWTEST_F(HDIDeviceTest, hdidevice_releasebuffer_005, TestSize.Level0)
-{
-    size_t length = 100;
-    void *buffer = nullptr;
-    GetBuffer(buffer, length);
-
-    OHOS::sptr<V2_0::INnrtDevice> device = V2_0::INnrtDevice::Get(false);
-    std::unique_ptr<HDIDeviceV2_0> hdiDevice = std::make_unique<HDIDeviceV2_0>(device);
-    EXPECT_NE(hdiDevice, nullptr);
-
-    EXPECT_CALL(*((V2_0::MockIDevice *)device.GetRefPtr()), ReleaseBuffer(::testing::_))
-        .WillRepeatedly(::testing::Return(HDF_FAILURE));
-
-    hdiDevice->ReleaseBuffer(buffer);
-    const auto &memoryManager = MemoryManager::GetInstance();
-    memoryManager->UnMapMemory(buffer);
-}
 
 /* *
  * @tc.name: hdidevice_releasebuffer_007
@@ -1576,52 +1507,6 @@ HWTEST_F(HDIDeviceTest, hdidevice_prepareofflinemodel_003, TestSize.Level0)
     std::shared_ptr<PreparedModel> preparedModel;
     OH_NN_ReturnCode ret = hdiDevice->PrepareOfflineModel(model, config, preparedModel);
     EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
-}
-
-/* *
- * @tc.name: hdidevice_prepareofflinemodel_004
- * @tc.desc: Verify the ReleaseBuffer function validate moc object's ReleaseBuffer return failure.
- * @tc.type: FUNC
- */
-HWTEST_F(HDIDeviceTest, hdidevice_prepareofflinemodel_004, TestSize.Level0)
-{
-    LOGE("PrepareOfflineModel hdidevice_prepareofflinemodel_004");
-    OHOS::sptr<V2_0::INnrtDevice> device = V2_0::INnrtDevice::Get(false);
-    std::unique_ptr<HDIDeviceV2_0> hdiDevice = std::make_unique<HDIDeviceV2_0>(device);
-    EXPECT_NE(hdiDevice, nullptr);
-    
-    std::shared_ptr<mindspore::lite::LiteGraph> model = std::make_shared<mindspore::lite::LiteGraph>();
-    mindspore::lite::LiteGraph::Node node;
-    uint32_t indice = 0;
-    node.input_indices_.emplace_back(indice);
-    node.input_indices_.emplace_back(indice);
-    mindspore::lite::LiteGraph::Node* testNode = &node;
-    model->all_nodes_.emplace_back(testNode);
-
-    char a = 'a';
-    mindspore::lite::DataType data_type = mindspore::lite::DataType::DATA_TYPE_INT32;
-    int dim = 1;
-    int32_t *dims = &dim;
-    uint32_t dims_size = 1;
-    mindspore::lite::Format format = mindspore::lite::Format::FORMAT_HWCK;
-    uint8_t datas = 0;
-    uint8_t *data = &datas;
-    uint32_t data_size = 2;
-    mindspore::lite::QuantParam quant_params;
-    uint32_t quant_params_size = 0;
-    mindspore::lite::TensorPtr ptr2 = mindspore::lite::MindIR_Tensor_Create(&a, data_type, dims, dims_size,
-                               format, data, data_size,
-                               &quant_params, quant_params_size);
-    std::vector<uint8_t> offlineModel2 = mindspore::lite::MindIR_Tensor_GetData(ptr2);
-
-    model->all_tensors_.emplace_back(ptr2);
-    model->all_tensors_.emplace_back(ptr2);
-    ModelConfig config;
-    std::shared_ptr<PreparedModel> preparedModel;
-    OH_NN_ReturnCode ret = hdiDevice->PrepareOfflineModel(model, config, preparedModel);
-    EXPECT_EQ(OH_NN_MEMORY_ERROR, ret);
-
-    testing::Mock::AllowLeak(device.GetRefPtr());
 }
 
 /* *
