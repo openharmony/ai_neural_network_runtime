@@ -1249,8 +1249,6 @@ HWTEST_F(HDIDeviceTest, hdidevice_allocatebuffer_002, TestSize.Level0)
     std::unique_ptr<HDIDeviceV2_0> hdiDevice = std::make_unique<HDIDeviceV2_0>(device);
     EXPECT_NE(hdiDevice, nullptr);
 
-    // size_t length = 8;
-    // void *result = hdiDevice->AllocateBuffer(length);
     void *result = nullptr;
     EXPECT_EQ(nullptr, result);
     hdiDevice->ReleaseBuffer(result);
