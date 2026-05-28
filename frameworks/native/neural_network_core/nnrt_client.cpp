@@ -64,6 +64,7 @@ NNRtServiceApi& NNRtServiceApi::GetInstance()
     LoadFunction(libNNRtService, "Scheduling", &nnrtService.Scheduling);
     LoadFunction(libNNRtService, "UpdateModelLatency", &nnrtService.UpdateModelLatency);
     LoadFunction(libNNRtService, "Unload", &nnrtService.Unload);
+    LoadFunction(libNNRtService, "RunSyncReport", &nnrtService.RunSyncReport);
     LoadFunction(libNNRtService, "PullUpDlliteService", &nnrtService.PullUpDlliteService);
     LoadFunction(libNNRtService, "AutoReinitSetModelID", &nnrtService.AutoReinitSetModelID);
     LoadFunction(libNNRtService, "AutoReinitScheduling", &nnrtService.AutoReinitScheduling);

@@ -35,6 +35,7 @@ public:
     int (*UpdateModelLatency)(uint32_t hiaiModelId, int modelLatency) = nullptr;
     int (*Unload)(uint32_t hiaiModelId, size_t nnrtModelId, int modelInferenceCount,
         size_t modelInferenceTotalTime) = nullptr;
+    int (*RunSyncReport)(size_t modelId, int modelInferenceCount, size_t modelInferenceTotalTime) = nullptr;
     bool (*PullUpDlliteService)() = nullptr;
     int (*AutoReinitSetModelID)(uint32_t originHiaimodelID, uint32_t hiaimodelID, size_t nnrtmodelID) = nullptr;
     int (*AutoReinitScheduling)(uint32_t originHiaimodelID, uint32_t hiaiModelId,

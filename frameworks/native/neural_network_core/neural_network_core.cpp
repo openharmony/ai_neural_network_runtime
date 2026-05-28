@@ -284,6 +284,28 @@ OH_NN_ReturnCode ScheduleModel(Compilation* compilationImpl)
     compilationImpl->isNeedModelLatency = needModelLatency;
     return OH_NN_SUCCESS;
 }
+
+OH_NN_ReturnCode ReportRunSyncAppEvent(size_t nnrtModelId, int modelInferenceCount, size_t modelInferenceTotalTime)
+{
+    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+    if (!nnrtService.IsServiceAvaliable()) {
+        LOGW("ReportRunSyncAppEvent failed, fail to get nnrt service, skip report run sync app event.");
+        return OH_NN_SUCCESS;
+    }
+
+    if (nnrtService.RunSyncReport == nullptr) {
+        LOGE("ReportRunSyncAppEvent failed, nnrtService RunSyncReport func is nullptr.");
+        return OH_NN_INVALID_PARAMETER;
+    }
+
+    int ret = nnrtService.RunSyncReport(nnrtModelId, modelInferenceCount, modelInferenceTotalTime);
+    if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+        LOGE("ReportRunSyncAppEvent failed, nnrtService RunSyncReport is failed.");
+        return static_cast<OH_NN_ReturnCode>(ret);
+    }
+
+    return OH_NN_SUCCESS;
+}
 }
 
 NNRT_API OH_NN_ReturnCode OH_NNDevice_GetAllDevicesID(const size_t **allDevicesID, uint32_t *deviceCount)
@@ -1531,7 +1553,9 @@ NNRT_API OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation)
     }
 
     if (compilationImpl->compiler != nullptr) {
-        executorImpl->nnrtModelId = compilationImpl->compiler->GetLiteGraphModelId();
+        bool isOnlineModel = compilationImpl->compiler->IsOnlineModel();
+        executorImpl->nnrtModelId =
+            isOnlineModel ? compilationImpl->compiler->GetLiteGraphModelId() : compilationImpl->nnrtModelID;
     }
 
     ret = ExecutorPrepare(&executorImpl, &compilationImpl);
@@ -1817,6 +1841,10 @@ OH_NN_ReturnCode RunSync(Executor *executor,
 
     executor->modelInferenceCount++;
     executor->modelInferenceTotalTime += static_cast<size_t>(executor->tempLatencyAccumulator);
+
+    std::thread reportThread(ReportRunSyncAppEvent, executor->nnrtModelId,
+        executor->modelInferenceCount, executor->modelInferenceTotalTime);
+    reportThread.detach();
 
     if (configPtr->isNeedModelLatency) {
         std::thread t(UpdateModelLatency, configPtr, modelLatency);
