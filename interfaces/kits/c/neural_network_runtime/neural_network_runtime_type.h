@@ -31,7 +31,7 @@
  * include "neural_network_runtime/neural_network_runtime_type.h"
  * @library libneural_network_runtime.so
  * @kit Neural Network Runtime Kit
- * @Syscap SystemCapability.Ai.NeuralNetworkRuntime
+ * @Syscap SystemCapability.AI.NeuralNetworkRuntime
  * @since 9
  * @version 2.0
  */
