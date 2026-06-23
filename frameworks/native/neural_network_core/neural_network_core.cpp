@@ -22,6 +22,10 @@
 #include <unordered_map>
 #include <future>
 #include <thread>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
 #include <openssl/sha.h>
 #include <unistd.h>
 
@@ -42,8 +46,68 @@ constexpr size_t TWO = 2;
 constexpr size_t END = 1;
 constexpr unsigned char MASK = 0x0F;
 constexpr size_t CALCULATE_INVOKE_TIME = 5;
+constexpr size_t REPORT_QUEUE_MAX_SIZE = 100;
 
 namespace {
+struct RunSyncEvent {
+    size_t nnrtModelId;
+    int modelInferenceCount;
+    size_t modelInferenceTotalTime;
+};
+
+std::queue<RunSyncEvent> g_reportQueue;
+std::mutex g_reportMutex;
+std::condition_variable g_reportCv;
+std::atomic<bool> g_stopReportThread {false};
+
+void ReportThreadLoop()
+{
+    while (true) {
+        RunSyncEvent event;
+        {
+            std::unique_lock<std::mutex> lock(g_reportMutex);
+            g_reportCv.wait(lock, [] {return !g_reportQueue.empty() || g_stopReportThread.load(); });
+            if (g_stopReportThread.load() && g_reportQueue.empty()) {
+                break;
+            }
+            if (g_reportQueue.empty()) {
+                continue;
+            }
+            event = g_reportQueue.front();
+            g_reportQueue.pop();
+        }
+        NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+        if (!nnrtService.IsServiceAvaliable()) {
+            LOGW("ReportThreadLoop nnrt service unavailable, skip report.");
+            continue;
+        }
+        if (nnrtService.RunSyncReport == nullptr) {
+            LOGW("ReportThreadLoop RunSyncReport func is nullptr");
+            continue;
+        }
+        int ret = nnrtService.RunSyncReport(event.nnrtModelId, event.modelInferenceCount,
+            event.modelInferenceTotalTime);
+        if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+            LOGW("ReportThreadLoop RunSyncReport failed");
+        }
+    }
+}
+
+std::thread g_reportThread(ReportThreadLoop);
+class ReportThreadGuard {
+public:
+    ~ReportThreadGuard()
+    {
+        g_stopReportThread.store(true);
+        g_reportCv.notify_one();
+        if (g_reportThread.joinable()) {
+            g_reportThread.join();
+        }
+    }
+};
+
+static ReportThreadGuard g_reportThreadGuard;
+
 std::string Sha256(const std::vector<void*>& dataList, const std::vector<size_t>& sizeList, bool isUpper)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH * TWO + END] = "";
@@ -1819,6 +1883,15 @@ OH_NN_ReturnCode RunSync(Executor *executor,
 
     executor->modelInferenceCount++;
     executor->modelInferenceTotalTime += static_cast<size_t>(executor->tempLatencyAccumulator);
+
+    {
+        std::lock_guard<std::mutex> lock(g_reportMutex);
+        if (g_reportQueue.size() < REPORT_QUEUE_MAX_SIZE) {
+            g_reportQueue.push({executor->nnrtModelId, executor->modelInferenceCount,
+                executor->modelInferenceTotalTime});
+        }
+    }
+    g_reportCv.notify_one();
 
     if (configPtr->isNeedModelLatency) {
         std::thread t(UpdateModelLatency, configPtr, modelLatency);
