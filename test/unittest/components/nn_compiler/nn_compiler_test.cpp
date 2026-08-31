@@ -771,7 +771,7 @@ HWTEST_F(NNCompilerTest, nncompilertest_build_006, TestSize.Level0)
     EXPECT_EQ(OH_NN_SUCCESS, retSetCacheDir);
 
     OH_NN_ReturnCode ret = nncompiler->Build();
-    EXPECT_EQ(OH_NN_FAILED, ret);
+    EXPECT_EQ(OH_NN_INVALID_PARAMETER, ret);
 
     testing::Mock::AllowLeak(device.get());
 }
