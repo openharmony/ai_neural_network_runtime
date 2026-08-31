@@ -21,6 +21,7 @@
 #include "neural_network_runtime_inner.h"
 #include "nnrt_client.h"
 #include "log.h"
+#include "parse_nnrt_config_int.h"
 
 #include "securec.h"
 #include "utils.h"
@@ -355,13 +356,23 @@ OH_NN_ReturnCode NNExecutor::SetExtensionConfig(const std::unordered_map<std::st
         }
 
         if (!config.first.compare("callingPid")) {
-            m_executorConfig->callingPid = std::atoi(configData);
+            int32_t callingPid = 0;
+            if (!ParseNnrtConfigInt32(configData, callingPid)) {
+                LOGE("[NNExecutor] SetExtensionConfig, invalid callingPid: %s", configData);
+                continue;
+            }
+            m_executorConfig->callingPid = callingPid;
             LOGD("[NNExecutor] SetExtensionConfig, callingPid: %{public}d.", m_executorConfig->callingPid);
         }
 
         if (!config.first.compare("hiaiModelId")) {
-            m_executorConfig->hiaiModelId = std::atoi(configData);
-            LOGD("[NNExecutor] SetExtensionConfig, hiaiModelId: %{public}d.", m_executorConfig->hiaiModelId);
+            uint32_t hiaiModelId = 0;
+            if (!ParseNnrtConfigUint32(configData, hiaiModelId)) {
+                LOGE("[NNExecutor] SetExtensionConfig, invalid hiaiModelId: %s", configData);
+                continue;
+            }
+            m_executorConfig->hiaiModelId = hiaiModelId;
+            LOGD("[NNExecutor] SetExtensionConfig, hiaiModelId: %{public}u.", m_executorConfig->hiaiModelId);
         }
 
         if (!config.first.compare("isNeedModelLatency")) {
