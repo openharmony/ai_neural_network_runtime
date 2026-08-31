@@ -19,6 +19,7 @@
 #include <sys/stat.h>
 #include <fstream>
 #include <climits>
+#include <memory>
 #include <securec.h>
 
 #include "validation.h"
@@ -402,10 +403,28 @@ OH_NN_ReturnCode NNCompiler::NormalBuild()
 
     // 保存cache
     if (!m_cachePath.empty()) {
-        ret = SaveToCacheFile();
-        if (ret != OH_NN_SUCCESS) {
-            LOGE("[NNCompiler] Build success, but fail to save cache to file.");
-            return ret;
+        auto cacheMutex = GetCacheMutex(m_cachePath, m_extensionConfig.modelName);
+        std::unique_ptr<std::lock_guard<std::mutex>> lock;
+        if (cacheMutex != nullptr) {
+            lock = std::make_unique<std::lock_guard<std::mutex>>(*cacheMutex);
+        }
+
+        char path[PATH_MAX];
+        if (realpath(m_cachePath.c_str(), path) == nullptr) {
+            LOGE("[NNCompiler] Build failed, fail to get the real path of cacheDir.");
+            return OH_NN_INVALID_PARAMETER;
+        }
+
+        std::string cachePath = path;
+        std::string cacheInfoPath = cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
+        if (std::filesystem::exists(cacheInfoPath)) {
+            LOGI("[NNCompiler] cache already saved.");
+        } else {
+            ret = SaveToCacheFile();
+            if (ret != OH_NN_SUCCESS) {
+                LOGE("[NNCompiler] Build success, but fail to save cache to file.");
+                return ret;
+            }
         }
     }
 
@@ -460,30 +479,40 @@ OH_NN_ReturnCode NNCompiler::Build()
 
 OH_NN_ReturnCode NNCompiler::OnlineBuild()
 {
-    // cache存在，从cache直接复原prepareModel、input/output TensorDesc
-    OH_NN_ReturnCode ret = RestoreFromCacheFile();
-    if (ret == OH_NN_INVALID_FILE) {
-        char path[PATH_MAX];
-        if (realpath(m_cachePath.c_str(), path) == nullptr) {
-            LOGE("[NNCompiler] Build failed, fail to get the real path of cacheDir.");
-            return OH_NN_INVALID_PARAMETER;
+    auto cacheMutex = GetCacheMutex(m_cachePath, m_extensionConfig.modelName);
+    OH_NN_ReturnCode ret = OH_NN_SUCCESS;
+    {
+        std::unique_ptr<std::lock_guard<std::mutex>> lock;
+        if (cacheMutex != nullptr) {
+            lock = std::make_unique<std::lock_guard<std::mutex>>(*cacheMutex);
         }
 
-        std::string cachePath = path;
-        std::string cacheInfo = cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
-        if (std::filesystem::exists(cacheInfo)) {
-            LOGW("[NNCompiler] cache file is failed, fail to delete cache file.");
-            std::filesystem::remove_all(cacheInfo);
-        }
-    }
+        // cache存在，从cache直接复原prepareModel、input/output TensorDesc
+        ret = RestoreFromCacheFile();
+        if (ret == OH_NN_INVALID_FILE) {
+            char path[PATH_MAX];
+            if (realpath(m_cachePath.c_str(), path) == nullptr) {
+                LOGE("[NNCompiler] Build failed, fail to get the real path of cacheDir.");
+                return OH_NN_INVALID_PARAMETER;
+            }
 
-    if (ret == OH_NN_OPERATION_FORBIDDEN) {
-        LOGE("[NNCompiler] Build failed, operation is forbidden.");
-        return ret;
-    }
-    if (ret == OH_NN_SUCCESS) {
-        LOGD("[NNCompiler] Build success, restore from cache file.");
-        m_isBuild = true;
+            std::string cachePath = path;
+            std::string cacheInfo = cachePath + "/" + m_extensionConfig.modelName + "cache_info.nncache";
+            if (std::filesystem::exists(cacheInfo)) {
+                LOGW("[NNCompiler] cache file is failed, fail to delete cache file.");
+                std::error_code ec;
+                std::filesystem::remove(cacheInfo, ec);
+            }
+        }
+
+        if (ret == OH_NN_OPERATION_FORBIDDEN) {
+            LOGE("[NNCompiler] Build failed, operation is forbidden.");
+            return ret;
+        }
+        if (ret == OH_NN_SUCCESS) {
+            LOGD("[NNCompiler] Build success, restore from cache file.");
+            m_isBuild = true;
+        }
     }
 
     // cache不存在或cache restore失败，走在线构图

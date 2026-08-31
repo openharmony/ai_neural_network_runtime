@@ -22,12 +22,9 @@
 #include <unordered_map>
 #include <future>
 #include <thread>
-#include <queue>
-#include <mutex>
-#include <condition_variable>
-#include <atomic>
 #include <openssl/sha.h>
 #include <unistd.h>
+#include <fstream>
 
 #include "log.h"
 #include "executor.h"
@@ -46,68 +43,15 @@ constexpr size_t TWO = 2;
 constexpr size_t END = 1;
 constexpr unsigned char MASK = 0x0F;
 constexpr size_t CALCULATE_INVOKE_TIME = 5;
-constexpr size_t REPORT_QUEUE_MAX_SIZE = 100;
+constexpr size_t LATENCY_TICK_RATIO = 10000;     // 0.1ms
+constexpr size_t LATENCY_TICK_TO_MS = 10;
+constexpr size_t OFFLINE_MODEL_BASE_SIZE = 10 * 1024 * 1024; // 10MB
+constexpr size_t OFFLINE_MODEL_SMALL_SIZE = 1 * 1024 * 1024;  // 1MB
+constexpr size_t OFFLINE_MODEL_SIZE_DIVISOR_TINY = 1000;
+constexpr size_t OFFLINE_MODEL_SIZE_DIVISOR_SMALL = 100000;
+constexpr size_t OFFLINE_MODEL_SIZE_DIVISOR_LARGE = 1000000;
 
 namespace {
-struct RunSyncEvent {
-    size_t nnrtModelId;
-    int modelInferenceCount;
-    size_t modelInferenceTotalTime;
-};
-
-std::queue<RunSyncEvent> g_reportQueue;
-std::mutex g_reportMutex;
-std::condition_variable g_reportCv;
-std::atomic<bool> g_stopReportThread {false};
-
-void ReportThreadLoop()
-{
-    while (true) {
-        RunSyncEvent event;
-        {
-            std::unique_lock<std::mutex> lock(g_reportMutex);
-            g_reportCv.wait(lock, [] {return !g_reportQueue.empty() || g_stopReportThread.load(); });
-            if (g_stopReportThread.load() && g_reportQueue.empty()) {
-                break;
-            }
-            if (g_reportQueue.empty()) {
-                continue;
-            }
-            event = g_reportQueue.front();
-            g_reportQueue.pop();
-        }
-        NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
-        if (!nnrtService.IsServiceAvaliable()) {
-            LOGW("ReportThreadLoop nnrt service unavailable, skip report.");
-            continue;
-        }
-        if (nnrtService.RunSyncReport == nullptr) {
-            LOGW("ReportThreadLoop RunSyncReport func is nullptr");
-            continue;
-        }
-        int ret = nnrtService.RunSyncReport(event.nnrtModelId, event.modelInferenceCount,
-            event.modelInferenceTotalTime);
-        if (ret != static_cast<int>(OH_NN_SUCCESS)) {
-            LOGW("ReportThreadLoop RunSyncReport failed");
-        }
-    }
-}
-
-std::thread g_reportThread(ReportThreadLoop);
-class ReportThreadGuard {
-public:
-    ~ReportThreadGuard()
-    {
-        g_stopReportThread.store(true);
-        g_reportCv.notify_one();
-        if (g_reportThread.joinable()) {
-            g_reportThread.join();
-        }
-    }
-};
-
-static ReportThreadGuard g_reportThreadGuard;
-
 std::string Sha256(const std::vector<void*>& dataList, const std::vector<size_t>& sizeList, bool isUpper)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH * TWO + END] = "";
@@ -155,6 +99,23 @@ std::string GetBufferId(const void* buffer, size_t size)
     return Sha256(dataList, sizeList, false);
 }
 
+std::string GetProcessNameByPid(int32_t pid)
+{
+    std::string filePath = "/proc/" + std::to_string(pid) + "/comm";
+    char tmpPath[PATH_MAX] = { 0 };
+    if (!realpath(filePath.c_str(), tmpPath)) {
+        return "UNKNOWN";
+    }
+    std::ifstream infile(filePath);
+    if (!infile.is_open()) {
+        return "UNKNOWN";
+    }
+    std::string processName = "UNKNOWN";
+    std::getline(infile, processName);
+    infile.close();
+    return processName;
+}
+
 OH_NN_ReturnCode GetNnrtModelId(Compilation* compilationImpl)
 {
     // 模型在线构图场景获取modelID
@@ -185,8 +146,18 @@ OH_NN_ReturnCode GetNnrtModelId(Compilation* compilationImpl)
     // omc buffer加载场景获取modelID
     if ((compilationImpl->offlineModelBuffer.first != nullptr) &&
         (compilationImpl->offlineModelBuffer.second != size_t(0))) {
-        std::string bufferSha = GetBufferId(compilationImpl->offlineModelBuffer.first,
-            compilationImpl->offlineModelBuffer.second);
+        int32_t clientPid = static_cast<int32_t>(getpid());
+        std::string processName = GetProcessNameByPid(clientPid);
+        size_t bufferSize = compilationImpl->offlineModelBuffer.second;
+        size_t normalizedSize;
+        if (bufferSize < OFFLINE_MODEL_SMALL_SIZE) {
+            normalizedSize = bufferSize / OFFLINE_MODEL_SIZE_DIVISOR_TINY;
+        } else if (bufferSize < OFFLINE_MODEL_BASE_SIZE) {
+            normalizedSize = bufferSize / OFFLINE_MODEL_SIZE_DIVISOR_SMALL;
+        } else {
+            normalizedSize = bufferSize / OFFLINE_MODEL_SIZE_DIVISOR_LARGE;
+        }
+        std::string bufferSha = processName + "_" + std::to_string(normalizedSize);
         compilationImpl->nnrtModelID = std::hash<std::string>{}(bufferSha);
         return OH_NN_SUCCESS;
     }
@@ -332,6 +303,10 @@ OH_NN_ReturnCode ScheduleModel(Compilation* compilationImpl)
         isModelBuffer = true;
     }
 
+    if (compilationImpl->compiler == nullptr) {
+        return OH_NN_INVALID_PARAMETER;
+    }
+
     bool isOnlineModel = compilationImpl->compiler->IsOnlineModel();
     std::string modelType = isOnlineModel ? "online" : "offline";
     size_t modelId = isOnlineModel ? compilationImpl->compiler->GetLiteGraphModelId() : compilationImpl->nnrtModelID;
@@ -341,7 +316,6 @@ OH_NN_ReturnCode ScheduleModel(Compilation* compilationImpl)
         compilationImpl->modelSize, isModelBuffer, modelId, modelType};
     ret = nnrtService.Scheduling(schedulingInfo);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
-        LOGE("Scheduling failed, some error happened when scheduling.");
         return static_cast<OH_NN_ReturnCode>(ret);
     }
 
@@ -1611,8 +1585,7 @@ NNRT_API OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation)
     return executor;
 }
 
-OH_NN_ReturnCode Unload(const ExecutorConfig* config, size_t modelId, int modelInferenceCount,
-    size_t modelInferenceTotalTime)
+OH_NN_ReturnCode Unload(const ExecutorConfig* config)
 {
     if (config == nullptr) {
         LOGE("Unload failed, config is nullptr.");
@@ -1630,7 +1603,7 @@ OH_NN_ReturnCode Unload(const ExecutorConfig* config, size_t modelId, int modelI
         return OH_NN_INVALID_PARAMETER;
     }
 
-    int ret = nnrtService.Unload(config->hiaiModelId, modelId, modelInferenceCount, modelInferenceTotalTime);
+    int ret = nnrtService.Unload(config->hiaiModelId);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         LOGE("Unload failed, some error happen when unload hiaiModelId.");
         return static_cast<OH_NN_ReturnCode>(ret);
@@ -1660,8 +1633,7 @@ NNRT_API void OH_NNExecutor_Destroy(OH_NNExecutor **executor)
         return;
     }
 
-    OH_NN_ReturnCode ret = Unload(executorImpl->GetExecutorConfig(), executorImpl->nnrtModelId,
-        executorImpl->modelInferenceCount, executorImpl->modelInferenceTotalTime);
+    OH_NN_ReturnCode ret = Unload(executorImpl->GetExecutorConfig());
     if (ret != OH_NN_SUCCESS) {
         LOGE("Unload failed, some error happened when unload nnrt service.");
     }
@@ -1860,7 +1832,7 @@ OH_NN_ReturnCode RunSync(Executor *executor,
 
     long timeStart = 0;
     if (configPtr->isNeedModelLatency || executor->modelInferenceCount % CALCULATE_INVOKE_TIME == 0) {
-        timeStart = std::chrono::duration_cast<std::chrono::milliseconds>(
+        timeStart = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
             std::chrono::system_clock::now().time_since_epoch()).count();
     }
 
@@ -1872,26 +1844,23 @@ OH_NN_ReturnCode RunSync(Executor *executor,
 
     int32_t modelLatency = 0;
     if (configPtr->isNeedModelLatency || executor->modelInferenceCount % CALCULATE_INVOKE_TIME == 0) {
-        long timeEnd = std::chrono::duration_cast<std::chrono::milliseconds>(
+        long timeEnd = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
             std::chrono::system_clock::now().time_since_epoch()).count();
-        modelLatency = static_cast<int32_t>((timeEnd - timeStart));
-    }
-
-    if (executor->modelInferenceCount % CALCULATE_INVOKE_TIME == 0) {
-        executor->tempLatencyAccumulator = modelLatency;
+        long timeDiff = timeEnd - timeStart;
+        modelLatency = static_cast<int32_t>((timeDiff / LATENCY_TICK_TO_MS));
+        executor->tempLatencyAccumulator = static_cast<int32_t>(timeDiff);
     }
 
     executor->modelInferenceCount++;
     executor->modelInferenceTotalTime += static_cast<size_t>(executor->tempLatencyAccumulator);
 
-    {
-        std::lock_guard<std::mutex> lock(g_reportMutex);
-        if (g_reportQueue.size() < REPORT_QUEUE_MAX_SIZE) {
-            g_reportQueue.push({executor->nnrtModelId, executor->modelInferenceCount,
-                executor->modelInferenceTotalTime});
+    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+    if ((nnrtService.IsServiceAvaliable) && (nnrtService.RunSyncReport != nullptr)) {
+        int ret = nnrtService.RunSyncReport(executor->nnrtModelId, 1, executor->tempLatencyAccumulator);
+        if (ret != static_cast<int>(OH_NN_SUCCESS)) {
+            LOGW("RunSyncReport failed.");
         }
     }
-    g_reportCv.notify_one();
 
     if (configPtr->isNeedModelLatency) {
         std::thread t(UpdateModelLatency, configPtr, modelLatency);

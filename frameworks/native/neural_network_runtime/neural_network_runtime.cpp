@@ -28,11 +28,13 @@
 #include <cstring>
 #include <fstream>
 #include <filesystem>
+#include <memory>
 #include <thread>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "nlohmann/json.hpp"
 #include "securec.h"
+#include "nncompiled_cache.h"
 
 using namespace OHOS::NeuralNetworkRuntime;
 
@@ -54,6 +56,7 @@ const std::string NNRT_DEVICE_NAME = "const.ai.nnrt_deivce";
 const std::string HARDWARE_NAME = "ohos.boot.hardware";
 const std::string HARDWARE_VERSION = "v5_0";
 const std::string SUPPORT_AIPP_DEVICE = "K6012";
+
 constexpr size_t HARDWARE_NAME_MAX_LENGTH = 128;
 constexpr size_t FILE_NUMBER_MAX = 100; // 限制cache文件数量最大为100
 constexpr size_t EXTENSION_MAX_SIZE = 200; // 限制MS传过来的参数最多为200
@@ -647,7 +650,7 @@ OH_NN_ReturnCode CheckCacheFile(const std::string& cacheInfoPath, int64_t& fileN
         return OH_NN_INVALID_FILE;
     }
 
-    if (access(path, F_OK) != 0) {
+    if (access(path, F_OK | R_OK | W_OK) != 0) {
         LOGE("OH_NNModel_HasCache access cache info file failed.");
         return OH_NN_INVALID_FILE;
     }
@@ -692,7 +695,15 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, u
         return false;
     }
 
-    std::string cacheInfoPath = std::string(cacheDir) + "/" + std::string(modelName) + "cache_info.nncache";
+    std::string cacheDirStr(cacheDir);
+    std::string modelNameStr(modelName);
+    auto cacheMutex = GetCacheMutex(cacheDirStr, modelNameStr);
+    std::unique_ptr<std::lock_guard<std::mutex>> lock;
+    if (cacheMutex != nullptr) {
+        lock = std::make_unique<std::lock_guard<std::mutex>>(*cacheMutex);
+    }
+
+    std::string cacheInfoPath = cacheDirStr + "/" + modelNameStr + "cache_info.nncache";
 
     // determine whether cache info file exists
     struct stat buffer;
@@ -707,31 +718,35 @@ NNRT_API bool OH_NNModel_HasCache(const char *cacheDir, const char *modelName, u
     OH_NN_ReturnCode returnCode = CheckCacheFile(cacheInfoPath, fileNumber, cacheVersion, deviceId);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("OH_NNModel_HasCache get fileNumber or cacheVersion fail.");
-        std::filesystem::remove_all(cacheInfoPath);
+        std::error_code ec;
+        std::filesystem::remove(cacheInfoPath, ec);
         return false;
     }
 
     returnCode = CheckDeviceId(deviceId);
     if (returnCode != OH_NN_SUCCESS) {
         LOGE("OH_NNModel_HasCache check deviceId fail.");
-        std::filesystem::remove_all(cacheInfoPath);
+        std::error_code ec;
+        std::filesystem::remove(cacheInfoPath, ec);
         return false;
     }
 
     if (fileNumber <= 0 || static_cast<size_t>(fileNumber) > FILE_NUMBER_MAX) {
         LOGE("OH_NNModel_HasCache fileNumber is invalid or more than 100");
-        std::filesystem::remove_all(cacheInfoPath);
+        std::error_code ec;
+        std::filesystem::remove(cacheInfoPath, ec);
         return false;
     }
 
     // determine whether cache model files exist
     for (int64_t i = 0; i < fileNumber; ++i) {
         std::string cacheModelPath =
-            std::string(cacheDir) + "/" + std::string(modelName) + std::to_string(i) + ".nncache";
+            cacheDirStr + "/" + modelNameStr + std::to_string(i) + ".nncache";
         exist = (exist && (stat(cacheModelPath.c_str(), &buffer) == 0));
         if (!exist) {
             LOGE("OH_NNModel_HasCache cacheModelPath is not existed.");
-            std::filesystem::remove_all(cacheInfoPath);
+            std::error_code ec;
+            std::filesystem::remove(cacheInfoPath, ec);
             return false;
         }
     }
