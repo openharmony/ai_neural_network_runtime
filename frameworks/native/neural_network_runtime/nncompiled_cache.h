@@ -19,6 +19,8 @@
 #include <vector>
 #include <fstream>
 #include <memory>
+#include <mutex>
+#include <unordered_map>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -44,6 +46,9 @@ struct NNCompiledCacheInfo {
     int64_t isExceedRamLimit{0};
     size_t liteGraphModelId{0};
 };
+
+// 按 cacheDir + modelName 粒度的全局缓存锁，跨编译单元共享
+std::shared_ptr<std::mutex> GetCacheMutex(const std::string& cacheDir, const std::string& modelName);
 
 class NNCompiledCache {
 public:

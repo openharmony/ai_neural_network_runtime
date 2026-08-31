@@ -28,6 +28,26 @@
 
 namespace OHOS {
 namespace NeuralNetworkRuntime {
+
+static std::mutex g_cacheMetaMutex;
+static std::unordered_map<std::string, std::shared_ptr<std::mutex>> g_cacheMutexMap;
+
+std::shared_ptr<std::mutex> GetCacheMutex(const std::string& cacheDir, const std::string& modelName)
+{
+    if (cacheDir.empty() || modelName.empty()) {
+        return nullptr;
+    }
+
+    std::string key = cacheDir + "/" + modelName;
+    std::lock_guard<std::mutex> metaLock(g_cacheMetaMutex);
+    auto it = g_cacheMutexMap.find(key);
+    if (it != g_cacheMutexMap.end()) {
+        return it->second;
+    }
+    auto mutexPtr = std::make_shared<std::mutex>();
+    g_cacheMutexMap[key] = mutexPtr;
+    return mutexPtr;
+}
 constexpr int32_t NULL_PTR_LENGTH = 0;
 constexpr int32_t NUMBER_CACHE_INFO_MEMBERS = 3;
 constexpr int32_t NUMBER_CACHE_INFO_EXTENSION_MEMBERS = 2;
@@ -97,7 +117,7 @@ OH_NN_ReturnCode NNCompiledCache::Restore(const std::string& cacheDir,
         LOGE("[NNCompiledCache] Restore failed, fail to get the real path of cacheInfoPath.");
         return OH_NN_INVALID_PARAMETER;
     }
-    if (access(path, F_OK) != 0) {
+    if (access(path, F_OK | R_OK | W_OK) != 0) {
         LOGE("[NNCompiledCache] Restore failed, cacheInfoPath is not exist.");
         return OH_NN_INVALID_PARAMETER;
     }
@@ -432,7 +452,7 @@ OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath
         LOGE("[NNCompiledCache] ReadCacheModelFile failed, fail to get the real path of filePath.");
         return OH_NN_INVALID_PARAMETER;
     }
-    if (access(path, 0) != 0) {
+    if (access(path, F_OK | R_OK | W_OK) != 0) {
         LOGE("[NNCompiledCache] ReadCacheModelFile failed, filePath is not exist.");
         return OH_NN_INVALID_PARAMETER;
     }
@@ -451,6 +471,11 @@ OH_NN_ReturnCode NNCompiledCache::ReadCacheModelFile(const std::string& filePath
     }
 
     off_t fsize = sb.st_size;
+    if (fsize <= 0) {
+        LOGE("[NNCompiledCache] ReadCacheModelFile failed, file:%{public}s size is invalid.", filePath.c_str());
+        close(fd);
+        return OH_NN_INVALID_FILE;
+    }
 
     void *ptr = mmap(nullptr, fsize, PROT_READ, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
