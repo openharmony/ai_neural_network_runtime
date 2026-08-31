@@ -1855,7 +1855,7 @@ OH_NN_ReturnCode RunSync(Executor *executor,
     executor->modelInferenceTotalTime += static_cast<size_t>(executor->tempLatencyAccumulator);
 
     NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
-    if ((nnrtService.IsServiceAvaliable) && (nnrtService.RunSyncReport != nullptr)) {
+    if ((nnrtService.IsServiceAvaliable()) && (nnrtService.RunSyncReport != nullptr)) {
         int ret = nnrtService.RunSyncReport(executor->nnrtModelId, 1, executor->tempLatencyAccumulator);
         if (ret != static_cast<int>(OH_NN_SUCCESS)) {
             LOGW("RunSyncReport failed.");
