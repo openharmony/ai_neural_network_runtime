@@ -23,6 +23,7 @@
         "ram": "2048KB",
         "deps": {
             "components": [
+                "bounds_checking_function",
                 "c_utils",
                 "drivers_interface_nnrt",
                 "hdf_core",

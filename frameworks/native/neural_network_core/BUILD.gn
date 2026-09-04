@@ -57,6 +57,7 @@ ohos_shared_library("libneural_network_core") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "hilog:libhilog",
     "openssl:libcrypto_shared",
