@@ -213,6 +213,17 @@ OH_NN_ReturnCode GetModelSize(const Compilation* compilation, size_t& modelSize)
     // omc路径加载场景获取modelSize
     if (compilation->offlineModelPath != nullptr) {
         modelSize = compilation->compiler->GetModelSize();
+    #ifdef NNRT_CAR
+        if (modelSize == 0) {
+            struct stat buffer;
+            if (stat(compilation->offlineModel, &buffer) != 0) {
+                LOGE("GetModelSize failed, offline model path is invalid or permission");
+                return OH_NN_INVALID_PARAMETER;
+            }
+            modelSize = static_cast<size_t>(buffer.st_size);
+            LOGI("GetModelSize: vendor returns 0, fallback to file size %{public}zu", modelSize);
+        }
+    #endif
         return OH_NN_SUCCESS;
     }
 
@@ -262,7 +273,33 @@ void AddSessionId(Executor *executorImpl)
     }
 }
 
-OH_NN_ReturnCode ScheduleModel(Compilation* compilationImpl, size_t createExecutorLatency)
+#ifdef NNRT_CAR
+static bool CarScheduleModel(Compilation* compilationImpl, const std::string& cachePath)
+{
+    NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
+    if (nnrtService.SchedulingExt != nullptr) {
+        return false;
+    }
+    constexpr const char* KEY_HIAI_MODEL_ID = "$HiaiModelId";
+    constexpr const char* KEY_CACHE_PATH = "$CachePath";
+    std::unorder_map<std::string, std::vector<char>> extConfigs;
+    extConfigs.insert(compilationImpl->configs.begin(), compilationImpl->config.end());
+    const std::string idStr = std::to_string(compilationImpl->hiaiModelId);
+    extConfigs[KEY_HIAI_MODEL_ID] = std::vector<char>(idStr.begin(), idStr.end());
+    if (!cachePath.empty()) {
+        extConfigs[KEY_CACHE_PATH] = std::vector<char>(cachePath.begin(), cachePath.end());
+    }
+    LOGI("SchedulingExt trigger: hiaiModelId=%{public}u, configCount=%{public}zu",
+        compilationImpl->hiaiModelId, extConfigs.size());
+    int extRet = nnrtService.SchedulingExt(extConfigs);
+    if (extRet != static_cast<int>(OH_NN_SUCCESS)) {
+        LOGE("SchedulingExt failed with exception:%{public}s", extRet);
+    }
+    return true;
+}
+#endif
+
+OH_NN_ReturnCode ScheduleModel(Compilation* compilationImpl)
 {
     NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
     if (!nnrtService.IsServiceAvaliable()) {
@@ -279,6 +316,12 @@ OH_NN_ReturnCode ScheduleModel(Compilation* compilationImpl, size_t createExecut
     if (compilationImpl->cachePath != nullptr) {
         cachePath = compilationImpl->cachePath;
     }
+
+#ifdef NNRT_CAR
+    if (CarScheduleModel(compilationImpl, cachePath)) {
+        return OH_NN_SUCCESS;
+    }
+#endif
 
     bool supportStat = false;
     int ret = nnrtService.IsSupportScheduling(&supportStat);
@@ -314,7 +357,7 @@ OH_NN_ReturnCode ScheduleModel(Compilation* compilationImpl, size_t createExecut
     bool needModelLatency = false;
     SchedulingInfo schedulingInfo = {compilationImpl->hiaiModelId, &needModelLatency, cachePath.c_str(),
         compilationImpl->modelSize, isModelBuffer, modelId, modelType};
-    ret = nnrtService.Scheduling(schedulingInfo, createExecutorLatency);
+    ret = nnrtService.Scheduling(schedulingInfo);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         return static_cast<OH_NN_ReturnCode>(ret);
     }
@@ -955,29 +998,16 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation)
         return OH_NN_OPERATION_FORBIDDEN;
     }
 
-    long timeStart = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
     ret = compilationImpl->compiler->Build();
     if (ret != OH_NN_SUCCESS) {
         LOGE("OH_NNCompilation_Build failed, fail to build compilation.");
         return ret;
     }
 
-    long timeEnd = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
-    long timeDiff = timeEnd - timeStart;
-
     ret = GetModelId(&compilationImpl);
     if (ret != OH_NN_SUCCESS) {
         LOGE("OH_NNCompilation_Build failed, fail to get modelId.");
         return ret;
-    }
-
-    bool isOnlineModel = compilationImpl->compiler->IsOnlineModel();
-    size_t nnrtModelId =
-        isOnlineModel ? compilationImpl->compiler->GetLiteGraphModelId() : compilationImpl->nnrtModelID;
-    if ((nnrtService.IsServiceAvaliable()) && (nnrtService.SaveBuildLatency != nullptr)) {
-        nnrtService.SaveBuildLatency(nnrtModelId, static_cast<size_t>(timeDiff));
     }
 
     return OH_NN_SUCCESS;
@@ -1441,7 +1471,7 @@ NNRT_API OH_NN_ReturnCode OH_NNTensor_GetOffset(const NN_Tensor *tensor, size_t 
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode Scheduling(Compilation** compilation, size_t createExecutorLatency)
+OH_NN_ReturnCode Scheduling(Compilation** compilation)
 {
     if (compilation == nullptr) {
         LOGE("Scheduling failed, compilation is nullptr.");
@@ -1454,7 +1484,7 @@ OH_NN_ReturnCode Scheduling(Compilation** compilation, size_t createExecutorLate
         return OH_NN_INVALID_PARAMETER;
     }
 
-    OH_NN_ReturnCode ret = ScheduleModel(compilationImpl, createExecutorLatency);
+    OH_NN_ReturnCode ret = ScheduleModel(compilationImpl);
     if (ret != OH_NN_SUCCESS) {
         LOGE("Scheduling failed, fail to schedule model.");
         return ret;
@@ -1491,7 +1521,7 @@ OH_NN_ReturnCode SetModelId(const Compilation* compilation)
     return OH_NN_SUCCESS;
 }
 
-OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation, size_t createExecutorLatency)
+OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation)
 {
     if (executor == nullptr) {
         LOGE("ExecutorPrepare failed, executor is nullptr.");
@@ -1521,7 +1551,7 @@ OH_NN_ReturnCode ExecutorPrepare(Executor** executor, Compilation** compilation,
         return ret;
     }
 
-    ret = Scheduling(&compilationImpl, createExecutorLatency);
+    ret = Scheduling(&compilationImpl);
     if (ret != OH_NN_SUCCESS) {
         LOGE("ExecutorPrepare failed, failed to create executor.");
         return ret;
@@ -1568,16 +1598,11 @@ NNRT_API OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation)
         return nullptr;
     }
 
-    long timeStart = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
     Executor* executorImpl = backend->CreateExecutor(compilationImpl);
     if (executorImpl == nullptr) {
         LOGE("OH_NNExecutor_Construct failed, failed to create executor.");
         return nullptr;
     }
-    long timeEnd = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
-    long timeDiff = timeEnd - timeStart;
 
     OH_NN_ReturnCode ret = executorImpl->GetModelID(compilationImpl->hiaiModelId);
     if (ret != OH_NN_SUCCESS) {
@@ -1592,7 +1617,7 @@ NNRT_API OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation)
             isOnlineModel ? compilationImpl->compiler->GetLiteGraphModelId() : compilationImpl->nnrtModelID;
     }
 
-    ret = ExecutorPrepare(&executorImpl, &compilationImpl, static_cast<size_t>(timeDiff));
+    ret = ExecutorPrepare(&executorImpl, &compilationImpl);
     if (ret != OH_NN_SUCCESS) {
         LOGE("OH_NNExecutor_Construct failed, failed to prepare executor.");
         OH_NNExecutor_Destroy(reinterpret_cast<OH_NNExecutor **>(&executorImpl));
