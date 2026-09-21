@@ -50,6 +50,7 @@ struct Buffer {
 struct ExtensionConfig {
     Buffer quantBuffer;
     std::string modelName;
+    std::string nodename;
     std::string isProfiling;
     std::map<std::string, std::string> opLayout;
     TuningStrategy tuningStrategy{TuningStrategy::OFF};
