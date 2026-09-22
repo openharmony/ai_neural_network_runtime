@@ -50,6 +50,7 @@ struct Buffer {
 struct ExtensionConfig {
     Buffer quantBuffer;
     std::string modelName;
+    std::string nodeName;
     std::string isProfiling;
     std::map<std::string, std::string> opLayout;
     TuningStrategy tuningStrategy{TuningStrategy::OFF};
@@ -92,6 +93,8 @@ struct SchedulingInfo {
     bool isModelBuffer;
     size_t nnrtModelId;
     std::string modelType;
+    std::string modelName;
+    std::string nodeName;
 };
 } // NeuralNetworkRuntime
 } // OHOS

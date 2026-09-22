@@ -262,6 +262,16 @@ void AddSessionId(Executor *executorImpl)
     }
 }
 
+static std::string GetExtConfigValue(const std::unordered_map<std::string, std::vector<char>>& configs,
+    const std::string& key)
+{
+    auto iter = configs.find(key);
+    if (iter == configs.end()) {
+        return "";
+    }
+    return std::string(iter->second.data(), iter->second.size());
+}
+
 OH_NN_ReturnCode ScheduleModel(Compilation* compilationImpl, size_t createExecutorLatency)
 {
     NNRtServiceApi& nnrtService = NNRtServiceApi::GetInstance();
@@ -313,7 +323,9 @@ OH_NN_ReturnCode ScheduleModel(Compilation* compilationImpl, size_t createExecut
 
     bool needModelLatency = false;
     SchedulingInfo schedulingInfo = {compilationImpl->hiaiModelId, &needModelLatency, cachePath.c_str(),
-        compilationImpl->modelSize, isModelBuffer, modelId, modelType};
+        compilationImpl->modelSize, isModelBuffer, modelId, modelType,
+        GetExtConfigValue(compilationImpl->configs, "ModelName"),
+        GetExtConfigValue(compilationImpl->configs, "NodeName")};
     ret = nnrtService.Scheduling(schedulingInfo, createExecutorLatency);
     if (ret != static_cast<int>(OH_NN_SUCCESS)) {
         return static_cast<OH_NN_ReturnCode>(ret);
