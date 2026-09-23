@@ -968,7 +968,7 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation)
     }
 
     long timeStart = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
+        std::chrono::steady_clock::now().time_since_epoch()).count();
     ret = compilationImpl->compiler->Build();
     if (ret != OH_NN_SUCCESS) {
         LOGE("OH_NNCompilation_Build failed, fail to build compilation.");
@@ -976,8 +976,11 @@ NNRT_API OH_NN_ReturnCode OH_NNCompilation_Build(OH_NNCompilation *compilation)
     }
 
     long timeEnd = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
+        std::chrono::steady_clock::now().time_since_epoch()).count();
     long timeDiff = timeEnd - timeStart;
+    if (timeDiff < 0) {
+        timeDiff = 0;
+    }
 
     ret = GetModelId(&compilationImpl);
     if (ret != OH_NN_SUCCESS) {
@@ -1581,15 +1584,18 @@ NNRT_API OH_NNExecutor *OH_NNExecutor_Construct(OH_NNCompilation *compilation)
     }
 
     long timeStart = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
+        std::chrono::steady_clock::now().time_since_epoch()).count();
     Executor* executorImpl = backend->CreateExecutor(compilationImpl);
     if (executorImpl == nullptr) {
         LOGE("OH_NNExecutor_Construct failed, failed to create executor.");
         return nullptr;
     }
     long timeEnd = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
+        std::chrono::steady_clock::now().time_since_epoch()).count();
     long timeDiff = timeEnd - timeStart;
+    if (timeDiff < 0) {
+        timeDiff = 0;
+    }
 
     OH_NN_ReturnCode ret = executorImpl->GetModelID(compilationImpl->hiaiModelId);
     if (ret != OH_NN_SUCCESS) {
