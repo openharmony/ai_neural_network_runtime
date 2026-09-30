@@ -1869,7 +1869,7 @@ OH_NN_ReturnCode RunSync(Executor *executor,
     long timeStart = 0;
     if (configPtr->isNeedModelLatency || executor->modelInferenceCount % CALCULATE_INVOKE_TIME == 0) {
         timeStart = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
-            std::chrono::system_clock::now().time_since_epoch()).count();
+            std::chrono::steady_clock::now().time_since_epoch()).count();
     }
 
     OH_NN_ReturnCode ret = executor->RunSync(inputTensor, inputCount, outputTensor, outputCount);
@@ -1881,8 +1881,11 @@ OH_NN_ReturnCode RunSync(Executor *executor,
     int32_t modelLatency = 0;
     if (configPtr->isNeedModelLatency || executor->modelInferenceCount % CALCULATE_INVOKE_TIME == 0) {
         long timeEnd = std::chrono::duration_cast<std::chrono::duration<long, std::ratio<1, LATENCY_TICK_RATIO>>>(
-            std::chrono::system_clock::now().time_since_epoch()).count();
+            std::chrono::steady_clock::now().time_since_epoch()).count();
         long timeDiff = timeEnd - timeStart;
+        if (timeDiff < 0) {
+            timeDiff = 0;
+        }
         modelLatency = static_cast<int32_t>((timeDiff / LATENCY_TICK_TO_MS));
         executor->tempLatencyAccumulator = static_cast<int32_t>(timeDiff);
     }
